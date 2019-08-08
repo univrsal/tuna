@@ -6,39 +6,35 @@
  */
 #include <stdint.h>
 
-enum class capability {
-    TITLE = 1 << 0,			/* Song title				*/
-    ARTIST = 1 << 1,		/* Song artitst				*/
-    ALBUM = 1 << 2,			/* Album name				*/
-    RELEASE = 1 << 3,		/* Release date 			*/
-    COVER = 1 << 4,			/* Cover image link			*/
-    LYRICS = 1 << 5,		/* Lyrics text link 		*/
-    LENGTH = 1 << 6,		/* Get song length in ms	*/
+enum capability {
+    CAP_TITLE = 1 << 0,			/* Song title				*/
+    CAP_ARTIST = 1 << 1,		/* Song artitst				*/
+    CAP_ALBUM = 1 << 2,			/* Album name				*/
+    CAP_RELEASE = 1 << 3,		/* Release date 			*/
+    CAP_COVER = 1 << 4,			/* Cover image link			*/
+    CAP_LYRICS = 1 << 5,		/* Lyrics text link 		*/
+    CAP_LENGTH = 1 << 6,		/* Get song length in ms	*/
 
     /* Control stuff */
-    NEXT_SONG = 1 << 7,		/* Skip to next song		*/
-    PREV_SONG = 1 << 8,		/* Go to previous song		*/
-    PLAY_PAUSE = 1 << 9,	/* Toggle play/pause		*/
-    VOLUME_UP = 1 << 10,	/* Increase volume			*/
-    VOLUME_DOWN = 1 << 11,	/* Decrease volume			*/
-    VOLUME_MUTE = 1 << 12,	/* Toggle mute				*/
+    CAP_NEXT_SONG = 1 << 7,		/* Skip to next song		*/
+    CAP_PREV_SONG = 1 << 8,		/* Go to previous song		*/
+    CAP_PLAY_PAUSE = 1 << 9,	/* Toggle play/pause		*/
+    CAP_VOLUME_UP = 1 << 10,	/* Increase volume			*/
+    CAP_VOLUME_DOWN = 1 << 11,	/* Decrease volume			*/
+    CAP_VOLUME_MUTE = 1 << 12,	/* Toggle mute				*/
 
     /* Additional info */
-    PROGRESS = 1 << 13,		/* Get play progress in ms	*/
-    STATUS = 1 << 14		/* Get song playing satus	*/
+    CAP_PROGRESS = 1 << 13,		/* Get play progress in ms	*/
+    CAP_STATUS = 1 << 14		/* Get song playing satus	*/
 };
 
 class music_source
 {
+protected:
     uint16_t m_capabilities = 0x0;
-    const char* m_name_key; /* Translation key */
     bool m_enabled; 		/* Wether this source can be used */
 public:
-    music_source(const char* name)
-    {
-        m_name_key = name;
-    }
-
+    music_source() = default;
     virtual ~music_source() {}
 
     /* util */

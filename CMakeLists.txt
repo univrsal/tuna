@@ -35,6 +35,7 @@ set(tuna_sources
     ./src/util/constants.hpp
     ./src/util/config.cpp
     ./src/util/config.hpp
+    ./src/util/creds.hpp
     ./src/gui/tuna_gui.cpp
     ./src/gui/tuna_gui.hpp
     ./src/query/music_source.hpp
@@ -45,6 +46,12 @@ add_library(tuna MODULE
     ${tuna_sources}
     ${tuna_ui}
     ${tuna_platform_sources})
+
+include_directories(
+        SYSTEM "${CMAKE_SOURCE_DIR}/libobs"
+        "../../UI/obs-frontend-api"
+        ${Qt5Core_INCLUDES}
+        ${Qt5Widgets_INCLUDES})
 
 target_link_libraries(tuna
     libobs

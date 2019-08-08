@@ -5,58 +5,43 @@
  * github.com/univrsal/tuna
  */
 #include "config.hpp"
+#include "../query/spotify_source.hpp"
+
 #include <util/config-file.h>
 #include <obs-module.h>
+#include <obs-frontend-api.h>
 
 namespace config
 {
     config_t* instance = nullptr;
 
+    spotify_source* spotify = nullptr;
     void init_default()
     {
         const char* path_song_file = obs_module_file("song.txt");
         const char* path_cover_art = obs_get_module_data_path(obs_current_module());
 
-        config_set_default_string(instance, CFG_REGION_BASICS, CFG_SONG_PATH,
+        config_set_default_string(instance, CFG_REGION, CFG_SONG_PATH,
                                   path_song_file);
-        config_set_default_string(instance, CFG_REGION_BASICS, CFG_COVER_PATH,
+        config_set_default_string(instance, CFG_REGION, CFG_COVER_PATH,
                                   path_cover_art);
 
         /* Source states */
-        config_set_default_bool(instance, CFG_REGION_SOURCES,
+        config_set_default_bool(instance, CFG_REGION,
                                 CFG_SPOTIFY_ENABLED, true);
-        config_set_default_bool(instance, CFG_REGION_SOURCES,
+        config_set_default_bool(instance, CFG_REGION,
                                 CFG_MPD_ENABLED, true);
-        config_set_default_bool(instance, CFG_REGION_SOURCES,
+        config_set_default_bool(instance, CFG_REGION,
                                 CFG_WINDOW_TITLE_ENABLED, true);
     }
 
-    bool load(const char* path)
+    void load()
     {
-        int result = config_open(&instance, path, CONFIG_OPEN_ALWAYS);
+        instance = obs_frontend_get_global_config();
+        init_default();
 
-        if (result == CONFIG_SUCCESS) {
-            return true;
-        } else if (result == CONFIG_FILENOTFOUND || result == CONFIG_ERROR) {
-            blog(LOG_ERROR, "[tuna] couldn't load config file!");
-            return false;
-        }
-        return result == CONFIG_SUCCESS;
-    }
+        spotify = new spotify_source;
 
-    bool save() {
-        int result = config_save(instance);
-        if (result == CONFIG_SUCCESS) {
-            return true;
-        } else if (result == CONFIG_FILENOTFOUND || result == CONFIG_ERROR) {
-            blog(LOG_ERROR, "[tuna] couldn't load config file!");
-            return false;
-        }
-        return result == CONFIG_SUCCESS;
-    }
-
-    void close() {
-        save();
-        config_close(instance);
+        spotify->load();
     }
 }

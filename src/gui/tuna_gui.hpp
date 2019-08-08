@@ -28,8 +28,23 @@ class tuna_gui : public QDialog
 public:
     explicit tuna_gui(QWidget *parent = nullptr);
     ~tuna_gui();
+    void toggleShowHide();
+
+private slots:
+    void on_btn_sp_show_auth_pressed();
+
+    void on_btn_sp_show_auth_released();
+
+    void on_btn_open_login_clicked();
+
+    void on_txt_auth_code_textChanged(const QString &arg1);
+
+    void on_btn_request_token_clicked();
+
+    void on_btn_performrefresh_clicked();
 
 private:
     Ui::tuna_gui *ui;
 };
 
+extern tuna_gui* tuna_dialog;

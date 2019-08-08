@@ -9,7 +9,10 @@
 
 #define S_PLUGIN_ID			"tuna"
 
-#define _T(s)				obs_module_text(s)
-#define T_SPOTIFY_SOURCE	_T("tuna.spotify_source")
-
 /* Translation */
+
+#define _T(s)				obs_module_text(s)
+#define T_MENU_TUNA			_T("tuna.gui.menu")
+#define T_SPOTIFY_LOGGEDIN	_T("tuna.gui.tab.spotify.loggedin")
+#define T_SPOTIFY_LOGGEDOUT _T("tuna.gui.tab.spotify.loggedout")
+#define T_SPOTIFY_WARNING	_T("tuna.gui.tab.spotify.linkmessage")
