@@ -48,6 +48,7 @@ public:
     /* Abstract stuff */
 
     virtual void load() = 0;
+    virtual void save() = 0;
     /* Perform information query */
     virtual void refresh() = 0;
 

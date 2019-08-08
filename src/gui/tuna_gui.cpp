@@ -92,13 +92,17 @@ void tuna_gui::on_txt_auth_code_textChanged(const QString &arg1)
 
 void tuna_gui::on_btn_request_token_clicked()
 {
-    config::spotify->set_auth_code(ui->txt_auth_code->text());
+    config::spotify->set_auth_code(ui->txt_auth_code->text().toStdString());
     bool result = config::spotify->new_token();
     ui->btn_performrefresh->setEnabled(result);
 
     if (result) {
-        ui->txt_token->setText(config::spotify->token());
-        ui->txt_refresh_token->setText(config::spotify->refresh_token());
+        ui->txt_token->setText(QString::fromStdString(config::spotify->token()));
+        ui->txt_refresh_token->setText(QString::fromStdString(config::spotify->refresh_token()));
+        ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
+        ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
+                                          "font-weight: bold;}");
+        config::spotify->save();
     }
 }
 

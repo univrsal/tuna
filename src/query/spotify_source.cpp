@@ -7,9 +7,9 @@
 #include <string>
 #include <QString>
 #include <util/config-file.h>
+#include <util/platform.h>
 #include <curl/curl.h>
 #include <jansson.h>
-#include <util/platform.h>
 #include "spotify_source.hpp"
 #include "../util/creds.hpp"
 #include "../util/constants.hpp"
@@ -52,6 +52,8 @@ void spotify_source::load()
                                   CFG_SPOTIFY_LOGGEDIN);
     m_token = config_get_string(config::instance, CFG_REGION,
                                 CFG_SPOTIFY_TOKEN);
+    m_token = config_get_string(config::instance, CFG_REGION,
+                                CFG_SPOTIFY_REFRESH_TOKEN);
     m_auth_code = config_get_string(config::instance, CFG_REGION,
                                     CFG_SPOTIFY_AUTH_CODE);
     m_token_termination = config_get_uint(config::instance, CFG_REGION,
@@ -67,6 +69,22 @@ void spotify_source::load()
     }
 }
 
+void spotify_source::save()
+{
+    config_set_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN,
+                    m_logged_in);
+    config_set_bool(config::instance, CFG_REGION, CFG_SPOTIFY_ENABLED,
+                    m_enabled);
+    config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN,
+                      m_token.c_str());
+    config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_AUTH_CODE,
+                      m_auth_code.c_str());
+    config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_REFRESH_TOKEN,
+                      m_refresh_token.c_str());
+    config_set_uint(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN_TERMINATION,
+                    m_token_termination);
+
+}
 void spotify_source::refresh()
 {
     if (m_logged_in) {
@@ -93,7 +111,9 @@ bool spotify_source::execute_capability(capability c)
         break;
         default:;
     }
+    return result;
 }
+
 /* === CURL/Spotify API handling === */
 
 size_t write_function(void *ptr, size_t size, size_t nmemb, std::string* str)
@@ -109,84 +129,56 @@ size_t write_function(void *ptr, size_t size, size_t nmemb, std::string* str)
     return new_length;
 }
 
-/* Requests an access token via an auth code
- * over a POST request to spotify */
-bool spotify_source::request_token(const char* grant_type, const char* code_id,
-                                   const char* code)
+CURL* prepare_curl(struct curl_slist* header, std::string* response, const char* request)
 {
-    if (!valid(grant_type) || !valid(code) || !valid(code_id)
-            || m_creds.length() < 1) {
-        blog(LOG_ERROR, "[tuna] Cannot request token without valid credentials"
-                        " and/or auth code!");
-        return false;
-    }
-
     CURL* curl = curl_easy_init();
-    std::string response;
-
-    /* Header text */
-    QString request = "Authorization: Basic ";
-    request.append(m_creds);
-    auto* list = curl_slist_append(nullptr, qPrintable(request));
-
-    /* Request body */
-    json_error_t error;
-    json_t* body = json_pack_ex(&error, 0, "{ssssss}",
-                             "grand_type", grant_type,
-                             code_id, code,
-                             "redirect_uri", REDIRECT_URI);
-
-    if (!body) {
-        blog(LOG_ERROR, "Error while packing json request body: %s",
-             error.text);
-        curl_easy_cleanup(curl);
-        json_decref(body);
-        return false;
-    }
-    char* json_text = json_dumps(body, 0);
-
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, TOKEN_URL);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(json_text));
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_text);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(request));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
 #ifdef DEBUG
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 #endif
+    return curl;
+}
 
+/* Requests an access token via request body
+ * over a POST request to spotify */
+json_t* request_token(const char* request, const char* credentials)
+{
+    if (!valid(request) || !valid(credentials)) {
+        blog(LOG_ERROR, "[tuna] Cannot request token without valid credentials"
+                        " and/or auth code!");
+        return nullptr;
+    }
+
+    std::string response;
+
+    /* Header text */
+    QString header = "Authorization: Basic ";
+    header.append(credentials);
+    auto* list = curl_slist_append(nullptr, qPrintable(header));
+
+    CURL* curl = prepare_curl(list, &response, request);
     CURLcode res = curl_easy_perform(curl);
-    bool result = true;
+    json_t* result = nullptr;
+    json_error_t error;
     if (res == CURLE_OK) {
         blog(LOG_INFO, "[tuna] Curl response: %s", response.c_str());
         json_t* response_parsed = json_loads(response.c_str(), 0, &error);
         if (response_parsed) {
-            json_t* expires_obj = json_object_get(response_parsed, "expires_in");
-            json_t* access_token = json_object_get(response_parsed, "access_token");
-            json_t* refresh_token = json_object_get(response_parsed, "refresh_token");
-
-            if (expires_obj && access_token && refresh_token) {
-                m_token_termination = os_gettime_ns() / 10e6 +
-                        (json_integer_value(expires_obj) * 10e3);
-                m_token = json_string_value(access_token);
-                m_refresh_token = json_string_value(refresh_token);
-            } else {
-                blog(LOG_ERROR, "Couldn't recieve data from json response");
-                result = false;
-            }
+            result = response_parsed;
         } else {
             blog(LOG_ERROR, "[tuna] Couldn't parse response to json: %s",
                  error.text);
-            result = false;
         }
     } else {
         blog(LOG_ERROR, "[tuna] Curl returned error code %i", res);
-        result = false;
     }
 
-    free(json_text);
-    json_decref(body);
     curl_slist_free_all(list);
     return result;
 }
@@ -194,11 +186,24 @@ bool spotify_source::request_token(const char* grant_type, const char* code_id,
 /* Gets a new token using the refresh token */
 bool spotify_source::do_refresh_token()
 {
-    return request_token("refresh_token", "refresh_token", qPrintable(m_refresh_token));
+    static std::string request;
+    request = "grant_type=refresh_token&refresh_token";
+    request.append(m_refresh_token);
+    auto* response = request_token(request.c_str(), m_creds.c_str());
+    if (response) {
+
+    }
 }
 
 /* Gets the first token from the access code */
 bool spotify_source::new_token()
 {
-    return request_token("authorization", "code", qPrintable(m_auth_code));
+    static std::string request;
+    request = "grant_type=authorization_code&code=";
+    request.append(m_auth_code).append("&redirect_uri=").append(REDIRECT_URI);
+    auto* response = request_token(request.c_str(), m_creds.c_str());
+
+    if (response) {
+
+    }
 }
