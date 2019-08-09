@@ -30,6 +30,8 @@ public:
     ~tuna_gui();
     void toggleShowHide();
 
+    void apply_login_state(bool state, const QString& log);
+
 private slots:
     void on_btn_sp_show_auth_pressed();
 
@@ -42,6 +44,13 @@ private slots:
     void on_btn_request_token_clicked();
 
     void on_btn_performrefresh_clicked();
+
+    void on_tuna_gui_accepted();
+
+    void on_btn_start_clicked();
+
+    void set_state();
+    void on_btn_stop_clicked();
 
 private:
     Ui::tuna_gui *ui;

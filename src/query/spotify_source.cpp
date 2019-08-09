@@ -17,16 +17,19 @@
 #include "../gui/tuna_gui.hpp"
 
 #define TOKEN_URL		"https://accounts.spotify.com/api/token"
+#define PLAYER_URL		"https://api.spotify.com/v1/me/player"
 #define REDIRECT_URI	"https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
-
+#define os_gettime_ms()	(static_cast<uint64_t>(os_gettime_ns() / 10e6))
 #define valid(s)		(s && strlen(s) > 0)
 
 spotify_source::spotify_source()
 {
+    /* builds credentials for spotify api */
     QString str = SPOTIFY_CLIENT_ID;
     str.append(":").append(SPOTIFY_CLIENT_SECRET);
     QString str2(str.toUtf8().toBase64());
-    m_creds = qPrintable(str2);
+    m_creds = str2.toStdString();
+
     m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE
             | CAP_COVER | CAP_LENGTH | CAP_NEXT_SONG | CAP_PREV_SONG
             | CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN
@@ -36,8 +39,6 @@ spotify_source::spotify_source()
 void spotify_source::load()
 {
     config_set_default_bool(config::instance, CFG_REGION,
-                            CFG_SPOTIFY_ENABLED, true);
-    config_set_default_bool(config::instance, CFG_REGION,
                             CFG_SPOTIFY_LOGGEDIN, false);
     config_set_default_string(config::instance, CFG_REGION,
                               CFG_SPOTIFY_TOKEN, "");
@@ -45,9 +46,9 @@ void spotify_source::load()
                               CFG_SPOTIFY_AUTH_CODE, "");
     config_set_default_uint(config::instance, CFG_REGION,
                             CFG_SPOTIFY_TOKEN_TERMINATION, 0);
+    config_set_default_string(config::instance, CFG_REGION,
+                              CFG_SPOTIFY_REFRESH_TOKEN, "");
 
-    m_enabled = config_get_bool(config::instance, CFG_REGION,
-                                CFG_SPOTIFY_ENABLED);
     m_logged_in = config_get_bool(config::instance, CFG_REGION,
                                   CFG_SPOTIFY_LOGGEDIN);
     m_token = config_get_string(config::instance, CFG_REGION,
@@ -59,13 +60,14 @@ void spotify_source::load()
     m_token_termination = config_get_uint(config::instance, CFG_REGION,
                                    CFG_SPOTIFY_TOKEN_TERMINATION);
 
-    if (!m_enabled)
-        return;
-
     /* Token handling */
     if (m_logged_in) {
-        if (os_gettime_ns() > m_token_termination)
-            do_refresh_token();
+        if (os_gettime_ms() > m_token_termination) {
+            QString log;
+            bool result = do_refresh_token(log);
+            tuna_dialog->apply_login_state(result, log);
+            save();
+        }
     }
 }
 
@@ -73,8 +75,6 @@ void spotify_source::save()
 {
     config_set_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN,
                     m_logged_in);
-    config_set_bool(config::instance, CFG_REGION, CFG_SPOTIFY_ENABLED,
-                    m_enabled);
     config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN,
                       m_token.c_str());
     config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_AUTH_CODE,
@@ -83,16 +83,104 @@ void spotify_source::save()
                       m_refresh_token.c_str());
     config_set_uint(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN_TERMINATION,
                     m_token_termination);
-
 }
+
+/* implementation further down */
+json_t* execute_command(const char* auth_token, const char* url);
+
 void spotify_source::refresh()
 {
-    if (m_logged_in) {
-        if (os_gettime_ns() > m_token_termination)
-            do_refresh_token();
+    if (!m_logged_in)
+        return;
+    if (os_gettime_ns() > m_token_termination) {
+        QString log;
+        bool result = do_refresh_token(log);
+        tuna_dialog->apply_login_state(result, log);
+        save();
+    }
+
+    json_t* song_info = execute_command(m_token.c_str(), PLAYER_URL);
+
+    if (song_info) {
+        json_t* progress = json_object_get(song_info, "progress_ms");
+        json_t* device = json_object_get(song_info, "device");
+
+        if (device && progress) {
+            json_t* is_private = json_object_get(device, "is_private_session");
+            if (is_private && json_integer_value(is_private)) {
+                blog(LOG_ERROR, "[tuna] Spotify session is private! Can't read track");
+            } else {
+                json_t* track = json_object_get(song_info, "item");
+                if (track) {
+
+                } else {
+                    blog(LOG_ERROR, "[tuna] Couldn't get spotify track json");
+                }
+            }
+            m_current.progress_ms = json_integer_value(progress);
+        }
+        json_decref(song_info);
     }
 }
 
+void spotify_source::parse_track_json(json_t* track)
+{
+    json_t* album = json_object_get(track, "album");
+    json_t* artists = json_object_get(track, "artists");
+    size_t index;
+    json_t* curr, *name;
+    if (album && artists) {
+        /* Get All artists */
+        m_current.artists.clear();
+        json_array_foreach(artists, index, curr) {
+            name = json_object_get(curr, "name");
+            m_current.artists.append(json_string_value(name));
+            m_current.artists.append(", ");
+        }
+        /* Remove last ', ' */
+        m_current.artists.pop_back();
+        m_current.artists.pop_back();
+
+        /* Get title */
+        name = json_object_get(track, "name");
+        m_current.title = json_string_value(name);
+
+        /* Get length */
+        curr = json_object_get(track, "duration_ms");
+        m_current.duration_ms = json_integer_value(curr);
+
+        /* Album name */
+        curr = json_object_get(album, "name");
+        m_current.album = json_string_value(curr);
+
+        /* Explicit ?*/
+        curr = json_object_get(track, "explicit");
+        m_current.is_explicit = json_integer_value(curr);
+
+        /* Disc number */
+        curr = json_object_get(track, "disc_number");
+        m_current.disc_number = json_integer_value(curr);
+
+        /* Track number */
+        curr = json_object_get(track, "track_number");
+        m_current.track_number = json_integer_value(curr);
+
+        /* Release date */
+        curr = json_object_get(album, "release_date");
+        QString date = json_string_value(curr);
+        m_current.release_precision = static_cast<date_precision>(qMin(date.count('-'), 2));
+        QStringList list = date.split("-");
+        switch (list.length()) {
+        case 3:
+            m_current.day = list[2].toStdString();
+        case 2: /* Fallthrough */
+            m_current.month = list[1].toStdString();
+        case 1: /* Fallthrough */
+            m_current.year = list[0].toStdString();
+        default:;
+        }
+    }
+}
 bool spotify_source::execute_capability(capability c)
 {
     bool result = true;
@@ -180,30 +268,121 @@ json_t* request_token(const char* request, const char* credentials)
     }
 
     curl_slist_free_all(list);
+    curl_easy_cleanup(curl);
     return result;
 }
 
 /* Gets a new token using the refresh token */
-bool spotify_source::do_refresh_token()
+bool spotify_source::do_refresh_token(QString& log)
 {
     static std::string request;
+    bool result = true;
     request = "grant_type=refresh_token&refresh_token";
     request.append(m_refresh_token);
     auto* response = request_token(request.c_str(), m_creds.c_str());
-    if (response) {
 
+    if (response) {
+        json_t* token = json_object_get(response, "access_token");
+        json_t* expires = json_object_get(response, "expires_in");
+        json_t* refresh_token = json_object_get(response, "refresh_token");
+
+        /* Dump the json into the log textbox */
+        const char* json_pretty = json_dumps(response, JSON_INDENT(4));
+        log = json_pretty;
+        free((void*)json_pretty);
+
+        if (token && expires) {
+            m_token = json_string_value(token);
+            m_token_termination = os_gettime_ms() + json_integer_value(expires)
+                    * 1000;
+            m_logged_in = true;
+            save();
+        } else {
+            blog(LOG_ERROR, "[tuna] Couldn't parse json response");
+            result = false;
+        }
+
+        /* Refreshing the token can return a new refresh token */
+        if (refresh_token) {
+            m_refresh_token = json_string_value(refresh_token);
+        }
+        json_decref(response);
+    } else {
+        result = false;
     }
+
+    m_logged_in = result;
+    return result;
 }
 
 /* Gets the first token from the access code */
-bool spotify_source::new_token()
+bool spotify_source::new_token(QString& log)
 {
     static std::string request;
+    bool result = true;
     request = "grant_type=authorization_code&code=";
     request.append(m_auth_code).append("&redirect_uri=").append(REDIRECT_URI);
     auto* response = request_token(request.c_str(), m_creds.c_str());
 
     if (response) {
+        json_t* token = json_object_get(response, "access_token");
+        json_t* refresh = json_object_get(response, "refresh_token");
+        json_t* expires = json_object_get(response, "expires_in");
+        /* Dump the json into the log textbox */
+        const char* json_pretty = json_dumps(response, JSON_INDENT(4));
+        log = json_pretty;
+        free((void*)json_pretty);
 
+        if (token && refresh && expires) {
+            m_token = json_string_value(token);
+            m_refresh_token = json_string_value(token);
+            m_token_termination = os_gettime_ms() + json_integer_value(expires)
+                    * 1000;
+            m_logged_in = true;
+            save();
+            result = true;
+        } else {
+            blog(LOG_ERROR, "[tuna] Couldn't parse json response!");
+            result = false;
+        }
+        json_decref(response);
+    } else {
+        result = false;
     }
+
+    m_logged_in = false;
+    return result;
+}
+
+/* Sends commands to spotify api via url */
+json_t* execute_command(const char* auth_token, const char* url)
+{
+    std::string response;
+    QString header = "Authorization: Bearer ";
+    header.append(auth_token);
+    auto* list = curl_slist_append(nullptr, qPrintable(header));
+
+    CURL* curl = curl_easy_init();
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+#ifdef DEBUG
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+#endif
+    CURLcode res = curl_easy_perform(curl);
+    json_t* result = nullptr;
+
+    if (res == CURLE_OK) {
+        json_error_t error;
+        result = json_loads(response.c_str(), 0, &error);
+        if (!result) {
+            blog(LOG_ERROR, "[tuna] Failed to parse json response");
+        }
+    } else {
+        blog(LOG_ERROR, "[tuna] CURL failed while sending spotify command");
+    }
+    curl_slist_free_all(list);
+    curl_easy_cleanup(curl);
+    return result;
 }

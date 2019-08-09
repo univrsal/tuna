@@ -5,6 +5,8 @@
  * github.com/univrsal/tuna
  */
 #include <stdint.h>
+#include <string>
+#include <QDate>
 
 enum capability {
     CAP_TITLE = 1 << 0,			/* Song title				*/
@@ -28,11 +30,24 @@ enum capability {
     CAP_STATUS = 1 << 14		/* Get song playing satus	*/
 };
 
+enum date_precision {
+    prec_day, prec_month, prec_year, prec_unkown
+};
+
+struct song_t {
+    uint16_t data;
+    std::string title, artists, album;
+    uint32_t disc_number, track_number, duration_ms, progress_ms;
+    bool is_explicit;
+    std::string year, month, day;
+    date_precision release_precision;
+};
+
 class music_source
 {
 protected:
     uint16_t m_capabilities = 0x0;
-    bool m_enabled; 		/* Wether this source can be used */
+    song_t m_current = {};
 public:
     music_source() = default;
     virtual ~music_source() {}
@@ -45,10 +60,14 @@ public:
         return m_capabilities & ((uint16_t) c);
     }
 
+    const song_t* song() { return &m_current; }
+
     /* Abstract stuff */
 
+    /* Save/load config values */
     virtual void load() = 0;
     virtual void save() = 0;
+
     /* Perform information query */
     virtual void refresh() = 0;
 

@@ -9,27 +9,38 @@
 
 #define CFG_REGION						"tuna"
 
-#define CFG_MPD_ENABLED					"mpd_enabled"
-#define CFG_WINDOW_TITLE_ENABLED		"window_title_enabled"
-
+#define CFG_RUNNING						"running"
 #define CFG_SONG_PATH					"song_path"
 #define CFG_COVER_PATH					"cover_path"
+#define CFG_LYRICS_PATH					"lyrics_path"
+#define CFG_SELECTED_SOURCE				"source"
+#define CFG_REFRESH_RATE				"refresh_rate"
+#define CFG_SONG_FORMAT					"song_format"
+#define CFG_SONG_PLACEHOLDER			"song_placeholder"
 
-#define CFG_SPOTIFY_ENABLED				"spotify_enabled"
-#define CFG_SPOTIFY_LOGGEDIN			"login"
-#define CFG_SPOTIFY_TOKEN				"token"
-#define CFG_SPOTIFY_REFRESH_TOKEN		"refresh_token"
-#define CFG_SPOTIFY_AUTH_CODE			"auth_code"
-#define CFG_SPOTIFY_TOKEN_TERMINATION	"token_termination"
+#define CFG_SPOTIFY_LOGGEDIN			"spotify.login"
+#define CFG_SPOTIFY_TOKEN				"spotify.token"
+#define CFG_SPOTIFY_REFRESH_TOKEN		"spotify.refresh_token"
+#define CFG_SPOTIFY_AUTH_CODE			"spotify.auth_code"
+#define CFG_SPOTIFY_TOKEN_TERMINATION	"spotify.token_termination"
 
 class spotify_source;
+class music_source;
 
 namespace config
 {
+    enum source {
+        src_spotify,
+        src_window_title,
+        src_mpd,
+        src_count
+    };
+    extern music_source* selected_source;
     extern config_t* instance;
     extern spotify_source* spotify;
 
     void init_default();
     void load();
-
+    void close();
+    void select_source(source s);
 }

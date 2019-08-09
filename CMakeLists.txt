@@ -40,7 +40,11 @@ set(tuna_sources
     ./src/gui/tuna_gui.hpp
     ./src/query/music_source.hpp
     ./src/query/spotify_source.cpp
-    ./src/query/spotify_source.hpp)
+    ./src/query/spotify_source.hpp
+    ./src/util/tuna_thread.cpp
+    ./src/util/tuna_thread.hpp
+    ./src/util/utility.cpp
+    ./src/util/utility.hpp)
 
 add_library(tuna MODULE
     ${tuna_sources}

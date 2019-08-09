@@ -16,3 +16,5 @@
 #define T_SPOTIFY_LOGGEDIN	_T("tuna.gui.tab.spotify.loggedin")
 #define T_SPOTIFY_LOGGEDOUT _T("tuna.gui.tab.spotify.loggedout")
 #define T_SPOTIFY_WARNING	_T("tuna.gui.tab.spotify.linkmessage")
+#define T_STATUS_RUNNING	_T("tuna.gui.basics.status.started")
+#define T_STATUS_STOPPED	_T("tuna.gui.basics.status.stopped")
