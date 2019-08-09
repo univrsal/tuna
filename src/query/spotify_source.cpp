@@ -99,7 +99,7 @@ void spotify_source::refresh()
 {
     if (!m_logged_in)
         return;
-    if (os_gettime_ns() > m_token_termination) {
+    if (os_gettime_ms() > m_token_termination) {
         QString log;
         bool result = do_refresh_token(log);
         tuna_dialog->apply_login_state(result, log);
@@ -119,7 +119,7 @@ void spotify_source::refresh()
             } else {
                 json_t* track = json_object_get(song_info, "item");
                 if (track) {
-
+                    parse_track_json(track);
                 } else {
                     blog(LOG_ERROR, "[tuna] Couldn't get spotify track json");
                 }

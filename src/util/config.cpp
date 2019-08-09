@@ -61,9 +61,6 @@ namespace config
         instance = obs_frontend_get_global_config();
         init_default();
         bool run = config_get_bool(instance, CFG_REGION, CFG_RUNNING);
-        auto src = config_get_uint(instance, CFG_REGION, CFG_SELECTED_SOURCE);
-        if (src < src_count)
-            select_source((source) src);
 
         cover_path = config_get_string(instance, CFG_REGION, CFG_COVER_PATH);
         lyrics_path = config_get_string(instance, CFG_REGION, CFG_LYRICS_PATH);
@@ -77,6 +74,10 @@ namespace config
 
         if (run && !thread::start())
             blog(LOG_ERROR, "[tuna] Couldn't start thread");
+
+        auto src = config_get_uint(instance, CFG_REGION, CFG_SELECTED_SOURCE);
+        if (src < src_count)
+            select_source((source) src);
     }
 
     void close()
