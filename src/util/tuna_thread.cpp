@@ -25,9 +25,9 @@ namespace thread {
     bool start()
     {
         bool result = true;
-        thread_state = true;
         if (thread_state)
             return result;
+        thread_state = true;
 
 #ifdef _WIN32
         thread_handle = CreateThread(nullptr, 0,

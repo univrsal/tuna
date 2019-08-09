@@ -550,12 +550,24 @@
        <item>
         <widget class="QFrame" name="frame_13">
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_13">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
           <item>
            <widget class="QLabel" name="lbl_status">
             <property name="text">
@@ -942,8 +954,14 @@
        </item>
        <item>
         <widget class="QPlainTextEdit" name="txt_json_log">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
          <property name="plainText">
           <string/>
+         </property>
+         <property name="tabStopDistance">
+          <double>80.000000000000000</double>
          </property>
         </widget>
        </item>

@@ -56,7 +56,16 @@ private slots:
     void on_btn_start_clicked();
 
     void set_state();
+
     void on_btn_stop_clicked();
+
+    void on_btn_sp_show_token_pressed();
+
+    void on_btn_sp_show_token_released();
+
+    void on_btn_sp_show_refresh_token_pressed();
+
+    void on_btn_sp_show_refresh_token_released();
 
 private:
     Ui::tuna_gui *ui;

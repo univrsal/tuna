@@ -84,6 +84,10 @@ tuna_gui::~tuna_gui()
 void tuna_gui::toggleShowHide()
 {
     setVisible(!isVisible());
+    if (isVisible()) {
+        /* Load config values for sources on dialog show */
+        config::spotify->load_gui_values();
+    }
 }
 
 void tuna_gui::on_btn_sp_show_auth_pressed()
@@ -182,4 +186,39 @@ void tuna_gui::on_btn_stop_clicked()
 {
     thread::stop();
     set_state();
+}
+
+void tuna_gui::set_spotify_auth_code(const char *str)
+{
+    ui->txt_auth_code->setText(str);
+}
+
+void tuna_gui::set_spotify_auth_token(const char *str)
+{
+    ui->txt_token->setText(str);
+}
+
+void tuna_gui::set_spotify_refresh_token(const char *str)
+{
+    ui->txt_refresh_token->setText(str);
+}
+
+void tuna_gui::on_btn_sp_show_token_pressed()
+{
+    ui->txt_token->setEchoMode(QLineEdit::Normal);
+}
+
+void tuna_gui::on_btn_sp_show_token_released()
+{
+    ui->txt_token->setEchoMode(QLineEdit::Password);
+}
+
+void tuna_gui::on_btn_sp_show_refresh_token_pressed()
+{
+    ui->txt_refresh_token->setEchoMode(QLineEdit::Normal);
+}
+
+void tuna_gui::on_btn_sp_show_refresh_token_released()
+{
+    ui->txt_refresh_token->setEchoMode(QLineEdit::Password);
 }

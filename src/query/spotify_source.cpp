@@ -53,7 +53,7 @@ void spotify_source::load()
                                   CFG_SPOTIFY_LOGGEDIN);
     m_token = config_get_string(config::instance, CFG_REGION,
                                 CFG_SPOTIFY_TOKEN);
-    m_token = config_get_string(config::instance, CFG_REGION,
+    m_refresh_token = config_get_string(config::instance, CFG_REGION,
                                 CFG_SPOTIFY_REFRESH_TOKEN);
     m_auth_code = config_get_string(config::instance, CFG_REGION,
                                     CFG_SPOTIFY_AUTH_CODE);
@@ -73,7 +73,9 @@ void spotify_source::load()
 
 void spotify_source::load_gui_values()
 {
-
+    tuna_dialog->set_spotify_auth_code(m_auth_code.c_str());
+    tuna_dialog->set_spotify_auth_token(m_token.c_str());
+    tuna_dialog->set_spotify_refresh_token(m_refresh_token.c_str());
 }
 
 void spotify_source::save()
@@ -373,11 +375,9 @@ bool spotify_source::new_token(QString& log)
 
         if (token && refresh && expires) {
             m_token = json_string_value(token);
-            m_refresh_token = json_string_value(token);
+            m_refresh_token = json_string_value(refresh);
             m_token_termination = os_gettime_ms() + json_integer_value(expires)
                     * 1000;
-            m_logged_in = true;
-            save();
             result = true;
         } else {
             blog(LOG_ERROR, "[tuna] Couldn't parse json response!");
@@ -388,7 +388,8 @@ bool spotify_source::new_token(QString& log)
         result = false;
     }
 
-    m_logged_in = false;
+    m_logged_in = result;
+    save();
     return result;
 }
 
