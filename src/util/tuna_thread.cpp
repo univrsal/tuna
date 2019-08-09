@@ -7,13 +7,13 @@
 #include "tuna_thread.hpp"
 #include "config.hpp"
 #include "../query/music_source.hpp"
+#include "../gui/tuna_gui.hpp"
 #include <util/platform.h>
 #ifdef LINUX
 #include <pthread.h>
 #endif
 namespace thread {
     volatile bool thread_state = false;
-    uint32_t sleep_time = 250;
     std::mutex mutex;
 
 #ifdef _WIN32
@@ -58,10 +58,17 @@ namespace thread {
             mutex.lock();
             if (config::selected_source) {
                 config::selected_source->refresh();
+                auto* s = config::selected_source->song();
+                if (s->data & CAP_COVER) {
 
+                }
+
+                if (s->data & CAP_TITLE) {
+                    tuna_dialog->set_output_preview(s->title.c_str());
+                }
             }
             mutex.unlock();
-            os_sleep_ms(sleep_time);
+            os_sleep_ms(config::refresh_rate);
         }
 
 #ifdef _WIN32

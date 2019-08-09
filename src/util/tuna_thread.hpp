@@ -13,7 +13,6 @@
 
 namespace thread {
     extern volatile bool thread_state;
-    extern uint32_t sleep_time;
     extern std::mutex mutex;
     bool start();
     void stop();

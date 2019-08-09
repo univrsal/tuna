@@ -71,6 +71,11 @@ void spotify_source::load()
     }
 }
 
+void spotify_source::load_gui_values()
+{
+
+}
+
 void spotify_source::save()
 {
     config_set_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN,
@@ -132,52 +137,85 @@ void spotify_source::parse_track_json(json_t* track)
     if (album && artists) {
         /* Get All artists */
         m_current.artists.clear();
+        m_current.data = 0x0;
         json_array_foreach(artists, index, curr) {
             name = json_object_get(curr, "name");
             m_current.artists.append(json_string_value(name));
             m_current.artists.append(", ");
         }
+
         /* Remove last ', ' */
         m_current.artists.pop_back();
         m_current.artists.pop_back();
 
+        /* Cover link */
+        curr = json_object_get(album, "images");
+        if (curr) {
+            curr = json_array_get(curr, 0);
+            if (curr) curr = json_object_get(curr, "url");
+            if (curr) {
+                m_current.cover = json_string_value(curr);
+                m_current.data |= CAP_COVER;
+            }
+        }
         /* Get title */
         name = json_object_get(track, "name");
-        m_current.title = json_string_value(name);
+        if (name) {
+            m_current.title = json_string_value(name);
+            m_current.data |= CAP_TITLE;
+        }
 
         /* Get length */
         curr = json_object_get(track, "duration_ms");
-        m_current.duration_ms = json_integer_value(curr);
+        if (curr) {
+            m_current.duration_ms = json_integer_value(curr);
+            m_current.data |= CAP_LENGTH;
+        }
 
         /* Album name */
         curr = json_object_get(album, "name");
-        m_current.album = json_string_value(curr);
+        if (curr) {
+            m_current.album = json_string_value(curr);
+            m_current.data |= CAP_ALBUM;
+        }
 
         /* Explicit ?*/
         curr = json_object_get(track, "explicit");
-        m_current.is_explicit = json_integer_value(curr);
+        if (curr) {
+            m_current.is_explicit = json_integer_value(curr);
+            m_current.data |= CAP_EXPLICIT;
+        }
 
         /* Disc number */
         curr = json_object_get(track, "disc_number");
-        m_current.disc_number = json_integer_value(curr);
+        if (curr) {
+            m_current.disc_number = json_integer_value(curr);
+            m_current.data |= CAP_DISC_NUMBER;
+        }
 
         /* Track number */
         curr = json_object_get(track, "track_number");
-        m_current.track_number = json_integer_value(curr);
+        if (curr) {
+            m_current.track_number = json_integer_value(curr);
+            m_current.data |= CAP_TRACK_NUMBER;
+        }
 
         /* Release date */
         curr = json_object_get(album, "release_date");
-        QString date = json_string_value(curr);
-        m_current.release_precision = static_cast<date_precision>(qMin(date.count('-'), 2));
-        QStringList list = date.split("-");
-        switch (list.length()) {
-        case 3:
-            m_current.day = list[2].toStdString();
-        case 2: /* Fallthrough */
-            m_current.month = list[1].toStdString();
-        case 1: /* Fallthrough */
-            m_current.year = list[0].toStdString();
-        default:;
+        if (curr) {
+            m_current.data |= CAP_RELEASE;
+            QString date = json_string_value(curr);
+            m_current.release_precision = static_cast<date_precision>(qMin(date.count('-'), 2));
+            QStringList list = date.split("-");
+            switch (list.length()) {
+            case 3:
+                m_current.day = list[2].toStdString();
+            case 2: /* Fallthrough */
+                m_current.month = list[1].toStdString();
+            case 1: /* Fallthrough */
+                m_current.year = list[0].toStdString();
+            default:;
+            }
         }
     }
 }

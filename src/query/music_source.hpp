@@ -16,18 +16,19 @@ enum capability {
     CAP_COVER = 1 << 4,			/* Cover image link			*/
     CAP_LYRICS = 1 << 5,		/* Lyrics text link 		*/
     CAP_LENGTH = 1 << 6,		/* Get song length in ms	*/
+    CAP_EXPLICIT = 1 << 7,		/* don't say swears			*/
+    CAP_DISC_NUMBER = 1 << 8,   /* Disc number				*/
+    CAP_TRACK_NUMBER = 1 << 9,	/* Track number on disk		*/
+    CAP_PROGRESS = 1 << 10,		/* Get play progress in ms	*/
+    CAP_STATUS = 1 << 11,		/* Get song playing satus	*/
 
     /* Control stuff */
-    CAP_NEXT_SONG = 1 << 7,		/* Skip to next song		*/
-    CAP_PREV_SONG = 1 << 8,		/* Go to previous song		*/
-    CAP_PLAY_PAUSE = 1 << 9,	/* Toggle play/pause		*/
-    CAP_VOLUME_UP = 1 << 10,	/* Increase volume			*/
-    CAP_VOLUME_DOWN = 1 << 11,	/* Decrease volume			*/
-    CAP_VOLUME_MUTE = 1 << 12,	/* Toggle mute				*/
-
-    /* Additional info */
-    CAP_PROGRESS = 1 << 13,		/* Get play progress in ms	*/
-    CAP_STATUS = 1 << 14		/* Get song playing satus	*/
+    CAP_NEXT_SONG = 1 << 16,	/* Skip to next song		*/
+    CAP_PREV_SONG = 1 << 17,	/* Go to previous song		*/
+    CAP_PLAY_PAUSE = 1 << 18,	/* Toggle play/pause		*/
+    CAP_VOLUME_UP = 1 << 19,	/* Increase volume			*/
+    CAP_VOLUME_DOWN = 1 << 20,	/* Decrease volume			*/
+    CAP_VOLUME_MUTE = 1 << 21,	/* Toggle mute				*/
 };
 
 enum date_precision {
@@ -36,7 +37,7 @@ enum date_precision {
 
 struct song_t {
     uint16_t data;
-    std::string title, artists, album;
+    std::string title, artists, album, cover, lyrics;
     uint32_t disc_number, track_number, duration_ms, progress_ms;
     bool is_explicit;
     std::string year, month, day;
@@ -46,7 +47,7 @@ struct song_t {
 class music_source
 {
 protected:
-    uint16_t m_capabilities = 0x0;
+    uint32_t m_capabilities = 0x0;
     song_t m_current = {};
 public:
     music_source() = default;
@@ -73,4 +74,6 @@ public:
 
     /* Execute and return true if successful */
     virtual bool execute_capability(capability c) = 0;
+
+    virtual void load_gui_values() = 0;
 };

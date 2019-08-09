@@ -71,6 +71,11 @@ void tuna_gui::set_state()
         ui->lbl_status->setText(T_STATUS_STOPPED);
 }
 
+void tuna_gui::set_output_preview(const char *str)
+{
+    ui->lbl_output->setText(str);
+}
+
 tuna_gui::~tuna_gui()
 {
     delete ui;
@@ -159,8 +164,10 @@ void tuna_gui::on_tuna_gui_accepted()
     config_set_uint(config::instance, CFG_REGION, CFG_REFRESH_RATE,
                     ui->sb_refresh_rate->value());
     thread::mutex.lock();
-    thread::sleep_time = ui->sb_refresh_rate->value();
+    config::refresh_rate = ui->sb_refresh_rate->value();
     thread::mutex.unlock();
+
+    config::load();
 }
 
 void tuna_gui::on_btn_start_clicked()

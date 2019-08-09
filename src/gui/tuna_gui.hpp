@@ -32,6 +32,12 @@ public:
 
     void apply_login_state(bool state, const QString& log);
 
+    void set_output_preview(const char* str);
+
+    void set_spotify_auth_code(const char* str);
+    void set_spotify_auth_token(const char* str);
+    void set_spotify_refresh_token(const char* str);
+
 private slots:
     void on_btn_sp_show_auth_pressed();
 

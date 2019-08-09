@@ -35,9 +35,16 @@ namespace config
         src_mpd,
         src_count
     };
+
     extern music_source* selected_source;
     extern config_t* instance;
     extern spotify_source* spotify;
+
+    /* Temp storage for config values */
+    extern uint16_t refresh_rate;
+    extern const char* cover_path;
+    extern const char* lyrics_path;
+    extern const char* song_path;
 
     void init_default();
     void load();

@@ -19,6 +19,11 @@ namespace config
     music_source* selected_source = nullptr;
     spotify_source* spotify = nullptr;
 
+    uint16_t refresh_rate = 500;
+    const char* cover_path = "";
+    const char* lyrics_path = "";
+    const char* song_path = "";
+
     void init_default()
     {
         QString home = QDir::homePath().append(QDir::separator());
@@ -35,6 +40,7 @@ namespace config
         config_set_default_uint(instance, CFG_REGION, CFG_SELECTED_SOURCE,
                                src_spotify);
         config_set_default_bool(instance, CFG_REGION, CFG_RUNNING, false);
+        config_set_default_uint(instance, CFG_REGION, CFG_REFRESH_RATE, 500);
     }
 
     void select_source(source s)
@@ -59,6 +65,12 @@ namespace config
         if (src < src_count)
             select_source((source) src);
 
+        cover_path = config_get_string(instance, CFG_REGION, CFG_COVER_PATH);
+        lyrics_path = config_get_string(instance, CFG_REGION, CFG_LYRICS_PATH);
+        song_path = config_get_string(instance, CFG_REGION, CFG_SONG_PATH);
+        refresh_rate = config_get_uint(instance, CFG_REGION, CFG_REFRESH_RATE);
+
+        /* Sources */
         spotify = new spotify_source;
 
         spotify->load();

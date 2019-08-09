@@ -28,6 +28,7 @@ public:
     void load() override;
     void save() override;
     void refresh() override;
+    void load_gui_values() override;
     bool execute_capability(capability c) override;
 
     bool do_refresh_token(QString& log);
