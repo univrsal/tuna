@@ -104,7 +104,7 @@ namespace thread {
                 auto* s = config::selected_source->song();
 
                 /* Process song data */
-                if (s->data & CAP_COVER && last_cover_url != s->cover) {
+                if (s->data & CAP_COVER  && config::download_cover && last_cover_url != s->cover) {
                     last_cover_url = s->cover;
                     util::curl_download(s->cover.c_str(), config::cover_path);
                 }

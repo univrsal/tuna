@@ -7,6 +7,7 @@
 #include "config.hpp"
 #include "constants.hpp"
 #include "../query/spotify_source.hpp"
+#include "../query/mpd_source.hpp"
 #include "../util/tuna_thread.hpp"
 #include <util/config-file.h>
 #include <util/platform.h>
@@ -19,6 +20,7 @@ namespace config
     config_t* instance = nullptr;
     music_source* selected_source = nullptr;
     spotify_source* spotify = nullptr;
+    mpd_source* mpd = nullptr;
 
     uint16_t refresh_rate = 1000;
     const char* format_string = "";
@@ -26,6 +28,7 @@ namespace config
     const char* cover_path = "";
     const char* lyrics_path = "";
     const char* song_path = "";
+    bool download_cover = true;
 
     void init_default()
     {
@@ -43,6 +46,7 @@ namespace config
         config_set_default_uint(instance, CFG_REGION, CFG_SELECTED_SOURCE,
                                src_spotify);
         config_set_default_bool(instance, CFG_REGION, CFG_RUNNING, false);
+        config_set_default_bool(instance, CFG_REGION, CFG_DOWNLOAD_COVER, true);
         config_set_default_uint(instance, CFG_REGION, CFG_REFRESH_RATE, refresh_rate);
         config_set_default_string(instance, CFG_REGION, CFG_SONG_FORMAT,
                                   T_FORMAT);
@@ -52,15 +56,19 @@ namespace config
 
     void select_source(source s)
     {
+        thread::mutex.lock();
         switch(s) {
+        default:
         case src_spotify:
             selected_source = spotify;
             break;
         case src_mpd:
+            selected_source = mpd;
             break;
         case src_window_title:
             break;
         }
+        thread::mutex.unlock();
     }
 
     void load()
@@ -75,11 +83,14 @@ namespace config
         refresh_rate = config_get_uint(instance, CFG_REGION, CFG_REFRESH_RATE);
         format_string = config_get_string(instance, CFG_REGION, CFG_SONG_FORMAT);
         placeholder = config_get_string(instance, CFG_REGION, CFG_SONG_PLACEHOLDER);
+        download_cover = config_get_bool(instance, CFG_REGION, CFG_DOWNLOAD_COVER);
 
         /* Sources */
         spotify = new spotify_source;
+        mpd = new mpd_source;
 
         spotify->load();
+        mpd->load();
 
         if (run && !thread::start())
             blog(LOG_ERROR, "[tuna] Couldn't start thread");
@@ -89,13 +100,27 @@ namespace config
             select_source((source) src);
     }
 
-    void close()
+    void load_gui_values()
+    {
+        spotify->load_gui_values();
+        mpd->load_gui_values();
+    }
+
+    void save()
     {
         config_set_bool(instance, CFG_REGION, CFG_RUNNING, thread::thread_state);
-        thread::stop();
         spotify->save();
+        mpd->save();
+    }
+
+    void close()
+    {
+        save();
+        thread::stop();
 
         delete spotify;
+        delete mpd;
         spotify = nullptr;
+        mpd = nullptr;
     }
 }

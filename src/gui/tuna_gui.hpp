@@ -38,6 +38,8 @@ public:
     void set_spotify_auth_token(const char* str);
     void set_spotify_refresh_token(const char* str);
 
+    void set_mpd_ip(const char* ip);
+    void set_mpd_port(uint16_t port);
 private slots:
     void on_btn_sp_show_auth_pressed();
 

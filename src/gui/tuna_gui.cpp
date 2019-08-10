@@ -98,7 +98,7 @@ void tuna_gui::toggleShowHide()
     setVisible(!isVisible());
     if (isVisible()) {
         /* Load config values for sources on dialog show */
-        config::spotify->load_gui_values();
+        config::load_gui_values();
     }
 }
 
@@ -138,7 +138,7 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
         ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
                                           "font-weight: bold;}");
-        config::spotify->save();
+        config::save();
     } else {
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDOUT);
         ui->lbl_spotify_info->setStyleSheet("QLabel {}");
@@ -205,6 +205,16 @@ void tuna_gui::on_btn_stop_clicked()
 {
     thread::stop();
     set_state();
+}
+
+void tuna_gui::set_mpd_ip(const char *ip)
+{
+    ui->txt_ip->setText(ip);
+}
+
+void tuna_gui::set_mpd_port(uint16_t port)
+{
+    ui->sb_port->setValue(port);
 }
 
 void tuna_gui::set_spotify_auth_code(const char *str)

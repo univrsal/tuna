@@ -146,9 +146,8 @@ void spotify_source::parse_track_json(json_t* track)
     size_t index;
     json_t* curr, *name;
     if (album && artists) {
+        m_current = {};
         /* Get All artists */
-        m_current.artists.clear();
-        m_current.data = 0x0;
         json_array_foreach(artists, index, curr) {
             name = json_object_get(curr, "name");
             m_current.artists.append(json_string_value(name));

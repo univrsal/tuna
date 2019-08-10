@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -104,6 +104,13 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cb_dl_cover">
+         <property name="text">
+          <string>tuna.gui.tab.basics.song.cover.enable</string>
+         </property>
         </widget>
        </item>
        <item>
@@ -981,6 +988,78 @@
       <attribute name="title">
        <string>tuna.gui.tab.mpd</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>tuna.gui.tab.mpd.server</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_14">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="txt_ip">
+            <property name="text">
+             <string>localhost</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="sb_port">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="minimum">
+             <number>1024</number>
+            </property>
+            <property name="maximum">
+             <number>65000</number>
+            </property>
+            <property name="value">
+             <number>1608</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>518</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_window_title">
       <attribute name="title">

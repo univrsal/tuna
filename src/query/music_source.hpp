@@ -4,6 +4,7 @@
  * See LICENSE or http://www.gnu.org/licenses
  * github.com/univrsal/tuna
  */
+#pragma once
 #include <stdint.h>
 #include <string>
 #include <QDate>

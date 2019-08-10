@@ -17,6 +17,7 @@
 #define CFG_REFRESH_RATE				"refresh_rate"
 #define CFG_SONG_FORMAT					"song_format"
 #define CFG_SONG_PLACEHOLDER			"song_placeholder"
+#define CFG_DOWNLOAD_COVER				"download_cover"
 
 #define CFG_SPOTIFY_LOGGEDIN			"spotify.login"
 #define CFG_SPOTIFY_TOKEN				"spotify.token"
@@ -24,7 +25,11 @@
 #define CFG_SPOTIFY_AUTH_CODE			"spotify.auth_code"
 #define CFG_SPOTIFY_TOKEN_TERMINATION	"spotify.token_termination"
 
+#define CFG_MPD_IP						"mpd.ip"
+#define CFG_MPD_PORT					"mpd.port"
+
 class spotify_source;
+class mpd_source;
 class music_source;
 
 namespace config
@@ -39,6 +44,7 @@ namespace config
     extern music_source* selected_source;
     extern config_t* instance;
     extern spotify_source* spotify;
+    extern mpd_source* mpd;
 
     /* Temp storage for config values */
     extern uint16_t refresh_rate;
@@ -47,9 +53,12 @@ namespace config
     extern const char* cover_path;
     extern const char* lyrics_path;
     extern const char* song_path;
+    extern bool download_cover;
 
+    void load_gui_values();
     void init_default();
     void load();
+    void save();
     void close();
     void select_source(source s);
 }
