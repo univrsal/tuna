@@ -6,6 +6,12 @@
  */
 #pragma once
 
+struct song_t;
+
 namespace util {
     bool curl_download(const char* url, const char* path);
+
+    void handle_cover_art(const song_t* song);
+    void handle_lyrics(const song_t* song);
+    bool move_file(const char* src, const char* dest);
 }

@@ -5,9 +5,12 @@
  * github.com/univrsal/tuna
  */
 #include "utility.hpp"
+#include "config.hpp"
+#include "../query/music_source.hpp"
 #include <curl/curl.h>
 #include <stdio.h>
 #include <obs-module.h>
+#include <fstream>
 
 namespace util {
 
@@ -47,5 +50,56 @@ namespace util {
         if (curl)
             curl_easy_cleanup(curl);
         return true;
+    }
+
+    bool move_file(const char* src, const char* dest)
+    {
+        std::ifstream in(src, std::ios::binary);
+        std::ofstream out(dest, std::ios::binary);
+        bool result = false;
+        if (in.good() && out.good()) {
+            out << in.rdbuf();
+            result = true;
+        }
+
+        in.close();
+        out.close();
+        return result;
+    }
+
+    void handle_lyrics(const song_t* song)
+    {
+        static std::string last_lyrics = "";
+
+        if (song->data & CAP_LYRICS && last_lyrics != song->lyrics) {
+            last_lyrics = song->lyrics;
+            if (!curl_download(song->lyrics.c_str(), config::lyrics_path))
+                blog(LOG_ERROR, "[tuna] Couldn't dowload lyrics from '%s' to '%s'",
+                     song->lyrics.c_str(), config::lyrics_path);
+        }
+    }
+
+    void handle_cover_art(const song_t* song)
+    {
+        static std::string last_cover = "";
+        bool is_url = song->cover.find("http") != std::string::npos;
+        bool found_cover = false;
+
+        if (!song->cover.empty() && song->cover != last_cover) {
+            if (is_url && config::download_cover) {
+                last_cover = song->cover;
+                found_cover = curl_download(song->cover.c_str(), config::cover_path);
+            } else if (!is_url) {
+                last_cover = song->cover;
+                found_cover = move_file(song->cover.c_str(), config::cover_path);
+            }
+        }
+
+        if (!found_cover && last_cover != "n/a") {
+            last_cover = "n/a";
+            /* no cover => use place placeholder */
+            if (!move_file(config::cover_placeholder, config::cover_path))
+                blog(LOG_ERROR, "[tuna] couldn't move placeholder cover");
+        }
     }
 }

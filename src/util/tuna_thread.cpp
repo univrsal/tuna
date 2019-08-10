@@ -104,8 +104,6 @@ namespace thread {
 #endif
     {
         QString formatted;
-        std::string last_cover_url = "";
-        std::string last_lyrics_url = "";
 
         while (thread_state) {
             mutex.lock();
@@ -115,36 +113,14 @@ namespace thread {
                 auto* s = config::selected_source->song();
 
                 /* Process song data */
-                if (s->data & CAP_COVER  && config::download_cover) {
-                    if (last_cover_url != s->cover) {
-                        last_cover_url = s->cover;
-                        util::curl_download(s->cover.c_str(), config::cover_path);
-                    }
-                } else if (last_cover_url != "n/a") {
-                    last_cover_url = "n/a";
-                    /* Copy placeholder over since we don't have a cover */
-                    std::ifstream pholder(config::cover_placeholder, std::ios::binary);
-                    std::ofstream cover(config::cover_path, std::ios::binary);
-                    if (pholder.good() && cover.good()) {
-                        cover << pholder.rdbuf();
-                    } else {
-                        blog(LOG_ERROR, "[tuna] Couldn't set placeholder album cover");
-                    }
-                    pholder.close();
-                    cover.close();
-                }
-
-                if (s->data & CAP_LYRICS && last_lyrics_url != s->lyrics) {
-                    last_lyrics_url = s->lyrics;
-                    util::curl_download(s->lyrics.c_str(), config::lyrics_path);
-                }
+                util::handle_cover_art(s);
+                util::handle_lyrics(s);
 
                 format_string(formatted, s);
-                if (formatted.length() < 1 || !s->is_playing) {
-                    write_song(config::placeholder);
-                } else {
-                    write_song(qPrintable(formatted));
-                }
+                if (formatted.length() < 1 || !s->is_playing)
+                    formatted = config::placeholder;
+
+                write_song(qPrintable(formatted));
                 /* This adds 'Preview: ' to the string so do this last */
                 if (tuna_dialog)
                     tuna_dialog->set_output_preview(formatted);
