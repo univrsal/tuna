@@ -42,6 +42,8 @@ namespace config
 
     /* Temp storage for config values */
     extern uint16_t refresh_rate;
+    extern const char* format_string;
+    extern const char* placeholder;
     extern const char* cover_path;
     extern const char* lyrics_path;
     extern const char* song_path;

@@ -32,7 +32,7 @@ public:
 
     void apply_login_state(bool state, const QString& log);
 
-    void set_output_preview(const char* str);
+    void set_output_preview(QString& str);
 
     void set_spotify_auth_code(const char* str);
     void set_spotify_auth_token(const char* str);

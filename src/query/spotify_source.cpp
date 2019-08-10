@@ -19,7 +19,7 @@
 #define TOKEN_URL		"https://accounts.spotify.com/api/token"
 #define PLAYER_URL		"https://api.spotify.com/v1/me/player"
 #define REDIRECT_URI	"https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
-#define os_gettime_ms()	(static_cast<uint64_t>(os_gettime_ns() / 10e6))
+#define os_gettime_ms()	(static_cast<uint64_t>(os_gettime_ns() / 1e6))
 #define valid(s)		(s && strlen(s) > 0)
 
 spotify_source::spotify_source()
@@ -62,10 +62,13 @@ void spotify_source::load()
 
     /* Token handling */
     if (m_logged_in) {
+        auto time = os_gettime_ms();
         if (os_gettime_ms() > m_token_termination) {
             QString log;
             bool result = do_refresh_token(log);
-            tuna_dialog->apply_login_state(result, log);
+            if (result) {
+                blog(LOG_DEBUG, "[tuna] Successfully renewed Spotify token");
+            }
             save();
         }
     }
@@ -125,6 +128,10 @@ void spotify_source::refresh()
                 }
             }
             m_current.progress_ms = json_integer_value(progress);
+        } else {
+            const char* json_str = json_dumps(song_info, 0);
+            blog(LOG_ERROR, "[tuna] Couldn't fetch song data from spotify json: %s", json_str);
+            free((void*) json_str);
         }
         json_decref(song_info);
     }
@@ -149,6 +156,8 @@ void spotify_source::parse_track_json(json_t* track)
         /* Remove last ', ' */
         m_current.artists.pop_back();
         m_current.artists.pop_back();
+        if (!m_current.artists.empty())
+            m_current.data |= CAP_ARTIST;
 
         /* Cover link */
         curr = json_object_get(album, "images");
@@ -317,7 +326,7 @@ bool spotify_source::do_refresh_token(QString& log)
 {
     static std::string request;
     bool result = true;
-    request = "grant_type=refresh_token&refresh_token";
+    request = "grant_type=refresh_token&refresh_token=";
     request.append(m_refresh_token);
     auto* response = request_token(request.c_str(), m_creds.c_str());
 

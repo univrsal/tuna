@@ -40,16 +40,23 @@ tuna_gui::tuna_gui(QWidget *parent) :
     ui->lbl_img->setPixmap(img);
     bfree((void*)path);
     ui->settings_tabs->setCurrentIndex(0);
-
-    if (config_get_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN)) {
+    bool logged_in = config_get_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN);
+    if (logged_in) {
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
         ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
                                           "font-weight: bold;}");
     } else {
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDOUT);
     }
+    ui->btn_performrefresh->setEnabled(logged_in);
 
-    /* setup paths */
+#ifdef LINUX
+    ui->cb_source->addItem(T_SOURCE_MPD);
+#else
+    ui->tab_mpd->setVisible(false);
+#endif
+
+    /* setup config values */
     ui->txt_song_info->setText(config_get_string(config::instance, CFG_REGION,
                                                  CFG_SONG_PATH));
     ui->txt_song_cover->setText(config_get_string(config::instance, CFG_REGION,
@@ -60,6 +67,10 @@ tuna_gui::tuna_gui(QWidget *parent) :
                                                   CFG_SELECTED_SOURCE));
     ui->sb_refresh_rate->setValue(config_get_uint(config::instance, CFG_REGION,
                                                   CFG_REFRESH_RATE));
+    ui->txt_song_format->setText(config_get_string(config::instance, CFG_REGION,
+                                                  CFG_SONG_FORMAT));
+    ui->txt_song_placeholder->setText(config_get_string(config::instance, CFG_REGION,
+                                                        CFG_SONG_PLACEHOLDER));
     set_state();
 }
 
@@ -71,8 +82,9 @@ void tuna_gui::set_state()
         ui->lbl_status->setText(T_STATUS_STOPPED);
 }
 
-void tuna_gui::set_output_preview(const char *str)
+void tuna_gui::set_output_preview(QString& str)
 {
+    str.prepend(T_PREVIEW);
     ui->lbl_output->setText(str);
 }
 
@@ -134,9 +146,11 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
     ui->btn_performrefresh->setEnabled(state);
 
     /* Log */
-    QDate now = QDate::currentDate();
-    ui->txt_json_log->appendPlainText("= " + now.toString() + " =");
-    ui->txt_json_log->appendPlainText(log);
+    if (ui->cb_use_log->isChecked()) {
+        QDateTime now = QDateTime::currentDateTime();
+        ui->txt_json_log->appendPlainText("= " + now.toString("yyyy.MM.dd hh:mm") + " =");
+        ui->txt_json_log->appendPlainText(log);
+    }
 }
 
 void tuna_gui::on_btn_request_token_clicked()
@@ -151,7 +165,7 @@ void tuna_gui::on_btn_performrefresh_clicked()
 {
     QString log;
     config::spotify->set_auth_code(ui->txt_auth_code->text().toStdString());
-    bool result = config::spotify->new_token(log);
+    bool result = config::spotify->do_refresh_token(log);
     apply_login_state(result, log);
 }
 
@@ -167,6 +181,11 @@ void tuna_gui::on_tuna_gui_accepted()
                    ui->cb_source->currentIndex());
     config_set_uint(config::instance, CFG_REGION, CFG_REFRESH_RATE,
                     ui->sb_refresh_rate->value());
+    config_set_string(config::instance, CFG_REGION, CFG_SONG_FORMAT,
+                      qPrintable(ui->txt_song_format->text()));
+    config_set_string(config::instance, CFG_REGION, CFG_SONG_PLACEHOLDER,
+                      qPrintable(ui->txt_song_placeholder->text()));
+
     thread::mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
     thread::mutex.unlock();

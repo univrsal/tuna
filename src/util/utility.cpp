@@ -7,6 +7,7 @@
 #include "utility.hpp"
 #include <curl/curl.h>
 #include <stdio.h>
+#include <obs-module.h>
 
 namespace util {
 
@@ -28,6 +29,16 @@ namespace util {
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 #ifdef DEBUG
             curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+#endif
+            CURLcode res = curl_easy_perform(curl);
+
+            if (res != CURLE_OK) {
+                blog(LOG_ERROR, "[tuna] Couldn't fetch file from %s to %s", url, path);
+            }
+#ifdef DEBUG
+            else {
+                blog(LOG_DEBUG, "[tuna] Fetched %s to %s", url, path);
+            }
 #endif
             fclose(fp);
             result = true;

@@ -7,5 +7,5 @@
 #pragma once
 
 namespace util {
-    bool curl_download_file(const char* url, const char* path);
+    bool curl_download(const char* url, const char* path);
 }

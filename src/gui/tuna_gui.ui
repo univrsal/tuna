@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>664</width>
-    <height>617</height>
+    <width>688</width>
+    <height>682</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -54,7 +54,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>tuna.gui.basics.song.info</string>
+             <string>tuna.gui.tab.basics.song.info</string>
             </property>
            </widget>
           </item>
@@ -136,7 +136,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>tuna.gui.basics.song.cover</string>
+             <string>tuna.gui.tab.basics.song.cover</string>
             </property>
            </widget>
           </item>
@@ -218,7 +218,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>tuna.gui.basics.song.lyrics</string>
+             <string>tuna.gui.tab.basics.song.lyrics</string>
             </property>
            </widget>
           </item>
@@ -273,7 +273,7 @@
        <item>
         <widget class="QLabel" name="lbl_format_info">
          <property name="text">
-          <string>tuna.gui.basics.format.info</string>
+          <string>tuna.gui.tab.basics.format.info</string>
          </property>
         </widget>
        </item>
@@ -307,7 +307,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>tuna.gui.basics.song.format</string>
+             <string>tuna.gui.tab.basics.song.format</string>
             </property>
            </widget>
           </item>
@@ -379,7 +379,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>tuna.gui.basics.song.placeholder</string>
+             <string>tuna.gui.tab.basics.song.placeholder</string>
             </property>
            </widget>
           </item>
@@ -454,7 +454,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>tuna.gui.basics.source</string>
+             <string>tuna.gui.tab.basics.source</string>
             </property>
            </widget>
           </item>
@@ -487,12 +487,12 @@
             </property>
             <item>
              <property name="text">
-              <string>Spotify</string>
+              <string>tuna.gui.tab.spotify</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Window Title</string>
+              <string>tuna.gui.tab.window_title</string>
              </property>
             </item>
            </widget>
@@ -524,7 +524,7 @@
           <item>
            <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>tuna.gui.basics.refreshrate</string>
+             <string>tuna.gui.tab.basics.refreshrate</string>
             </property>
            </widget>
           </item>
@@ -571,14 +571,14 @@
           <item>
            <widget class="QLabel" name="lbl_status">
             <property name="text">
-             <string>tuna.gui.basics.status</string>
+             <string>tuna.gui.tab.basics.status</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="lbl_output">
             <property name="text">
-             <string>tuna.gui.basics.notrunning</string>
+             <string>tuna.gui.tab.basics.notrunning</string>
             </property>
            </widget>
           </item>
@@ -609,14 +609,14 @@
           <item>
            <widget class="QPushButton" name="btn_start">
             <property name="text">
-             <string>tuna.gui.basics.start</string>
+             <string>tuna.gui.tab.basics.start</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btn_stop">
             <property name="text">
-             <string>tuna.gui.basics.stop</string>
+             <string>tuna.gui.tab.basics.stop</string>
             </property>
            </widget>
           </item>
@@ -946,6 +946,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cb_use_log">
+         <property name="text">
+          <string>tuna.gui.tab.spotify.enablelog</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>tuna.gui.tab.spotify.label.log</string>
@@ -1042,7 +1052,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;tuna&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;by univrsal&lt;/p&gt;&lt;p&gt;Display information about currently playing music directly within obs.&lt;/p&gt;&lt;p&gt;Depends on Qt, libobs, libmpdclient, curl and jansson.&lt;/p&gt;&lt;p&gt;Tuna is licensed under the GPL v2.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;tuna&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;https://github.com/univrsal/tuna&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;github.com/univrsal/tuna&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Display information about currently playing music directly within obs.&lt;/p&gt;&lt;p&gt;Depends on Qt, libobs, libmpdclient, curl and jansson.&lt;/p&gt;&lt;p&gt;Tuna is licensed under the GPL v2.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
