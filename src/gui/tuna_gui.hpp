@@ -41,6 +41,9 @@ public:
     void set_mpd_ip(const char* ip);
     void set_mpd_port(uint16_t port);
 private slots:
+
+    void on_apply_pressed();
+
     void on_btn_sp_show_auth_pressed();
 
     void on_btn_sp_show_auth_released();
@@ -68,7 +71,6 @@ private slots:
     void on_btn_sp_show_refresh_token_pressed();
 
     void on_btn_sp_show_refresh_token_released();
-
 private:
     Ui::tuna_gui *ui;
 };

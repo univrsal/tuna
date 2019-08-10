@@ -33,6 +33,7 @@ tuna_gui::tuna_gui(QWidget *parent) :
     ui(new Ui::tuna_gui)
 {
     ui->setupUi(this);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(on_apply_pressed()));
 
     /* load logo */
     const char* path = obs_module_file("tuna.jpg");
@@ -191,6 +192,11 @@ void tuna_gui::on_tuna_gui_accepted()
     thread::mutex.unlock();
 
     config::load();
+}
+
+void tuna_gui::on_apply_pressed()
+{
+    on_tuna_gui_accepted();
 }
 
 void tuna_gui::on_btn_start_clicked()
