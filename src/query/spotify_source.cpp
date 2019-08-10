@@ -114,12 +114,14 @@ void spotify_source::refresh()
     if (song_info) {
         json_t* progress = json_object_get(song_info, "progress_ms");
         json_t* device = json_object_get(song_info, "device");
+        json_t* playing = json_object_get(song_info, "is_playing");
 
-        if (device && progress) {
+        if (device && progress && playing) {
             json_t* is_private = json_object_get(device, "is_private_session");
-            if (is_private && json_integer_value(is_private)) {
+            if (is_private && json_true() == is_private) {
                 blog(LOG_ERROR, "[tuna] Spotify session is private! Can't read track");
             } else {
+                m_current.is_playing = json_true() == playing;
                 json_t* track = json_object_get(song_info, "item");
                 if (track) {
                     parse_track_json(track);
@@ -221,8 +223,14 @@ void spotify_source::parse_track_json(json_t* track)
             switch (list.length()) {
             case 3:
                 m_current.day = list[2].toStdString();
+                /* Sometimes the release date gets reported wrong, so adjust it
+                 * if a value wasn't found */
+                if (m_current.day.empty())
+                    m_current.release_precision = prec_month;
             case 2: /* Fallthrough */
                 m_current.month = list[1].toStdString();
+                if (m_current.month.empty())
+                    m_current.release_precision = prec_year;
             case 1: /* Fallthrough */
                 m_current.year = list[0].toStdString();
             default:;

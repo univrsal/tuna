@@ -39,7 +39,7 @@ struct song_t {
     uint16_t data;
     std::string title, artists, album, cover, lyrics;
     uint32_t disc_number, track_number, duration_ms, progress_ms;
-    bool is_explicit;
+    bool is_explicit, is_playing;
     std::string year, month, day;
     date_precision release_precision;
 };

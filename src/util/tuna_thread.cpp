@@ -115,7 +115,7 @@ namespace thread {
                 }
 
                 format_string(formatted, s);
-                if (formatted.length() < 1) {
+                if (formatted.length() < 1 || !s->is_playing) {
                     write_song(config::placeholder);
                 } else {
                     write_song(qPrintable(formatted));
