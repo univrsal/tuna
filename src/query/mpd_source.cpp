@@ -71,27 +71,35 @@ void mpd_source::refresh()
     if (!m_connected)
         connect();
     m_current = {};
+    m_current.release_precision = prec_unkown;
+
     m_status = mpd_run_status(m_connection);
     m_mpd_song = mpd_run_current_song(m_connection);
 
     if (m_status) {
         m_mpd_state = mpd_status_get_state(m_status);
         m_current.progress_ms = mpd_status_get_elapsed_ms(m_status);
+        m_current.is_playing = m_mpd_state == MPD_STATE_PLAY;
         m_current.data |= CAP_PROGRESS | CAP_STATUS;
-
-        mpd_status_free(m_status);
-        m_status = nullptr;
     }
 
-    m_current.is_playing = m_mpd_state == MPD_STATE_PLAY;
-
     if (m_mpd_song) {
-        m_current.title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
-        m_current.artists = mpd_song_get_tag(m_mpd_song, MPD_TAG_ARTIST, 0);
-        m_current.year = mpd_song_get_tag(m_mpd_song, MPD_TAG_DATE, 0);
-        m_current.album = mpd_song_get_tag(m_mpd_song, MPD_TAG_ALBUM, 0);
-        m_current.duration_ms = mpd_song_get_duration_ms(m_mpd_song);
+        const char* title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
+        const char* artists = mpd_song_get_tag(m_mpd_song, MPD_TAG_ARTIST, 0);
+        const char* year = mpd_song_get_tag(m_mpd_song, MPD_TAG_DATE, 0);
+        const char* album = mpd_song_get_tag(m_mpd_song, MPD_TAG_ALBUM, 0);
+        const char* num = mpd_song_get_tag(m_mpd_song, MPD_TAG_TRACK, 0);
+        const char* disc = mpd_song_get_tag(m_mpd_song, MPD_TAG_DISC, 0);
 
+        if (title) m_current.title = title; else m_current.title = "N/A";
+        if (artists) m_current.artists = artists;
+        if (year) m_current.year = year;
+        if (album) m_current.album = album;
+
+        if (num) m_current.track_number = std::stoi(num);
+        if (disc) m_current.disc_number = std::atoi(disc);
+
+        m_current.duration_ms = mpd_song_get_duration_ms(m_mpd_song);
         if (!m_current.title.empty())
             m_current.data |= CAP_TITLE;
         if (!m_current.artists.empty())
@@ -104,10 +112,15 @@ void mpd_source::refresh()
             m_current.data |= CAP_ALBUM;
         if (m_current.duration_ms > 0)
             m_current.data |= CAP_LENGTH;
-
-        mpd_song_free(m_mpd_song);
-        m_mpd_song = nullptr;
     }
+
+    if (m_mpd_song)
+        mpd_song_free(m_mpd_song);
+    m_mpd_song = nullptr;
+
+    if (m_status)
+        mpd_status_free(m_status);
+    m_status = nullptr;
 }
 
 bool mpd_source::execute_capability(capability c)

@@ -121,10 +121,10 @@ void spotify_source::refresh()
             if (is_private && json_true() == is_private) {
                 blog(LOG_ERROR, "[tuna] Spotify session is private! Can't read track");
             } else {
-                m_current.is_playing = json_true() == playing;
                 json_t* track = json_object_get(song_info, "item");
                 if (track) {
                     parse_track_json(track);
+                    m_current.is_playing = json_true() == playing;
                 } else {
                     blog(LOG_ERROR, "[tuna] Couldn't get spotify track json");
                 }
@@ -147,6 +147,8 @@ void spotify_source::parse_track_json(json_t* track)
     json_t* curr, *name;
     if (album && artists) {
         m_current = {};
+        m_current.release_precision = prec_unkown;
+
         /* Get All artists */
         json_array_foreach(artists, index, curr) {
             name = json_object_get(curr, "name");

@@ -12,6 +12,7 @@
 #include <util/platform.h>
 #include <obs-module.h>
 #include <fstream>
+#include <QTime>
 #ifdef LINUX
 #include <pthread.h>
 #endif
@@ -61,29 +62,39 @@ namespace thread {
         thread_state = false;
     }
 
+    QString time_format(uint32_t ms)
+    {
+        int secs = (ms / 1000) % 60;
+        int minute = (ms / 1000) / 60 % 60;
+        int hour = (ms / 1000) / 60 / 60 % 60;
+        QTime t(hour, minute, secs);
+
+        return t.toString(hour > 0 ? "h:mm:ss" : "m:ss");
+    }
+
     void format_string(QString& out, const song_t* song)
     {
         out = config::format_string;
-        if (song->data & CAP_TITLE)
-            out.replace("%t", song->title.c_str());
-        if (song->data & CAP_ARTIST)
-            out.replace("%m", song->artists.c_str());
-        if (song->data & CAP_ALBUM)
-            out.replace("%a", song->album.c_str());
-        if (song->data & CAP_RELEASE) {
-            QString full_date = "";
-            switch(song->release_precision) {
-            case prec_day:
-                full_date.append(song->day.c_str()).append('.');
-            case prec_month:
-                full_date.append(song->month.c_str()).append('.');
-            case prec_year:
-                full_date.append(song->year.c_str());
-            default:;
-            }
-            out.replace("%y", song->year.c_str());
-            out.replace("%r", full_date);
+        out.replace("%t", song->title.c_str());
+        out.replace("%m", song->artists.c_str());
+        out.replace("%a", song->album.c_str());
+        out.replace("%d", QString::number(song->disc_number));
+        out.replace("%n", QString::number(song->track_number));
+        out.replace("%p", time_format(song->progress_ms));
+        out.replace("%l", time_format(song->duration_ms));
+
+        QString full_date = "";
+        switch(song->release_precision) {
+        case prec_day:
+            full_date.append(song->day.c_str()).append('.');
+        case prec_month:
+            full_date.append(song->month.c_str()).append('.');
+        case prec_year:
+            full_date.append(song->year.c_str());
+        default:;
         }
+        out.replace("%y", song->year.c_str());
+        out.replace("%r", full_date);
     }
 
 #ifdef _WIN32
@@ -104,9 +115,23 @@ namespace thread {
                 auto* s = config::selected_source->song();
 
                 /* Process song data */
-                if (s->data & CAP_COVER  && config::download_cover && last_cover_url != s->cover) {
-                    last_cover_url = s->cover;
-                    util::curl_download(s->cover.c_str(), config::cover_path);
+                if (s->data & CAP_COVER  && config::download_cover) {
+                    if (last_cover_url != s->cover) {
+                        last_cover_url = s->cover;
+                        util::curl_download(s->cover.c_str(), config::cover_path);
+                    }
+                } else if (last_cover_url != "n/a") {
+                    last_cover_url = "n/a";
+                    /* Copy placeholder over since we don't have a cover */
+                    std::ifstream pholder(config::cover_placeholder, std::ios::binary);
+                    std::ofstream cover(config::cover_path, std::ios::binary);
+                    if (pholder.good() && cover.good()) {
+                        cover << pholder.rdbuf();
+                    } else {
+                        blog(LOG_ERROR, "[tuna] Couldn't set placeholder album cover");
+                    }
+                    pholder.close();
+                    cover.close();
                 }
 
                 if (s->data & CAP_LYRICS && last_lyrics_url != s->lyrics) {
@@ -121,7 +146,8 @@ namespace thread {
                     write_song(qPrintable(formatted));
                 }
                 /* This adds 'Preview: ' to the string so do this last */
-                tuna_dialog->set_output_preview(formatted);
+                if (tuna_dialog)
+                    tuna_dialog->set_output_preview(formatted);
             }
 
             mutex.unlock();

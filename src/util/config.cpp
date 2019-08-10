@@ -28,6 +28,7 @@ namespace config
     const char* cover_path = "";
     const char* lyrics_path = "";
     const char* song_path = "";
+    const char* cover_placeholder = "";
     bool download_cover = true;
 
     void init_default()
@@ -52,6 +53,7 @@ namespace config
                                   T_FORMAT);
         config_set_default_string(instance, CFG_REGION, CFG_SONG_PLACEHOLDER,
                                   T_PLACEHOLDER);
+        cover_placeholder = obs_module_file("placeholder.png");
     }
 
     void select_source(source s)
@@ -115,12 +117,15 @@ namespace config
 
     void close()
     {
+        thread::mutex.lock();
         save();
         thread::stop();
+        bfree((void*)cover_placeholder);
 
         delete spotify;
         delete mpd;
         spotify = nullptr;
         mpd = nullptr;
+        thread::mutex.unlock();
     }
 }

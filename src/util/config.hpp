@@ -53,6 +53,7 @@ namespace config
     extern const char* cover_path;
     extern const char* lyrics_path;
     extern const char* song_path;
+    extern const char* cover_placeholder;
     extern bool download_cover;
 
     void load_gui_values();
