@@ -91,6 +91,7 @@ namespace config
 
     void close()
     {
+        config_set_bool(instance, CFG_REGION, CFG_RUNNING, thread::thread_state);
         thread::stop();
         spotify->save();
 
