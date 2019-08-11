@@ -5,6 +5,7 @@
  * github.com/univrsal/tuna
  */
 #pragma once
+#include <stdint.h>
 
 struct song_t;
 
@@ -14,4 +15,6 @@ namespace util {
     void handle_cover_art(const song_t* song);
     void handle_lyrics(const song_t* song);
     bool move_file(const char* src, const char* dest);
+
+    int64_t epoch();
 }

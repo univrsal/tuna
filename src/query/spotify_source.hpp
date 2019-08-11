@@ -18,8 +18,8 @@ class spotify_source : public music_source
     std::string m_auth_code = "";
     std::string m_refresh_token = "";
 
-    /* system time in ms */
-    uint64_t m_token_termination = 0;
+    /* epoch time in seconds */
+    int64_t m_token_termination = 0;
 
     void parse_track_json(json_t* track);
 public:

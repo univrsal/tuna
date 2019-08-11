@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <obs-module.h>
 #include <fstream>
+#include <ctime>
 
 namespace util {
 
@@ -83,7 +84,7 @@ namespace util {
     {
         static std::string last_cover = "";
         bool is_url = song->cover.find("http") != std::string::npos;
-        bool found_cover = false;
+        bool found_cover = song->data & CAP_COVER;
 
         if (!song->cover.empty() && song->cover != last_cover) {
             if (is_url && config::download_cover) {
@@ -101,5 +102,10 @@ namespace util {
             if (!move_file(config::cover_placeholder, config::cover_path))
                 blog(LOG_ERROR, "[tuna] couldn't move placeholder cover");
         }
+
+    }
+
+    int64_t epoch() {
+        return time(nullptr);
     }
 }

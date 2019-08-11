@@ -12,6 +12,7 @@
 #include <jansson.h>
 #include "spotify_source.hpp"
 #include "../util/creds.hpp"
+#include "../util/utility.hpp"
 #include "../util/constants.hpp"
 #include "../util/config.hpp"
 #include "../gui/tuna_gui.hpp"
@@ -19,7 +20,6 @@
 #define TOKEN_URL		"https://accounts.spotify.com/api/token"
 #define PLAYER_URL		"https://api.spotify.com/v1/me/player"
 #define REDIRECT_URI	"https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
-#define os_gettime_ms()	(static_cast<uint64_t>(os_gettime_ns() / 1e6))
 #define valid(s)		(s && strlen(s) > 0)
 
 spotify_source::spotify_source()
@@ -44,7 +44,7 @@ void spotify_source::load()
                               CFG_SPOTIFY_TOKEN, "");
     config_set_default_string(config::instance, CFG_REGION,
                               CFG_SPOTIFY_AUTH_CODE, "");
-    config_set_default_uint(config::instance, CFG_REGION,
+    config_set_default_int(config::instance, CFG_REGION,
                             CFG_SPOTIFY_TOKEN_TERMINATION, 0);
     config_set_default_string(config::instance, CFG_REGION,
                               CFG_SPOTIFY_REFRESH_TOKEN, "");
@@ -57,13 +57,12 @@ void spotify_source::load()
                                 CFG_SPOTIFY_REFRESH_TOKEN);
     m_auth_code = config_get_string(config::instance, CFG_REGION,
                                     CFG_SPOTIFY_AUTH_CODE);
-    m_token_termination = config_get_uint(config::instance, CFG_REGION,
+    m_token_termination = config_get_int(config::instance, CFG_REGION,
                                    CFG_SPOTIFY_TOKEN_TERMINATION);
 
     /* Token handling */
     if (m_logged_in) {
-        auto time = os_gettime_ms();
-        if (os_gettime_ms() > m_token_termination) {
+        if (util::epoch() > m_token_termination) {
             QString log;
             bool result = do_refresh_token(log);
             if (result) {
@@ -91,7 +90,7 @@ void spotify_source::save()
                       m_auth_code.c_str());
     config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_REFRESH_TOKEN,
                       m_refresh_token.c_str());
-    config_set_uint(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN_TERMINATION,
+    config_set_int(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN_TERMINATION,
                     m_token_termination);
 }
 
@@ -102,7 +101,7 @@ void spotify_source::refresh()
 {
     if (!m_logged_in)
         return;
-    if (os_gettime_ms() > m_token_termination) {
+    if (util::epoch() > m_token_termination) {
         QString log;
         bool result = do_refresh_token(log);
         tuna_dialog->apply_login_state(result, log);
@@ -169,7 +168,8 @@ void spotify_source::parse_track_json(json_t* track)
             if (curr) curr = json_object_get(curr, "url");
             if (curr) {
                 m_current.cover = json_string_value(curr);
-                m_current.data |= CAP_COVER;
+                if (!m_current.cover.empty())
+                    m_current.data |= CAP_COVER;
             }
         }
         /* Get title */
@@ -239,6 +239,7 @@ void spotify_source::parse_track_json(json_t* track)
         }
     }
 }
+
 bool spotify_source::execute_capability(capability c)
 {
     bool result = true;
@@ -351,8 +352,7 @@ bool spotify_source::do_refresh_token(QString& log)
 
         if (token && expires) {
             m_token = json_string_value(token);
-            m_token_termination = os_gettime_ms() + json_integer_value(expires)
-                    * 1000;
+            m_token_termination = util::epoch() + json_integer_value(expires);
             m_logged_in = true;
             save();
         } else {
@@ -394,8 +394,7 @@ bool spotify_source::new_token(QString& log)
         if (token && refresh && expires) {
             m_token = json_string_value(token);
             m_refresh_token = json_string_value(refresh);
-            m_token_termination = os_gettime_ms() + json_integer_value(expires)
-                    * 1000;
+            m_token_termination = util::epoch() + json_integer_value(expires);
             result = true;
         } else {
             blog(LOG_ERROR, "[tuna] Couldn't parse json response!");

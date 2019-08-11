@@ -49,6 +49,7 @@ void mpd_source::connect()
              m_address, m_port, mpd_connection_get_error_message(m_connection));
     } else {
         m_connected = true;
+        mpd_connection_set_keepalive(m_connection, true);
     }
 }
 
@@ -81,6 +82,9 @@ void mpd_source::refresh()
         m_current.progress_ms = mpd_status_get_elapsed_ms(m_status);
         m_current.is_playing = m_mpd_state == MPD_STATE_PLAY;
         m_current.data |= CAP_PROGRESS | CAP_STATUS;
+    } else {
+        /* Connection might have closed in between refreshes */
+        connect();
     }
 
     if (m_mpd_song) {

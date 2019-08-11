@@ -43,6 +43,8 @@ set(tuna_sources
     ./src/query/spotify_source.hpp
     ./src/query/mpd_source.cpp
     ./src/query/mpd_source.hpp
+    ./src/query/window_source.cpp
+    ./src/query/window_source.hpp
     ./src/util/tuna_thread.cpp
     ./src/util/tuna_thread.hpp
     ./src/util/utility.cpp
