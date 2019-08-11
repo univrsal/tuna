@@ -17,6 +17,7 @@ class mpd_source : public music_source
     const char* m_address;
     bool m_connected;
     uint16_t m_port;
+    bool m_local;
 public:
     mpd_source();
     ~mpd_source() override;

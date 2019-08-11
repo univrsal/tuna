@@ -43,6 +43,7 @@
 
 #define CFG_MPD_IP						"mpd.ip"
 #define CFG_MPD_PORT					"mpd.port"
+#define CFG_MPD_LOCAL					"mpd.local"
 
 #define CFG_WINDOW_TITLE				"window.title"
 #define CFG_WINDOW_SEARCH				"window.search"

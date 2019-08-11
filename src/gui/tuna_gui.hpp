@@ -40,6 +40,7 @@ public:
 
     void set_mpd_ip(const char* ip);
     void set_mpd_port(uint16_t port);
+    void set_mpd_local(bool state);
 
     void set_window_title(const char* str);
     void set_window_search(const char* str);
@@ -78,6 +79,8 @@ private slots:
     void on_btn_sp_show_refresh_token_pressed();
 
     void on_btn_sp_show_refresh_token_released();
+    void on_checkBox_stateChanged(int arg1);
+
 private:
     Ui::tuna_gui *ui;
 };

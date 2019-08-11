@@ -41,7 +41,7 @@ tuna_gui::tuna_gui(QWidget *parent) :
     ui->lbl_img->setPixmap(img);
     bfree((void*)path);
     ui->settings_tabs->setCurrentIndex(0);
-    bool logged_in = config_get_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN);
+    bool logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
     if (logged_in) {
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
         ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
@@ -58,21 +58,18 @@ tuna_gui::tuna_gui(QWidget *parent) :
 #endif
 
     /* setup config values */
-    ui->txt_song_info->setText(config_get_string(config::instance, CFG_REGION,
-                                                 CFG_SONG_PATH));
-    ui->txt_song_cover->setText(config_get_string(config::instance, CFG_REGION,
-                                                 CFG_COVER_PATH));
-    ui->txt_song_lyrics->setText(config_get_string(config::instance, CFG_REGION,
-                                                 CFG_LYRICS_PATH));
-    ui->cb_source->setCurrentIndex(config_get_uint(config::instance, CFG_REGION,
-                                                  CFG_SELECTED_SOURCE));
-    ui->sb_refresh_rate->setValue(config_get_uint(config::instance, CFG_REGION,
-                                                  CFG_REFRESH_RATE));
-    ui->txt_song_format->setText(config_get_string(config::instance, CFG_REGION,
-                                                  CFG_SONG_FORMAT));
-    ui->txt_song_placeholder->setText(config_get_string(config::instance, CFG_REGION,
-                                                        CFG_SONG_PLACEHOLDER));
+    ui->txt_song_info->setText(CGET_STR(CFG_SONG_PATH));
+    ui->txt_song_cover->setText(CGET_STR(CFG_COVER_PATH));
+    ui->txt_song_lyrics->setText(CGET_STR(CFG_LYRICS_PATH));
+    ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
+    ui->sb_refresh_rate->setValue(CGET_UINT(CFG_REFRESH_RATE));
+    ui->txt_song_format->setText(CGET_STR(CFG_SONG_FORMAT));
+    ui->txt_song_placeholder->setText(CGET_STR(CFG_SONG_PLACEHOLDER));
+    ui->cb_dl_cover->setChecked(CGET_BOOL(CFG_DOWNLOAD_COVER));
     set_state();
+
+    /* TODO Lyrics */
+    ui->frame_lyrics->setVisible(false);
 }
 
 void tuna_gui::set_state()
@@ -172,20 +169,26 @@ void tuna_gui::on_btn_performrefresh_clicked()
 
 void tuna_gui::on_tuna_gui_accepted()
 {
-    config_set_string(config::instance, CFG_REGION, CFG_SONG_PATH,
-                      qPrintable(ui->txt_song_info->text()));
-    config_set_string(config::instance, CFG_REGION, CFG_COVER_PATH,
-                      qPrintable(ui->txt_song_cover->text()));
-    config_set_string(config::instance, CFG_REGION, CFG_LYRICS_PATH,
-                      qPrintable(ui->txt_song_lyrics->text()));
-    config_set_int(config::instance, CFG_REGION, CFG_SELECTED_SOURCE,
-                   ui->cb_source->currentIndex());
-    config_set_uint(config::instance, CFG_REGION, CFG_REFRESH_RATE,
-                    ui->sb_refresh_rate->value());
-    config_set_string(config::instance, CFG_REGION, CFG_SONG_FORMAT,
-                      qPrintable(ui->txt_song_format->text()));
-    config_set_string(config::instance, CFG_REGION, CFG_SONG_PLACEHOLDER,
-                      qPrintable(ui->txt_song_placeholder->text()));
+    CSET_STR(CFG_SONG_PATH, qPrintable(ui->txt_song_info->text()));
+    CSET_STR(CFG_COVER_PATH, qPrintable(ui->txt_song_cover->text()));
+    CSET_STR(CFG_LYRICS_PATH, qPrintable(ui->txt_song_lyrics->text()));
+    CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
+    CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
+    CSET_STR(CFG_SONG_FORMAT, qPrintable(ui->txt_song_format->text()));
+    CSET_STR(CFG_SONG_PLACEHOLDER, qPrintable(ui->txt_song_placeholder->text()));
+    CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
+
+    /* Source settings */
+    CSET_STR(CFG_MPD_IP, qPrintable(ui->txt_ip->text()));
+    CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
+    CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
+
+    CSET_STR(CFG_WINDOW_TITLE, qPrintable(ui->txt_title->text()));
+    CSET_STR(CFG_WINDOW_SEARCH, qPrintable(ui->txt_search->text()));
+    CSET_STR(CFG_WINDOW_REPLACE, qPrintable(ui->txt_replace->text()));
+    CSET_BOOL(CFG_WINDOW_REGEX, ui->cb_regex->isChecked());
+    CSET_UINT(CFG_WINDOW_CUT_BEGIN, ui->sb_begin->value());
+    CSET_UINT(CFG_WINDOW_CUT_END, ui->sb_end->value());
 
     thread::mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
@@ -221,6 +224,11 @@ void tuna_gui::set_mpd_ip(const char *ip)
 void tuna_gui::set_mpd_port(uint16_t port)
 {
     ui->sb_port->setValue(port);
+}
+
+void tuna_gui::set_mpd_local(bool state)
+{
+    ui->cb_local->setChecked(state);
 }
 
 void tuna_gui::set_spotify_auth_code(const char *str)
@@ -286,4 +294,10 @@ void tuna_gui::on_btn_sp_show_refresh_token_pressed()
 void tuna_gui::on_btn_sp_show_refresh_token_released()
 {
     ui->txt_refresh_token->setEchoMode(QLineEdit::Password);
+}
+
+void tuna_gui::on_checkBox_stateChanged(int arg1)
+{
+    ui->txt_ip->setEnabled(arg1 > 0);
+    ui->sb_port->setEnabled(arg1 > 0);
 }

@@ -13,7 +13,7 @@
 
 window_source::window_source()
 {
-    m_capabilities = CAP_PLAIN;
+    m_capabilities = CAP_TITLE;
 }
 
 void window_source::load()
@@ -45,6 +45,9 @@ void window_source::save()
 
 void window_source::refresh()
 {
+    if (m_title.empty())
+        return;
+
     std::vector<std::string> window_titles;
     GetWindowList(window_titles);
     QRegularExpression regex(m_title.c_str());
@@ -67,11 +70,12 @@ void window_source::refresh()
 
     /* Replace & cut */
     util::replace_all(result, m_search, m_replace);
-    if (m_cut_end + m_cut_begin < result.length())
-        result = result.substr(m_cut_begin, m_cut_end);
+    if (0 < m_cut_end + m_cut_begin && m_cut_end + m_cut_begin < result.length())
+         result = result.substr(m_cut_begin, result.length() - m_cut_begin - m_cut_end);
 
     m_current = {};
-    m_current.data = CAP_PLAIN;
+    m_current.data = CAP_TITLE;
+    m_current.is_playing = true;
     m_current.title = result;
 }
 

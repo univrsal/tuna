@@ -43,10 +43,15 @@ void mpd_source::disconnect()
 void mpd_source::connect()
 {
     disconnect();
-    m_connection = mpd_connection_new(m_address, m_port, 500);
+    if (m_local)
+        m_connection = mpd_connection_new(nullptr, 0, 0);
+    else
+        m_connection = mpd_connection_new(m_address, m_port, 500);
+
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
         blog(LOG_ERROR, "[tuna] mpd connection to %s:%hu failed with error %s",
              m_address, m_port, mpd_connection_get_error_message(m_connection));
+        mpd_connection_free(m_connection);
     } else {
         m_connected = true;
         mpd_connection_set_keepalive(m_connection, true);
@@ -57,20 +62,26 @@ void mpd_source::load()
 {
     CDEF_INT(CFG_MPD_PORT, 0);
     CDEF_STR(CFG_MPD_IP, "localhost");
+    CDEF_BOOL(CFG_MPD_LOCAL, true);
+
     m_address = CGET_STR(CFG_MPD_IP);
     m_port = CGET_UINT(CFG_MPD_PORT);
+    m_local = CGET_BOOL(CFG_MPD_LOCAL);
 }
 
 void mpd_source::save()
 {
     CSET_STR(CFG_MPD_IP, m_address);
     CSET_UINT(CFG_MPD_PORT, m_port);
+    CSET_BOOL(CFG_MPD_LOCAL, m_local);
 }
 
 void mpd_source::refresh()
 {
     if (!m_connected)
         connect();
+    if (!m_connected) return;
+
     m_current = {};
     m_current.release_precision = prec_unkown;
 
@@ -82,9 +93,6 @@ void mpd_source::refresh()
         m_current.progress_ms = mpd_status_get_elapsed_ms(m_status);
         m_current.is_playing = m_mpd_state == MPD_STATE_PLAY;
         m_current.data |= CAP_PROGRESS | CAP_STATUS;
-    } else {
-        /* Connection might have closed in between refreshes */
-        connect();
     }
 
     if (m_mpd_song) {

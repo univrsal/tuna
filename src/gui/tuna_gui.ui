@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -25,7 +25,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QFrame" name="frame_5">
+        <widget class="QFrame" name="frame_song_path">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -114,7 +114,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_7">
+        <widget class="QFrame" name="frame_cover">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -196,7 +196,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_6">
+        <widget class="QFrame" name="frame_lyrics">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -285,7 +285,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_8">
+        <widget class="QFrame" name="frame_format">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -357,7 +357,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_9">
+        <widget class="QFrame" name="frame_placeholder">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -432,7 +432,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_10">
+        <widget class="QFrame" name="frame_source">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -508,7 +508,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_12">
+        <widget class="QFrame" name="frame_refresh">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -555,7 +555,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_13">
+        <widget class="QFrame" name="frame_preview">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -593,7 +593,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame_11">
+        <widget class="QFrame" name="frame_control">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -997,6 +997,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cb_local">
+         <property name="text">
+          <string>tuna.gui.tab.mpd.local</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QFrame" name="frame_14">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -1019,6 +1029,9 @@
           </property>
           <item>
            <widget class="QLineEdit" name="txt_ip">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>localhost</string>
             </property>
@@ -1026,6 +1039,9 @@
           </item>
           <item>
            <widget class="QSpinBox" name="sb_port">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="minimumSize">
              <size>
               <width>90</width>

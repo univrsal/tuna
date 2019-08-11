@@ -25,12 +25,12 @@ namespace config
     mpd_source* mpd = nullptr;
 
     uint16_t refresh_rate = 1000;
-    const char* format_string = "";
-    const char* placeholder = "";
-    const char* cover_path = "";
-    const char* lyrics_path = "";
-    const char* song_path = "";
-    const char* cover_placeholder = "";
+    const char* format_string = nullptr;
+    const char* placeholder = nullptr;
+    const char* cover_path = nullptr;
+    const char* lyrics_path = nullptr;
+    const char* song_path = nullptr;
+    const char* cover_placeholder = nullptr;
     bool download_cover = true;
 
     void init_default()
@@ -51,7 +51,8 @@ namespace config
         CDEF_STR(CFG_SONG_FORMAT, T_FORMAT);
         CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
 
-        cover_placeholder = obs_module_file("placeholder.png");
+        if (!cover_placeholder)
+            cover_placeholder = obs_module_file("placeholder.png");
     }
 
     void select_source(source s)
@@ -74,7 +75,8 @@ namespace config
 
     void load()
     {
-        instance = obs_frontend_get_global_config();
+        if (!instance)
+            instance = obs_frontend_get_global_config();
         init_default();
         bool run = CGET_BOOL(CFG_RUNNING);
 
@@ -123,6 +125,11 @@ namespace config
         thread::mutex.lock();
         save();
         thread::stop();
+        thread::mutex.unlock();
+
+        /* Wait for thread to exit to delete resources */
+        while (thread::thread_state)
+            os_sleep_ms(5);
         bfree((void*)cover_placeholder);
 
         delete spotify;
@@ -131,6 +138,5 @@ namespace config
         window = nullptr;
         spotify = nullptr;
         mpd = nullptr;
-        thread::mutex.unlock();
     }
 }
