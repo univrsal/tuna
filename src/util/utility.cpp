@@ -105,6 +105,17 @@ namespace util {
 
     }
 
+    void replace_all(std::string& str, const std::string& find, const std::string& replace)
+    {
+        if(find.empty())
+            return;
+        size_t start_pos = 0;
+        while((start_pos = str.find(find, start_pos)) != std::string::npos) {
+            str.replace(start_pos, find.length(), replace);
+            start_pos += replace.length();
+        }
+    }
+
     int64_t epoch() {
         return time(nullptr);
     }

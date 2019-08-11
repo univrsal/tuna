@@ -38,27 +38,17 @@ spotify_source::spotify_source()
 
 void spotify_source::load()
 {
-    config_set_default_bool(config::instance, CFG_REGION,
-                            CFG_SPOTIFY_LOGGEDIN, false);
-    config_set_default_string(config::instance, CFG_REGION,
-                              CFG_SPOTIFY_TOKEN, "");
-    config_set_default_string(config::instance, CFG_REGION,
-                              CFG_SPOTIFY_AUTH_CODE, "");
-    config_set_default_int(config::instance, CFG_REGION,
-                            CFG_SPOTIFY_TOKEN_TERMINATION, 0);
-    config_set_default_string(config::instance, CFG_REGION,
-                              CFG_SPOTIFY_REFRESH_TOKEN, "");
+    CDEF_BOOL(CFG_SPOTIFY_LOGGEDIN, false);
+    CDEF_STR(CFG_SPOTIFY_TOKEN, "");
+    CDEF_STR(CFG_SPOTIFY_AUTH_CODE, "");
+    CDEF_STR(CFG_SPOTIFY_REFRESH_TOKEN, "");
+    CDEF_INT(CFG_SPOTIFY_TOKEN_TERMINATION, 0);
 
-    m_logged_in = config_get_bool(config::instance, CFG_REGION,
-                                  CFG_SPOTIFY_LOGGEDIN);
-    m_token = config_get_string(config::instance, CFG_REGION,
-                                CFG_SPOTIFY_TOKEN);
-    m_refresh_token = config_get_string(config::instance, CFG_REGION,
-                                CFG_SPOTIFY_REFRESH_TOKEN);
-    m_auth_code = config_get_string(config::instance, CFG_REGION,
-                                    CFG_SPOTIFY_AUTH_CODE);
-    m_token_termination = config_get_int(config::instance, CFG_REGION,
-                                   CFG_SPOTIFY_TOKEN_TERMINATION);
+    m_logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
+    m_token = CGET_STR(CFG_SPOTIFY_TOKEN);
+    m_refresh_token = CGET_STR(CFG_SPOTIFY_REFRESH_TOKEN);
+    m_auth_code = CGET_STR(CFG_SPOTIFY_AUTH_CODE);
+    m_token_termination = CGET_INT(CFG_SPOTIFY_TOKEN_TERMINATION);
 
     /* Token handling */
     if (m_logged_in) {
@@ -82,16 +72,11 @@ void spotify_source::load_gui_values()
 
 void spotify_source::save()
 {
-    config_set_bool(config::instance, CFG_REGION, CFG_SPOTIFY_LOGGEDIN,
-                    m_logged_in);
-    config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN,
-                      m_token.c_str());
-    config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_AUTH_CODE,
-                      m_auth_code.c_str());
-    config_set_string(config::instance, CFG_REGION, CFG_SPOTIFY_REFRESH_TOKEN,
-                      m_refresh_token.c_str());
-    config_set_int(config::instance, CFG_REGION, CFG_SPOTIFY_TOKEN_TERMINATION,
-                    m_token_termination);
+    CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, m_logged_in);
+    CSET_STR(CFG_SPOTIFY_TOKEN, m_token.c_str());
+    CSET_STR(CFG_SPOTIFY_AUTH_CODE, m_auth_code.c_str());
+    CSET_STR(CFG_SPOTIFY_REFRESH_TOKEN, m_refresh_token.c_str());
+    CSET_INT(CFG_SPOTIFY_TOKEN_TERMINATION, m_token_termination);
 }
 
 /* implementation further down */

@@ -6,7 +6,7 @@
  */
 #pragma once
 #include <stdint.h>
-
+#include <string>
 struct song_t;
 
 namespace util {
@@ -15,6 +15,8 @@ namespace util {
     void handle_cover_art(const song_t* song);
     void handle_lyrics(const song_t* song);
     bool move_file(const char* src, const char* dest);
+
+    void replace_all(std::string& str, const std::string& find, const std::string& replace);
 
     int64_t epoch();
 }

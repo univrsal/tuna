@@ -7,6 +7,22 @@
 #pragma once
 #include <util/config-file.h>
 
+/* Config macros */
+#define CDEF_STR(id, value)				config_set_default_string(config::instance, CFG_REGION, id, value)
+#define CDEF_INT(id, value)				config_set_default_int(config::instance, CFG_REGION, id, value)
+#define CDEF_UINT(id, value)			config_set_default_uint(config::instance, CFG_REGION, id, value)
+#define CDEF_BOOL(id, value)			config_set_default_bool(config::instance, CFG_REGION, id, value)
+
+#define CGET_STR(id)					config_get_string(config::instance, CFG_REGION, id)
+#define CGET_INT(id)					config_get_int(config::instance, CFG_REGION, id)
+#define CGET_UINT(id)					config_get_uint(config::instance, CFG_REGION, id)
+#define CGET_BOOL(id)					config_get_bool(config::instance, CFG_REGION, id)
+
+#define CSET_STR(id, value)				config_set_string(config::instance, CFG_REGION, id, value)
+#define CSET_INT(id, value)				config_set_int(config::instance, CFG_REGION, id, value)
+#define CSET_UINT(id, value)			config_set_uint(config::instance, CFG_REGION, id, value)
+#define CSET_BOOL(id, value)			config_set_bool(config::instance, CFG_REGION, id, value)
+
 #define CFG_REGION						"tuna"
 
 #define CFG_RUNNING						"running"
@@ -28,7 +44,15 @@
 #define CFG_MPD_IP						"mpd.ip"
 #define CFG_MPD_PORT					"mpd.port"
 
+#define CFG_WINDOW_TITLE				"window.title"
+#define CFG_WINDOW_SEARCH				"window.search"
+#define CFG_WINDOW_REPLACE				"window.replace"
+#define CFG_WINDOW_CUT_BEGIN			"window.cut.begin"
+#define CFG_WINDOW_CUT_END				"window.cut.end"
+#define CFG_WINDOW_REGEX				"window.regex"
+
 class spotify_source;
+class window_source;
 class mpd_source;
 class music_source;
 
@@ -44,6 +68,7 @@ namespace config
     extern music_source* selected_source;
     extern config_t* instance;
     extern spotify_source* spotify;
+    extern window_source* window;
     extern mpd_source* mpd;
 
     /* Temp storage for config values */

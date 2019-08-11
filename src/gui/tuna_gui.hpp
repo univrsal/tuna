@@ -40,6 +40,13 @@ public:
 
     void set_mpd_ip(const char* ip);
     void set_mpd_port(uint16_t port);
+
+    void set_window_title(const char* str);
+    void set_window_search(const char* str);
+    void set_window_replace(const char* str);
+    void set_window_cut_begin(uint16_t n);
+    void set_window_cut_end(uint16_t n);
+    void set_window_regex(bool state);
 private slots:
 
     void on_apply_pressed();

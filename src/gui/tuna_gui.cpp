@@ -233,6 +233,36 @@ void tuna_gui::set_spotify_auth_token(const char *str)
     ui->txt_token->setText(str);
 }
 
+void tuna_gui::set_window_regex(bool state)
+{
+    ui->cb_regex->setChecked(state);
+}
+
+void tuna_gui::set_window_title(const char *str)
+{
+    ui->txt_title->setText(str);
+}
+
+void tuna_gui::set_window_search(const char *str)
+{
+    ui->txt_search->setText(str);
+}
+
+void tuna_gui::set_window_replace(const char *str)
+{
+    ui->txt_replace->setText(str);
+}
+
+void tuna_gui::set_window_cut_begin(uint16_t n)
+{
+    ui->sb_begin->setValue(n);
+}
+
+void tuna_gui::set_window_cut_end(uint16_t n)
+{
+    ui->sb_end->setValue(n);
+}
+
 void tuna_gui::set_spotify_refresh_token(const char *str)
 {
     ui->txt_refresh_token->setText(str);

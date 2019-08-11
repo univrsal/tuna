@@ -55,16 +55,16 @@ void mpd_source::connect()
 
 void mpd_source::load()
 {
-    config_set_default_uint(config::instance, CFG_REGION, CFG_MPD_PORT, 0);
-    config_set_default_string(config::instance, CFG_REGION, CFG_MPD_IP, "localhost");
-    m_address = config_get_string(config::instance, CFG_REGION, CFG_MPD_IP);
-    m_port = config_get_uint(config::instance, CFG_REGION, CFG_MPD_PORT);
+    CDEF_INT(CFG_MPD_PORT, 0);
+    CDEF_STR(CFG_MPD_IP, "localhost");
+    m_address = CGET_STR(CFG_MPD_IP);
+    m_port = CGET_UINT(CFG_MPD_PORT);
 }
 
 void mpd_source::save()
 {
-    config_set_string(config::instance, CFG_REGION, CFG_MPD_IP, m_address);
-    config_set_uint(config::instance, CFG_REGION, CFG_MPD_PORT, m_port);
+    CSET_STR(CFG_MPD_IP, m_address);
+    CSET_UINT(CFG_MPD_PORT, m_port);
 }
 
 void mpd_source::refresh()

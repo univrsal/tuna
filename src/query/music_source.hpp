@@ -22,6 +22,8 @@ enum capability {
     CAP_TRACK_NUMBER = 1 << 9,	/* Track number on disk		*/
     CAP_PROGRESS = 1 << 10,		/* Get play progress in ms	*/
     CAP_STATUS = 1 << 11,		/* Get song playing satus	*/
+    CAP_PLAIN = 1 << 12,		/* Source only provides
+                                   preformatted string		*/
 
     /* Control stuff */
     CAP_NEXT_SONG = 1 << 16,	/* Skip to next song		*/

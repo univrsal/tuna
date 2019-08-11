@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -1074,10 +1074,10 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit"/>
+        <widget class="QLineEdit" name="txt_title"/>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="cb_regex">
          <property name="text">
           <string>tuna.gui.tab.windowtitle.regex</string>
          </property>
@@ -1124,7 +1124,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="txt_find"/>
+              <widget class="QLineEdit" name="txt_search"/>
              </item>
              <item>
               <widget class="QLabel" name="label_20">
@@ -1168,7 +1168,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="spinBox">
+              <widget class="QSpinBox" name="sb_begin">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -1215,7 +1215,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="spinBox_2">
+              <widget class="QSpinBox" name="sb_end">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
