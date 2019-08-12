@@ -4,6 +4,7 @@
  * See LICENSE or http://www.gnu.org/licenses
  * github.com/univrsal/tuna
  */
+#ifdef LINUX
 #include "mpd_source.hpp"
 #include "../util/config.hpp"
 #include "../gui/tuna_gui.hpp"
@@ -161,3 +162,4 @@ void mpd_source::load_gui_values()
     tuna_dialog->set_mpd_ip(m_address);
     tuna_dialog->set_mpd_port(m_port);
 }
+#endif

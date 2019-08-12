@@ -5,6 +5,7 @@
  * github.com/univrsal/tuna
  */
 #pragma once
+#ifdef LINUX
 #include "music_source.hpp"
 #include <mpd/client.h>
 
@@ -33,4 +34,4 @@ private:
     void disconnect();
 
 };
-
+#endif

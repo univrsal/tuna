@@ -28,6 +28,9 @@ if (MSVC)
    set(tuna_platform_sources "./src/util/window/window_helper.win.cpp")
    set(tuna_platform_deps
             w32-pthreads)
+   find_package(Libcurl REQUIRED)
+   include_directories(${LIBCURL_INCLUDE_DIRS})
+   add_definitions(${LIBCURL_DEFINITIONS})
 endif ()
 
 set(tuna_sources

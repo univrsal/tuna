@@ -63,9 +63,11 @@ namespace config
         case src_spotify:
             selected_source = spotify;
             break;
+#ifdef LINUX
         case src_mpd:
             selected_source = mpd;
             break;
+#endif
         case src_window_title:
             selected_source = window;
             break;
@@ -90,11 +92,15 @@ namespace config
 
         /* Sources */
         spotify = new spotify_source;
+#ifdef LINUX
         mpd = new mpd_source;
-        window = new window_source();
+#endif
+        window = new window_source;
 
         spotify->load();
+#ifdef LINUX
         mpd->load();
+#endif
         window->load();
 
         if (run && !thread::start())
@@ -108,7 +114,9 @@ namespace config
     void load_gui_values()
     {
         spotify->load_gui_values();
+#ifdef LINUX
         mpd->load_gui_values();
+#endif
         window->load_gui_values();
     }
 
@@ -116,7 +124,9 @@ namespace config
     {
         CSET_BOOL(CFG_RUNNING, thread::thread_state);
         spotify->save();
+#ifdef LINUX
         mpd->save();
+#endif
         window->save();
     }
 
@@ -133,7 +143,9 @@ namespace config
         bfree((void*)cover_placeholder);
 
         delete spotify;
+#ifdef LINUX
         delete mpd;
+#endif
         delete window;
         window = nullptr;
         spotify = nullptr;
