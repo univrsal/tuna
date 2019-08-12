@@ -146,8 +146,8 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
     /* Log */
     if (ui->cb_use_log->isChecked()) {
         QDateTime now = QDateTime::currentDateTime();
-        ui->txt_json_log->appendPlainText("= " + now.toString("yyyy.MM.dd hh:mm") + " =");
-        ui->txt_json_log->appendPlainText(log);
+        ui->txt_json_log->append("= " + now.toString("yyyy.MM.dd hh:mm") + " =");
+        ui->txt_json_log->append(log);
     }
 }
 

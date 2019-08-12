@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>4</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -970,17 +970,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="txt_json_log">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="plainText">
-          <string/>
-         </property>
-         <property name="tabStopDistance">
-          <double>80.000000000000000</double>
-         </property>
-        </widget>
+        <widget class="QTextEdit" name="txt_json_log"/>
        </item>
       </layout>
      </widget>
