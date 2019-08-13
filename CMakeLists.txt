@@ -7,6 +7,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5Widgets REQUIRED)
+find_package(Libcurl REQUIRED)
+include_directories(${LIBCURL_INCLUDE_DIRS})
+add_definitions(${LIBCURL_DEFINITIONS})
+
 if (NOT Qt5Widgets_FOUND)
     message(FATAL_ERROR "Failed to find Qt5")
 endif ()
@@ -28,9 +32,6 @@ if (MSVC)
    set(tuna_platform_sources "./src/util/window/window_helper.win.cpp")
    set(tuna_platform_deps
             w32-pthreads)
-   find_package(Libcurl REQUIRED)
-   include_directories(${LIBCURL_INCLUDE_DIRS})
-   add_definitions(${LIBCURL_DEFINITIONS})
 endif ()
 
 set(tuna_sources
@@ -68,9 +69,9 @@ include_directories(
 target_link_libraries(tuna
     libobs
     jansson
-    curl
     Qt5::Widgets
     obs-frontend-api
+    ${LIBCURL_LIBRARIES}
     ${tuna_platform_deps})
 
 install_obs_plugin_with_data(tuna data)
