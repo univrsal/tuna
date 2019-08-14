@@ -36,7 +36,7 @@ tuna_gui::tuna_gui(QWidget *parent) :
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(on_apply_pressed()));
 
     /* load logo */
-    const char* path = obs_module_file("tuna.jpg");
+    const char* path = obs_module_file("tuna.png");
     QPixmap img(path);
     ui->lbl_img->setPixmap(img);
     bfree((void*)path);
@@ -55,6 +55,7 @@ tuna_gui::tuna_gui(QWidget *parent) :
     ui->cb_source->addItem(T_SOURCE_MPD);
 #else
     ui->tab_mpd->setVisible(false);
+    ui->tab_mpd->setEnabled(false);
 #endif
 
     /* setup config values */

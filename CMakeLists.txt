@@ -25,11 +25,11 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     find_path(MPD_INCLUDE_DIRS mpd.h)
     set(tuna_platform_deps
             mpdclient)
-    set(tuna_plaform_sources "./src/util/window/window_helper_nix.cpp")
+    set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
 endif ()
 
 if (MSVC)
-   set(tuna_platform_sources "./src/util/window/window_helper.win.cpp")
+   set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
    set(tuna_platform_deps
             w32-pthreads)
 endif ()
@@ -58,7 +58,7 @@ set(tuna_sources
 add_library(tuna MODULE
     ${tuna_sources}
     ${tuna_ui}
-    ${tuna_plaform_sources})
+    ${tuna_platform_sources})
 
 include_directories(
         SYSTEM "${CMAKE_SOURCE_DIR}/libobs"
