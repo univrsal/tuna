@@ -49,6 +49,7 @@ public:
     void set_window_cut_end(uint16_t n);
     void set_window_regex(bool state);
 private slots:
+    void choose_file(QString& path, const char* title, const char* file_types);
 
     void on_apply_pressed();
 
@@ -80,6 +81,12 @@ private slots:
 
     void on_btn_sp_show_refresh_token_released();
     void on_checkBox_stateChanged(int arg1);
+
+    void on_btn_browse_song_info_clicked();
+
+    void on_btn_browse_song_cover_clicked();
+
+    void on_btn_browse_song_lyrics_clicked();
 
 private:
     Ui::tuna_gui *ui;

@@ -38,7 +38,7 @@ namespace config
         QDir home = QDir::homePath();
         QString path_song_file = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
         QString path_cover_art = QDir::toNativeSeparators(home.absoluteFilePath("cover.png"));
-	QString path_lyrics = QDir::toNativeSeparators(home.absoluteFilePath("lyrics.txt"));
+        QString path_lyrics = QDir::toNativeSeparators(home.absoluteFilePath("lyrics.txt"));
 
         CDEF_STR(CFG_SONG_PATH, qPrintable(path_song_file));
         CDEF_STR(CFG_COVER_PATH, qPrintable(path_cover_art));
@@ -122,7 +122,6 @@ namespace config
 
     void save()
     {
-        CSET_BOOL(CFG_RUNNING, thread::thread_state);
         spotify->save();
 #ifdef LINUX
         mpd->save();

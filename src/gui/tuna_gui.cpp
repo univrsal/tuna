@@ -24,6 +24,7 @@
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QDate>
+#include <QFileDialog>
 #include <random>
 
 tuna_gui* tuna_dialog = nullptr;
@@ -71,6 +72,11 @@ tuna_gui::tuna_gui(QWidget *parent) :
 
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
+}
+
+void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)
+{
+    path = QFileDialog::getSaveFileName(this, QDir::home().path(), tr(title), tr(file_types));
 }
 
 void tuna_gui::set_state()
@@ -208,12 +214,14 @@ void tuna_gui::on_btn_start_clicked()
     if (!thread::start()) {
         QMessageBox::warning(this, "Error", "Thread couldn't be started!");
     }
+    CSET_BOOL(CFG_RUNNING, thread::thread_state);
     set_state();
 }
 
 void tuna_gui::on_btn_stop_clicked()
 {
     thread::stop();
+    CSET_BOOL(CFG_RUNNING, thread::thread_state);
     set_state();
 }
 
@@ -301,4 +309,25 @@ void tuna_gui::on_checkBox_stateChanged(int arg1)
 {
     ui->txt_ip->setEnabled(arg1 > 0);
     ui->sb_port->setEnabled(arg1 > 0);
+}
+
+void tuna_gui::on_btn_browse_song_info_clicked()
+{
+    QString path;
+    choose_file(path, T_SELECT_SONG_FILE, FILTER("Text file", "*.txt"));
+    ui->txt_song_info->setText(path);
+}
+
+void tuna_gui::on_btn_browse_song_cover_clicked()
+{
+    QString path;
+    choose_file(path, T_SELECT_COVER_FILE, FILTER("Image file", "*.png"));
+    ui->txt_song_cover->setText(path);
+}
+
+void tuna_gui::on_btn_browse_song_lyrics_clicked()
+{
+    QString path;
+    choose_file(path, T_SELECT_LYRICS_FILE, FILTER("Text file", "*.txt"));
+    ui->txt_song_lyrics->setText(path);
 }

@@ -57,8 +57,6 @@ namespace thread {
 
     void stop()
     {
-        if (!thread_state)
-            return;
         thread_state = false;
     }
 
