@@ -7,4 +7,4 @@ Currently supports
 - MPD
 - Any Window title
 
-<img src="/data/tuna.jpg" alt="hey tuna" width="180px">
+<img src="/data/tuna.png" alt="hey tuna" width="180px">
