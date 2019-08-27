@@ -13,10 +13,13 @@
 #include <obs-module.h>
 #include <fstream>
 #include <QTime>
+#include <QFile>
+#include <qtextstream.h>
 #ifdef LINUX
 #include <pthread.h>
 #endif
 namespace thread {
+    QString song_text;
     volatile bool thread_state = false;
     std::mutex mutex;
 
@@ -26,16 +29,21 @@ namespace thread {
     static pthread_t thread_handle;
 #endif
 
-    void write_song(const char* line)
+    void write_song(QString& str)
     {
-        std::ofstream file(config::song_path, std::ofstream::out | std::ofstream::trunc);
-        if (file.good()) {
-            file << line;
-            file.close();
-        } else {
-            blog(LOG_ERROR, "[tuna] Couldn't open song output file %s", config::song_path);
-        }
+	QFile out(config::song_path);
+	if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+	    QTextStream stream(&out);
+	    stream.setCodec("UTF-8");
+	    stream << str;
+	    stream.flush();
+	    out.close();
+	} else {
+	    blog(LOG_ERROR, "[tuna] Couldn't open song output file %s",
+		config::song_path);       
+	}
     }
+
     bool start()
     {
         bool result = true;
@@ -101,27 +109,22 @@ namespace thread {
     void* thread_method(void*)
 #endif
     {
-        QString formatted;
-
         while (thread_state) {
             mutex.lock();
             if (config::selected_source) {
                 config::selected_source->refresh();
-                formatted = "";
+                song_text = "";
                 auto* s = config::selected_source->song();
 
                 /* Process song data */
                 util::handle_cover_art(s);
                 util::handle_lyrics(s);
 
-                format_string(formatted, s);
-                if (formatted.length() < 1 || !s->is_playing)
-                    formatted = config::placeholder;
+                format_string(song_text, s);
+		if (song_text.length() < 1 || !s->is_playing)
+			song_text = config::placeholder;
 
-                write_song(qPrintable(formatted));
-                /* This adds 'Preview: ' to the string so do this last */
-                if (tuna_dialog)
-                    tuna_dialog->set_output_preview(formatted);
+                write_song(song_text);
             }
 
             mutex.unlock();

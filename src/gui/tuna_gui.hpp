@@ -32,8 +32,6 @@ public:
 
     void apply_login_state(bool state, const QString& log);
 
-    void set_output_preview(QString& str);
-
     void set_spotify_auth_code(const char* str);
     void set_spotify_auth_token(const char* str);
     void set_spotify_refresh_token(const char* str);
@@ -49,6 +47,8 @@ public:
     void set_window_cut_end(uint16_t n);
     void set_window_regex(bool state);
 private slots:
+    void update_output_preview();
+
     void choose_file(QString& path, const char* title, const char* file_types);
 
     void on_apply_pressed();
@@ -89,6 +89,7 @@ private slots:
     void on_btn_browse_song_lyrics_clicked();
 
 private:
+    QTimer* m_refresh;
     Ui::tuna_gui *ui;
 };
 

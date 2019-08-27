@@ -84,12 +84,18 @@ namespace util {
     {
         static std::string last_cover = "";
         bool is_url = song->cover.find("http") != std::string::npos;
-        bool found_cover = song->data & CAP_COVER;
+        bool found_cover = song->data & CAP_COVER && song->is_playing;
 
-        if (!song->cover.empty() && song->cover != last_cover) {
+        if (found_cover && !song->cover.empty() && song->cover != last_cover) {
             if (is_url && config::download_cover) {
+		std::string tmp = config::cover_path;
+		tmp += ".tmp";
                 last_cover = song->cover;
-                found_cover = curl_download(song->cover.c_str(), config::cover_path);
+                found_cover = curl_download(song->cover.c_str(), tmp.c_str());
+		/* Replace cover only after download is done */
+            	if (found_cover) {
+		    move_file(tmp.c_str(), config::cover_path);
+		}
             } else if (!is_url) {
                 last_cover = song->cover;
                 found_cover = move_file(song->cover.c_str(), config::cover_path);
@@ -102,7 +108,6 @@ namespace util {
             if (!move_file(config::cover_placeholder, config::cover_path))
                 blog(LOG_ERROR, "[tuna] couldn't move placeholder cover");
         }
-
     }
 
     void replace_all(std::string& str, const std::string& find, const std::string& replace)
