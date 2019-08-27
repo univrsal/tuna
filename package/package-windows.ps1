@@ -21,7 +21,7 @@ while ($version.length -lt 1) {
 }
 
 echo("Creating build directory")
-New-Item $build_dir/plugin/data/obs-plugins/input-overlay -itemtype directory
+New-Item $build_dir/plugin/data/obs-plugins/$project -itemtype directory
 New-Item $build_dir/plugin/obs-plugins/32bit -itemtype directory
 New-Item $build_dir/plugin/obs-plugins/64bit -itemtype directory
 
@@ -33,9 +33,9 @@ echo("Fetching build from $build_location_x64")
 Copy-Item $build_location_x64/$project.dll -Destination $build_dir/plugin/obs-plugins/64bit/
 
 echo("Fetching data")
-Copy-Item $data_dir/* -Destination $build_dir/plugin/data/obs-plugins/input-overlay/ -Recurse
+Copy-Item $data_dir/* -Destination $build_dir/plugin/data/obs-plugins/$project/ -Recurse
 Copy-Item ../LICENSE -Destination $build_dir/LICENSE.txt
-Copy-Item ./README_WINDOWS.txt $build_dir/README.txt
+Copy-Item ./README.txt $build_dir/README.txt
 replace $build_dir/README.txt "@VERSION" $version
 
 echo("Making archive")
