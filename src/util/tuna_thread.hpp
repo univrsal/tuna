@@ -9,19 +9,25 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+
 #include <QString>
 #include <mutex>
 
-namespace thread {
-    extern QString song_text;
-    extern volatile bool thread_state;
-    extern std::mutex mutex;
-    bool start();
-    void stop();
+namespace thread
+{
+	extern QString song_text;
+	extern volatile bool thread_state;
+	extern std::mutex mutex;
+
+	bool start();
+
+	void stop();
 
 #ifdef _WIN32
-    DWORD WINAPI thread_method(LPVOID arg);
+	DWORD WINAPI thread_method(LPVOID arg);
 #else
-    void* thread_method(void*);
+
+	void* thread_method(void*);
+
 #endif
 }

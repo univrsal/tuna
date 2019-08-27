@@ -18,136 +18,136 @@
 
 namespace config
 {
-    config_t* instance = nullptr;
-    music_source* selected_source = nullptr;
-    spotify_source* spotify = nullptr;
-    window_source* window = nullptr;
-    mpd_source* mpd = nullptr;
+	config_t* instance = nullptr;
+	music_source* selected_source = nullptr;
+	spotify_source* spotify = nullptr;
+	window_source* window = nullptr;
+	mpd_source* mpd = nullptr;
 
-    uint16_t refresh_rate = 1000;
-    const char* format_string = nullptr;
-    const char* placeholder = nullptr;
-    const char* cover_path = nullptr;
-    const char* lyrics_path = nullptr;
-    const char* song_path = nullptr;
-    const char* cover_placeholder = nullptr;
-    bool download_cover = true;
+	uint16_t refresh_rate = 1000;
+	const char* format_string = nullptr;
+	const char* placeholder = nullptr;
+	const char* cover_path = nullptr;
+	const char* lyrics_path = nullptr;
+	const char* song_path = nullptr;
+	const char* cover_placeholder = nullptr;
+	bool download_cover = true;
 
-    void init_default()
-    {
-        QDir home = QDir::homePath();
-        QString path_song_file = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
-        QString path_cover_art = QDir::toNativeSeparators(home.absoluteFilePath("cover.png"));
-        QString path_lyrics = QDir::toNativeSeparators(home.absoluteFilePath("lyrics.txt"));
+	void init_default()
+	{
+		QDir home = QDir::homePath();
+		QString path_song_file = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
+		QString path_cover_art = QDir::toNativeSeparators(home.absoluteFilePath("cover.png"));
+		QString path_lyrics = QDir::toNativeSeparators(home.absoluteFilePath("lyrics.txt"));
 
-        CDEF_STR(CFG_SONG_PATH, qPrintable(path_song_file));
-        CDEF_STR(CFG_COVER_PATH, qPrintable(path_cover_art));
-        CDEF_STR(CFG_LYRICS_PATH, qPrintable(path_lyrics));
-        CDEF_UINT(CFG_SELECTED_SOURCE, src_spotify);
+		CDEF_STR(CFG_SONG_PATH, qPrintable(path_song_file));
+		CDEF_STR(CFG_COVER_PATH, qPrintable(path_cover_art));
+		CDEF_STR(CFG_LYRICS_PATH, qPrintable(path_lyrics));
+		CDEF_UINT(CFG_SELECTED_SOURCE, src_spotify);
 
-        CDEF_BOOL(CFG_RUNNING, false);
-        CDEF_BOOL(CFG_DOWNLOAD_COVER, true);
-        CDEF_UINT(CFG_REFRESH_RATE, refresh_rate);
-        CDEF_STR(CFG_SONG_FORMAT, T_FORMAT);
-        CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
+		CDEF_BOOL(CFG_RUNNING, false);
+		CDEF_BOOL(CFG_DOWNLOAD_COVER, true);
+		CDEF_UINT(CFG_REFRESH_RATE, refresh_rate);
+		CDEF_STR(CFG_SONG_FORMAT, T_FORMAT);
+		CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
 
-        if (!cover_placeholder)
-            cover_placeholder = obs_module_file("placeholder.png");
-    }
+		if (!cover_placeholder)
+			cover_placeholder = obs_module_file("placeholder.png");
+	}
 
-    void select_source(source s)
-    {
-        thread::mutex.lock();
-        switch(s) {
-        default:
-        case src_spotify:
-            selected_source = spotify;
-            break;
+	void select_source(source s)
+	{
+		thread::mutex.lock();
+		switch (s) {
+			default:
+			case src_spotify:
+				selected_source = spotify;
+				break;
 #ifdef LINUX
-        case src_mpd:
-            selected_source = mpd;
-            break;
+			case src_mpd:
+				selected_source = mpd;
+				break;
 #endif
-        case src_window_title:
-            selected_source = window;
-            break;
-        }
-        thread::mutex.unlock();
-    }
+			case src_window_title:
+				selected_source = window;
+				break;
+		}
+		thread::mutex.unlock();
+	}
 
-    void load()
-    {
-        if (!instance)
-            instance = obs_frontend_get_global_config();
-        init_default();
-        bool run = CGET_BOOL(CFG_RUNNING);
+	void load()
+	{
+		if (!instance)
+			instance = obs_frontend_get_global_config();
+		init_default();
+		bool run = CGET_BOOL(CFG_RUNNING);
 
-        cover_path = CGET_STR(CFG_COVER_PATH);
-        lyrics_path = CGET_STR(CFG_LYRICS_PATH);
-        song_path = CGET_STR(CFG_SONG_PATH);
-        refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
-        format_string = CGET_STR(CFG_SONG_FORMAT);
-        placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
-        download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
+		cover_path = CGET_STR(CFG_COVER_PATH);
+		lyrics_path = CGET_STR(CFG_LYRICS_PATH);
+		song_path = CGET_STR(CFG_SONG_PATH);
+		refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
+		format_string = CGET_STR(CFG_SONG_FORMAT);
+		placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
+		download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
 
-        /* Sources */
-        spotify = new spotify_source;
+		/* Sources */
+		spotify = new spotify_source;
 #ifdef LINUX
-        mpd = new mpd_source;
+		mpd = new mpd_source;
 #endif
-        window = new window_source;
+		window = new window_source;
 
-        spotify->load();
+		spotify->load();
 #ifdef LINUX
-        mpd->load();
+		mpd->load();
 #endif
-        window->load();
+		window->load();
 
-        if (run && !thread::start())
-            blog(LOG_ERROR, "[tuna] Couldn't start thread");
+		if (run && !thread::start())
+			blog(LOG_ERROR, "[tuna] Couldn't start thread");
 
-        auto src = CGET_UINT(CFG_SELECTED_SOURCE);
-        if (src < src_count)
-            select_source((source) src);
-    }
+		auto src = CGET_UINT(CFG_SELECTED_SOURCE);
+		if (src < src_count)
+			select_source((source) src);
+	}
 
-    void load_gui_values()
-    {
-        spotify->load_gui_values();
+	void load_gui_values()
+	{
+		spotify->load_gui_values();
 #ifdef LINUX
-        mpd->load_gui_values();
+		mpd->load_gui_values();
 #endif
-        window->load_gui_values();
-    }
+		window->load_gui_values();
+	}
 
-    void save()
-    {
-        spotify->save();
+	void save()
+	{
+		spotify->save();
 #ifdef LINUX
-        mpd->save();
+		mpd->save();
 #endif
-        window->save();
-    }
+		window->save();
+	}
 
-    void close()
-    {
-        thread::mutex.lock();
-        save();
-        thread::stop();
-        thread::mutex.unlock();
+	void close()
+	{
+		thread::mutex.lock();
+		save();
+		thread::stop();
+		thread::mutex.unlock();
 
-        /* Wait for thread to exit to delete resources */
-        while (thread::thread_state)
-            os_sleep_ms(5);
-        bfree((void*)cover_placeholder);
+		/* Wait for thread to exit to delete resources */
+		while (thread::thread_state)
+			os_sleep_ms(5);
+		bfree((void*) cover_placeholder);
 
-        delete spotify;
+		delete spotify;
 #ifdef LINUX
-        delete mpd;
+		delete mpd;
 #endif
-        delete window;
-        window = nullptr;
-        spotify = nullptr;
-        mpd = nullptr;
-    }
+		delete window;
+		window = nullptr;
+		spotify = nullptr;
+		mpd = nullptr;
+	}
 }

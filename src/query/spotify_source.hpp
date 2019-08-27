@@ -5,6 +5,7 @@
  * github.com/univrsal/tuna
  */
 #pragma once
+
 #include "music_source.hpp"
 #include <jansson.h>
 #include <string>
@@ -12,35 +13,46 @@
 
 class spotify_source : public music_source
 {
-    bool m_logged_in = false;
-    std::string m_token = "";
-    std::string m_creds = "";
-    std::string m_auth_code = "";
-    std::string m_refresh_token = "";
+	bool m_logged_in = false;
+	std::string m_token = "";
+	std::string m_creds = "";
+	std::string m_auth_code = "";
+	std::string m_refresh_token = "";
 
-    /* epoch time in seconds */
-    int64_t m_token_termination = 0;
+	/* epoch time in seconds */
+	int64_t m_token_termination = 0;
 
-    void parse_track_json(json_t* track);
+	void parse_track_json(json_t* track);
+
 public:
-    spotify_source();
+	spotify_source();
 
-    void load() override;
-    void save() override;
-    void refresh() override;
-    void load_gui_values() override;
-    bool execute_capability(capability c) override;
+	void load() override;
 
-    bool do_refresh_token(QString& log);
-    bool new_token(QString& log);
+	void save() override;
 
-    void set_auth_code(const std::string& auth_code)
-    {
-        m_auth_code = auth_code;
-    }
+	void refresh() override;
 
-    const std::string& auth_code() const { return m_auth_code; }
-    const std::string& token() const { return m_token; }
-    const std::string& refresh_token() const { return m_refresh_token; }
+	void load_gui_values() override;
+
+	bool execute_capability(capability c) override;
+
+	bool do_refresh_token(QString& log);
+
+	bool new_token(QString& log);
+
+	void set_auth_code(const std::string& auth_code)
+	{
+		m_auth_code = auth_code;
+	}
+
+	const std::string& auth_code() const
+	{ return m_auth_code; }
+
+	const std::string& token() const
+	{ return m_token; }
+
+	const std::string& refresh_token() const
+	{ return m_refresh_token; }
 };
 
