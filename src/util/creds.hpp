@@ -6,5 +6,6 @@
  */
 #pragma once
 
-#define SPOTIFY_CLIENT_ID        "847d7cf0c5dc4ff185161d1f000a9d0e"
-#define SPOTIFY_CLIENT_SECRET    "984a19132729452a8da2eb331c5384be"
+#ifndef SPOTIFY_CREDENTIALS
+#define SPOTIFY_CREDENTIALS "{client_id}:{secret}"
+#endif

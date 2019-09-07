@@ -15,6 +15,11 @@ if (NOT Qt5Widgets_FOUND)
     message(FATAL_ERROR "Failed to find Qt5")
 endif ()
 
+# Read Spotify credentials from creds.txt
+# In this format {client_id}:{client_secre}
+file(READ "creds.txt" CREDS)
+add_definitions(-DSPOTIFY_CREDENTIALS=${CREDS})
+
 set(tuna_ui
         src/gui/tuna_gui.ui)
 
