@@ -13,21 +13,21 @@
 #include <QString>
 #include <mutex>
 
-namespace thread
-{
-	extern QString song_text;
-	extern volatile bool thread_state;
-	extern std::mutex mutex;
+namespace thread {
+extern QString song_text;
+extern volatile bool thread_state;
+extern std::mutex mutex;
 
-	bool start();
+bool start();
 
-	void stop();
+void stop();
 
 #ifdef _WIN32
-	DWORD WINAPI thread_method(LPVOID arg);
+DWORD WINAPI
+thread_method(LPVOID arg);
 #else
 
-	void* thread_method(void*);
+void* thread_method(void*);
 
 #endif
-}
+} // namespace thread

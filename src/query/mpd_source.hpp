@@ -10,36 +10,35 @@
 #include "music_source.hpp"
 #include <mpd/client.h>
 
-class mpd_source : public music_source
-{
-	struct mpd_connection* m_connection = nullptr;
-	struct mpd_status* m_status = nullptr;
-	struct mpd_song* m_mpd_song = nullptr;
-	enum mpd_state m_mpd_state;
-	const char* m_address;
-	bool m_connected;
-	uint16_t m_port;
-	bool m_local;
+class mpd_source : public music_source {
+    struct mpd_connection* m_connection = nullptr;
+    struct mpd_status* m_status = nullptr;
+    struct mpd_song* m_mpd_song = nullptr;
+    enum mpd_state m_mpd_state;
+    const char* m_address;
+    bool m_connected;
+    uint16_t m_port;
+    bool m_local;
+
 public:
-	mpd_source();
+    mpd_source();
 
-	~mpd_source() override;
+    ~mpd_source() override;
 
-	void load() override;
+    void load() override;
 
-	void save() override;
+    void save() override;
 
-	void refresh() override;
+    void refresh() override;
 
-	void load_gui_values() override;
+    void load_gui_values() override;
 
-	bool execute_capability(capability c) override;
+    bool execute_capability(capability c) override;
 
 private:
-	void connect();
+    void connect();
 
-	void disconnect();
-
+    void disconnect();
 };
 
 #endif

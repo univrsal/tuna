@@ -11,17 +11,19 @@
 
 struct song_t;
 
-namespace util
-{
-	bool curl_download(const char* url, const char* path);
+namespace util {
+bool curl_download(const char* url, const char* path);
 
-	void handle_cover_art(const song_t* song);
+void handle_cover_art(const song_t* song);
 
-	void handle_lyrics(const song_t* song);
+void handle_lyrics(const song_t* song);
 
-	bool move_file(const char* src, const char* dest);
+bool move_file(const char* src, const char* dest);
 
-	void replace_all(std::string& str, const std::string& find, const std::string& replace);
+void replace_all(std::string& str,
+    const std::string& find,
+    const std::string& replace);
 
-	int64_t epoch();
-}
+int64_t
+epoch();
+} // namespace util

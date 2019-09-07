@@ -4,23 +4,23 @@
  * See LICENSE or http://www.gnu.org/licenses
  * github.com/univrsal/tuna
  */
-#include <string>
-#include <QString>
-#include <util/config-file.h>
-#include <util/platform.h>
-#include <curl/curl.h>
-#include <jansson.h>
 #include "spotify_source.hpp"
+#include "../gui/tuna_gui.hpp"
+#include "../util/config.hpp"
+#include "../util/constants.hpp"
 #include "../util/creds.hpp"
 #include "../util/utility.hpp"
-#include "../util/constants.hpp"
-#include "../util/config.hpp"
-#include "../gui/tuna_gui.hpp"
+#include <QString>
+#include <curl/curl.h>
+#include <jansson.h>
+#include <string>
+#include <util/config-file.h>
+#include <util/platform.h>
 
-#define TOKEN_URL        "https://accounts.spotify.com/api/token"
-#define PLAYER_URL       "https://api.spotify.com/v1/me/player"
-#define REDIRECT_URI     "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
-#define valid(s)         (s && strlen(s) > 0)
+#define TOKEN_URL "https://accounts.spotify.com/api/token"
+#define PLAYER_URL "https://api.spotify.com/v1/me/player"
+#define REDIRECT_URI "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
+#define valid(s) (s && strlen(s) > 0)
 
 spotify_source::spotify_source()
 {
@@ -29,9 +29,7 @@ spotify_source::spotify_source()
     QString str2(str.toUtf8().toBase64());
     m_creds = str2.toStdString();
 
-    m_capabilities =
-            CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_LENGTH | CAP_NEXT_SONG | CAP_PREV_SONG |
-            CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
+    m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_LENGTH | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
 }
 
 void spotify_source::load()
@@ -78,7 +76,8 @@ void spotify_source::save()
 }
 
 /* implementation further down */
-json_t* execute_command(const char* auth_token, const char* url);
+json_t*
+execute_command(const char* auth_token, const char* url);
 
 void spotify_source::refresh()
 {
@@ -114,8 +113,10 @@ void spotify_source::refresh()
             m_current.progress_ms = json_integer_value(progress);
         } else {
             const char* json_str = json_dumps(song_info, 0);
-            blog(LOG_ERROR, "[tuna] Couldn't fetch song data from spotify json: %s", json_str);
-            free((void*) json_str);
+            blog(LOG_ERROR,
+                "[tuna] Couldn't fetch song data from spotify json: %s",
+                json_str);
+            free((void*)json_str);
         }
         json_decref(song_info);
     }
@@ -126,13 +127,14 @@ void spotify_source::parse_track_json(json_t* track)
     json_t* album = json_object_get(track, "album");
     json_t* artists = json_object_get(track, "artists");
     size_t index;
-    json_t* curr, * name;
+    json_t *curr, *name;
     if (album && artists) {
         m_current = {};
         m_current.release_precision = prec_unkown;
 
         /* Get All artists */
-        json_array_foreach(artists, index, curr) {
+        json_array_foreach(artists, index, curr)
+        {
             name = json_object_get(curr, "name");
             m_current.artists.append(json_string_value(name));
             m_current.artists.append(", ");
@@ -148,7 +150,8 @@ void spotify_source::parse_track_json(json_t* track)
         curr = json_object_get(album, "images");
         if (curr) {
             curr = json_array_get(curr, 0);
-            if (curr) curr = json_object_get(curr, "url");
+            if (curr)
+                curr = json_object_get(curr, "url");
             if (curr) {
                 m_current.cover = json_string_value(curr);
                 if (!m_current.cover.empty())
@@ -205,19 +208,19 @@ void spotify_source::parse_track_json(json_t* track)
             m_current.release_precision = static_cast<date_precision>(qMin(date.count('-'), 2));
             QStringList list = date.split("-");
             switch (list.length()) {
-                case 3:
-                    m_current.day = list[2].toStdString();
-                    /* Sometimes the release date gets reported wrong, so adjust it
-                     * if a value wasn't found */
-                    if (m_current.day.empty())
-                        m_current.release_precision = prec_month;
-                case 2: /* Fallthrough */
-                    m_current.month = list[1].toStdString();
-                    if (m_current.month.empty())
-                        m_current.release_precision = prec_year;
-                case 1: /* Fallthrough */
-                    m_current.year = list[0].toStdString();
-                default:;
+            case 3:
+                m_current.day = list[2].toStdString();
+                /* Sometimes the release date gets reported wrong, so adjust it
+           * if a value wasn't found */
+                if (m_current.day.empty())
+                    m_current.release_precision = prec_month;
+            case 2: /* Fallthrough */
+                m_current.month = list[1].toStdString();
+                if (m_current.month.empty())
+                    m_current.release_precision = prec_year;
+            case 1: /* Fallthrough */
+                m_current.year = list[0].toStdString();
+            default:;
             }
         }
     }
@@ -227,30 +230,31 @@ bool spotify_source::execute_capability(capability c)
 {
     bool result = true;
     switch (c) {
-        case CAP_NEXT_SONG:
-            break;
-        case CAP_PREV_SONG:
-            break;
-        case CAP_PLAY_PAUSE:
-            break;
-        case CAP_VOLUME_UP:
-            break;
-        case CAP_VOLUME_DOWN:
-            break;
-        case CAP_VOLUME_MUTE:
-            break;
-        default:;
+    case CAP_NEXT_SONG:
+        break;
+    case CAP_PREV_SONG:
+        break;
+    case CAP_PLAY_PAUSE:
+        break;
+    case CAP_VOLUME_UP:
+        break;
+    case CAP_VOLUME_DOWN:
+        break;
+    case CAP_VOLUME_MUTE:
+        break;
+    default:;
     }
     return result;
 }
 
 /* === CURL/Spotify API handling === */
 
-size_t write_function(void* ptr, size_t size, size_t nmemb, std::string* str)
+size_t
+write_function(void* ptr, size_t size, size_t nmemb, std::string* str)
 {
     size_t new_length = size * nmemb;
     try {
-        str->append((char*) ptr, new_length);
+        str->append((char*)ptr, new_length);
     } catch (std::bad_alloc& e) {
         blog(LOG_ERROR, "[tuna] Error reading curl response: %s", e.what());
         return 0;
@@ -258,7 +262,9 @@ size_t write_function(void* ptr, size_t size, size_t nmemb, std::string* str)
     return new_length;
 }
 
-CURL* prepare_curl(struct curl_slist* header, std::string* response, const char* request)
+CURL* prepare_curl(struct curl_slist* header,
+    std::string* response,
+    const char* request)
 {
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -276,11 +282,13 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, const char*
 
 /* Requests an access token via request body
  * over a POST request to spotify */
-json_t* request_token(const char* request, const char* credentials)
+json_t*
+request_token(const char* request, const char* credentials)
 {
     if (!valid(request) || !valid(credentials)) {
-        blog(LOG_ERROR, "[tuna] Cannot request token without valid credentials"
-                        " and/or auth code!");
+        blog(LOG_ERROR,
+            "[tuna] Cannot request token without valid credentials"
+            " and/or auth code!");
         return nullptr;
     }
 
@@ -329,7 +337,7 @@ bool spotify_source::do_refresh_token(QString& log)
         /* Dump the json into the log textbox */
         const char* json_pretty = json_dumps(response, JSON_INDENT(4));
         log = json_pretty;
-        free((void*) json_pretty);
+        free((void*)json_pretty);
 
         if (token && expires) {
             m_token = json_string_value(token);
@@ -370,7 +378,7 @@ bool spotify_source::new_token(QString& log)
         /* Dump the json into the log textbox */
         const char* json_pretty = json_dumps(response, JSON_INDENT(4));
         log = json_pretty;
-        free((void*) json_pretty);
+        free((void*)json_pretty);
 
         if (token && refresh && expires) {
             m_token = json_string_value(token);
@@ -392,7 +400,8 @@ bool spotify_source::new_token(QString& log)
 }
 
 /* Sends commands to spotify api via url */
-json_t* execute_command(const char* auth_token, const char* url)
+json_t*
+execute_command(const char* auth_token, const char* url)
 {
     std::string response;
     QString header = "Authorization: Bearer ";
@@ -414,7 +423,9 @@ json_t* execute_command(const char* auth_token, const char* url)
         json_error_t error;
         result = json_loads(response.c_str(), 0, &error);
         if (!result) {
-            blog(LOG_ERROR, "[tuna] Failed to parse json response: %s", response.c_str());
+            blog(LOG_ERROR,
+                "[tuna] Failed to parse json response: %s",
+                response.c_str());
         }
     } else {
         blog(LOG_ERROR, "[tuna] CURL failed while sending spotify command");
