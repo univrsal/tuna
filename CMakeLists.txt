@@ -17,8 +17,9 @@ endif ()
 
 # Read Spotify credentials from creds.txt
 # In this format {client_id}:{client_secre}
+# Make sure that there's no empty new line
 file(READ "creds.txt" CREDS)
-add_definitions(-DSPOTIFY_CREDENTIALS=${CREDS})
+add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 
 set(tuna_ui
         src/gui/tuna_gui.ui)

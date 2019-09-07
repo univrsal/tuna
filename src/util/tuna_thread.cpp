@@ -83,7 +83,7 @@ namespace thread
 
 	void format_string(QString& out, const song_t* song)
 	{
-		out = config::format_string;
+		out = QString::fromUtf8(config::format_string);
 		out.replace("%t", song->title.c_str());
 		out.replace("%m", song->artists.c_str());
 		out.replace("%a", song->album.c_str());

@@ -18,15 +18,14 @@
 #include "../gui/tuna_gui.hpp"
 
 #define TOKEN_URL        "https://accounts.spotify.com/api/token"
-#define PLAYER_URL        "https://api.spotify.com/v1/me/player"
-#define REDIRECT_URI        "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
-#define valid(s)        (s && strlen(s) > 0)
+#define PLAYER_URL       "https://api.spotify.com/v1/me/player"
+#define REDIRECT_URI     "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
+#define valid(s)         (s && strlen(s) > 0)
 
 spotify_source::spotify_source()
 {
 	/* builds credentials for spotify api */
-	QString str = SPOTIFY_CLIENT_ID;
-	str.append(":").append(SPOTIFY_CLIENT_SECRET);
+	QString str = SPOTIFY_CREDENTIALS;
 	QString str2(str.toUtf8().toBase64());
 	m_creds = str2.toStdString();
 

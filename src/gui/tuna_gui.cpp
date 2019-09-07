@@ -19,6 +19,7 @@
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../query/spotify_source.hpp"
+#include <util/platform.h>
 #include <obs-module.h>
 #include <QPixmap>
 #include <QDesktopServices>
@@ -64,8 +65,8 @@ tuna_gui::tuna_gui(QWidget* parent) : QDialog(parent), ui(new Ui::tuna_gui)
 	ui->txt_song_lyrics->setText(CGET_STR(CFG_LYRICS_PATH));
 	ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
 	ui->sb_refresh_rate->setValue(CGET_UINT(CFG_REFRESH_RATE));
-	ui->txt_song_format->setText(CGET_STR(CFG_SONG_FORMAT));
-	ui->txt_song_placeholder->setText(CGET_STR(CFG_SONG_PLACEHOLDER));
+	ui->txt_song_format->setText(QString::fromUtf8(CGET_STR(CFG_SONG_FORMAT)));
+	ui->txt_song_placeholder->setText(QString::fromUtf8(CGET_STR(CFG_SONG_PLACEHOLDER)));
 	ui->cb_dl_cover->setChecked(CGET_BOOL(CFG_DOWNLOAD_COVER));
 	set_state();
 
@@ -181,13 +182,14 @@ void tuna_gui::on_btn_performrefresh_clicked()
 
 void tuna_gui::on_tuna_gui_accepted()
 {
-	CSET_STR(CFG_SONG_PATH, qPrintable(ui->txt_song_info->text()));
-	CSET_STR(CFG_COVER_PATH, qPrintable(ui->txt_song_cover->text()));
-	CSET_STR(CFG_LYRICS_PATH, qPrintable(ui->txt_song_lyrics->text()));
+	CSET_STR(CFG_SONG_PATH, ui->txt_song_info->text().toStdString().c_str());
+	CSET_STR(CFG_COVER_PATH, ui->txt_song_cover->text().toStdString().c_str());
+	CSET_STR(CFG_LYRICS_PATH, ui->txt_song_lyrics->text().toStdString().c_str());
 	CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
 	CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
-	CSET_STR(CFG_SONG_FORMAT, qPrintable(ui->txt_song_format->text()));
-	CSET_STR(CFG_SONG_PLACEHOLDER, qPrintable(ui->txt_song_placeholder->text()));
+
+	CSET_STR(CFG_SONG_FORMAT, ui->txt_song_format->text().toStdString().c_str());
+	CSET_STR(CFG_SONG_PLACEHOLDER, ui->txt_song_placeholder->text().toStdString().c_str());
 	CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
 	/* Source settings */
@@ -195,9 +197,9 @@ void tuna_gui::on_tuna_gui_accepted()
 	CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
 	CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
 
-	CSET_STR(CFG_WINDOW_TITLE, qPrintable(ui->txt_title->text()));
-	CSET_STR(CFG_WINDOW_SEARCH, qPrintable(ui->txt_search->text()));
-	CSET_STR(CFG_WINDOW_REPLACE, qPrintable(ui->txt_replace->text()));
+	CSET_STR(CFG_WINDOW_TITLE, ui->txt_title->text().toStdString().c_str());
+	CSET_STR(CFG_WINDOW_SEARCH, ui->txt_search->text().toStdString().c_str());
+	CSET_STR(CFG_WINDOW_REPLACE, ui->txt_replace->text().toStdString().c_str());
 	CSET_BOOL(CFG_WINDOW_REGEX, ui->cb_regex->isChecked());
 	CSET_UINT(CFG_WINDOW_CUT_BEGIN, ui->sb_begin->value());
 	CSET_UINT(CFG_WINDOW_CUT_END, ui->sb_end->value());
@@ -236,7 +238,7 @@ void tuna_gui::set_mpd_ip(const char* ip)
 }
 
 void tuna_gui::set_mpd_port(uint16_t port)
-{
+{ 
 	ui->sb_port->setValue(port);
 }
 
