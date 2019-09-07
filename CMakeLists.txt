@@ -19,10 +19,12 @@ endif ()
 # In this format {client_id}:{client_secre}
 # Make sure that there's no empty new line
 file(READ "creds.txt" CREDS)
+string(REGEX REPLACE "\n$" "" CREDS "${CREDS}")
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 
 set(tuna_ui
         src/gui/tuna_gui.ui)
+
 
 if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     add_definitions(-DLINUX=1)
