@@ -1,15 +1,28 @@
-/**
+/*************************************************************************
  * This file is part of tuna
- * which is licensed under the GPL v2.0
- * See LICENSE or http://www.gnu.org/licenses
- * github.com/univrsal/tuna
- */
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *************************************************************************/
+
 #include "config.hpp"
 #include "../query/mpd_source.hpp"
 #include "../query/spotify_source.hpp"
 #include "../query/window_source.hpp"
 #include "../util/tuna_thread.hpp"
 #include "constants.hpp"
+#include <jansson.h>
 #include <QDir>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
@@ -24,11 +37,10 @@ window_source* window = nullptr;
 mpd_source* mpd = nullptr;
 
 uint16_t refresh_rate = 1000;
-const char* format_string = nullptr;
 const char* placeholder = nullptr;
 const char* cover_path = nullptr;
 const char* lyrics_path = nullptr;
-const char* song_path = nullptr;
+QList<QPair<QString, QString>> outputs;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;
 
@@ -83,18 +95,20 @@ void load()
 
     cover_path = CGET_STR(CFG_COVER_PATH);
     lyrics_path = CGET_STR(CFG_LYRICS_PATH);
-    song_path = CGET_STR(CFG_SONG_PATH);
+    load_outputs(outputs);
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
-    format_string = CGET_STR(CFG_SONG_FORMAT);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
 
     /* Sources */
-    spotify = new spotify_source;
+    if (!spotify)
+        spotify = new spotify_source;
 #ifdef LINUX
-    mpd = new mpd_source;
+    if (!mpd)
+        mpd = new mpd_source;
 #endif
-    window = new window_source;
+    if (!window)
+        window = new window_source;
 
     spotify->load();
 #ifdef LINUX
@@ -126,6 +140,7 @@ void save()
     mpd->save();
 #endif
     window->save();
+    save_outputs(outputs);
 }
 
 void close()
@@ -148,5 +163,73 @@ void close()
     window = nullptr;
     spotify = nullptr;
     mpd = nullptr;
+}
+
+void load_outputs(QList<QPair<QString, QString>> &table_content)
+{
+    table_content.clear();
+    QString path = obs_get_module_data_path(obs_current_module());
+    if (!path.endsWith(QDir::separator()))
+            path += QDir::separator();
+    path.append(OUTPUT_FILE);
+    QFileInfo check(path);
+
+    if (check.exists() && check.isFile()) {
+        json_error_t error;
+        json_t *file = json_load_file(path.toStdString().c_str(), 0, &error);
+
+        if (file) {
+            size_t index;
+            json_t *val;
+            json_array_foreach(file, index, val) {
+                char *format, *path;
+                if (json_unpack_ex(val, &error, 0, "{ssss}", JSON_FORMAT_ID, &format,
+                               JSON_OUTPUT_PATH_ID, &path) < 0) {
+                    blog(LOG_WARNING, "[tuna] failed to unpack json: %s", error.text);
+                } else {
+                    table_content.push_back(QPair<QString, QString>(format, path));
+                }
+            }
+        } else {
+            int code = json_error_code(&error);
+            blog(LOG_WARNING, "[tuna] Error loading output json at line "
+                              "%i (col: %i) Code: %i: %s", error.line, error.column, code, error.text);
+        }
+    } else {
+        /* Nothing to load, add default */
+        QDir home = QDir::homePath();
+        QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
+        table_content.push_back(QPair<QString, QString>(default_output, T_SONG_FORMAT_DEFAULT));
+    }
+}
+
+void save_outputs(const QList<QPair<QString, QString>> &table_content)
+{
+    QString path = obs_get_module_data_path(obs_current_module());
+    if (!path.endsWith(QDir::separator()))
+            path += QDir::separator();
+    path.append(OUTPUT_FILE);
+
+    json_t* output_array = json_array();
+    json_error_t error;
+
+    for (const auto& pair : table_content) {
+        json_t* obj = json_pack_ex(&error, 0, "{ssss}", JSON_FORMAT_ID,
+                                   pair.first.toStdString().c_str(),
+                                   JSON_OUTPUT_PATH_ID, pair.second.toStdString().c_str());
+
+        if (obj) {
+            json_array_append_new(output_array, obj);
+        } else {
+            blog(LOG_WARNING, "[tuna] Error encoding json: %s", error.text);
+        }
+    }
+
+    if (json_dump_file(output_array, path.toStdString().c_str(), JSON_INDENT(4)) < 0) {
+        blog(LOG_WARNING, "[tuna] Error writing json at line "
+                          "%i (col: %i): %s", error.line, error.column, error.text);
+    }
+    json_array_clear(output_array);
+    json_decref(output_array);
 }
 } // namespace config

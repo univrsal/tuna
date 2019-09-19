@@ -1,18 +1,21 @@
-/* tuna_gui.hpp created on 2019.8.8
+/*************************************************************************
+ * This file is part of tuna
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, version 2 of the License.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * github.com/univrsal/
- *
- */
+ *************************************************************************/
+
 #pragma once
 
 #include <QDialog>
@@ -49,6 +52,8 @@ public:
 
     void set_window_search(const char* str);
 
+    void set_window_pause(const char* str);
+
     void set_window_replace(const char* str);
 
     void set_window_cut_begin(uint16_t n);
@@ -57,9 +62,12 @@ public:
 
     void set_window_regex(bool state);
 
-private slots:
+    void add_output(const QString& format, const QString& path);
 
-    void update_output_preview();
+    void edit_output(const QString& format, const QString& path);
+
+    void get_selected_output(QString& format, QString& path);
+private slots:
 
     void choose_file(QString& path, const char* title, const char* file_types);
 
@@ -95,14 +103,17 @@ private slots:
 
     void on_checkBox_stateChanged(int arg1);
 
-    void on_btn_browse_song_info_clicked();
-
     void on_btn_browse_song_cover_clicked();
 
     void on_btn_browse_song_lyrics_clicked();
 
+    void on_btn_add_output_clicked();
+
+    void on_btn_remove_output_clicked();
+
+    void on_btn_edit_output_clicked();
+
 private:
-    QTimer* m_refresh;
     Ui::tuna_gui* ui;
 };
 

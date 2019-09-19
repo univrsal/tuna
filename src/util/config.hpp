@@ -1,12 +1,27 @@
-/**
+/*************************************************************************
  * This file is part of tuna
- * which is licensed under the GPL v2.0
- * See LICENSE or http://www.gnu.org/licenses
- * github.com/univrsal/tuna
- */
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *************************************************************************/
+
 #pragma once
 
 #include <util/config-file.h>
+#include <QList>
+#include <QPair>
+#include <QString>
 
 /* Config macros */
 #define CDEF_STR(id, value) \
@@ -55,6 +70,7 @@
 #define CFG_MPD_LOCAL "mpd.local"
 
 #define CFG_WINDOW_TITLE "window.title"
+#define CFG_WINDOW_PAUSE "window.title.pause"
 #define CFG_WINDOW_SEARCH "window.search"
 #define CFG_WINDOW_REPLACE "window.replace"
 #define CFG_WINDOW_CUT_BEGIN "window.cut.begin"
@@ -85,11 +101,10 @@ extern mpd_source* mpd;
 
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
-extern const char* format_string;
 extern const char* placeholder;
 extern const char* cover_path;
 extern const char* lyrics_path;
-extern const char* song_path;
+extern QList<QPair<QString, QString>> outputs;
 extern const char* cover_placeholder;
 extern bool download_cover;
 
@@ -104,4 +119,8 @@ void save();
 void close();
 
 void select_source(source s);
+
+void load_outputs(QList<QPair<QString, QString>> &table_content);
+
+void save_outputs(const QList<QPair<QString, QString>> &table_content);
 } // namespace config

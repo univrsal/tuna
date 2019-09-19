@@ -1,9 +1,21 @@
-/**
+/*************************************************************************
  * This file is part of tuna
- * which is licensed under the GPL v2.0
- * See LICENSE or http://www.gnu.org/licenses
- * github.com/univrsal/tuna
- */
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *************************************************************************/
+
 #include "utility.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
@@ -13,7 +25,7 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
-
+#include <QTextStream>
 namespace util {
 
 size_t
@@ -133,6 +145,71 @@ void handle_cover_art(const song_t* song)
         /* no cover => use place placeholder */
         if (!move_file(config::cover_placeholder, config::cover_path))
             blog(LOG_ERROR, "[tuna] couldn't move placeholder cover");
+    }
+}
+
+QString time_format(uint32_t ms)
+{
+    int secs = (ms / 1000) % 60;
+    int minute = (ms / 1000) / 60 % 60;
+    int hour = (ms / 1000) / 60 / 60 % 60;
+    QTime t(hour, minute, secs);
+
+    return t.toString(hour > 0 ? "h:mm:ss" : "m:ss");
+}
+
+void format_string(QString& out, const song_t* song)
+{
+    out.replace("%t", song->title.c_str());
+    out.replace("%m", song->artists.c_str());
+    out.replace("%a", song->album.c_str());
+    out.replace("%d", QString::number(song->disc_number));
+    out.replace("%n", QString::number(song->track_number));
+    out.replace("%p", time_format(song->progress_ms));
+    out.replace("%l", time_format(song->duration_ms));
+    out.replace("%b", "\n");
+    QString full_date = "";
+
+    switch (song->release_precision) {
+    case prec_day:
+        full_date.append(song->day.c_str()).append('.');
+    case prec_month:
+        full_date.append(song->month.c_str()).append('.');
+    case prec_year:
+        full_date.append(song->year.c_str());
+    default:;
+    }
+    out.replace("%y", song->year.c_str());
+    out.replace("%r", full_date);
+}
+
+void write_song(const QString& str, const QString& output)
+{
+    QFile out(output);
+    if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&out);
+        stream.setCodec("UTF-8");
+        stream << str;
+        stream.flush();
+        out.close();
+    } else {
+        blog(
+            LOG_ERROR, "[tuna] Couldn't open song output file %s", output.toStdString().c_str());
+    }
+}
+
+void handle_outputs(const song_t *s)
+{
+    static QString tmp_text = "";
+
+    for (const auto& output : config::outputs) {
+        tmp_text.clear();
+        tmp_text = output.first;
+        format_string(tmp_text, s);
+
+        if (tmp_text.length() < 1 || !s->is_playing)
+            tmp_text = config::placeholder;
+        write_song(tmp_text, output.second);
     }
 }
 

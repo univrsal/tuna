@@ -1,19 +1,27 @@
-/**
+/*************************************************************************
  * This file is part of tuna
- * which is licensed under the GPL v2.0
- * See LICENSE or http://www.gnu.org/licenses
- * github.com/univrsal/tuna
- */
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *************************************************************************/
+
 #include "tuna_thread.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
 #include "utility.hpp"
-#include <QFile>
-#include <QTime>
-#include <fstream>
 #include <obs-module.h>
-#include <qtextstream.h>
 #include <util/platform.h>
 
 #ifdef LINUX
@@ -22,7 +30,6 @@
 
 #endif
 namespace thread {
-QString song_text;
 volatile bool thread_state = false;
 std::mutex mutex;
 
@@ -32,20 +39,6 @@ static HANDLE thread_handle;
 static pthread_t thread_handle;
 #endif
 
-void write_song(QString& str)
-{
-    QFile out(config::song_path);
-    if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream stream(&out);
-        stream.setCodec("UTF-8");
-        stream << str;
-        stream.flush();
-        out.close();
-    } else {
-        blog(
-            LOG_ERROR, "[tuna] Couldn't open song output file %s", config::song_path);
-    }
-}
 
 bool start()
 {
@@ -74,42 +67,6 @@ void stop()
     thread_state = false;
 }
 
-QString
-time_format(uint32_t ms)
-{
-    int secs = (ms / 1000) % 60;
-    int minute = (ms / 1000) / 60 % 60;
-    int hour = (ms / 1000) / 60 / 60 % 60;
-    QTime t(hour, minute, secs);
-
-    return t.toString(hour > 0 ? "h:mm:ss" : "m:ss");
-}
-
-void format_string(QString& out, const song_t* song)
-{
-    out = QString::fromUtf8(config::format_string);
-    out.replace("%t", song->title.c_str());
-    out.replace("%m", song->artists.c_str());
-    out.replace("%a", song->album.c_str());
-    out.replace("%d", QString::number(song->disc_number));
-    out.replace("%n", QString::number(song->track_number));
-    out.replace("%p", time_format(song->progress_ms));
-    out.replace("%l", time_format(song->duration_ms));
-
-    QString full_date = "";
-    switch (song->release_precision) {
-    case prec_day:
-        full_date.append(song->day.c_str()).append('.');
-    case prec_month:
-        full_date.append(song->month.c_str()).append('.');
-    case prec_year:
-        full_date.append(song->year.c_str());
-    default:;
-    }
-    out.replace("%y", song->year.c_str());
-    out.replace("%r", full_date);
-}
-
 #ifdef _WIN32
 DWORD WINAPI
 thread_method(LPVOID arg)
@@ -122,18 +79,12 @@ void* thread_method(void*)
         mutex.lock();
         if (config::selected_source) {
             config::selected_source->refresh();
-            song_text = "";
             auto* s = config::selected_source->song();
 
             /* Process song data */
             util::handle_cover_art(s);
             util::handle_lyrics(s);
-
-            format_string(song_text, s);
-            if (song_text.length() < 1 || !s->is_playing)
-                song_text = config::placeholder;
-
-            write_song(song_text);
+            util::handle_outputs(s);
         }
 
         mutex.unlock();

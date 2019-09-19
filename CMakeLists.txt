@@ -23,7 +23,8 @@ string(REGEX REPLACE "\n$" "" CREDS "${CREDS}")
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 
 set(tuna_ui
-        src/gui/tuna_gui.ui)
+        src/gui/tuna_gui.ui
+        src/gui/output_edit_dialog.ui)
 
 
 if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
@@ -50,6 +51,8 @@ set(tuna_sources
     ./src/util/creds.hpp
     ./src/gui/tuna_gui.cpp
     ./src/gui/tuna_gui.hpp
+    ./src/gui/output_edit_dialog.cpp
+    ./src/gui/output_edit_dialog.hpp
     ./src/query/music_source.hpp
     ./src/query/spotify_source.cpp
     ./src/query/spotify_source.hpp

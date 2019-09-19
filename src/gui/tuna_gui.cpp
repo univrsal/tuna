@@ -1,24 +1,31 @@
-/* tuna_gui.cpp created on 2019.8.8
+/*************************************************************************
+ * This file is part of tuna
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, version 2 of the License.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * github.com/univrsal/
- *
- */
+ *************************************************************************/
+
 #include "tuna_gui.hpp"
+#include "output_edit_dialog.hpp"
 #include "../query/spotify_source.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 #include "ui_tuna_gui.h"
+#include <QPair>
+#include <QString>
+#include <QList>
 #include <QDate>
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -28,6 +35,7 @@
 #include <obs-module.h>
 #include <random>
 #include <util/platform.h>
+#include <obs-frontend-api.h>
 
 tuna_gui* tuna_dialog = nullptr;
 
@@ -40,6 +48,7 @@ tuna_gui::tuna_gui(QWidget* parent)
         SIGNAL(clicked()),
         this,
         SLOT(on_apply_pressed()));
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     /* load logo */
     const char* path = obs_module_file("tuna.png");
@@ -60,26 +69,8 @@ tuna_gui::tuna_gui(QWidget* parent)
 #ifdef LINUX
     ui->cb_source->addItem(T_SOURCE_MPD);
 #else
-    ui->tab_mpd->setVisible(false);
-    ui->tab_mpd->setEnabled(false);
+    ui->settings_tabs->removeTab(2);
 #endif
-
-    /* setup config values */
-    ui->txt_song_info->setText(CGET_STR(CFG_SONG_PATH));
-    ui->txt_song_cover->setText(CGET_STR(CFG_COVER_PATH));
-    ui->txt_song_lyrics->setText(CGET_STR(CFG_LYRICS_PATH));
-    ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
-    ui->sb_refresh_rate->setValue(CGET_UINT(CFG_REFRESH_RATE));
-    ui->txt_song_format->setText(QString::fromUtf8(CGET_STR(CFG_SONG_FORMAT)));
-    ui->txt_song_placeholder->setText(
-        QString::fromUtf8(CGET_STR(CFG_SONG_PLACEHOLDER)));
-    ui->cb_dl_cover->setChecked(CGET_BOOL(CFG_DOWNLOAD_COVER));
-    set_state();
-
-    /* Update song preview */
-    m_refresh = new QTimer(this);
-    connect(m_refresh, SIGNAL(timeout()), SLOT(update_output_preview()));
-    m_refresh->start(250);
 
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
@@ -99,13 +90,6 @@ void tuna_gui::set_state()
         ui->lbl_status->setText(T_STATUS_STOPPED);
 }
 
-void tuna_gui::update_output_preview()
-{
-    thread::mutex.lock();
-    ui->lbl_output->setText(T_PREVIEW + thread::song_text);
-    thread::mutex.unlock();
-}
-
 tuna_gui::~tuna_gui()
 {
     delete ui;
@@ -117,6 +101,28 @@ void tuna_gui::toggleShowHide()
     if (isVisible()) {
         /* Load config values for sources on dialog show */
         config::load_gui_values();
+
+        /* setup config values */
+        ui->txt_song_cover->setText(CGET_STR(CFG_COVER_PATH));
+        ui->txt_song_lyrics->setText(CGET_STR(CFG_LYRICS_PATH));
+        ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
+        ui->sb_refresh_rate->setValue(CGET_UINT(CFG_REFRESH_RATE));
+        ui->txt_song_placeholder->setText(
+            QString::fromUtf8(CGET_STR(CFG_SONG_PLACEHOLDER)));
+        ui->cb_dl_cover->setChecked(CGET_BOOL(CFG_DOWNLOAD_COVER));
+        set_state();
+
+        /* Load table contents */
+        int row = 1; /* Clear all rows except headers */
+        for (; row < ui->tbl_outputs->rowCount(); row++)
+            ui->tbl_outputs->removeRow(row);
+        row = 0; /* Load rows */
+        ui->tbl_outputs->setRowCount(config::outputs.size());
+        for (const auto& entry : config::outputs) {
+            ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(entry.first));
+            ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(entry.second));
+            row++;
+        }
     }
 }
 
@@ -135,8 +141,8 @@ void tuna_gui::on_btn_open_login_clicked()
     static QString base_url = "https://univrsal.github.io/auth/login?state=";
     QMessageBox::information(this, "Info", T_SPOTIFY_WARNING);
     /* Each login uses a random number before login which is matched
-   * against the number returned after login, to make sure the login
-   * process finished correctly */
+     * against the number returned after login, to make sure the login
+     * process finished correctly */
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_int_distribution<std::mt19937::result_type> dist(1, 32000);
@@ -190,13 +196,11 @@ void tuna_gui::on_btn_performrefresh_clicked()
 
 void tuna_gui::on_tuna_gui_accepted()
 {
-    CSET_STR(CFG_SONG_PATH, ui->txt_song_info->text().toStdString().c_str());
     CSET_STR(CFG_COVER_PATH, ui->txt_song_cover->text().toStdString().c_str());
     CSET_STR(CFG_LYRICS_PATH, ui->txt_song_lyrics->text().toStdString().c_str());
     CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
 
-    CSET_STR(CFG_SONG_FORMAT, ui->txt_song_format->text().toStdString().c_str());
     CSET_STR(CFG_SONG_PLACEHOLDER,
         ui->txt_song_placeholder->text().toStdString().c_str());
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
@@ -207,11 +211,21 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
 
     CSET_STR(CFG_WINDOW_TITLE, ui->txt_title->text().toStdString().c_str());
+    CSET_STR(CFG_WINDOW_PAUSE, ui->txt_paused->text().toStdString().c_str());
     CSET_STR(CFG_WINDOW_SEARCH, ui->txt_search->text().toStdString().c_str());
     CSET_STR(CFG_WINDOW_REPLACE, ui->txt_replace->text().toStdString().c_str());
     CSET_BOOL(CFG_WINDOW_REGEX, ui->cb_regex->isChecked());
     CSET_UINT(CFG_WINDOW_CUT_BEGIN, ui->sb_begin->value());
     CSET_UINT(CFG_WINDOW_CUT_END, ui->sb_end->value());
+
+    config::outputs.clear();
+    for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
+        config::outputs.push_back(QPair<QString, QString>(
+                            ui->tbl_outputs->item(row, 0)->text(),
+                            ui->tbl_outputs->item(row, 1)->text()
+                            ));
+    }
+    config::save_outputs(config::outputs);
 
     thread::mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
@@ -281,6 +295,11 @@ void tuna_gui::set_window_search(const char* str)
     ui->txt_search->setText(str);
 }
 
+void tuna_gui::set_window_pause(const char *str)
+{
+    ui->txt_paused->setText(str);
+}
+
 void tuna_gui::set_window_replace(const char* str)
 {
     ui->txt_replace->setText(str);
@@ -327,14 +346,6 @@ void tuna_gui::on_checkBox_stateChanged(int arg1)
     ui->sb_port->setEnabled(arg1 > 0);
 }
 
-void tuna_gui::on_btn_browse_song_info_clicked()
-{
-    QString path;
-    choose_file(path, T_SELECT_SONG_FILE, FILTER("Text file", "*.txt"));
-    if (!path.isEmpty())
-        ui->txt_song_info->setText(path);
-}
-
 void tuna_gui::on_btn_browse_song_cover_clicked()
 {
     QString path;
@@ -349,4 +360,60 @@ void tuna_gui::on_btn_browse_song_lyrics_clicked()
     choose_file(path, T_SELECT_LYRICS_FILE, FILTER("Text file", "*.txt"));
     if (!path.isEmpty())
         ui->txt_song_lyrics->setText(path);
+}
+
+void tuna_gui::add_output(const QString &format, const QString &path)
+{
+    int row = ui->tbl_outputs->rowCount();
+    ui->tbl_outputs->insertRow(row);
+    ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(format));
+    ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(path));
+}
+
+void tuna_gui::edit_output(const QString &format, const QString &path)
+{
+    auto selection = ui->tbl_outputs->selectedItems();
+    if (!selection.empty() && selection.size() > 1) {
+        selection.at(0)->setText(format);
+        selection.at(1)->setText(path);
+    }
+}
+
+void tuna_gui::on_btn_add_output_clicked()
+{
+    obs_frontend_push_ui_translation(obs_module_get_string);
+    auto *dialog = new output_edit_dialog(edit_mode::create, this);
+    obs_frontend_pop_ui_translation();
+    dialog->exec();
+}
+
+void tuna_gui::on_btn_remove_output_clicked()
+{
+    auto *select = ui->tbl_outputs->selectionModel();
+    if (select->hasSelection()) {
+        auto rows = select->selectedRows();
+        if (!rows.empty()) {
+            ui->tbl_outputs->removeRow(rows.first().row());
+        }
+    }
+}
+
+void tuna_gui::get_selected_output(QString &format, QString &path)
+{
+    auto selection = ui->tbl_outputs->selectedItems();
+    if (!selection.empty() && selection.size() > 1) {
+        format = selection.at(0)->text();
+        path = selection.at(1)->text();
+    }
+}
+
+void tuna_gui::on_btn_edit_output_clicked()
+{
+    auto selection = ui->tbl_outputs->selectedItems();
+    if (!selection.empty() && selection.size() > 1) {
+        obs_frontend_push_ui_translation(obs_module_get_string);
+        auto *dialog = new output_edit_dialog(edit_mode::modify, this);
+        obs_frontend_pop_ui_translation();
+        dialog->exec();
+    }
 }

@@ -1,9 +1,21 @@
-/**
- * This file is part of input-overlay
- * which is licensed under the GPL v2.0
- * See LICENSE or http://www.gnu.org/licenses
- * github.com/univrsal/input-overlay
- */
+/*************************************************************************
+ * This file is part of tuna
+ * github.con/univrsal/tuna
+ * Copyright 2019 univrsal <universailp@web.de>.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *************************************************************************/
+
 #pragma once
 
 #include <obs-module.h>
@@ -27,4 +39,14 @@
 #define T_SELECT_COVER_FILE T_("tuna.gui.select.cover.file")
 #define T_SELECT_LYRICS_FILE T_("tuna.gui.select.lyrics.file")
 
+#define T_SONG_PATH	T_("tuna.gui.tab.basics.song.info")
+#define T_SONG_FORMAT T_("tuna.gui.tab.basics.song.format")
+#define T_SONG_FORMAT_DEFAULT T_("tuna.config.song.format")
+
+#define T_OUTPUT_ERROR_TITLE T_("tuna.gui.output.edit.dialog.error.title")
+#define T_OUTPUT_ERROR T_("tuna.gui.output.edit.dialog.error")
+
 #define FILTER(name, type) name " (" type ");;All Files(*)"
+#define OUTPUT_FILE	"outputs.json"
+#define JSON_OUTPUT_PATH_ID "output"
+#define JSON_FORMAT_ID "format"
