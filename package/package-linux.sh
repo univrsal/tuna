@@ -32,7 +32,7 @@ sed -i -e "s/@VERSION/$version/g" $build_dir/README.txt
 
 echo "Zipping to $project.v$version.$arch.zip"
 cd $build_dir
-zip -r "../$project.v.$version.$arch.zip" ./ 
+zip -r "../$project.v$version.$arch.zip" ./ 
 cd ..
 
 echo "Cleaning up"
