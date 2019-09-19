@@ -161,8 +161,11 @@ QString time_format(uint32_t ms)
 void format_string(QString& out, const song_t* song)
 {
     out.replace("%t", song->title.c_str());
+    out.replace("%T", QString::fromStdString(song->title).toUpper());
     out.replace("%m", song->artists.c_str());
+    out.replace("%M", QString::fromStdString(song->artists).toUpper());
     out.replace("%a", song->album.c_str());
+    out.replace("%A", QString::fromStdString(song->album).toUpper());
     out.replace("%d", QString::number(song->disc_number));
     out.replace("%n", QString::number(song->track_number));
     out.replace("%p", time_format(song->progress_ms));
