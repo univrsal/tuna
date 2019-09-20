@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -728,7 +728,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../../../../UI/forms/obs.qrc">
               <normaloff>:/res/images/invisible.svg</normaloff>:/res/images/invisible.svg</iconset>
             </property>
            </widget>
@@ -814,7 +814,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../../../../UI/forms/obs.qrc">
               <normaloff>:/res/images/invisible.svg</normaloff>:/res/images/invisible.svg</iconset>
             </property>
            </widget>
@@ -900,7 +900,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../../../../UI/forms/obs.qrc">
               <normaloff>:/res/images/invisible.svg</normaloff>:/res/images/invisible.svg</iconset>
             </property>
            </widget>
@@ -1698,7 +1698,9 @@ Public License instead of this License.</string>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../UI/forms/obs.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

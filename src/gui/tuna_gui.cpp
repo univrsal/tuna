@@ -71,7 +71,6 @@ tuna_gui::tuna_gui(QWidget* parent)
 #else
     ui->settings_tabs->removeTab(2);
 #endif
-
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
 }
