@@ -191,9 +191,8 @@ void load_outputs(QList<QPair<QString, QString>> &table_content)
                 }
             }
         } else {
-            int code = json_error_code(&error);
             blog(LOG_WARNING, "[tuna] Error loading output json at line "
-                              "%i (col: %i) Code: %i: %s", error.line, error.column, code, error.text);
+                              "%i (col: %i): %s", error.line, error.column, error.text);
         }
     } else {
         /* Nothing to load, add default */

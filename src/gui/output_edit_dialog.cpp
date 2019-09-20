@@ -24,6 +24,9 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QFileDialog>
+#ifdef _WIN32
+#include <QTextStream>
+#endif
 
 output_edit_dialog::output_edit_dialog(edit_mode m, QWidget *parent) :
     QDialog(parent),
@@ -49,12 +52,23 @@ output_edit_dialog::~output_edit_dialog()
 
 static inline bool is_valid_file(const QString& file)
 {
+    bool result = false;
+#ifdef _WIN32
+    QFile f(file);				/* On NTFS file checks don't work unless the file exists */
+    result = f.open(QIODevice::WriteOnly | QIODevice::Text);
+    f.close();
+#else
     QFileInfo info(file);
-    return info.isWritable() && info.isFile();
+    result = info.isWritable() && info.isFile();
+#endif
+    return result;
 }
 
 void output_edit_dialog::on_buttonBox_accepted()
 {
+    bool empty = ui->txt_format->text().isEmpty();
+    bool valid = is_valid_file(ui->txt_path->text());
+
     if (ui->txt_format->text().isEmpty() || !is_valid_file(ui->txt_path->text())) {
         QMessageBox::warning(this, T_OUTPUT_ERROR_TITLE, T_OUTPUT_ERROR);
         return; /* Nothing to do */

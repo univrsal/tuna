@@ -81,6 +81,7 @@ target_link_libraries(tuna
     libobs
     jansson
     Qt5::Widgets
+    Qt5::Core
     obs-frontend-api
     ${LIBCURL_LIBRARIES}
     ${tuna_platform_deps})
