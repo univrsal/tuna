@@ -198,7 +198,7 @@ void load_outputs(QList<QPair<QString, QString>> &table_content)
         /* Nothing to load, add default */
         QDir home = QDir::homePath();
         QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
-        table_content.push_back(QPair<QString, QString>(default_output, T_SONG_FORMAT_DEFAULT));
+        table_content.push_back(QPair<QString, QString>(T_SONG_FORMAT_DEFAULT, default_output));
     }
 }
 
