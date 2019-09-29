@@ -215,7 +215,7 @@ void save_outputs(const QList<QPair<QString, QString>> &table_content)
     for (const auto& pair : table_content) {
         json_t* obj = json_pack_ex(&error, 0, "{ssss}", JSON_FORMAT_ID,
                                    pair.first.toStdString().c_str(),
-                                   JSON_OUTPUT_PATH_ID, pair.second.toStdString().c_str());
+                                   JSON_OUTPUT_PATH_ID, QDir::toNativeSeparators(pair.second).toStdString().c_str());
 
         if (obj) {
             json_array_append_new(output_array, obj);

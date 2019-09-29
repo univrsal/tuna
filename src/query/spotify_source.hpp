@@ -33,6 +33,8 @@ class spotify_source : public music_source {
     /* epoch time in seconds */
     int64_t m_token_termination = 0;
 
+    uint64_t m_timeout_length = 0, /* Rate limit timeout length */
+        m_timout_start = 0; /* Timeout start */
     void parse_track_json(json_t* track);
 
 public:

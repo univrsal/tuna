@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <string>
 
+#define SECOND_TO_NS 1000000000
 struct song_t;
 
 namespace util {

@@ -50,3 +50,5 @@
 #define OUTPUT_FILE	"outputs.json"
 #define JSON_OUTPUT_PATH_ID "output"
 #define JSON_FORMAT_ID "format"
+
+#define STATUS_RETRY_AFTER 429
