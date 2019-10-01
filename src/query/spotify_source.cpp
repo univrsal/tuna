@@ -370,7 +370,6 @@ json_t *request_token(const char *request, const char *credentials)
 	json_t *result = nullptr;
 	json_error_t error;
 	if (res == CURLE_OK) {
-		blog(LOG_INFO, "[tuna] Curl response: %s", response.c_str());
 		json_t *response_parsed = json_loads(response.c_str(), 0, &error);
 		if (response_parsed) {
 			result = response_parsed;
@@ -501,7 +500,7 @@ json_t *execute_command(const char *auth_token, const char *url, std::string &re
 	if (res == CURLE_OK) {
 		json_error_t error;
         result = json_loads(response.c_str(), 0, &error);
-		if (!result) {
+        if (!result && !response.empty()) {
 			blog(LOG_ERROR, "[tuna] Failed to parse json response: %s", response.c_str());
 		}
 	} else {

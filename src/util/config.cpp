@@ -51,9 +51,9 @@ void init_default()
     QString path_cover_art = QDir::toNativeSeparators(home.absoluteFilePath("cover.png"));
     QString path_lyrics = QDir::toNativeSeparators(home.absoluteFilePath("lyrics.txt"));
 
-    CDEF_STR(CFG_SONG_PATH, qPrintable(path_song_file));
-    CDEF_STR(CFG_COVER_PATH, qPrintable(path_cover_art));
-    CDEF_STR(CFG_LYRICS_PATH, qPrintable(path_lyrics));
+    CDEF_STR(CFG_SONG_PATH, path_song_file.toStdString().c_str());
+    CDEF_STR(CFG_COVER_PATH, path_cover_art.toStdString().c_str());
+    CDEF_STR(CFG_LYRICS_PATH, path_lyrics.toStdString().c_str());
     CDEF_UINT(CFG_SELECTED_SOURCE, src_spotify);
 
     CDEF_BOOL(CFG_RUNNING, false);
@@ -168,10 +168,8 @@ void close()
 void load_outputs(QList<QPair<QString, QString>> &table_content)
 {
     table_content.clear();
-    QString path = obs_get_module_data_path(obs_current_module());
-    if (!path.endsWith(QDir::separator()))
-            path += QDir::separator();
-    path.append(OUTPUT_FILE);
+    QDir home = QDir::homePath();
+    QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
     QFileInfo check(path);
 
     if (check.exists() && check.isFile()) {
@@ -204,10 +202,9 @@ void load_outputs(QList<QPair<QString, QString>> &table_content)
 
 void save_outputs(const QList<QPair<QString, QString>> &table_content)
 {
-    QString path = obs_get_module_data_path(obs_current_module());
-    if (!path.endsWith(QDir::separator()))
-            path += QDir::separator();
-    path.append(OUTPUT_FILE);
+    QDir home = QDir::homePath();
+    QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
+    QFileInfo check(path);
 
     json_t* output_array = json_array();
     json_error_t error;
