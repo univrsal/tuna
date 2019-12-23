@@ -31,8 +31,8 @@ OBS_MODULE_USE_DEFAULT_LOCALE(S_PLUGIN_ID, "en-US")
 void register_gui()
 {
     /* UI registration from
-   * https://github.com/Palakis/obs-websocket/
-   */
+     * https://github.com/Palakis/obs-websocket/
+     */
     const auto menu_action = static_cast<QAction*>(obs_frontend_add_tools_menu_qaction(T_MENU_TUNA));
     obs_frontend_push_ui_translation(obs_module_get_string);
     const auto main_window = static_cast<QMainWindow*>(obs_frontend_get_main_window());

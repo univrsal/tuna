@@ -19,13 +19,13 @@
 #include "utility.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
+#include <QTextStream>
 #include <ctime>
 #include <curl/curl.h>
 #include <fstream>
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
-#include <QTextStream>
 namespace util {
 
 size_t
@@ -201,7 +201,7 @@ void write_song(const QString& str, const QString& output)
     }
 }
 
-void handle_outputs(const song_t *s)
+void handle_outputs(const song_t* s)
 {
     static QString tmp_text = "";
 

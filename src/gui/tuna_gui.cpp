@@ -17,25 +17,25 @@
  *************************************************************************/
 
 #include "tuna_gui.hpp"
-#include "output_edit_dialog.hpp"
 #include "../query/spotify_source.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
+#include "output_edit_dialog.hpp"
 #include "ui_tuna_gui.h"
-#include <QPair>
-#include <QString>
-#include <QList>
 #include <QDate>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QList>
 #include <QMessageBox>
+#include <QPair>
 #include <QPixmap>
+#include <QString>
 #include <QTimer>
+#include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <random>
 #include <util/platform.h>
-#include <obs-frontend-api.h>
 
 tuna_gui* tuna_dialog = nullptr;
 
@@ -220,12 +220,10 @@ void tuna_gui::on_tuna_gui_accepted()
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
         config::outputs.push_back(QPair<QString, QString>(
-                            ui->tbl_outputs->item(row, 0)->text(),
-                            ui->tbl_outputs->item(row, 1)->text()
-                            ));
+            ui->tbl_outputs->item(row, 0)->text(),
+            ui->tbl_outputs->item(row, 1)->text()));
     }
     config::save_outputs(config::outputs);
-
     thread::mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
     thread::mutex.unlock();
@@ -294,7 +292,7 @@ void tuna_gui::set_window_search(const char* str)
     ui->txt_search->setText(str);
 }
 
-void tuna_gui::set_window_pause(const char *str)
+void tuna_gui::set_window_pause(const char* str)
 {
     ui->txt_paused->setText(str);
 }
@@ -361,7 +359,7 @@ void tuna_gui::on_btn_browse_song_lyrics_clicked()
         ui->txt_song_lyrics->setText(path);
 }
 
-void tuna_gui::add_output(const QString &format, const QString &path)
+void tuna_gui::add_output(const QString& format, const QString& path)
 {
     int row = ui->tbl_outputs->rowCount();
     ui->tbl_outputs->insertRow(row);
@@ -369,7 +367,7 @@ void tuna_gui::add_output(const QString &format, const QString &path)
     ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(path));
 }
 
-void tuna_gui::edit_output(const QString &format, const QString &path)
+void tuna_gui::edit_output(const QString& format, const QString& path)
 {
     auto selection = ui->tbl_outputs->selectedItems();
     if (!selection.empty() && selection.size() > 1) {
@@ -381,14 +379,14 @@ void tuna_gui::edit_output(const QString &format, const QString &path)
 void tuna_gui::on_btn_add_output_clicked()
 {
     obs_frontend_push_ui_translation(obs_module_get_string);
-    auto *dialog = new output_edit_dialog(edit_mode::create, this);
+    auto* dialog = new output_edit_dialog(edit_mode::create, this);
     obs_frontend_pop_ui_translation();
     dialog->exec();
 }
 
 void tuna_gui::on_btn_remove_output_clicked()
 {
-    auto *select = ui->tbl_outputs->selectionModel();
+    auto* select = ui->tbl_outputs->selectionModel();
     if (select->hasSelection()) {
         auto rows = select->selectedRows();
         if (!rows.empty()) {
@@ -397,7 +395,7 @@ void tuna_gui::on_btn_remove_output_clicked()
     }
 }
 
-void tuna_gui::get_selected_output(QString &format, QString &path)
+void tuna_gui::get_selected_output(QString& format, QString& path)
 {
     auto selection = ui->tbl_outputs->selectedItems();
     if (!selection.empty() && selection.size() > 1) {
@@ -411,7 +409,7 @@ void tuna_gui::on_btn_edit_output_clicked()
     auto selection = ui->tbl_outputs->selectedItems();
     if (!selection.empty() && selection.size() > 1) {
         obs_frontend_push_ui_translation(obs_module_get_string);
-        auto *dialog = new output_edit_dialog(edit_mode::modify, this);
+        auto* dialog = new output_edit_dialog(edit_mode::modify, this);
         obs_frontend_pop_ui_translation();
         dialog->exec();
     }

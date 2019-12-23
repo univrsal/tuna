@@ -22,8 +22,8 @@
 #include "../query/window_source.hpp"
 #include "../util/tuna_thread.hpp"
 #include "constants.hpp"
-#include <jansson.h>
 #include <QDir>
+#include <jansson.h>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <util/config-file.h>
@@ -165,7 +165,7 @@ void close()
     mpd = nullptr;
 }
 
-void load_outputs(QList<QPair<QString, QString>> &table_content)
+void load_outputs(QList<QPair<QString, QString>>& table_content)
 {
     table_content.clear();
     QDir home = QDir::homePath();
@@ -174,33 +174,40 @@ void load_outputs(QList<QPair<QString, QString>> &table_content)
 
     if (check.exists() && check.isFile()) {
         json_error_t error;
-        json_t *file = json_load_file(path.toStdString().c_str(), 0, &error);
+        json_t* file = json_load_file(path.toStdString().c_str(), 0, &error);
 
         if (file) {
             size_t index;
-            json_t *val;
-            json_array_foreach(file, index, val) {
+            json_t* val;
+            json_array_foreach(file, index, val)
+            {
                 char *format, *path;
                 if (json_unpack_ex(val, &error, 0, "{ssss}", JSON_FORMAT_ID, &format,
-                               JSON_OUTPUT_PATH_ID, &path) < 0) {
+                        JSON_OUTPUT_PATH_ID, &path)
+                    < 0) {
                     blog(LOG_WARNING, "[tuna] failed to unpack json: %s", error.text);
                 } else {
                     table_content.push_back(QPair<QString, QString>(format, path));
                 }
             }
+            json_decref(file);
+            blog(LOG_INFO, "[tuna] Successfully loaded output config with %lu outputs from %s",
+                index, path.toStdString().c_str());
         } else {
-            blog(LOG_WARNING, "[tuna] Error loading output json at line "
-                              "%i (col: %i): %s", error.line, error.column, error.text);
+            blog(LOG_WARNING, "[tuna] Error loading output json (%s) at line "
+                              "%i (col: %i): %s",
+                error.source, error.line, error.column, error.text);
         }
     } else {
         /* Nothing to load, add default */
+        blog(LOG_INFO, "[tuna] No config exists, creating default");
         QDir home = QDir::homePath();
         QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
         table_content.push_back(QPair<QString, QString>(T_SONG_FORMAT_DEFAULT, default_output));
     }
 }
 
-void save_outputs(const QList<QPair<QString, QString>> &table_content)
+void save_outputs(const QList<QPair<QString, QString>>& table_content)
 {
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
@@ -211,8 +218,8 @@ void save_outputs(const QList<QPair<QString, QString>> &table_content)
 
     for (const auto& pair : table_content) {
         json_t* obj = json_pack_ex(&error, 0, "{ssss}", JSON_FORMAT_ID,
-                                   pair.first.toStdString().c_str(),
-                                   JSON_OUTPUT_PATH_ID, QDir::toNativeSeparators(pair.second).toStdString().c_str());
+            pair.first.toStdString().c_str(),
+            JSON_OUTPUT_PATH_ID, QDir::toNativeSeparators(pair.second).toStdString().c_str());
 
         if (obj) {
             json_array_append_new(output_array, obj);
@@ -220,11 +227,13 @@ void save_outputs(const QList<QPair<QString, QString>> &table_content)
             blog(LOG_WARNING, "[tuna] Error encoding json: %s", error.text);
         }
     }
-
     if (json_dump_file(output_array, path.toStdString().c_str(), JSON_INDENT(4)) < 0) {
-        blog(LOG_WARNING, "[tuna] Error writing json at line "
-                          "%i (col: %i): %s", error.line, error.column, error.text);
+        blog(LOG_WARNING, "[tuna] Error writing json to %s", path.toStdString().c_str());
+    } else {
+        blog(LOG_INFO, "[tuna] Successfully saved output config with %i outputs to %s",
+            table_content.size(), path.toStdString().c_str());
     }
+
     json_array_clear(output_array);
     json_decref(output_array);
 }

@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <util/config-file.h>
 #include <QList>
 #include <QPair>
 #include <QString>
+#include <util/config-file.h>
 
 /* Config macros */
 #define CDEF_STR(id, value) \
@@ -120,7 +120,7 @@ void close();
 
 void select_source(source s);
 
-void load_outputs(QList<QPair<QString, QString>> &table_content);
+void load_outputs(QList<QPair<QString, QString>>& table_content);
 
-void save_outputs(const QList<QPair<QString, QString>> &table_content);
+void save_outputs(const QList<QPair<QString, QString>>& table_content);
 } // namespace config

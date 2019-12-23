@@ -31,12 +31,11 @@ enum class edit_mode {
     modify
 };
 
-class output_edit_dialog : public QDialog
-{
+class output_edit_dialog : public QDialog {
     Q_OBJECT
 
 public:
-    output_edit_dialog(edit_mode m, QWidget *parent = nullptr);
+    output_edit_dialog(edit_mode m, QWidget* parent = nullptr);
     ~output_edit_dialog();
 
 private slots:
@@ -45,8 +44,7 @@ private slots:
     void on_pushButton_clicked();
 
 private:
-    Ui::output_edit_dialog *ui;
+    Ui::output_edit_dialog* ui;
     edit_mode m_mode;
-    tuna_gui *m_tuna;
+    tuna_gui* m_tuna;
 };
-

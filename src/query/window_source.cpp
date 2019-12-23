@@ -93,7 +93,7 @@ void window_source::refresh()
         /* Replace & cut */
         util::replace_all(result, m_search, m_replace);
         if (0 < m_cut_end + m_cut_begin && m_cut_end + m_cut_begin < result.length())
-        result = result.substr(m_cut_begin, result.length() - m_cut_begin - m_cut_end);
+            result = result.substr(m_cut_begin, result.length() - m_cut_begin - m_cut_end);
 
         m_current.data = CAP_TITLE | CAP_STATUS;
         m_current.is_playing = true;

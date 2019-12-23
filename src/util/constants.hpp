@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <jansson.h>
 #include <obs-module.h>
 
 #define S_PLUGIN_ID "tuna"
@@ -39,7 +40,7 @@
 #define T_SELECT_COVER_FILE T_("tuna.gui.select.cover.file")
 #define T_SELECT_LYRICS_FILE T_("tuna.gui.select.lyrics.file")
 
-#define T_SONG_PATH	T_("tuna.gui.tab.basics.song.info")
+#define T_SONG_PATH T_("tuna.gui.tab.basics.song.info")
 #define T_SONG_FORMAT T_("tuna.gui.tab.basics.song.format")
 #define T_SONG_FORMAT_DEFAULT T_("tuna.config.song.format")
 
@@ -47,7 +48,16 @@
 #define T_OUTPUT_ERROR T_("tuna.gui.output.edit.dialog.error")
 
 #define FILTER(name, type) name " (" type ");;All Files(*)"
-#define OUTPUT_FILE	"outputs.json"
+
+/* Outputs are saved into config folder on linux, but on windows
+ * the home directory isn't really used anyways so just save it
+ * there */
+#if LINUX
+#define OUTPUT_FILE ".config/outputs.json"
+#else
+#define OUTPUT_FILE "outputs.json"
+#endif
+
 #define JSON_OUTPUT_PATH_ID "output"
 #define JSON_FORMAT_ID "format"
 

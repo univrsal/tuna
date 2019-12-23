@@ -17,21 +17,21 @@
  *************************************************************************/
 
 #include "output_edit_dialog.hpp"
-#include "ui_output_edit_dialog.h"
-#include "tuna_gui.hpp"
 #include "../util/constants.hpp"
-#include <QFileInfo>
-#include <QMessageBox>
+#include "tuna_gui.hpp"
+#include "ui_output_edit_dialog.h"
 #include <QDir>
 #include <QFileDialog>
+#include <QFileInfo>
+#include <QMessageBox>
 #ifdef _WIN32
 #include <QTextStream>
 #endif
 
-output_edit_dialog::output_edit_dialog(edit_mode m, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::output_edit_dialog),
-    m_mode(m)
+output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
+    : QDialog(parent)
+    , ui(new Ui::output_edit_dialog)
+    , m_mode(m)
 {
     ui->setupUi(this);
     ui->txt_format->setText(T_SONG_FORMAT_DEFAULT);
@@ -54,12 +54,15 @@ static inline bool is_valid_file(const QString& file)
 {
     bool result = false;
 #ifdef _WIN32
-    QFile f(file);				/* On NTFS file checks don't work unless the file exists */
+    QFile f(file); /* On NTFS file checks don't work unless the file exists */
     result = f.open(QIODevice::WriteOnly | QIODevice::Text);
     f.close();
 #else
-    QFileInfo info(file);
-    result = info.isWritable() && info.isFile();
+    QFile test(file);
+
+    result = test.open(QFile::OpenModeFlag::ReadWrite);
+    if (result)
+        test.close();
 #endif
     return result;
 }
@@ -69,7 +72,7 @@ void output_edit_dialog::on_buttonBox_accepted()
     bool empty = ui->txt_format->text().isEmpty();
     bool valid = is_valid_file(ui->txt_path->text());
 
-    if (ui->txt_format->text().isEmpty() || !is_valid_file(ui->txt_path->text())) {
+    if (empty || !valid) {
         QMessageBox::warning(this, T_OUTPUT_ERROR_TITLE, T_OUTPUT_ERROR);
         return; /* Nothing to do */
     }

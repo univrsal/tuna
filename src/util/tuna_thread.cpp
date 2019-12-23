@@ -39,7 +39,6 @@ static HANDLE thread_handle;
 static pthread_t thread_handle;
 #endif
 
-
 bool start()
 {
     bool result = true;
