@@ -19,6 +19,7 @@
 #include "utility.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
+#include <QFile>
 #include <QTextStream>
 #include <ctime>
 #include <curl/curl.h>
@@ -26,6 +27,7 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
+
 namespace util {
 
 size_t
