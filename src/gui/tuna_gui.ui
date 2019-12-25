@@ -247,11 +247,11 @@
               <property name="cornerButtonEnabled">
                <bool>false</bool>
               </property>
-              <attribute name="horizontalHeaderDefaultSectionSize">
-               <number>200</number>
-              </attribute>
               <attribute name="horizontalHeaderMinimumSectionSize">
                <number>37</number>
+              </attribute>
+              <attribute name="horizontalHeaderDefaultSectionSize">
+               <number>200</number>
               </attribute>
               <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
                <bool>false</bool>

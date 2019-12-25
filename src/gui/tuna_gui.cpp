@@ -265,6 +265,8 @@ void tuna_gui::set_mpd_port(uint16_t port)
 void tuna_gui::set_mpd_local(bool state)
 {
     ui->cb_local->setChecked(state);
+    ui->txt_ip->setEnabled(!state);
+    ui->sb_port->setEnabled(!state);
 }
 
 void tuna_gui::set_spotify_auth_code(const char* str)

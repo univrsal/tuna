@@ -27,6 +27,7 @@ mpd_source::mpd_source()
 {
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_LENGTH | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
     m_address = nullptr;
+    m_connection = nullptr;
     m_port = 0;
     m_connected = false;
 }
@@ -46,7 +47,7 @@ mpd_source::~mpd_source()
 
 void mpd_source::disconnect()
 {
-    if (m_connection) {
+    if (m_connected) {
         mpd_connection_free(m_connection);
         m_connection = nullptr;
     }
@@ -59,7 +60,7 @@ void mpd_source::connect()
     if (m_local)
         m_connection = mpd_connection_new(nullptr, 0, 0);
     else
-        m_connection = mpd_connection_new(m_address, m_port, 500);
+        m_connection = mpd_connection_new(m_address, m_port, 2000);
 
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
         blog(LOG_ERROR,
