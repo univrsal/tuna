@@ -181,7 +181,8 @@ void load_outputs(QList<QPair<QString, QString>>& table_content)
 		if (doc.isArray())
 			array = doc.array();
 
-		foreach(const QJsonValue obj, array) {
+        for (const auto &val : array) {
+            QJsonObject obj = val.toObject();
 			table_content.push_back(QPair<QString, QString>(
 			                            obj[JSON_FORMAT_ID].toString(),
 			                            obj[JSON_OUTPUT_PATH_ID].toString()

@@ -113,6 +113,8 @@ private slots:
 
     void on_btn_edit_output_clicked();
 
+    void on_cb_local_clicked(bool checked);
+
 private:
     Ui::tuna_gui* ui;
 };

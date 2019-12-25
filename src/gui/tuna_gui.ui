@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>674</width>
+    <width>710</width>
     <height>701</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -247,11 +247,11 @@
               <property name="cornerButtonEnabled">
                <bool>false</bool>
               </property>
-              <attribute name="horizontalHeaderMinimumSectionSize">
-               <number>37</number>
-              </attribute>
               <attribute name="horizontalHeaderDefaultSectionSize">
                <number>200</number>
+              </attribute>
+              <attribute name="horizontalHeaderMinimumSectionSize">
+               <number>37</number>
               </attribute>
               <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
                <bool>false</bool>
@@ -1709,8 +1709,8 @@ Public License instead of this License.</string>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>257</x>
+     <y>691</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -1725,8 +1725,8 @@ Public License instead of this License.</string>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>325</x>
+     <y>691</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

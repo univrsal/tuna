@@ -414,3 +414,9 @@ void tuna_gui::on_btn_edit_output_clicked()
         dialog->exec();
     }
 }
+
+void tuna_gui::on_cb_local_clicked(bool checked)
+{
+    ui->txt_ip->setEnabled(!checked);
+    ui->sb_port->setEnabled(!checked);
+}

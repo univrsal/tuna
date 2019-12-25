@@ -177,6 +177,7 @@ bool mpd_source::execute_capability(capability c)
         return mpd_run_set_volume(m_connection, 0);
     case CAP_PLAY_PAUSE:
         return mpd_run_toggle_pause(m_connection);
+    default:;
     }
     return false;
 }
@@ -185,6 +186,7 @@ void mpd_source::load_gui_values()
 {
     tuna_dialog->set_mpd_ip(m_address);
     tuna_dialog->set_mpd_port(m_port);
+    tuna_dialog->set_mpd_local(m_local);
 }
 
 #endif
