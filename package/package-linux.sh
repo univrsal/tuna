@@ -4,8 +4,8 @@
 version=$1
 data_dir="../data"
 project="tuna"
-arch="linux64"
-build_location="../../../qtc-release/rundir/Release/obs-plugins/64bit"
+arch="ubuntu.x64"
+build_location="../../../relwithdebinfo/rundir/RelWithDebInfo/obs-plugins/64bit"
 build_dir=$project.v$version.$arch
 
 if [ -z "$version" ]; then
