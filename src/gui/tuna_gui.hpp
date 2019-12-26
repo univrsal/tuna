@@ -25,51 +25,52 @@ class tuna_gui;
 }
 
 class tuna_gui : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 
-	void load_vlc_sources();
+    void load_vlc_sources();
+
 public:
-	explicit tuna_gui(QWidget* parent = nullptr);
+    explicit tuna_gui(QWidget* parent = nullptr);
 
-	~tuna_gui();
+    ~tuna_gui();
 
-	void toggleShowHide();
+    void toggleShowHide();
 
-	void apply_login_state(bool state, const QString& log);
+    void apply_login_state(bool state, const QString& log);
 
-	void select_vlc_source(const char* id);
+    void select_vlc_source(const char* id);
 
-	void set_spotify_auth_code(const char* str);
+    void set_spotify_auth_code(const char* str);
 
-	void set_spotify_auth_token(const char* str);
+    void set_spotify_auth_token(const char* str);
 
-	void set_spotify_refresh_token(const char* str);
+    void set_spotify_refresh_token(const char* str);
 
-	void set_mpd_ip(const char* ip);
+    void set_mpd_ip(const char* ip);
 
-	void set_mpd_port(uint16_t port);
+    void set_mpd_port(uint16_t port);
 
-	void set_mpd_local(bool state);
+    void set_mpd_local(bool state);
 
-	void set_window_title(const char* str);
+    void set_window_title(const char* str);
 
-	void set_window_search(const char* str);
+    void set_window_search(const char* str);
 
-	void set_window_pause(const char* str);
+    void set_window_pause(const char* str);
 
-	void set_window_replace(const char* str);
+    void set_window_replace(const char* str);
 
-	void set_window_cut_begin(uint16_t n);
+    void set_window_cut_begin(uint16_t n);
 
-	void set_window_cut_end(uint16_t n);
+    void set_window_cut_end(uint16_t n);
 
-	void set_window_regex(bool state);
+    void set_window_regex(bool state);
 
-	void add_output(const QString& format, const QString& path);
+    void add_output(const QString& format, const QString& path);
 
-	void edit_output(const QString& format, const QString& path);
+    void edit_output(const QString& format, const QString& path);
 
-	void get_selected_output(QString& format, QString& path);
+    void get_selected_output(QString& format, QString& path);
 private slots:
 
     void choose_file(QString& path, const char* title, const char* file_types);

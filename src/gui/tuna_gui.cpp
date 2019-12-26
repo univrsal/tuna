@@ -18,12 +18,12 @@
 
 #include "tuna_gui.hpp"
 #include "../query/spotify_source.hpp"
+#include "../query/vlc_obs_source.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
 #include "output_edit_dialog.hpp"
-#include "../query/vlc_obs_source.hpp"
 #include "ui_tuna_gui.h"
 #include <QDate>
 #include <QDesktopServices>
@@ -75,13 +75,13 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->settings_tabs->removeTab(2);
 #endif
 
-	/* Notify user, if vlc source is disabled */
-	ui->lbl_vlc_disabled->setStyleSheet("QLabel { color: red;"
-	                                    "font-weight: bold;");
-	ui->lbl_vlc_disabled->setVisible(!util::vlc_loaded);
+    /* Notify user, if vlc source is disabled */
+    ui->lbl_vlc_disabled->setStyleSheet("QLabel { color: red;"
+                                        "font-weight: bold;");
+    ui->lbl_vlc_disabled->setVisible(!util::vlc_loaded);
 
-	/* TODO Lyrics */
-	ui->frame_lyrics->setVisible(false);
+    /* TODO Lyrics */
+    ui->frame_lyrics->setVisible(false);
 }
 
 void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)
@@ -435,15 +435,15 @@ void tuna_gui::on_cb_local_clicked(bool checked)
     ui->sb_port->setEnabled(!checked);
 }
 
-static bool add_source(void *data, obs_source_t *src)
+static bool add_source(void* data, obs_source_t* src)
 {
-	auto *id = obs_source_get_id(src);
-	if (strcmp(id, "vlc_source") == 0) {
-		auto *name = obs_source_get_name(src);
-		QComboBox *cb = reinterpret_cast<QComboBox *>(data);
-		cb->addItem(name);
-	}
-	return true;
+    auto* id = obs_source_get_id(src);
+    if (strcmp(id, "vlc_source") == 0) {
+        auto* name = obs_source_get_name(src);
+        QComboBox* cb = reinterpret_cast<QComboBox*>(data);
+        cb->addItem(name);
+    }
+    return true;
 }
 
 void tuna_gui::load_vlc_sources()
@@ -458,7 +458,7 @@ void tuna_gui::on_pb_refresh_vlc_clicked()
     load_vlc_sources();
 }
 
-void tuna_gui::select_vlc_source(const char *id)
+void tuna_gui::select_vlc_source(const char* id)
 {
     auto idx = ui->cb_source->findText(id);
     if (idx >= 0)

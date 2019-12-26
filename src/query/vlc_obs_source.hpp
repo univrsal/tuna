@@ -17,20 +17,20 @@
  *************************************************************************/
 #pragma once
 #include "music_source.hpp"
-#include <string>
 #include <obs-module.h>
+#include <string>
 
-class vlc_obs_source : public music_source
-{
+class vlc_obs_source : public music_source {
     std::string m_target_source_name;
-    obs_weak_source_t *m_weak_src = nullptr;
+    obs_weak_source_t* m_weak_src = nullptr;
     /* If obs version changed since the plugin was
      * compiled, vlc source will be disabled since its
      * functionality is based on some hacks that can easily
      * break in between obs versions */
 
-    struct vlc_source *get_vlc();
+    struct vlc_source* get_vlc();
     bool m_lib_vlc_loaded = false;
+
 public:
     vlc_obs_source();
     ~vlc_obs_source();

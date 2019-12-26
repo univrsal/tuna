@@ -43,15 +43,13 @@ void load_vlc()
         blog(LOG_WARNING, "[tuna] libobs version %d.%d.%d is "
                           "invalid. Tuna expects %d.%d.%d for"
                           " VLC sources to work",
-             major, minor, patch, LIBOBS_API_MAJOR_VER,
-             LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
+            major, minor, patch, LIBOBS_API_MAJOR_VER,
+            LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
         vlc_loaded = false;
     }
 
     if (vlc_loaded) {
-        if (!load_libvlc_module() ||
-            !load_vlc_funcs() ||
-            !load_libvlc()) {
+        if (!load_libvlc_module() || !load_vlc_funcs() || !load_libvlc()) {
             blog(LOG_WARNING, "[tuna] Couldn't load libVLC,"
                               " VLC source support disabled");
             vlc_loaded = false;
@@ -157,8 +155,7 @@ void handle_lyrics(const song_t* song)
 void handle_cover_art(const song_t* song)
 {
     static std::string last_cover = "";
-    bool is_url = song->cover.find("http") != std::string::npos ||
-                  song->cover.find("file://") != std::string::npos;
+    bool is_url = song->cover.find("http") != std::string::npos || song->cover.find("file://") != std::string::npos;
 
     bool found_cover = song->data & CAP_COVER && song->is_playing;
 

@@ -17,10 +17,10 @@
  *************************************************************************/
 
 #include "gui/tuna_gui.hpp"
+#include "query/vlc_obs_source.hpp"
 #include "util/config.hpp"
 #include "util/constants.hpp"
 #include "util/utility.hpp"
-#include "query/vlc_obs_source.hpp"
 #include <QAction>
 #include <QMainWindow>
 #include <obs-frontend-api.h>

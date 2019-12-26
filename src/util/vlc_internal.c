@@ -2,9 +2,8 @@
 #include <windows.h>
 #endif
 
-#include <util/platform.h>
 #include "vlc_internal.h"
-
+#include <util/platform.h>
 
 /* libvlc core */
 LIBVLC_NEW libvlc_new_;
@@ -22,75 +21,75 @@ LIBVLC_MEDIA_PLAYER_CAN_PAUSE libvlc_media_player_can_pause_;
 LIBVLC_MEDIA_PLAYER_PAUSE libvlc_media_player_pause_;
 LIBVLC_MEDIA_PLAYER_GET_MEDIA libvlc_media_player_get_media_;
 
-void *libvlc_module = NULL;
+void* libvlc_module = NULL;
 
 #ifdef __APPLE__
-void *libvlc_core_module = NULL;
+void* libvlc_core_module = NULL;
 #endif
 
-libvlc_instance_t *libvlc = NULL;
+libvlc_instance_t* libvlc = NULL;
 uint64_t time_start = 0;
 
 bool load_vlc_funcs(void)
 {
-#define LOAD_VLC_FUNC(func)                                     \
-	do {                                                    \
-	    func##_ = os_dlsym(libvlc_module, #func);       \
-	    if (!func##_) {                                 \
-	        blog(LOG_WARNING,                       \
-	             "[tuna] Could not func VLC function %s, " \
-	             "VLC loading failed",              \
-                 #func);                            \
-            return false;                           \
-        }                                               \
+#define LOAD_VLC_FUNC(func)                               \
+    do {                                                  \
+        func##_ = os_dlsym(libvlc_module, #func);         \
+        if (!func##_) {                                   \
+            blog(LOG_WARNING,                             \
+                "[tuna] Could not func VLC function %s, " \
+                "VLC loading failed",                     \
+                #func);                                   \
+            return false;                                 \
+        }                                                 \
     } while (false)
 
-	/* libvlc core */
-	LOAD_VLC_FUNC(libvlc_new);
-	LOAD_VLC_FUNC(libvlc_release);
-	LOAD_VLC_FUNC(libvlc_clock);
-	LOAD_VLC_FUNC(libvlc_event_attach);
+    /* libvlc core */
+    LOAD_VLC_FUNC(libvlc_new);
+    LOAD_VLC_FUNC(libvlc_release);
+    LOAD_VLC_FUNC(libvlc_clock);
+    LOAD_VLC_FUNC(libvlc_event_attach);
 
-	/* libvlc media */
-	LOAD_VLC_FUNC(libvlc_media_get_meta);
+    /* libvlc media */
+    LOAD_VLC_FUNC(libvlc_media_get_meta);
 
-	/* libvlc media player */
-	LOAD_VLC_FUNC(libvlc_media_player_get_time);
-	LOAD_VLC_FUNC(libvlc_media_player_get_state);
-	LOAD_VLC_FUNC(libvlc_media_player_can_pause);
-	LOAD_VLC_FUNC(libvlc_media_player_pause);
-	LOAD_VLC_FUNC(libvlc_media_player_get_media);
+    /* libvlc media player */
+    LOAD_VLC_FUNC(libvlc_media_player_get_time);
+    LOAD_VLC_FUNC(libvlc_media_player_get_state);
+    LOAD_VLC_FUNC(libvlc_media_player_can_pause);
+    LOAD_VLC_FUNC(libvlc_media_player_pause);
+    LOAD_VLC_FUNC(libvlc_media_player_get_media);
 
-	return true;
+    return true;
 }
 
 bool load_libvlc_module(void)
 {
 #ifdef _WIN32
-	char *path_utf8 = NULL;
-	wchar_t path[1024];
-	LSTATUS status;
-	DWORD size;
-	HKEY key;
+    char* path_utf8 = NULL;
+    wchar_t path[1024];
+    LSTATUS status;
+    DWORD size;
+    HKEY key;
 
-	memset(path, 0, 1024 * sizeof(wchar_t));
+    memset(path, 0, 1024 * sizeof(wchar_t));
 
-	status = RegOpenKeyW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\VideoLAN\\VLC",
-	             &key);
-	if (status != ERROR_SUCCESS)
-		return false;
+    status = RegOpenKeyW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\VideoLAN\\VLC",
+        &key);
+    if (status != ERROR_SUCCESS)
+        return false;
 
-	size = 1024;
-	status = RegQueryValueExW(key, L"InstallDir", NULL, NULL, (LPBYTE)path,
-	              &size);
-	if (status == ERROR_SUCCESS) {
-		wcscat(path, L"\\libvlc.dll");
-		os_wcs_to_utf8_ptr(path, 0, &path_utf8);
-		libvlc_module = os_dlopen(path_utf8);
-		bfree(path_utf8);
-	}
+    size = 1024;
+    status = RegQueryValueExW(key, L"InstallDir", NULL, NULL, (LPBYTE)path,
+        &size);
+    if (status == ERROR_SUCCESS) {
+        wcscat(path, L"\\libvlc.dll");
+        os_wcs_to_utf8_ptr(path, 0, &path_utf8);
+        libvlc_module = os_dlopen(path_utf8);
+        bfree(path_utf8);
+    }
 
-	RegCloseKey(key);
+    RegCloseKey(key);
 #else
 
 #ifdef __APPLE__
@@ -98,44 +97,44 @@ bool load_libvlc_module(void)
 /* According to otoolo -L, this is what libvlc.dylib wants. */
 #define LIBVLC_CORE_FILE LIBVLC_DIR "lib/libvlccore.dylib"
 #define LIBVLC_FILE LIBVLC_DIR "lib/libvlc.5.dylib"
-	setenv("VLC_PLUGIN_PATH", LIBVLC_DIR "plugins", false);
-	libvlc_core_module = os_dlopen(LIBVLC_CORE_FILE);
+    setenv("VLC_PLUGIN_PATH", LIBVLC_DIR "plugins", false);
+    libvlc_core_module = os_dlopen(LIBVLC_CORE_FILE);
 
-	if (!libvlc_core_module)
-		return false;
+    if (!libvlc_core_module)
+        return false;
 #else
 #define LIBVLC_FILE "libvlc.so.5"
 #endif
-	libvlc_module = os_dlopen(LIBVLC_FILE);
+    libvlc_module = os_dlopen(LIBVLC_FILE);
 
 #endif
 
-	return libvlc_module != NULL;
+    return libvlc_module != NULL;
 }
 
 bool load_libvlc(void)
 {
-	if (libvlc)
-		return true;
+    if (libvlc)
+        return true;
 
-	libvlc = libvlc_new_(0, 0);
-	if (!libvlc) {
-		blog(LOG_INFO, "Couldn't create libvlc instance");
-		return false;
-	}
+    libvlc = libvlc_new_(0, 0);
+    if (!libvlc) {
+        blog(LOG_INFO, "Couldn't create libvlc instance");
+        return false;
+    }
 
-	time_start = (uint64_t)libvlc_clock_() * 1000ULL;
-	return true;
+    time_start = (uint64_t)libvlc_clock_() * 1000ULL;
+    return true;
 }
 
 void unload_libvlc(void)
 {
-	if (libvlc)
-		libvlc_release_(libvlc);
+    if (libvlc)
+        libvlc_release_(libvlc);
 #ifdef __APPLE__
-	if (libvlc_core_module)
-		os_dlclose(libvlc_core_module);
+    if (libvlc_core_module)
+        os_dlclose(libvlc_core_module);
 #endif
-	if (libvlc_module)
-		os_dlclose(libvlc_module);
+    if (libvlc_module)
+        os_dlclose(libvlc_module);
 }

@@ -98,20 +98,20 @@ enum source {
     src_count
 };
 
-extern music_source *selected_source;
-extern config_t *instance;
-extern vlc_obs_source *vlc_obs;
-extern spotify_source *spotify;
-extern window_source *window;
-extern mpd_source *mpd;
+extern music_source* selected_source;
+extern config_t* instance;
+extern vlc_obs_source* vlc_obs;
+extern spotify_source* spotify;
+extern window_source* window;
+extern mpd_source* mpd;
 
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
-extern const char *placeholder;
-extern const char *cover_path;
-extern const char *lyrics_path;
+extern const char* placeholder;
+extern const char* cover_path;
+extern const char* lyrics_path;
 extern QList<QPair<QString, QString>> outputs;
-extern const char *cover_placeholder;
+extern const char* cover_placeholder;
 extern bool download_cover;
 
 void load_gui_values();
