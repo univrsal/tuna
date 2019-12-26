@@ -21,7 +21,9 @@
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
+#include "../util/utility.hpp"
 #include "output_edit_dialog.hpp"
+#include "../query/vlc_obs_source.hpp"
 #include "ui_tuna_gui.h"
 #include <QDate>
 #include <QDesktopServices>
@@ -55,6 +57,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     QPixmap img(path);
     ui->lbl_img->setPixmap(img);
     bfree((void*)path);
+
     ui->settings_tabs->setCurrentIndex(0);
     bool logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
     if (logged_in) {
@@ -71,8 +74,14 @@ tuna_gui::tuna_gui(QWidget* parent)
 #else
     ui->settings_tabs->removeTab(2);
 #endif
-    /* TODO Lyrics */
-    ui->frame_lyrics->setVisible(false);
+
+	/* Notify user, if vlc source is disabled */
+	ui->lbl_vlc_disabled->setStyleSheet("QLabel { color: red;"
+	                                    "font-weight: bold;");
+	ui->lbl_vlc_disabled->setVisible(!util::vlc_loaded);
+
+	/* TODO Lyrics */
+	ui->frame_lyrics->setVisible(false);
 }
 
 void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)
@@ -99,6 +108,7 @@ void tuna_gui::toggleShowHide()
     setVisible(!isVisible());
     if (isVisible()) {
         /* Load config values for sources on dialog show */
+        load_vlc_sources();
         config::load_gui_values();
 
         /* setup config values */
@@ -216,6 +226,8 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_BOOL(CFG_WINDOW_REGEX, ui->cb_regex->isChecked());
     CSET_UINT(CFG_WINDOW_CUT_BEGIN, ui->sb_begin->value());
     CSET_UINT(CFG_WINDOW_CUT_END, ui->sb_end->value());
+
+    CSET_STR(CFG_VLC_ID, ui->cb_vlc_source_name->currentText().toStdString().c_str());
 
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
@@ -421,4 +433,36 @@ void tuna_gui::on_cb_local_clicked(bool checked)
 {
     ui->txt_ip->setEnabled(!checked);
     ui->sb_port->setEnabled(!checked);
+}
+
+static bool add_source(void *data, obs_source_t *src)
+{
+	auto *id = obs_source_get_id(src);
+	if (strcmp(id, "vlc_source") == 0) {
+		auto *name = obs_source_get_name(src);
+		QComboBox *cb = reinterpret_cast<QComboBox *>(data);
+		cb->addItem(name);
+	}
+	return true;
+}
+
+void tuna_gui::load_vlc_sources()
+{
+    ui->cb_vlc_source_name->clear();
+    ui->cb_vlc_source_name->addItem(T_VLC_NONE);
+    obs_enum_sources(add_source, ui->cb_vlc_source_name);
+}
+
+void tuna_gui::on_pb_refresh_vlc_clicked()
+{
+    load_vlc_sources();
+}
+
+void tuna_gui::select_vlc_source(const char *id)
+{
+    auto idx = ui->cb_source->findText(id);
+    if (idx >= 0)
+        ui->cb_vlc_source_name->setCurrentIndex(idx);
+    else
+        ui->cb_vlc_source_name->setCurrentIndex(0);
 }

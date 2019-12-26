@@ -43,6 +43,27 @@ if (MSVC)
             w32-pthreads)
 endif ()
 
+find_package(LibVLC QUIET)
+if (NOT LIBVLC_INCLUDES_FOUND AND ENABLE_VLC)
+    message(STATUS "LibVLC includes not found but set as enabled")
+    add_definitions(-DDISABLE_TUNA_VLC=1)
+elseif (NOT LIBVLC_INCLUDES_FOUND)
+    message(STATUS "LibVLC includes not found, VLC video plugin disabled")
+    add_definitions(-DDISABLE_TUNA_VLC=1)
+endif()
+
+if (DISABLE_VLC)
+    message(STATUS "VLC integration disabled")
+    add_definitions(-DDISABLE_TUNA_VLC=1)
+else()
+    include_directories(${LIBVLC_INCLUDE_DIRS})
+    add_definitions(${LIBVLC_DEFINITIONS})
+    set(tuna_vlc_source
+        ./src/query/vlc_obs_source.cpp
+        ./src/util/vlc_internal.h
+        ./src/util/vlc_internal.c)
+endif()
+
 set(tuna_sources
     ./src/tuna_plugin.cpp
     ./src/util/constants.hpp
@@ -60,6 +81,8 @@ set(tuna_sources
     ./src/query/mpd_source.hpp
     ./src/query/window_source.cpp
     ./src/query/window_source.hpp
+    ${tuna_vlc_source}
+    ./src/query/vlc_obs_source.hpp
     ./src/util/tuna_thread.cpp
     ./src/util/tuna_thread.hpp
     ./src/util/utility.cpp

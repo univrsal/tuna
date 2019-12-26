@@ -19,6 +19,7 @@
 #include "utility.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
+#include "vlc_internal.h"
 #include <QFile>
 #include <QTextStream>
 #include <ctime>
@@ -29,6 +30,39 @@
 #include <util/platform.h>
 
 namespace util {
+
+bool vlc_loaded = true;
+
+void load_vlc()
+{
+    auto ver = obs_get_version();
+    if (obs_get_version() != LIBOBS_API_VER) {
+        int major = ver >> 24 & 0xFF;
+        int minor = ver >> 16 & 0xFF;
+        int patch = ver & 0xFF;
+        blog(LOG_WARNING, "[tuna] libobs version %d.%d.%d is "
+                          "invalid. Tuna expects %d.%d.%d for"
+                          " VLC sources to work",
+             major, minor, patch, LIBOBS_API_MAJOR_VER,
+             LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
+        vlc_loaded = false;
+    }
+
+    if (vlc_loaded) {
+        if (!load_libvlc_module() ||
+            !load_vlc_funcs() ||
+            !load_libvlc()) {
+            blog(LOG_WARNING, "[tuna] Couldn't load libVLC,"
+                              " VLC source support disabled");
+            vlc_loaded = false;
+        }
+    }
+}
+
+void unload_vlc()
+{
+    unload_libvlc();
+}
 
 size_t
 write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
@@ -123,7 +157,9 @@ void handle_lyrics(const song_t* song)
 void handle_cover_art(const song_t* song)
 {
     static std::string last_cover = "";
-    bool is_url = song->cover.find("http") != std::string::npos;
+    bool is_url = song->cover.find("http") != std::string::npos ||
+                  song->cover.find("file://") != std::string::npos;
+
     bool found_cover = song->data & CAP_COVER && song->is_playing;
 
     if (found_cover && !song->cover.empty() && song->cover != last_cover) {

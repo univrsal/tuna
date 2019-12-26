@@ -47,6 +47,8 @@
 #define T_OUTPUT_ERROR_TITLE T_("tuna.gui.output.edit.dialog.error.title")
 #define T_OUTPUT_ERROR T_("tuna.gui.output.edit.dialog.error")
 
+#define T_VLC_NONE T_("tuna.vlc.none")
+
 #define FILTER(name, type) name " (" type ");;All Files(*)"
 
 /* Outputs are saved into config folder on linux, but on windows

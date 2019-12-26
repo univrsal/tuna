@@ -125,29 +125,31 @@ void mpd_source::refresh()
             m_current.title = title;
         else
             m_current.title = "N/A";
-        if (artists)
+        m_current.data |= CAP_TITLE;
+
+        if (artists) {
             m_current.artists = artists;
-        if (year)
-            m_current.year = year;
-        if (album)
-            m_current.album = album;
-
-        if (num)
-            m_current.track_number = std::stoi(num);
-        if (disc)
-            m_current.disc_number = std::atoi(disc);
-
-        m_current.duration_ms = mpd_song_get_duration_ms(m_mpd_song);
-        if (!m_current.title.empty())
-            m_current.data |= CAP_TITLE;
-        if (!m_current.artists.empty())
             m_current.data |= CAP_ARTIST;
-        if (!m_current.year.empty()) {
+        }
+        if (year) {
+            m_current.year = year;
             m_current.data |= CAP_RELEASE;
             m_current.release_precision = prec_year;
         }
-        if (!m_current.album.empty())
+        if (album) {
+            m_current.album = album;
             m_current.data |= CAP_ALBUM;
+        }
+        if (num) {
+            m_current.track_number = std::stoi(num);
+            m_current.data |= CAP_TRACK_NUMBER;
+        }
+        if (disc) {
+            m_current.disc_number = std::atoi(disc);
+            m_current.data |= CAP_DISC_NUMBER;
+        }
+
+        m_current.duration_ms = mpd_song_get_duration_ms(m_mpd_song);
         if (m_current.duration_ms > 0)
             m_current.data |= CAP_LENGTH;
     }

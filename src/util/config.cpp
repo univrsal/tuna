@@ -20,6 +20,7 @@
 #include "../query/mpd_source.hpp"
 #include "../query/spotify_source.hpp"
 #include "../query/window_source.hpp"
+#include "../query/vlc_obs_source.hpp"
 #include "../util/tuna_thread.hpp"
 #include "constants.hpp"
 #include <QDir>
@@ -33,18 +34,19 @@
 #include <util/platform.h>
 
 namespace config {
-config_t* instance = nullptr;
-music_source* selected_source = nullptr;
-spotify_source* spotify = nullptr;
-window_source* window = nullptr;
+config_t *instance = nullptr;
+music_source *selected_source = nullptr;
+spotify_source *spotify = nullptr;
+vlc_obs_source *vlc_obs = nullptr;
+window_source *window = nullptr;
 mpd_source* mpd = nullptr;
 
 uint16_t refresh_rate = 1000;
-const char* placeholder = nullptr;
-const char* cover_path = nullptr;
-const char* lyrics_path = nullptr;
+const char *placeholder = nullptr;
+const char *cover_path = nullptr;
+const char *lyrics_path = nullptr;
 QList<QPair<QString, QString>> outputs;
-const char* cover_placeholder = nullptr;
+const char *cover_placeholder = nullptr;
 bool download_cover = true;
 
 void init_default()
@@ -82,6 +84,9 @@ void select_source(source s)
         selected_source = mpd;
         break;
 #endif
+        case src_vlc_obs:
+            selected_source = vlc_obs;
+            break;
     case src_window_title:
         selected_source = window;
         break;
@@ -112,8 +117,11 @@ void load()
 #endif
     if (!window)
         window = new window_source;
+    if (!vlc_obs)
+        vlc_obs = new vlc_obs_source;
 
     spotify->load();
+    vlc_obs->load();
 #ifdef LINUX
     mpd->load();
 #endif
@@ -133,6 +141,7 @@ void load_gui_values()
 #ifdef LINUX
     mpd->load_gui_values();
 #endif
+    vlc_obs->load_gui_values();
     window->load_gui_values();
 }
 
@@ -143,6 +152,7 @@ void save()
     mpd->save();
 #endif
     window->save();
+    vlc_obs->save();
     save_outputs(outputs);
 }
 
@@ -183,19 +193,19 @@ void load_outputs(QList<QPair<QString, QString>>& table_content)
 
         for (const auto &val : array) {
             QJsonObject obj = val.toObject();
-			table_content.push_back(QPair<QString, QString>(
-			                            obj[JSON_FORMAT_ID].toString(),
-			                            obj[JSON_OUTPUT_PATH_ID].toString()
-			                            ));
-		}
-		blog(LOG_INFO, "[tuna] Loaded %i outputs", array.size());
-	} else {
-		/* Nothing to load, add default */
-		blog(LOG_INFO, "[tuna] No config exists, creating default");
-		QDir home = QDir::homePath();
-		QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
-		table_content.push_back(QPair<QString, QString>(T_SONG_FORMAT_DEFAULT, default_output));
-	}
+            table_content.push_back(QPair<QString, QString>(
+                                        obj[JSON_FORMAT_ID].toString(),
+                                        obj[JSON_OUTPUT_PATH_ID].toString()
+                                        ));
+        }
+        blog(LOG_INFO, "[tuna] Loaded %i outputs", array.size());
+    } else {
+        /* Nothing to load, add default */
+        blog(LOG_INFO, "[tuna] No config exists, creating default");
+        QDir home = QDir::homePath();
+        QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
+        table_content.push_back(QPair<QString, QString>(T_SONG_FORMAT_DEFAULT, default_output));
+    }
 }
 
 void save_outputs(const QList<QPair<QString, QString>>& table_content)

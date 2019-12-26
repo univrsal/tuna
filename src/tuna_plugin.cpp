@@ -19,6 +19,8 @@
 #include "gui/tuna_gui.hpp"
 #include "util/config.hpp"
 #include "util/constants.hpp"
+#include "util/utility.hpp"
+#include "query/vlc_obs_source.hpp"
 #include <QAction>
 #include <QMainWindow>
 #include <obs-frontend-api.h>
@@ -44,6 +46,7 @@ void register_gui()
 
 bool obs_module_load()
 {
+    util::load_vlc();
     config::load();
     register_gui();
     return true;
@@ -52,4 +55,5 @@ bool obs_module_load()
 void obs_module_unload()
 {
     config::close();
+    util::unload_vlc();
 }

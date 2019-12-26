@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -503,6 +503,11 @@
             <item>
              <property name="text">
               <string>tuna.gui.tab.window_title</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>tuna.gui.tab.vlc</string>
              </property>
             </item>
            </widget>
@@ -1048,6 +1053,54 @@
           <size>
            <width>20</width>
            <height>518</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>tuna.gui.tab.vlc</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <widget class="QLabel" name="lbl_vlc_disabled">
+         <property name="text">
+          <string>tuna.gui.vlc.disabled</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_19">
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>tuna.gui.vlc.source.name</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cb_vlc_source_name"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_refresh_vlc">
+         <property name="text">
+          <string>tuna.gui.vlc.refresh</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>521</height>
           </size>
          </property>
         </spacer>
