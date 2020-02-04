@@ -64,7 +64,7 @@ void spotify_source::load()
             QString log;
             bool result = do_refresh_token(log);
             if (result) {
-                blog(LOG_DEBUG, "[tuna] Successfully renewed Spotify token");
+                bdebug("Successfully renewed Spotify token");
             }
             save();
         }
@@ -126,7 +126,7 @@ void spotify_source::refresh()
             m_timout_start = 0;
             m_timeout_length = 0;
         } else {
-            blog(LOG_INFO, "[tuna] Waiting for Spotify-API timeout");
+            binfo("Waiting for Spotify-API timeout");
             return;
         }
     }
@@ -143,7 +143,7 @@ void spotify_source::refresh()
         if (code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
-                blog(LOG_WARNING, "[tuna] Spotify-API Rate limit hit, waiting %s seconds\n", m_timeout_length);
+                bwarn("Spotify-API Rate limit hit, waiting %s seconds\n", m_timeout_length);
                 m_timeout_length *= SECOND_TO_NS;
                 m_timout_start = os_gettime_ns();
             }
@@ -156,20 +156,20 @@ void spotify_source::refresh()
         if (device && progress && playing) {
             json_t* is_private = json_object_get(device, "is_private_session");
             if (is_private && json_true() == is_private) {
-                blog(LOG_ERROR, "[tuna] Spotify session is private! Can't read track");
+                berr("Spotify session is private! Can't read track");
             } else {
                 json_t* track = json_object_get(song_info, "item");
                 if (track) {
                     parse_track_json(track);
                     m_current.is_playing = json_true() == playing;
                 } else {
-                    blog(LOG_ERROR, "[tuna] Couldn't get spotify track json");
+                    berr("Couldn't get spotify track json");
                 }
             }
             m_current.progress_ms = json_integer_value(progress);
         } else {
             char* json_str = json_dumps(song_info, 0);
-            blog(LOG_ERROR, "[tuna] Couldn't fetch song data from spotify json: %s", json_str);
+            berr("Couldn't fetch song data from spotify json: %s", json_str);
             free(json_str);
         }
         json_decref(song_info);
@@ -309,7 +309,7 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
     try {
         str->append(ptr, new_length);
     } catch (std::bad_alloc& e) {
-        blog(LOG_ERROR, "[tuna] Error reading curl response: %s", e.what());
+        berr("Error reading curl response: %s", e.what());
         return 0;
     }
     return new_length;
@@ -321,7 +321,7 @@ size_t header_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
     try {
         str->append(ptr, new_length);
     } catch (std::bad_alloc& e) {
-        blog(LOG_ERROR, "[tuna] Error reading curl header: %s", e.what());
+        berr("Error reading curl header: %s", e.what());
         return 0;
     }
     return new_length;
@@ -351,7 +351,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
 json_t* request_token(const char* request, const char* credentials)
 {
     if (!valid(request) || !valid(credentials)) {
-        blog(LOG_ERROR, "[tuna] Cannot request token without valid credentials"
+        berr("Cannot request token without valid credentials"
                         " and/or auth code!");
         return nullptr;
     }
@@ -377,15 +377,15 @@ json_t* request_token(const char* request, const char* credentials)
             json_object_set(dup, "access_token", json_string("REDACTED"));
             json_object_set(dup, "refresh_token", json_string("REDACTED"));
             char* str = json_dumps(dup, 0);
-            blog(LOG_INFO, "[tuna] Spotify response: %s", str);
+            binfo("Spotify response: %s", str);
             free(str);
             json_decref(dup);
         } else {
-            blog(LOG_ERROR, "[tuna] Couldn't parse response to json: %s",
+            berr("Couldn't parse response to json: %s",
                 strlen(error.text) > 0 ? error.text : "Response was empty");
         }
     } else {
-        blog(LOG_ERROR, "[tuna] Curl returned error code %i", res);
+        berr("Curl returned error code %i", res);
     }
 
     curl_slist_free_all(list);
@@ -418,7 +418,7 @@ bool spotify_source::do_refresh_token(QString& log)
             m_logged_in = true;
             save();
         } else {
-            blog(LOG_ERROR, "[tuna] Couldn't parse json response");
+            berr("Couldn't parse json response");
             result = false;
         }
 
@@ -459,7 +459,7 @@ bool spotify_source::new_token(QString& log)
             m_token_termination = util::epoch() + json_integer_value(expires);
             result = true;
         } else {
-            blog(LOG_ERROR, "[tuna] Couldn't parse json response!");
+            berr("Couldn't parse json response!");
             result = false;
         }
         json_decref(response);
@@ -488,7 +488,7 @@ json_t* execute_command(const char* auth_token, const char* url, std::string& re
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
     if (!response_header.empty())
-        blog(LOG_DEBUG, "[tuna] Response header: %s", response_header.c_str());
+        bdebug("Response header: %s", response_header.c_str());
 
 #ifdef DEBUG
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -499,11 +499,10 @@ json_t* execute_command(const char* auth_token, const char* url, std::string& re
     if (res == CURLE_OK) {
         json_error_t error;
         result = json_loads(response.c_str(), 0, &error);
-        if (!result && !response.empty()) {
-            blog(LOG_ERROR, "[tuna] Failed to parse json response: %s", response.c_str());
-        }
+        if (!result && !response.empty())
+            berr("Failed to parse json response: %s", response.c_str());
     } else {
-        blog(LOG_ERROR, "[tuna] CURL failed while sending spotify command");
+        berr("CURL failed while sending spotify command");
     }
 
     curl_slist_free_all(list);

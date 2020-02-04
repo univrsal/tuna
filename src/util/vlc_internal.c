@@ -119,7 +119,7 @@ bool load_libvlc(void)
 
     libvlc = libvlc_new_(0, 0);
     if (!libvlc) {
-        blog(LOG_INFO, "Couldn't create libvlc instance");
+        blog(LOG_WARNING, "[tuna] Couldn't create libvlc instance");
         return false;
     }
 

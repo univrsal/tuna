@@ -20,6 +20,7 @@
 #include "../query/music_source.hpp"
 #include "config.hpp"
 #include "vlc_internal.h"
+#include "constants.hpp"
 #include <QFile>
 #include <QTextStream>
 #include <ctime>
@@ -28,6 +29,7 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
+#include <QMessageBox>
 
 namespace util {
 
@@ -40,17 +42,21 @@ void load_vlc()
         int major = ver >> 24 & 0xFF;
         int minor = ver >> 16 & 0xFF;
         int patch = ver & 0xFF;
-        blog(LOG_WARNING, "[tuna] libobs version %d.%d.%d is "
-                          "invalid. Tuna expects %d.%d.%d for"
-                          " VLC sources to work",
+        bwarn("libobs version %d.%d.%d is "
+             "invalid. Tuna expects %d.%d.%d for"
+             " VLC sources to work",
             major, minor, patch, LIBOBS_API_MAJOR_VER,
             LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
-        vlc_loaded = false;
+        bool result = QMessageBox::question(nullptr, T_ERROR_TITLE, T_VLC_VERSION_ISSUE)
+                     == QMessageBox::StandardButton::Yes;
+        if (result) {
+            bwarn("User force enabled VLC support");
+        }
     }
 
     if (vlc_loaded) {
         if (!load_libvlc_module() || !load_vlc_funcs() || !load_libvlc()) {
-            blog(LOG_WARNING, "[tuna] Couldn't load libVLC,"
+            bwarn("Couldn't load libVLC,"
                               " VLC source support disabled");
             vlc_loaded = false;
         }
@@ -93,14 +99,10 @@ bool curl_download(const char* url, const char* path)
 #endif
         CURLcode res = curl_easy_perform(curl);
 
-        if (res != CURLE_OK) {
-            blog(LOG_ERROR, "[tuna] Couldn't fetch file from %s to %s", url, path);
-        }
-#ifdef DEBUG
-        else {
-            blog(LOG_DEBUG, "[tuna] Fetched %s to %s", url, path);
-        }
-#endif
+        if (res != CURLE_OK)
+            berr("Couldn't fetch file from %s to %s", url, path);
+        else
+            bdebug("Fetched %s to %s", url, path);
         fclose(fp);
         result = true;
     }
@@ -144,11 +146,10 @@ void handle_lyrics(const song_t* song)
 
     if (song->data & CAP_LYRICS && last_lyrics != song->lyrics) {
         last_lyrics = song->lyrics;
-        if (!curl_download(song->lyrics.c_str(), config::lyrics_path))
-            blog(LOG_ERROR,
-                "[tuna] Couldn't dowload lyrics from '%s' to '%s'",
-                song->lyrics.c_str(),
-                config::lyrics_path);
+        if (!curl_download(song->lyrics.c_str(), config::lyrics_path)) {
+            berr("Couldn't dowload lyrics from '%s' to '%s'",
+                  song->lyrics.c_str(), config::lyrics_path);
+        }
     }
 }
 
@@ -179,7 +180,7 @@ void handle_cover_art(const song_t* song)
         last_cover = "n/a";
         /* no cover => use place placeholder */
         if (!move_file(config::cover_placeholder, config::cover_path))
-            blog(LOG_ERROR, "[tuna] couldn't move placeholder cover");
+            berr("Couldn't move placeholder cover");
     }
 }
 
@@ -231,8 +232,7 @@ void write_song(const QString& str, const QString& output)
         stream.flush();
         out.close();
     } else {
-        blog(
-            LOG_ERROR, "[tuna] Couldn't open song output file %s", output.toStdString().c_str());
+        berr("Couldn't open song output file %s", output.toStdString().c_str());
     }
 }
 

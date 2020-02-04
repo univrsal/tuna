@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #include "config.hpp"
+#include "utility.hpp"
 #include "../query/mpd_source.hpp"
 #include "../query/spotify_source.hpp"
 #include "../query/vlc_obs_source.hpp"
@@ -128,7 +129,7 @@ void load()
     window->load();
 
     if (run && !thread::start())
-        blog(LOG_ERROR, "[tuna] Couldn't start thread");
+         berr("Couldn't start thread");
 
     auto src = CGET_UINT(CFG_SELECTED_SOURCE);
     if (src < src_count)
@@ -197,10 +198,10 @@ void load_outputs(QList<QPair<QString, QString>>& table_content)
                 obj[JSON_FORMAT_ID].toString(),
                 obj[JSON_OUTPUT_PATH_ID].toString()));
         }
-        blog(LOG_INFO, "[tuna] Loaded %i outputs", array.size());
+        binfo("Loaded %i outputs", array.size());
     } else {
         /* Nothing to load, add default */
-        blog(LOG_INFO, "[tuna] No config exists, creating default");
+        binfo("No config exists, creating default");
         QDir home = QDir::homePath();
         QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
         table_content.push_back(QPair<QString, QString>(T_SONG_FORMAT_DEFAULT, default_output));
@@ -223,7 +224,7 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
     }
 
     if (output_array.empty()) {
-        blog(LOG_INFO, "[tuna] No ouputs to save");
+        binfo("No ouputs to save");
     } else {
         QJsonDocument doc(output_array);
         QFile save_file(path);
@@ -231,14 +232,14 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
             auto data = doc.toJson();
             auto wrote = save_file.write(data);
             if (data.length() != wrote) {
-                blog(LOG_ERROR, "[tuna] Couldn't write outputs to %s only"
+                berr("Couldn't write outputs to %s only"
                                 "wrote %i bytes out of %i",
                     path.toStdString().c_str(),
                     wrote, data.length());
             }
             save_file.close();
         } else {
-            blog(LOG_ERROR, "[tuna] Couldn't write outputs to %s", path.toStdString().c_str());
+            berr("Couldn't write outputs to %s", path.toStdString().c_str());
         }
     }
 }

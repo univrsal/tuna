@@ -11,11 +11,14 @@ extern "C" {
 typedef SSIZE_T ssize_t;
 #endif
 
-#include <libvlc_events.h>
+/* clang-format off */
+/* Include order is important, otherwise it won't compile */
 #include <libvlc_media.h>
 #include <libvlc_media_list.h>
-#include <libvlc_media_list_player.h>
+#include <libvlc_events.h>
 #include <libvlc_media_player.h>
+#include <libvlc_media_list_player.h>
+/* clang-format on */
 
 /* Lord forgive me for this atrocity */
 #define private priv

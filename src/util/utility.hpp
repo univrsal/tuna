@@ -20,6 +20,14 @@
 
 #include <stdint.h>
 #include <string>
+#include <obs-module.h>
+
+#define write_log(log_level, format, ...) blog(log_level, "[tuna] " format, ##__VA_ARGS__)
+
+#define bdebug(format, ...) write_log(LOG_DEBUG, format, ##__VA_ARGS__)
+#define binfo(format, ...) write_log(LOG_INFO, format, ##__VA_ARGS__)
+#define bwarn(format, ...) write_log(LOG_WARNING, format, ##__VA_ARGS__)
+#define berr(format, ...) write_log(LOG_ERROR, format, ##__VA_ARGS__)
 
 #define SECOND_TO_NS 1000000000
 struct song_t;

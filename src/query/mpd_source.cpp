@@ -21,6 +21,7 @@
 #include "mpd_source.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
+#include "../util/utility.hpp"
 #include <obs-module.h>
 
 mpd_source::mpd_source()
@@ -63,8 +64,7 @@ void mpd_source::connect()
         m_connection = mpd_connection_new(m_address, m_port, 2000);
 
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
-        blog(LOG_ERROR,
-            "[tuna] mpd connection to %s:%hu failed with error %s",
+        berr("mpd connection to %s:%hu failed with error %s",
             m_address,
             m_port,
             mpd_connection_get_error_message(m_connection));

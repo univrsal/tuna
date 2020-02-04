@@ -27,7 +27,7 @@ vlc_obs_source::vlc_obs_source()
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_LENGTH | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 
     if (!load_libvlc()) {
-        blog(LOG_INFO, "[tuna] Couldn't load libVLC, VLC support disabled");
+        binfo("Couldn't load libVLC, VLC support disabled");
     } else {
         m_lib_vlc_loaded = true;
     }
@@ -53,7 +53,7 @@ void vlc_obs_source::load()
                 obs_weak_source_release(m_weak_src);
             m_weak_src = obs_source_get_weak_source(src);
         } else {
-            blog(LOG_INFO, "[tuna] %s is not a valid vlc source", id.c_str());
+            binfo("%s is not a valid vlc source", id.c_str());
         }
     }
 }

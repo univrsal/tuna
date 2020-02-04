@@ -47,37 +47,41 @@
 #define CSET_BOOL(id, value) \
     config_set_bool(config::instance, CFG_REGION, id, value)
 
-#define CFG_REGION "tuna"
+/* clang-format off */
 
-#define CFG_RUNNING "running"
-#define CFG_SONG_PATH "song_path"
-#define CFG_COVER_PATH "cover_path"
-#define CFG_LYRICS_PATH "lyrics_path"
-#define CFG_SELECTED_SOURCE "source"
-#define CFG_REFRESH_RATE "refresh_rate"
-#define CFG_SONG_FORMAT "song_format"
-#define CFG_SONG_PLACEHOLDER "song_placeholder"
-#define CFG_DOWNLOAD_COVER "download_cover"
+#define CFG_REGION 						"tuna"
 
-#define CFG_SPOTIFY_LOGGEDIN "spotify.login"
-#define CFG_SPOTIFY_TOKEN "spotify.token"
-#define CFG_SPOTIFY_REFRESH_TOKEN "spotify.refresh_token"
-#define CFG_SPOTIFY_AUTH_CODE "spotify.auth_code"
-#define CFG_SPOTIFY_TOKEN_TERMINATION "spotify.token_termination"
+#define CFG_RUNNING 					"running"
+#define CFG_SONG_PATH 					"song_path"
+#define CFG_COVER_PATH 					"cover_path"
+#define CFG_LYRICS_PATH 				"lyrics_path"
+#define CFG_SELECTED_SOURCE 			"source"
+#define CFG_REFRESH_RATE 				"refresh_rate"
+#define CFG_SONG_FORMAT 				"song_format"
+#define CFG_SONG_PLACEHOLDER 			"song_placeholder"
+#define CFG_DOWNLOAD_COVER 				"download_cover"
 
-#define CFG_MPD_IP "mpd.ip"
-#define CFG_MPD_PORT "mpd.port"
-#define CFG_MPD_LOCAL "mpd.local"
+#define CFG_SPOTIFY_LOGGEDIN 			"spotify.login"
+#define CFG_SPOTIFY_TOKEN 				"spotify.token"
+#define CFG_SPOTIFY_REFRESH_TOKEN 		"spotify.refresh_token"
+#define CFG_SPOTIFY_AUTH_CODE 			"spotify.auth_code"
+#define CFG_SPOTIFY_TOKEN_TERMINATION 	"spotify.token_termination"
 
-#define CFG_VLC_ID "vlc.id"
+#define CFG_MPD_IP 						"mpd.ip"
+#define CFG_MPD_PORT 					"mpd.port"
+#define CFG_MPD_LOCAL 					"mpd.local"
 
-#define CFG_WINDOW_TITLE "window.title"
-#define CFG_WINDOW_PAUSE "window.title.pause"
-#define CFG_WINDOW_SEARCH "window.search"
-#define CFG_WINDOW_REPLACE "window.replace"
-#define CFG_WINDOW_CUT_BEGIN "window.cut.begin"
-#define CFG_WINDOW_CUT_END "window.cut.end"
-#define CFG_WINDOW_REGEX "window.regex"
+#define CFG_VLC_ID 						"vlc.id"
+
+#define CFG_WINDOW_TITLE 				"window.title"
+#define CFG_WINDOW_PAUSE 				"window.title.pause"
+#define CFG_WINDOW_SEARCH 				"window.search"
+#define CFG_WINDOW_REPLACE 				"window.replace"
+#define CFG_WINDOW_CUT_BEGIN 			"window.cut.begin"
+#define CFG_WINDOW_CUT_END 				"window.cut.end"
+#define CFG_WINDOW_REGEX 				"window.regex"
+
+/* clang-format on */
 
 class spotify_source;
 
