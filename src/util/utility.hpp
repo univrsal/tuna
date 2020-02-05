@@ -30,7 +30,7 @@
 #define berr(format, ...) write_log(LOG_ERROR, format, ##__VA_ARGS__)
 
 #define SECOND_TO_NS 1000000000
-struct song_t;
+class song;
 
 namespace util {
 extern bool vlc_loaded;
@@ -41,11 +41,11 @@ void unload_vlc();
 
 bool curl_download(const char* url, const char* path);
 
-void handle_cover_art(const song_t* song);
+void handle_cover_art(const song* song);
 
-void handle_lyrics(const song_t* song);
+void handle_lyrics(const song* song);
 
-void handle_outputs(const song_t* song);
+void handle_outputs(const song* song);
 
 bool move_file(const char* src, const char* dest);
 

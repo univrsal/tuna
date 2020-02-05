@@ -140,7 +140,7 @@ bool move_file(const char* src, const char* dest)
     return result;
 }
 
-void handle_lyrics(const song_t* song)
+void handle_lyrics(const song* song)
 {
     static std::string last_lyrics = "";
 
@@ -153,7 +153,7 @@ void handle_lyrics(const song_t* song)
     }
 }
 
-void handle_cover_art(const song_t* song)
+void handle_cover_art(const song* song)
 {
     static std::string last_cover = "";
     bool is_url = song->cover.find("http") != std::string::npos || song->cover.find("file://") != std::string::npos;
@@ -194,7 +194,7 @@ QString time_format(uint32_t ms)
     return t.toString(hour > 0 ? "h:mm:ss" : "m:ss");
 }
 
-void format_string(QString& out, const song_t* song)
+void format_string(QString& out, const song* song)
 {
     out.replace("%t", song->title.c_str());
     out.replace("%T", QString::fromStdString(song->title).toUpper());
@@ -236,7 +236,7 @@ void write_song(const QString& str, const QString& output)
     }
 }
 
-void handle_outputs(const song_t* s)
+void handle_outputs(const song* s)
 {
     static QString tmp_text = "";
 

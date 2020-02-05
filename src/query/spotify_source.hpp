@@ -20,7 +20,7 @@
 
 #include "music_source.hpp"
 #include <QString>
-#include <jansson.h>
+#include <QJsonValue>
 #include <string>
 
 class spotify_source : public music_source {
@@ -35,7 +35,7 @@ class spotify_source : public music_source {
 
     uint64_t m_timeout_length = 0, /* Rate limit timeout length */
         m_timout_start = 0; /* Timeout start */
-    void parse_track_json(json_t* track);
+    void parse_track_json(const QJsonValue& track);
 
 public:
     spotify_source();

@@ -23,8 +23,10 @@
 #include "../util/creds.hpp"
 #include "../util/utility.hpp"
 #include <QString>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <curl/curl.h>
-#include <jansson.h>
 #include <string>
 #include <util/config-file.h>
 #include <util/platform.h>
@@ -88,8 +90,8 @@ void spotify_source::save()
 }
 
 /* implementation further down */
-json_t* execute_command(const char* auth_token, const char* url,
-    std::string& response_header);
+void execute_command(const char* auth_token, const char* url,
+    std::string& response_header, QJsonDocument& result);
 
 void extract_timeout(const std::string header, uint64_t& timeout)
 {
@@ -132,14 +134,28 @@ void spotify_source::refresh()
     }
 
     std::string header = "";
-    json_t* song_info = execute_command(m_token.c_str(), PLAYER_URL, header);
-    json_t* err = nullptr;
-    if ((err = json_object_get(song_info, "error"))) {
-        json_t* error_code = json_object_get(err, "status");
-        int code = -1;
-        if (error_code)
-            code = json_integer_value(error_code);
+    QJsonDocument response;
+    execute_command(m_token.c_str(), PLAYER_URL, header, response);
 
+    if (response["error"].isNull()) {
+        const auto& progress = response["progress_ms"];
+        const auto& device = response["device"];
+        const auto& playing = response["is_playing"];
+
+        if (!device.isNull() && !playing.isNull() && !playing.isNull()) {
+            if (device["is_private"].toBool()) {
+                berr("Spotify session is private! Can't read track");
+            } else {
+                parse_track_json(response["item"]);
+                m_current.set_playing(playing.toBool());
+            }
+            m_current.set_progress(progress.toInt());
+        } else {
+            QString str(response.toJson());
+            berr("Couldn't fetch song data from spotify json: %s", str.toStdString().c_str());
+        }
+    } else {
+        int code = response["status"].toInt(-1);
         if (code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
@@ -148,132 +164,45 @@ void spotify_source::refresh()
                 m_timout_start = os_gettime_ns();
             }
         }
-    } else if (song_info) {
-        json_t* progress = json_object_get(song_info, "progress_ms");
-        json_t* device = json_object_get(song_info, "device");
-        json_t* playing = json_object_get(song_info, "is_playing");
-
-        if (device && progress && playing) {
-            json_t* is_private = json_object_get(device, "is_private_session");
-            if (is_private && json_true() == is_private) {
-                berr("Spotify session is private! Can't read track");
-            } else {
-                json_t* track = json_object_get(song_info, "item");
-                if (track) {
-                    parse_track_json(track);
-                    m_current.is_playing = json_true() == playing;
-                } else {
-                    berr("Couldn't get spotify track json");
-                }
-            }
-            m_current.progress_ms = json_integer_value(progress);
-        } else {
-            char* json_str = json_dumps(song_info, 0);
-            berr("Couldn't fetch song data from spotify json: %s", json_str);
-            free(json_str);
-        }
-        json_decref(song_info);
     }
 }
 
-void spotify_source::parse_track_json(json_t* track)
+void spotify_source::parse_track_json(const QJsonValue& track)
 {
-    json_t* album = json_object_get(track, "album");
-    json_t* artists = json_object_get(track, "artists");
+    const auto& album = track["album"];
+    const auto& artists = track["artists"];
     size_t index;
-    json_t *curr, *name;
-    if (album && artists) {
-        m_current = {};
-        m_current.release_precision = prec_unkown;
+    if (!album.isNull() && !artists.isNull()) {
+        m_current.clear();
 
         /* Get All artists */
-        json_array_foreach(artists, index, curr)
-        {
-            name = json_object_get(curr, "name");
-            m_current.artists.append(json_string_value(name));
-            m_current.artists.append(", ");
-        }
-
-        /* Remove last ', ' */
-        m_current.artists.pop_back();
-        m_current.artists.pop_back();
-        if (!m_current.artists.empty())
-            m_current.data |= CAP_ARTIST;
+        for (const auto artist : artists.toArray())
+            m_current.append_artist(artist.toString());
 
         /* Cover link */
-        curr = json_object_get(album, "images");
-        if (curr) {
-            curr = json_array_get(curr, 0);
-            if (curr)
-                curr = json_object_get(curr, "url");
-            if (curr) {
-                m_current.cover = json_string_value(curr);
-                if (!m_current.cover.empty())
-                    m_current.data |= CAP_COVER;
-            }
-        }
-        /* Get title */
-        name = json_object_get(track, "name");
-        if (name) {
-            m_current.title = json_string_value(name);
-            m_current.data |= CAP_TITLE;
-        }
+        const auto& covers = album["images"];
+        if (covers.isArray())
+            m_current.set_cover_link(covers.toArray()[0].toString());
 
-        /* Get length */
-        curr = json_object_get(track, "duration_ms");
-        if (curr) {
-            m_current.duration_ms = json_integer_value(curr);
-            m_current.data |= CAP_LENGTH;
-        }
-
-        /* Album name */
-        curr = json_object_get(album, "name");
-        if (curr) {
-            m_current.album = json_string_value(curr);
-            m_current.data |= CAP_ALBUM;
-        }
-
-        /* Explicit ?*/
-        curr = json_object_get(track, "explicit");
-        if (curr) {
-            m_current.is_explicit = json_integer_value(curr);
-            m_current.data |= CAP_EXPLICIT;
-        }
-
-        /* Disc number */
-        curr = json_object_get(track, "disc_number");
-        if (curr) {
-            m_current.disc_number = json_integer_value(curr);
-            m_current.data |= CAP_DISC_NUMBER;
-        }
-
-        /* Track number */
-        curr = json_object_get(track, "track_number");
-        if (curr) {
-            m_current.track_number = json_integer_value(curr);
-            m_current.data |= CAP_TRACK_NUMBER;
-        }
+        /* Other stuff */
+        m_current.set_title(track["name"].toString());
+        m_current.set_duration(track["duration_ms"].toInt());
+        m_current.set_album(album["name"].toString());
+        m_current.set_explicit(track["explicit"].toBool());
+        m_current.set_disc_number(track["disc_number"].toInt());
+        m_current.set_track_number(track["track_number"].toInt());
 
         /* Release date */
-        curr = json_object_get(album, "release_date");
-        if (curr) {
-            m_current.data |= CAP_RELEASE;
-            QString date = json_string_value(curr);
-            m_current.release_precision = static_cast<date_precision>(qMin(date.count('-'), 2));
+        const auto& date = album["release_date"].toString();
+        if (date.length() > 0) {
             QStringList list = date.split("-");
             switch (list.length()) {
             case 3:
-                m_current.day = list[2].toStdString();
-                /* Sometimes the release date gets reported wrong, so adjust it
-           * if a value wasn't found */
-                if (m_current.day.empty())
-                    m_current.release_precision = prec_month;
+                m_current.set_day(list[2]);
             case 2: /* Fallthrough */
-                m_current.month = list[1].toStdString();
-                if (m_current.month.empty())
-                    m_current.release_precision = prec_year;
+                m_current.set_month(list[1]);
             case 1: /* Fallthrough */
-                m_current.year = list[0].toStdString();
+                m_current.set_day(list[0]);
             default:;
             }
         }
@@ -303,11 +232,12 @@ bool spotify_source::execute_capability(capability c)
 
 /* === CURL/Spotify API handling === */
 
-size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
+size_t write_callback(char* ptr, size_t size, size_t nmemb, QString* str)
 {
     size_t new_length = size * nmemb;
     try {
-        str->append(ptr, new_length);
+        str->resize(new_length)
+        str->append(ptr);
     } catch (std::bad_alloc& e) {
         berr("Error reading curl response: %s", e.what());
         return 0;
@@ -315,11 +245,12 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
     return new_length;
 }
 
-size_t header_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
+size_t header_callback(char* ptr, size_t size, size_t nmemb, QString* str)
 {
     size_t new_length = size * nmemb;
     try {
-        str->append(ptr, new_length);
+        str->resize(new_length);
+        str->append(ptr);
     } catch (std::bad_alloc& e) {
         berr("Error reading curl header: %s", e.what());
         return 0;
@@ -327,7 +258,7 @@ size_t header_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
     return new_length;
 }
 
-CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string* response_header,
+CURL* prepare_curl(struct curl_slist* header, QString* response, QString* response_header,
     const char* request)
 {
     CURL* curl = curl_easy_init();
@@ -348,41 +279,36 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
 
 /* Requests an access token via request body
  * over a POST request to spotify */
-json_t* request_token(const char* request, const char* credentials)
+void request_token(const char* request, const char* credentials, QJsonDocument& response_json)
 {
     if (!valid(request) || !valid(credentials)) {
         berr("Cannot request token without valid credentials"
                         " and/or auth code!");
-        return nullptr;
+        return;
     }
 
-    std::string response;
-    std::string response_header;
-
-    /* Header text */
+    QString response, response_header;
     QString header = "Authorization: Basic ";
     header.append(credentials);
-    auto* list = curl_slist_append(nullptr, qPrintable(header));
 
+    auto* list = curl_slist_append(nullptr, qPrintable(header));
     CURL* curl = prepare_curl(list, &response, &response_header, request);
     CURLcode res = curl_easy_perform(curl);
-    json_t* result = nullptr;
-    json_error_t error;
+
     if (res == CURLE_OK) {
-        json_t* response_parsed = json_loads(response.c_str(), 0, &error);
-        if (response_parsed) {
-            result = response_parsed;
-            /* Log response without tokens */
-            json_t* dup = json_deep_copy(response_parsed);
-            json_object_set(dup, "access_token", json_string("REDACTED"));
-            json_object_set(dup, "refresh_token", json_string("REDACTED"));
-            char* str = json_dumps(dup, 0);
-            binfo("Spotify response: %s", str);
-            free(str);
-            json_decref(dup);
-        } else {
+        QJsonParseError err;
+        response_json = QJsonDocument::fromJson(response.toUtf8(), &err);
+        if (response_json.isNull()) {
             berr("Couldn't parse response to json: %s",
-                strlen(error.text) > 0 ? error.text : "Response was empty");
+                err.errorString().toStdString().c_str());
+        } else {
+            /* Log response without tokens */
+            auto obj = response_json.object();
+            obj["access_token"] = "REDACTED";
+            obj["refresh_token"] = "REDACTED";
+            auto doc = QJsonDocument(obj);
+            QString str(doc.toJson());
+            binfo("Spotify response: %s", str.toStdString().c_str());
         }
     } else {
         berr("Curl returned error code %i", res);
@@ -390,7 +316,6 @@ json_t* request_token(const char* request, const char* credentials)
 
     curl_slist_free_all(list);
     curl_easy_cleanup(curl);
-    return result;
 }
 
 /* Gets a new token using the refresh token */
@@ -398,9 +323,10 @@ bool spotify_source::do_refresh_token(QString& log)
 {
     static std::string request;
     bool result = true;
+    QJsonDocument response;
     request = "grant_type=refresh_token&refresh_token=";
     request.append(m_refresh_token);
-    auto* response = request_token(request.c_str(), m_creds.c_str());
+    request_token(request.c_str(), m_creds.c_str(), response);
 
     if (response) {
         json_t* token = json_object_get(response, "access_token");

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "song.hpp"
 #include <QDate>
 #include <stdint.h>
 #include <string>
@@ -49,27 +50,10 @@ enum capability {
 
 /* clang-format on */
 
-enum date_precision {
-    prec_day,
-    prec_month,
-    prec_year,
-    prec_unkown
-};
-
-struct song_t {
-    uint16_t data;
-    std::string title, artists, album, cover, lyrics;
-    uint32_t disc_number, track_number, duration_ms, progress_ms;
-    bool is_explicit, is_playing;
-    std::string year, month, day;
-    date_precision release_precision;
-};
-
 class music_source {
 protected:
     uint32_t m_capabilities = 0x0;
-    song_t m_current = {};
-
+    song m_current = {};
 public:
     music_source() = default;
 
@@ -83,7 +67,7 @@ public:
         return m_capabilities & ((uint16_t)c);
     }
 
-    const song_t* song() { return &m_current; }
+    const song* song() { return &m_current; }
 
     /* Abstract stuff */
 
