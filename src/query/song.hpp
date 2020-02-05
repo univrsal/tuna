@@ -17,9 +17,9 @@
  *************************************************************************/
 
 #pragma once
-#include <stdint.h>
-#include <QVector>
 #include <QString>
+#include <QVector>
+#include <stdint.h>
 
 enum date_precision {
     prec_day,
@@ -36,6 +36,7 @@ class song {
     int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
     bool m_is_explicit, m_is_playing;
     date_precision m_release_precision;
+
 public:
     song();
     void update_release_precision();

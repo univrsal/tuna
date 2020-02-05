@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.con/univrsal/tuna
- * Copyright 2019 univrsal <universailp@web.de>.
+ * Copyright 2020 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@
 #include "../util/constants.hpp"
 #include "../util/creds.hpp"
 #include "../util/utility.hpp"
-#include <QString>
 #include <QJsonArray>
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QString>
 #include <curl/curl.h>
 #include <string>
 #include <util/config-file.h>
@@ -237,7 +237,7 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, QString* str)
     size_t new_length = size * nmemb;
     try {
         str->resize(new_length)
-        str->append(ptr);
+            str->append(ptr);
     } catch (std::bad_alloc& e) {
         berr("Error reading curl response: %s", e.what());
         return 0;
@@ -283,7 +283,7 @@ void request_token(const char* request, const char* credentials, QJsonDocument& 
 {
     if (!valid(request) || !valid(credentials)) {
         berr("Cannot request token without valid credentials"
-                        " and/or auth code!");
+             " and/or auth code!");
         return;
     }
 
@@ -328,7 +328,9 @@ bool spotify_source::do_refresh_token(QString& log)
     request.append(m_refresh_token);
     request_token(request.c_str(), m_creds.c_str(), response);
 
-    if (response) {
+    if (response.isNull()) {
+        return false;
+    } else {
         json_t* token = json_object_get(response, "access_token");
         json_t* expires = json_object_get(response, "expires_in");
         json_t* refresh_token = json_object_get(response, "refresh_token");
@@ -353,8 +355,6 @@ bool spotify_source::do_refresh_token(QString& log)
             m_refresh_token = json_string_value(refresh_token);
         }
         json_decref(response);
-    } else {
-        result = false;
     }
 
     m_logged_in = result;

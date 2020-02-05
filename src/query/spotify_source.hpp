@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.con/univrsal/tuna
- * Copyright 2019 univrsal <universailp@web.de>.
+ * Copyright 2020 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 #pragma once
 
 #include "music_source.hpp"
-#include <QString>
 #include <QJsonValue>
+#include <QString>
 #include <string>
 
 class spotify_source : public music_source {

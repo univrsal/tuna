@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.con/univrsal/tuna
- * Copyright 2019 univrsal <universailp@web.de>.
+ * Copyright 2020 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,10 @@
 #include "utility.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
-#include "vlc_internal.h"
 #include "constants.hpp"
+#include "vlc_internal.h"
 #include <QFile>
+#include <QMessageBox>
 #include <QTextStream>
 #include <ctime>
 #include <curl/curl.h>
@@ -29,7 +30,6 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
-#include <QMessageBox>
 
 namespace util {
 
@@ -43,12 +43,12 @@ void load_vlc()
         int minor = ver >> 16 & 0xFF;
         int patch = ver & 0xFF;
         bwarn("libobs version %d.%d.%d is "
-             "invalid. Tuna expects %d.%d.%d for"
-             " VLC sources to work",
+              "invalid. Tuna expects %d.%d.%d for"
+              " VLC sources to work",
             major, minor, patch, LIBOBS_API_MAJOR_VER,
             LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
         bool result = QMessageBox::question(nullptr, T_ERROR_TITLE, T_VLC_VERSION_ISSUE)
-                     == QMessageBox::StandardButton::Yes;
+            == QMessageBox::StandardButton::Yes;
         if (result) {
             bwarn("User force enabled VLC support");
         }
@@ -57,7 +57,7 @@ void load_vlc()
     if (vlc_loaded) {
         if (!load_libvlc_module() || !load_vlc_funcs() || !load_libvlc()) {
             bwarn("Couldn't load libVLC,"
-                              " VLC source support disabled");
+                  " VLC source support disabled");
             vlc_loaded = false;
         }
     }
@@ -148,7 +148,7 @@ void handle_lyrics(const song* song)
         last_lyrics = song->lyrics;
         if (!curl_download(song->lyrics.c_str(), config::lyrics_path)) {
             berr("Couldn't dowload lyrics from '%s' to '%s'",
-                  song->lyrics.c_str(), config::lyrics_path);
+                song->lyrics.c_str(), config::lyrics_path);
         }
     }
 }

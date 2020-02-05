@@ -56,19 +56,19 @@ void song::update_release_precision()
     }
 }
 
-void song::append_artist(const QString &a)
+void song::append_artist(const QString& a)
 {
     m_data |= CAP_ARTIST;
     m_artists.append(a);
 }
 
-void song::set_cover_link(const QString &link)
+void song::set_cover_link(const QString& link)
 {
     m_data |= CAP_COVER;
     m_cover = link;
 }
 
-void song::set_title(const QString &title)
+void song::set_title(const QString& title)
 {
     m_data |= CAP_TITLE;
     m_title = title;
@@ -86,7 +86,7 @@ void song::set_progress(int ms)
     m_progress_ms = ms;
 }
 
-void song::set_album(const QString &album)
+void song::set_album(const QString& album)
 {
     m_data |= CAP_ALBUM;
     m_album = album;
@@ -116,21 +116,21 @@ void song::set_track_number(int i)
     m_track_number = i;
 }
 
-void song::set_year(const QString &y)
+void song::set_year(const QString& y)
 {
     m_data |= CAP_RELEASE;
     m_year = y;
     update_release_precision();
 }
 
-void song::set_month(const QString &m)
+void song::set_month(const QString& m)
 {
     m_data |= CAP_RELEASE;
     m_month = m;
     update_release_precision();
 }
 
-void song::set_day(const QString &d)
+void song::set_day(const QString& d)
 {
     m_data |= CAP_RELEASE;
     m_day = d;

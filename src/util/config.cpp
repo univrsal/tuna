@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.con/univrsal/tuna
- * Copyright 2019 univrsal <universailp@web.de>.
+ * Copyright 2020 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
  *************************************************************************/
 
 #include "config.hpp"
-#include "utility.hpp"
 #include "../query/mpd_source.hpp"
 #include "../query/spotify_source.hpp"
 #include "../query/vlc_obs_source.hpp"
 #include "../query/window_source.hpp"
 #include "../util/tuna_thread.hpp"
 #include "constants.hpp"
+#include "utility.hpp"
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -129,7 +129,7 @@ void load()
     window->load();
 
     if (run && !thread::start())
-         berr("Couldn't start thread");
+        berr("Couldn't start thread");
 
     auto src = CGET_UINT(CFG_SELECTED_SOURCE);
     if (src < src_count)
@@ -233,7 +233,7 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
             auto wrote = save_file.write(data);
             if (data.length() != wrote) {
                 berr("Couldn't write outputs to %s only"
-                                "wrote %i bytes out of %i",
+                     "wrote %i bytes out of %i",
                     path.toStdString().c_str(),
                     wrote, data.length());
             }
