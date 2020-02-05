@@ -21,8 +21,8 @@
 #include "music_source.hpp"
 
 class window_source : public music_source {
-    std::string m_title = "";
-    std::string m_search = "", m_replace = "", m_pause = "";
+    QString m_title = "";
+    QString m_search = "", m_replace = "", m_pause = "";
     uint16_t m_cut_begin = 0, m_cut_end;
     bool m_regex = false;
 
@@ -38,4 +38,6 @@ public:
     bool execute_capability(capability c) override;
 
     void load_gui_values() override;
+
+    bool valid_format(const QString& str) override;
 };

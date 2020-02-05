@@ -26,7 +26,7 @@
 
 mpd_source::mpd_source()
 {
-    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_LENGTH | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
+    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
     m_address = nullptr;
     m_connection = nullptr;
     m_port = 0;
@@ -100,17 +100,14 @@ void mpd_source::refresh()
     if (!m_connected)
         return;
 
-    m_current = {};
-    m_current.release_precision = prec_unkown;
-
+    m_current.clear();
     m_status = mpd_run_status(m_connection);
     m_mpd_song = mpd_run_current_song(m_connection);
 
     if (m_status) {
         m_mpd_state = mpd_status_get_state(m_status);
-        m_current.progress_ms = mpd_status_get_elapsed_ms(m_status);
-        m_current.is_playing = m_mpd_state == MPD_STATE_PLAY;
-        m_current.data |= CAP_PROGRESS | CAP_STATUS;
+        m_current.set_progress(mpd_status_get_elapsed_ms(m_status));
+        m_current.set_playing(m_mpd_state == MPD_STATE_PLAY);
     }
 
     if (m_mpd_song) {
@@ -122,36 +119,19 @@ void mpd_source::refresh()
         const char* disc = mpd_song_get_tag(m_mpd_song, MPD_TAG_DISC, 0);
 
         if (title)
-            m_current.title = title;
-        else
-            m_current.title = "N/A";
-        m_current.data |= CAP_TITLE;
+            m_current.set_title(title);
+        if (artists)
+            m_current.append_artist(artists);
+        if (year)
+            m_current.set_year(year);
+        if (album)
+            m_current.set_album(album);
+        if (num)
+            m_current.set_track_number(std::stoi(num));
+        if (disc)
+            m_current.set_disc_number(std::atoi(disc));
 
-        if (artists) {
-            m_current.artists = artists;
-            m_current.data |= CAP_ARTIST;
-        }
-        if (year) {
-            m_current.year = year;
-            m_current.data |= CAP_RELEASE;
-            m_current.release_precision = prec_year;
-        }
-        if (album) {
-            m_current.album = album;
-            m_current.data |= CAP_ALBUM;
-        }
-        if (num) {
-            m_current.track_number = std::stoi(num);
-            m_current.data |= CAP_TRACK_NUMBER;
-        }
-        if (disc) {
-            m_current.disc_number = std::atoi(disc);
-            m_current.data |= CAP_DISC_NUMBER;
-        }
-
-        m_current.duration_ms = mpd_song_get_duration_ms(m_mpd_song);
-        if (m_current.duration_ms > 0)
-            m_current.data |= CAP_LENGTH;
+        m_current.set_duration(mpd_song_get_duration_ms(m_mpd_song));
     }
 
     if (m_mpd_song)
@@ -190,6 +170,12 @@ void mpd_source::load_gui_values()
     tuna_dialog->set_mpd_ip(m_address);
     tuna_dialog->set_mpd_port(m_port);
     tuna_dialog->set_mpd_local(m_local);
+}
+
+bool mpd_source::valid_format(const QString& str)
+{
+    /* Supports all specifiers */
+    return true;
 }
 
 #endif

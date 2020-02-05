@@ -21,14 +21,13 @@
 #include "music_source.hpp"
 #include <QJsonValue>
 #include <QString>
-#include <string>
 
 class spotify_source : public music_source {
     bool m_logged_in = false;
-    std::string m_token = "";
-    std::string m_creds = "";
-    std::string m_auth_code = "";
-    std::string m_refresh_token = "";
+    QString m_token = "";
+    QString m_creds = "";
+    QString m_auth_code = "";
+    QString m_refresh_token = "";
 
     /* epoch time in seconds */
     int64_t m_token_termination = 0;
@@ -50,15 +49,17 @@ public:
 
     bool execute_capability(capability c) override;
 
+    bool valid_format(const QString& str) override;
+
     bool do_refresh_token(QString& log);
 
     bool new_token(QString& log);
 
-    void set_auth_code(const std::string& auth_code) { m_auth_code = auth_code; }
+    void set_auth_code(const QString& auth_code) { m_auth_code = auth_code; }
 
-    const std::string& auth_code() const { return m_auth_code; }
+    const QString& auth_code() const { return m_auth_code; }
 
-    const std::string& token() const { return m_token; }
+    const QString& token() const { return m_token; }
 
-    const std::string& refresh_token() const { return m_refresh_token; }
+    const QString& refresh_token() const { return m_refresh_token; }
 };

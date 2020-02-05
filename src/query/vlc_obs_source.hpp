@@ -41,6 +41,7 @@ public:
     void refresh() override;
     void load_gui_values() override;
     bool execute_capability(capability c) override;
+    bool valid_format(const QString& str) override;
 };
 
 #if DISABLE_TUNA_VLC

@@ -21,7 +21,6 @@
 #include "song.hpp"
 #include <QDate>
 #include <stdint.h>
-#include <string>
 
 /* clang-format off */
 
@@ -32,7 +31,7 @@ enum capability {
     CAP_RELEASE = 1 << 3, 		/* Release date 			*/
     CAP_COVER = 1 << 4, 		/* Cover image link			*/
     CAP_LYRICS = 1 << 5, 		/* Lyrics text link 		*/
-    CAP_LENGTH = 1 << 6, 		/* Get song length in ms	*/
+    CAP_DURATION = 1 << 6, 		/* Get song length in ms	*/
     CAP_EXPLICIT = 1 << 7, 		/* don't say swears			*/
     CAP_DISC_NUMBER = 1 << 8, 	/* Disc number				*/
     CAP_TRACK_NUMBER = 1 << 9, 	/* Track number on disk		*/
@@ -68,7 +67,7 @@ public:
         return m_capabilities & ((uint16_t)c);
     }
 
-    const song* song() { return &m_current; }
+    const song* song_info() { return &m_current; }
 
     /* Abstract stuff */
 
@@ -84,4 +83,6 @@ public:
     virtual bool execute_capability(capability c) = 0;
 
     virtual void load_gui_values() = 0;
+
+    virtual bool valid_format(const QString& str) = 0;
 };

@@ -49,10 +49,10 @@ void window_source::load()
 
 void window_source::save()
 {
-    CSET_STR(CFG_WINDOW_TITLE, m_title.c_str());
-    CSET_STR(CFG_WINDOW_SEARCH, m_search.c_str());
-    CSET_STR(CFG_WINDOW_REPLACE, m_replace.c_str());
-    CSET_STR(CFG_WINDOW_PAUSE, m_pause.c_str());
+    CSET_STR(CFG_WINDOW_TITLE, util::qcstr(m_title));
+    CSET_STR(CFG_WINDOW_SEARCH, util::qcstr(m_search));
+    CSET_STR(CFG_WINDOW_REPLACE, util::qcstr(m_replace));
+    CSET_STR(CFG_WINDOW_PAUSE, util::qcstr(m_pause));
     CSET_BOOL(CFG_WINDOW_REGEX, m_regex);
     CSET_UINT(CFG_WINDOW_CUT_BEGIN, m_cut_begin);
     CSET_UINT(CFG_WINDOW_CUT_END, m_cut_begin);
@@ -60,13 +60,13 @@ void window_source::save()
 
 void window_source::refresh()
 {
-    if (m_title.empty())
+    if (m_title.isEmpty())
         return;
 
     std::vector<std::string> window_titles;
     GetWindowList(window_titles);
-    QRegularExpression regex(m_title.c_str());
-    std::string result = "";
+    QRegularExpression regex(m_title);
+    QString result = "";
 
     for (const auto& title : window_titles) {
         bool matches = false;
@@ -74,30 +74,28 @@ void window_source::refresh()
             matches = regex.match(title.c_str()).hasMatch();
         } else {
             /* Direct search */
-            matches = title.find(m_title) != std::string::npos;
-            if (matches && !m_pause.empty() && title.find(m_pause) == std::string::npos)
+            matches = title.find(m_title.toStdString()) != std::string::npos;
+            if (matches && !m_pause.isEmpty() && title.find(m_pause.toStdString()) != std::string::npos)
                 matches = false;
         }
 
         if (matches) {
-            result = title;
+            result = title.c_str();
             break;
         }
     }
 
-    m_current = {};
-    if (result.empty()) {
-        m_current.is_playing = false;
-        m_current.data = CAP_STATUS;
+    m_current.clear();
+    if (result.isEmpty()) {
+        m_current.set_playing(false);
     } else {
         /* Replace & cut */
-        util::replace_all(result, m_search, m_replace);
+        result.replace(m_search, m_replace);
         if (0 < m_cut_end + m_cut_begin && m_cut_end + m_cut_begin < result.length())
-            result = result.substr(m_cut_begin, result.length() - m_cut_begin - m_cut_end);
+            result = result.mid(m_cut_begin, result.length() - m_cut_begin - m_cut_end);
 
-        m_current.data = CAP_TITLE | CAP_STATUS;
-        m_current.is_playing = true;
-        m_current.title = result;
+        m_current.set_playing(true);
+        m_current.set_title(result);
     }
 }
 
@@ -107,13 +105,20 @@ bool window_source::execute_capability(capability c)
     return true;
 }
 
+bool window_source::valid_format(const QString& str)
+{
+    QRegularExpression reg("/%[m|M]|%[a|A]|%[r|R]|%[y|Y]|%[d|D]|%[n|N]"
+                           "%[p|P]%[l|L]/gm");
+    return !reg.match(str).hasMatch();
+}
+
 void window_source::load_gui_values()
 {
     tuna_dialog->set_window_regex(m_regex);
-    tuna_dialog->set_window_title(m_title.c_str());
-    tuna_dialog->set_window_search(m_search.c_str());
-    tuna_dialog->set_window_replace(m_replace.c_str());
-    tuna_dialog->set_window_pause(m_pause.c_str());
+    tuna_dialog->set_window_title(m_title);
+    tuna_dialog->set_window_search(m_search);
+    tuna_dialog->set_window_replace(m_replace);
+    tuna_dialog->set_window_pause(m_pause);
     tuna_dialog->set_window_cut_begin(m_cut_begin);
     tuna_dialog->set_window_cut_end(m_cut_end);
 }

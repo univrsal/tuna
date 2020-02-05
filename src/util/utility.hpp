@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <QString>
 #include <obs-module.h>
 #include <stdint.h>
-#include <string>
 
 #define write_log(log_level, format, ...) blog(log_level, "[tuna] " format, ##__VA_ARGS__)
 
@@ -39,19 +39,22 @@ void load_vlc();
 
 void unload_vlc();
 
-bool curl_download(const char* url, const char* path);
+bool curl_download(const QString& url, const QString& path);
 
-void handle_cover_art(const song* song);
+void download_cover(const song* song);
 
-void handle_lyrics(const song* song);
+void download_lyrics(const song* song);
 
 void handle_outputs(const song* song);
 
-bool move_file(const char* src, const char* dest);
-
-void replace_all(std::string& str,
-    const std::string& find,
-    const std::string& replace);
+bool move_file(const QString& src, const QString& dest);
 
 int64_t epoch();
+
+inline const char* qcstr(const QString& str)
+{
+    auto ba = str.toLocal8Bit();
+    return ba.constData();
+}
+
 } // namespace util

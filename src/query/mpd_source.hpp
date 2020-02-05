@@ -47,6 +47,8 @@ public:
 
     bool execute_capability(capability c) override;
 
+    bool valid_format(const QString& str) override;
+
 private:
     void connect();
 

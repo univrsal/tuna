@@ -27,10 +27,10 @@ song::song()
 void song::clear()
 {
     m_data = 0x0;
-    m_title = "";
-    m_album = "";
+    m_title = "n/a";
+    m_album = "n/a";
     m_cover = "";
-    m_lyrics = "";
+    m_lyrics = "n/a";
     m_artists.clear();
     m_disc_number = 0;
     m_track_number = 0;
@@ -38,9 +38,9 @@ void song::clear()
     m_progress_ms = 0;
     m_is_playing = false;
     m_is_explicit = false;
-    m_day = "";
-    m_month = "";
-    m_year = "";
+    m_day = "n/a";
+    m_month = "n/a";
+    m_year = "n/a";
 }
 
 void song::update_release_precision()
@@ -58,25 +58,30 @@ void song::update_release_precision()
 
 void song::append_artist(const QString& a)
 {
-    m_data |= CAP_ARTIST;
-    m_artists.append(a);
+    if (!a.isEmpty())
+        m_artists.append(a);
+    if (!m_artists.isEmpty())
+        m_data |= CAP_ARTIST;
 }
 
 void song::set_cover_link(const QString& link)
 {
-    m_data |= CAP_COVER;
+    if (!link.isEmpty())
+        m_data |= CAP_COVER;
     m_cover = link;
 }
 
 void song::set_title(const QString& title)
 {
-    m_data |= CAP_TITLE;
+    if (!title.isEmpty())
+        m_data |= CAP_TITLE;
     m_title = title;
 }
 
 void song::set_duration(int ms)
 {
-    m_data |= CAP_LENGTH;
+    if (ms > 0)
+        m_data |= CAP_DURATION;
     m_duration_ms = ms;
 }
 
@@ -88,7 +93,8 @@ void song::set_progress(int ms)
 
 void song::set_album(const QString& album)
 {
-    m_data |= CAP_ALBUM;
+    if (!album.isEmpty())
+        m_data |= CAP_ALBUM;
     m_album = album;
 }
 
@@ -106,13 +112,15 @@ void song::set_playing(bool p)
 
 void song::set_disc_number(int i)
 {
-    m_data |= CAP_DISC_NUMBER;
+    if (i > 0)
+        m_data |= CAP_DISC_NUMBER;
     m_disc_number = i;
 }
 
 void song::set_track_number(int i)
 {
-    m_data |= CAP_TRACK_NUMBER;
+    if (i > 0)
+        m_data |= CAP_TRACK_NUMBER;
     m_track_number = i;
 }
 

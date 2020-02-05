@@ -38,27 +38,27 @@ public:
 
     void apply_login_state(bool state, const QString& log);
 
-    void select_vlc_source(const char* id);
+    void select_vlc_source(const QString& id);
 
-    void set_spotify_auth_code(const char* str);
+    void set_spotify_auth_code(const QString& str);
 
-    void set_spotify_auth_token(const char* str);
+    void set_spotify_auth_token(const QString& str);
 
-    void set_spotify_refresh_token(const char* str);
+    void set_spotify_refresh_token(const QString& str);
 
-    void set_mpd_ip(const char* ip);
+    void set_mpd_ip(const QString& ip);
 
     void set_mpd_port(uint16_t port);
 
     void set_mpd_local(bool state);
 
-    void set_window_title(const char* str);
+    void set_window_title(const QString& str);
 
-    void set_window_search(const char* str);
+    void set_window_search(const QString& str);
 
-    void set_window_pause(const char* str);
+    void set_window_pause(const QString& str);
 
-    void set_window_replace(const char* str);
+    void set_window_replace(const QString& str);
 
     void set_window_cut_begin(uint16_t n);
 

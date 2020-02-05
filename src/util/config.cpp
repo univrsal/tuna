@@ -57,9 +57,9 @@ void init_default()
     QString path_cover_art = QDir::toNativeSeparators(home.absoluteFilePath("cover.png"));
     QString path_lyrics = QDir::toNativeSeparators(home.absoluteFilePath("lyrics.txt"));
 
-    CDEF_STR(CFG_SONG_PATH, path_song_file.toStdString().c_str());
-    CDEF_STR(CFG_COVER_PATH, path_cover_art.toStdString().c_str());
-    CDEF_STR(CFG_LYRICS_PATH, path_lyrics.toStdString().c_str());
+    CDEF_STR(CFG_SONG_PATH, util::qcstr(path_song_file));
+    CDEF_STR(CFG_COVER_PATH, util::qcstr(path_cover_art));
+    CDEF_STR(CFG_LYRICS_PATH, util::qcstr(path_lyrics));
     CDEF_UINT(CFG_SELECTED_SOURCE, src_spotify);
 
     CDEF_BOOL(CFG_RUNNING, false);
@@ -239,7 +239,7 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
             }
             save_file.close();
         } else {
-            berr("Couldn't write outputs to %s", path.toStdString().c_str());
+            berr("Couldn't write outputs to %s", util::qcstr(path));
         }
     }
 }

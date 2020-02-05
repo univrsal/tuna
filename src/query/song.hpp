@@ -17,8 +17,9 @@
  *************************************************************************/
 
 #pragma once
+#include <QList>
 #include <QString>
-#include <QVector>
+#include <memory>
 #include <stdint.h>
 
 enum date_precision {
@@ -31,7 +32,7 @@ enum date_precision {
 class song {
     uint16_t m_data;
     QString m_title, m_album, m_cover, m_lyrics;
-    QVector<QString> m_artists;
+    QList<QString> m_artists;
     QString m_year, m_month, m_day;
     int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
     bool m_is_explicit, m_is_playing;
@@ -54,4 +55,23 @@ public:
     void set_month(const QString& m);
     void set_day(const QString& d);
     void clear();
+
+    void fetch_lyrics();
+    void fetch_art();
+
+    bool playing() const { return m_is_playing; }
+    uint16_t data() const { return m_data; }
+    const QString& cover() const { return m_cover; }
+    const QString& lyrics() const { return m_lyrics; }
+    const QString* title() const { return &m_title; }
+    const QString* album() const { return &m_album; }
+    const QString* year() const { return &m_year; }
+    const QString* month() const { return &m_month; }
+    const QString* day() const { return &m_day; }
+    const QList<QString>* artists() const { return &m_artists; }
+    const int32_t* disc() const { return &m_disc_number; }
+    const int32_t* track() const { return &m_track_number; }
+    const int32_t* progress() const { return &m_progress_ms; }
+    const int32_t* duration() const { return &m_duration_ms; }
+    date_precision release_precision() const { return m_release_precision; }
 };

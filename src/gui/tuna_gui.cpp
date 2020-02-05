@@ -166,9 +166,9 @@ void tuna_gui::on_txt_auth_code_textChanged(const QString& arg1)
 void tuna_gui::apply_login_state(bool state, const QString& log)
 {
     if (state) {
-        ui->txt_token->setText(QString::fromStdString(config::spotify->token()));
+        ui->txt_token->setText(config::spotify->token());
         ui->txt_refresh_token->setText(
-            QString::fromStdString(config::spotify->refresh_token()));
+            config::spotify->refresh_token());
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
         ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
                                             "font-weight: bold;}");
@@ -190,7 +190,7 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
 void tuna_gui::on_btn_request_token_clicked()
 {
     QString log;
-    config::spotify->set_auth_code(ui->txt_auth_code->text().toStdString());
+    config::spotify->set_auth_code(ui->txt_auth_code->text());
     bool result = config::spotify->new_token(log);
     apply_login_state(result, log);
 }
@@ -198,20 +198,20 @@ void tuna_gui::on_btn_request_token_clicked()
 void tuna_gui::on_btn_performrefresh_clicked()
 {
     QString log;
-    config::spotify->set_auth_code(ui->txt_auth_code->text().toStdString());
+    config::spotify->set_auth_code(ui->txt_auth_code->text());
     bool result = config::spotify->do_refresh_token(log);
     apply_login_state(result, log);
 }
 
 void tuna_gui::on_tuna_gui_accepted()
 {
-    CSET_STR(CFG_COVER_PATH, ui->txt_song_cover->text().toStdString().c_str());
-    CSET_STR(CFG_LYRICS_PATH, ui->txt_song_lyrics->text().toStdString().c_str());
+    CSET_STR(CFG_COVER_PATH, util::qcstr(ui->txt_song_cover->text()));
+    CSET_STR(CFG_LYRICS_PATH, util::qcstr(ui->txt_song_lyrics->text()));
     CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
 
     CSET_STR(CFG_SONG_PLACEHOLDER,
-        ui->txt_song_placeholder->text().toStdString().c_str());
+        util::qcstr(ui->txt_song_placeholder->text()));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */
@@ -219,10 +219,10 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
     CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
 
-    CSET_STR(CFG_WINDOW_TITLE, ui->txt_title->text().toStdString().c_str());
-    CSET_STR(CFG_WINDOW_PAUSE, ui->txt_paused->text().toStdString().c_str());
-    CSET_STR(CFG_WINDOW_SEARCH, ui->txt_search->text().toStdString().c_str());
-    CSET_STR(CFG_WINDOW_REPLACE, ui->txt_replace->text().toStdString().c_str());
+    CSET_STR(CFG_WINDOW_TITLE, util::qcstr(ui->txt_title->text()));
+    CSET_STR(CFG_WINDOW_PAUSE, util::qcstr(ui->txt_paused->text()));
+    CSET_STR(CFG_WINDOW_SEARCH, util::qcstr(ui->txt_search->text()));
+    CSET_STR(CFG_WINDOW_REPLACE, util::qcstr(ui->txt_replace->text()));
     CSET_BOOL(CFG_WINDOW_REGEX, ui->cb_regex->isChecked());
     CSET_UINT(CFG_WINDOW_CUT_BEGIN, ui->sb_begin->value());
     CSET_UINT(CFG_WINDOW_CUT_END, ui->sb_end->value());
@@ -264,7 +264,7 @@ void tuna_gui::on_btn_stop_clicked()
     set_state();
 }
 
-void tuna_gui::set_mpd_ip(const char* ip)
+void tuna_gui::set_mpd_ip(const QString& ip)
 {
     ui->txt_ip->setText(ip);
 }
@@ -281,12 +281,12 @@ void tuna_gui::set_mpd_local(bool state)
     ui->sb_port->setEnabled(!state);
 }
 
-void tuna_gui::set_spotify_auth_code(const char* str)
+void tuna_gui::set_spotify_auth_code(const QString& str)
 {
     ui->txt_auth_code->setText(str);
 }
 
-void tuna_gui::set_spotify_auth_token(const char* str)
+void tuna_gui::set_spotify_auth_token(const QString& str)
 {
     ui->txt_token->setText(str);
 }
@@ -296,22 +296,22 @@ void tuna_gui::set_window_regex(bool state)
     ui->cb_regex->setChecked(state);
 }
 
-void tuna_gui::set_window_title(const char* str)
+void tuna_gui::set_window_title(const QString& str)
 {
     ui->txt_title->setText(str);
 }
 
-void tuna_gui::set_window_search(const char* str)
+void tuna_gui::set_window_search(const QString& str)
 {
     ui->txt_search->setText(str);
 }
 
-void tuna_gui::set_window_pause(const char* str)
+void tuna_gui::set_window_pause(const QString& str)
 {
     ui->txt_paused->setText(str);
 }
 
-void tuna_gui::set_window_replace(const char* str)
+void tuna_gui::set_window_replace(const QString& str)
 {
     ui->txt_replace->setText(str);
 }
@@ -326,7 +326,7 @@ void tuna_gui::set_window_cut_end(uint16_t n)
     ui->sb_end->setValue(n);
 }
 
-void tuna_gui::set_spotify_refresh_token(const char* str)
+void tuna_gui::set_spotify_refresh_token(const QString& str)
 {
     ui->txt_refresh_token->setText(str);
 }
@@ -458,7 +458,7 @@ void tuna_gui::on_pb_refresh_vlc_clicked()
     load_vlc_sources();
 }
 
-void tuna_gui::select_vlc_source(const char* id)
+void tuna_gui::select_vlc_source(const QString& id)
 {
     auto idx = ui->cb_source->findText(id);
     if (idx >= 0)

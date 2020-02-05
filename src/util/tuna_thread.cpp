@@ -78,11 +78,11 @@ void* thread_method(void*)
         mutex.lock();
         if (config::selected_source) {
             config::selected_source->refresh();
-            auto* s = config::selected_source->song();
+            auto* s = config::selected_source->song_info();
 
             /* Process song data */
-            util::handle_cover_art(s);
-            util::handle_lyrics(s);
+            util::download_cover(s);
+            util::download_lyrics(s);
             util::handle_outputs(s);
         }
 

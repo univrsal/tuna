@@ -24,7 +24,7 @@
 
 vlc_obs_source::vlc_obs_source()
 {
-    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_LENGTH | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
+    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 
     if (!load_libvlc()) {
         binfo("Couldn't load libVLC, VLC support disabled");
@@ -87,11 +87,11 @@ void vlc_obs_source::refresh()
     auto* vlc = get_vlc();
 
     if (vlc) {
-        m_current.progress_ms = libvlc_media_player_get_time_(vlc->media_player);
-        m_current.duration_ms = libvlc_media_player_get_time_(vlc->media_player);
-        m_current.is_playing = libvlc_media_player_get_state_(vlc->media_player)
-            == libvlc_Playing;
-        m_current.data |= CAP_PROGRESS | CAP_STATUS | CAP_TITLE | CAP_LENGTH;
+        m_current.clear();
+        m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
+        m_current.set_duration(libvlc_media_player_get_time_(vlc->media_player));
+        m_current.set_playing(libvlc_media_player_get_state_(vlc->media_player)
+            == libvlc_Playing);
 
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
         if (media) {
@@ -104,40 +104,20 @@ void vlc_obs_source::refresh()
             const char* cover = libvlc_media_get_meta_(media, libvlc_meta_ArtworkURL);
 
             if (title)
-                m_current.title = title;
-            else
-                m_current.title = "N/A";
+                m_current.set_title(title);
+            if (cover)
+                m_current.set_cover_link(cover);
+            if (artists)
+                m_current.append_artist(artists);
+            if (year)
+                m_current.set_year(year);
+            if (album)
+                m_current.set_album(album);
+            if (num)
+                m_current.set_track_number(std::stoi(num));
 
-            if (cover) {
-                m_current.cover = cover;
-                m_current.data |= CAP_COVER;
-            }
-
-            if (artists) {
-                m_current.artists = artists;
-                m_current.data |= CAP_ARTIST;
-            }
-
-            if (year) {
-                m_current.year = year;
-                m_current.data |= CAP_RELEASE;
-                m_current.release_precision = prec_year;
-            }
-
-            if (album) {
-                m_current.album = album;
-                m_current.data |= CAP_ALBUM;
-            }
-
-            if (num) {
-                m_current.track_number = std::stoi(num);
-                m_current.data |= CAP_TRACK_NUMBER;
-            }
-
-            if (disc) {
-                m_current.disc_number = std::stoi(disc);
-                m_current.data |= CAP_DISC_NUMBER;
-            }
+            if (disc)
+                m_current.set_disc_number(std::stoi(disc));
         }
     } else {
         m_current = {};
@@ -171,4 +151,9 @@ bool vlc_obs_source::execute_capability(capability c)
 void vlc_obs_source::load_gui_values()
 {
     tuna_dialog->select_vlc_source(m_target_source_name.c_str());
+}
+
+bool vlc_obs_source::valid_format(const QString& str)
+{
+    return true;
 }

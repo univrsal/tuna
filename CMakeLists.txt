@@ -83,6 +83,8 @@ set(tuna_sources
     ./src/query/window_source.hpp
     ./src/query/song.cpp
     ./src/query/song.hpp
+    ./src/util/format.cpp
+    ./src/util/format.hpp
     ${tuna_vlc_source}
     ./src/query/vlc_obs_source.hpp
     ./src/util/tuna_thread.cpp
