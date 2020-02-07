@@ -51,9 +51,9 @@ void spotify_source::load()
     CDEF_INT(CFG_SPOTIFY_TOKEN_TERMINATION, 0);
 
     m_logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
-    m_token = CGET_STR(CFG_SPOTIFY_TOKEN);
-    m_refresh_token = CGET_STR(CFG_SPOTIFY_REFRESH_TOKEN);
-    m_auth_code = CGET_STR(CFG_SPOTIFY_AUTH_CODE);
+    m_token = utf8_to_qt(CGET_STR(CFG_SPOTIFY_TOKEN));
+    m_refresh_token = utf8_to_qt(CGET_STR(CFG_SPOTIFY_REFRESH_TOKEN));
+    m_auth_code = utf8_to_qt(CGET_STR(CFG_SPOTIFY_AUTH_CODE));
     m_token_termination = CGET_INT(CFG_SPOTIFY_TOKEN_TERMINATION);
 
     /* Token handling */
@@ -79,9 +79,9 @@ void spotify_source::load_gui_values()
 void spotify_source::save()
 {
     CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, m_logged_in);
-    CSET_STR(CFG_SPOTIFY_TOKEN, util::qcstr(m_token));
-    CSET_STR(CFG_SPOTIFY_AUTH_CODE, util::qcstr(m_auth_code));
-    CSET_STR(CFG_SPOTIFY_REFRESH_TOKEN, util::qcstr(m_refresh_token));
+    CSET_STR(CFG_SPOTIFY_TOKEN, qt_to_utf8(m_token));
+    CSET_STR(CFG_SPOTIFY_AUTH_CODE, qt_to_utf8(m_auth_code));
+    CSET_STR(CFG_SPOTIFY_REFRESH_TOKEN, qt_to_utf8(m_refresh_token));
     CSET_INT(CFG_SPOTIFY_TOKEN_TERMINATION, m_token_termination);
 }
 
@@ -92,8 +92,8 @@ bool spotify_source::valid_format(const QString& str)
 }
 
 /* implementation further down */
-void execute_command(const QString& auth_token, const char* url,
-    QString& response_header, QJsonDocument& result);
+void execute_command(const QString& auth_token, const QString& url, QString& response_header,
+    QJsonDocument& response_json);
 
 void extract_timeout(const QString& header, uint64_t& timeout)
 {
@@ -263,7 +263,7 @@ CURL* prepare_curl(struct curl_slist* header, QString* response, QString* respon
     curl_easy_setopt(curl, CURLOPT_URL, TOKEN_URL);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, request.length());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, util::qcstr(request));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, qt_to_utf8(request));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
@@ -288,7 +288,7 @@ void request_token(const QString& request, const QString& credentials, QJsonDocu
     QString header = "Authorization: Basic ";
     header.append(credentials);
 
-    auto* list = curl_slist_append(nullptr, util::qcstr(header));
+    auto* list = curl_slist_append(nullptr, qt_to_utf8(header));
     CURL* curl = prepare_curl(list, &response, &response_header, request);
     CURLcode res = curl_easy_perform(curl);
 
@@ -305,7 +305,7 @@ void request_token(const QString& request, const QString& credentials, QJsonDocu
             obj["refresh_token"] = "REDACTED";
             auto doc = QJsonDocument(obj);
             QString str(doc.toJson());
-            binfo("Spotify response: %s", util::qcstr(str));
+            binfo("Spotify response: %s", qt_to_utf8(str));
         }
     } else {
         berr("Curl returned error code %i", res);
@@ -390,23 +390,24 @@ bool spotify_source::new_token(QString& log)
 }
 
 /* Sends commands to spotify api via url */
+
 void execute_command(const QString& auth_token, const QString& url,
     QString& response_header, QJsonDocument& response_json)
 {
     QString response;
     QString header = "Authorization: Bearer ";
     header.append(auth_token);
-    auto* list = curl_slist_append(nullptr, util::qcstr(header));
+    auto* list = curl_slist_append(nullptr, qt_to_utf8(header));
 
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, util::qcstr(url));
+    curl_easy_setopt(curl, CURLOPT_URL, qt_to_utf8(url));
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
     if (!response_header.isEmpty())
-        bdebug("Response header: %s", util::qcstr(response_header));
+        bdebug("Response header: %s", qt_to_utf8(response_header));
 
 #ifdef DEBUG
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -416,8 +417,8 @@ void execute_command(const QString& auth_token, const QString& url,
         QJsonParseError err;
         response_json = QJsonDocument::fromJson(response.toUtf8(), &err);
         if (response_json.isNull() && !response.isEmpty())
-            berr("Failed to parse json response: %s, Error: %s", util::qcstr(response),
-                util::qcstr(err.errorString()));
+            berr("Failed to parse json response: %s, Error: %s", qt_to_utf8(response),
+                qt_to_utf8(err.errorString()));
     } else {
         berr("CURL failed while sending spotify command");
     }

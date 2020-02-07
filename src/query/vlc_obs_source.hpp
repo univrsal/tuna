@@ -18,11 +18,11 @@
 
 #pragma once
 #include "music_source.hpp"
+#include <QString>
 #include <obs-module.h>
-#include <string>
 
 class vlc_obs_source : public music_source {
-    std::string m_target_source_name;
+    const char* m_target_source_name;
     obs_weak_source_t* m_weak_src = nullptr;
 
     /* If obs version changed since the plugin was

@@ -22,6 +22,9 @@
 #include <obs-module.h>
 #include <stdint.h>
 
+#define utf8_to_qt(str) QString::fromUtf8(str)
+#define qt_to_utf8(str) str.toUtf8().constData()
+
 #define write_log(log_level, format, ...) blog(log_level, "[tuna] " format, ##__VA_ARGS__)
 
 #define bdebug(format, ...) write_log(LOG_DEBUG, format, ##__VA_ARGS__)
@@ -50,11 +53,5 @@ void handle_outputs(const song* song);
 bool move_file(const QString& src, const QString& dest);
 
 int64_t epoch();
-
-inline const char* qcstr(const QString& str)
-{
-    auto ba = str.toLocal8Bit();
-    return ba.constData();
-}
 
 } // namespace util

@@ -34,7 +34,7 @@ protected:
     int m_tag_id;
 
 public:
-    specifier();
+    specifier() = default;
     specifier(char id, int tag_id)
         : m_id(id)
         , m_tag_id(tag_id)
@@ -74,9 +74,12 @@ public:
 };
 
 class specifier_string_list : public specifier {
+    const QList<QString>* m_data;
+
 public:
-    specifier_string_list(char id, int tag_id)
+    specifier_string_list(char id, int tag_id, const QList<QString>* data)
         : specifier(id, tag_id)
+        , m_data(data)
     {
     }
 

@@ -38,21 +38,21 @@ void window_source::load()
     CDEF_UINT(CFG_WINDOW_CUT_BEGIN, 0);
     CDEF_UINT(CFG_WINDOW_CUT_END, 0);
 
-    m_title = CGET_STR(CFG_WINDOW_TITLE);
+    m_title = utf8_to_qt(CGET_STR(CFG_WINDOW_TITLE));
     m_regex = CGET_BOOL(CFG_WINDOW_REGEX);
-    m_search = CGET_STR(CFG_WINDOW_SEARCH);
-    m_replace = CGET_STR(CFG_WINDOW_REPLACE);
-    m_pause = CGET_STR(CFG_WINDOW_PAUSE);
+    m_search = utf8_to_qt(CGET_STR(CFG_WINDOW_SEARCH));
+    m_replace = utf8_to_qt(CGET_STR(CFG_WINDOW_REPLACE));
+    m_pause = utf8_to_qt(CGET_STR(CFG_WINDOW_PAUSE));
     m_cut_begin = CGET_UINT(CFG_WINDOW_CUT_BEGIN);
     m_cut_end = CGET_UINT(CFG_WINDOW_CUT_END);
 }
 
 void window_source::save()
 {
-    CSET_STR(CFG_WINDOW_TITLE, util::qcstr(m_title));
-    CSET_STR(CFG_WINDOW_SEARCH, util::qcstr(m_search));
-    CSET_STR(CFG_WINDOW_REPLACE, util::qcstr(m_replace));
-    CSET_STR(CFG_WINDOW_PAUSE, util::qcstr(m_pause));
+    CSET_STR(CFG_WINDOW_TITLE, qt_to_utf8(m_title));
+    CSET_STR(CFG_WINDOW_SEARCH, qt_to_utf8(m_search));
+    CSET_STR(CFG_WINDOW_REPLACE, qt_to_utf8(m_replace));
+    CSET_STR(CFG_WINDOW_PAUSE, qt_to_utf8(m_pause));
     CSET_BOOL(CFG_WINDOW_REGEX, m_regex);
     CSET_UINT(CFG_WINDOW_CUT_BEGIN, m_cut_begin);
     CSET_UINT(CFG_WINDOW_CUT_END, m_cut_begin);

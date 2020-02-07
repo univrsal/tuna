@@ -81,7 +81,7 @@ void init()
     specifiers.emplace_back(specifier_string('t', CAP_TITLE, s->title()));
     specifiers.emplace_back(specifier_string('a', CAP_ALBUM, s->album()));
     specifiers.emplace_back(specifier_string('y', 1, s->year()));
-    specifiers.emplace_back(specifier_string_list('m', CAP_ARTIST));
+    specifiers.emplace_back(specifier_string_list('m', CAP_ARTIST, s->artists()));
     specifiers.emplace_back(specifier_date('r', CAP_RELEASE));
     specifiers.emplace_back(specifier_int('d', CAP_DISC_NUMBER, s->disc()));
     specifiers.emplace_back(specifier_int('n', CAP_TRACK_NUMBER, s->track()));
@@ -102,10 +102,16 @@ void execute(QString& q)
 
 bool specifier::replace(QString& slice, const song* s, const QString& data) const
 {
-    Q_UNUSED(slice)
     if (!(s->data() & m_tag_id))
         return false; /* We do not have the information needed for this specifier */
+
+    /* get truncation, if specified */
+    int max_length = get_truncate_arg(slice);
     slice.replace(m_id, data);
+    if (slice.length() > max_length) {
+        slice.truncate(max_length);
+        slice.append("...");
+    }
     return true;
 }
 
@@ -116,17 +122,20 @@ bool specifier_int::do_format(QString& slice, const song* s) const
 
 bool specifier_string::do_format(QString& slice, const song* s) const
 {
-    /* get truncation, if specified */
-    int max_length = get_truncate_arg(slice);
-    QString data(*m_data);
-    if (data.length() > max_length) {
-        data.truncate(max_length);
-        data.append("...");
-    }
-    return replace(slice, s, data);
+    return replace(slice, s, *m_data);
 }
 
 bool specifier_string_list::do_format(QString& slice, const song* s) const
+{
+    QString concatenated_list;
+    for (auto str : *m_data) {
+        concatenated_list += str + ", ";
+    }
+    concatenated_list.truncate(2);
+    return replace(slice, s, concatenated_list);
+}
+
+bool specifier_date::do_format(QString& slice, const song* s) const
 {
     QString data;
     if (s->release_precision() == prec_day) {

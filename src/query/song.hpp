@@ -56,9 +56,6 @@ public:
     void set_day(const QString& d);
     void clear();
 
-    void fetch_lyrics();
-    void fetch_art();
-
     bool playing() const { return m_is_playing; }
     uint16_t data() const { return m_data; }
     const QString& cover() const { return m_cover; }

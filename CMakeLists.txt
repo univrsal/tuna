@@ -35,21 +35,25 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     set(tuna_platform_deps
             mpdclient)
     set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
+    find_package(LibVLC QUIET)
 endif ()
 
 if (MSVC)
    set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
    set(tuna_platform_deps
             w32-pthreads)
+   set(LIBVLC_INCLUDE_DIRS "./libvlc/include")
+   set(LIBVLC_INCLUDES_FOUND TRUE)
 endif ()
 
-find_package(LibVLC QUIET)
 if (NOT LIBVLC_INCLUDES_FOUND AND ENABLE_VLC)
-    message(STATUS "LibVLC includes not found but set as enabled")
+    message(STATUS "[tuna] LibVLC includes not found but set as enabled")
     add_definitions(-DDISABLE_TUNA_VLC=1)
 elseif (NOT LIBVLC_INCLUDES_FOUND)
-    message(STATUS "LibVLC includes not found, VLC video plugin disabled")
+    message(STATUS "[tuna] LibVLC includes not found, VLC source support disabled")
     add_definitions(-DDISABLE_TUNA_VLC=1)
+else()
+    message(STATUS "[tuna] LibVLC headers found, VLC source support enabled")
 endif()
 
 if (DISABLE_VLC)

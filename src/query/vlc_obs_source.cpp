@@ -44,16 +44,17 @@ void vlc_obs_source::load()
         return;
     CDEF_STR(CFG_VLC_ID, "");
     m_target_source_name = CGET_STR(CFG_VLC_ID);
-    auto* src = obs_get_source_by_name(m_target_source_name.c_str());
+
+    auto* src = obs_get_source_by_name(m_target_source_name);
 
     if (src) {
-        std::string id(obs_source_get_id(src));
-        if (id == "vlc_source") {
+        auto id = obs_source_get_id(src);
+        if (strcmp(id, "vlc_source") == 0) {
             if (m_weak_src)
                 obs_weak_source_release(m_weak_src);
             m_weak_src = obs_source_get_weak_source(src);
         } else {
-            binfo("%s is not a valid vlc source", id.c_str());
+            binfo("%s is not a valid vlc source", id);
         }
     }
 }
@@ -62,7 +63,7 @@ void vlc_obs_source::save()
 {
     if (!util::vlc_loaded)
         return;
-    CSET_STR(CFG_VLC_ID, m_target_source_name.c_str());
+    CSET_STR(CFG_VLC_ID, m_target_source_name);
 }
 
 struct vlc_source* vlc_obs_source::get_vlc()
@@ -140,8 +141,8 @@ bool vlc_obs_source::execute_capability(capability c)
         case CAP_VOLUME_MUTE:
             break;
         case CAP_PLAY_PAUSE:
-            if (libvlc_media_player_can_pause(vlc->media_player))
-                libvlc_media_player_pause(vlc->media_player);
+            //if (libvlc_media_player_can_pause(vlc->media_player))
+            //    libvlc_media_player_pause(vlc->media_player);
             break;
         }
     }
@@ -150,7 +151,7 @@ bool vlc_obs_source::execute_capability(capability c)
 
 void vlc_obs_source::load_gui_values()
 {
-    tuna_dialog->select_vlc_source(m_target_source_name.c_str());
+    tuna_dialog->select_vlc_source(utf8_to_qt(m_target_source_name));
 }
 
 bool vlc_obs_source::valid_format(const QString& str)

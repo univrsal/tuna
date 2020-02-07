@@ -112,12 +112,11 @@ void tuna_gui::toggleShowHide()
         config::load_gui_values();
 
         /* setup config values */
-        ui->txt_song_cover->setText(CGET_STR(CFG_COVER_PATH));
-        ui->txt_song_lyrics->setText(CGET_STR(CFG_LYRICS_PATH));
+        ui->txt_song_cover->setText(utf8_to_qt(CGET_STR(CFG_COVER_PATH)));
+        ui->txt_song_lyrics->setText(utf8_to_qt(CGET_STR(CFG_LYRICS_PATH)));
         ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
         ui->sb_refresh_rate->setValue(CGET_UINT(CFG_REFRESH_RATE));
-        ui->txt_song_placeholder->setText(
-            QString::fromUtf8(CGET_STR(CFG_SONG_PLACEHOLDER)));
+        ui->txt_song_placeholder->setText(utf8_to_qt(CGET_STR(CFG_SONG_PLACEHOLDER)));
         ui->cb_dl_cover->setChecked(CGET_BOOL(CFG_DOWNLOAD_COVER));
         set_state();
 
@@ -205,13 +204,12 @@ void tuna_gui::on_btn_performrefresh_clicked()
 
 void tuna_gui::on_tuna_gui_accepted()
 {
-    CSET_STR(CFG_COVER_PATH, util::qcstr(ui->txt_song_cover->text()));
-    CSET_STR(CFG_LYRICS_PATH, util::qcstr(ui->txt_song_lyrics->text()));
+    CSET_STR(CFG_COVER_PATH, qt_to_utf8(ui->txt_song_cover->text()));
+    CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(ui->txt_song_lyrics->text()));
     CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
 
-    CSET_STR(CFG_SONG_PLACEHOLDER,
-        util::qcstr(ui->txt_song_placeholder->text()));
+    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */
@@ -219,15 +217,15 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
     CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
 
-    CSET_STR(CFG_WINDOW_TITLE, util::qcstr(ui->txt_title->text()));
-    CSET_STR(CFG_WINDOW_PAUSE, util::qcstr(ui->txt_paused->text()));
-    CSET_STR(CFG_WINDOW_SEARCH, util::qcstr(ui->txt_search->text()));
-    CSET_STR(CFG_WINDOW_REPLACE, util::qcstr(ui->txt_replace->text()));
+    CSET_STR(CFG_WINDOW_TITLE, qt_to_utf8(ui->txt_title->text()));
+    CSET_STR(CFG_WINDOW_PAUSE, qt_to_utf8(ui->txt_paused->text()));
+    CSET_STR(CFG_WINDOW_SEARCH, qt_to_utf8(ui->txt_search->text()));
+    CSET_STR(CFG_WINDOW_REPLACE, qt_to_utf8(ui->txt_replace->text()));
     CSET_BOOL(CFG_WINDOW_REGEX, ui->cb_regex->isChecked());
     CSET_UINT(CFG_WINDOW_CUT_BEGIN, ui->sb_begin->value());
     CSET_UINT(CFG_WINDOW_CUT_END, ui->sb_end->value());
 
-    CSET_STR(CFG_VLC_ID, ui->cb_vlc_source_name->currentText().toStdString().c_str());
+    CSET_STR(CFG_VLC_ID, qt_to_utf8(ui->cb_vlc_source_name->currentText()));
 
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
