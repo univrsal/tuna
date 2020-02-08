@@ -65,7 +65,6 @@ void init_default()
     CDEF_BOOL(CFG_RUNNING, false);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, true);
     CDEF_UINT(CFG_REFRESH_RATE, refresh_rate);
-    CDEF_STR(CFG_SONG_FORMAT, T_FORMAT);
     CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
 
     if (!cover_placeholder)
@@ -108,6 +107,7 @@ void load()
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
+    placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
 
     /* Sources */
     if (!spotify)

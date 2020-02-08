@@ -54,6 +54,6 @@ void vlc_obs_source::load() {}
 void vlc_obs_source::save() {}
 void vlc_obs_source::refresh() {}
 void vlc_obs_source::load_gui_values() {}
-void vlc_obs_source::execute_capability(capability c) {}
+bool vlc_obs_source::execute_capability(capability c) { return true; }
 
 #endif

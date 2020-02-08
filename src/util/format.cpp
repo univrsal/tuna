@@ -24,13 +24,13 @@
 
 namespace format {
 
-std::vector<specifier> specifiers;
+std::vector<std::unique_ptr<specifier>> specifiers;
 
 const specifier* get_matching_specifier(char c)
 {
     for (const auto& s : specifiers) {
-        if (s.get_id() == c)
-            return &s;
+        if (s->get_id() == c)
+            return s.get();
     }
     return nullptr;
 }
@@ -77,16 +77,16 @@ QString time_format(uint32_t ms)
 void init()
 {
     /* Register format specifiers with their data */
-    auto s = config::selected_source->song_info();
-    specifiers.emplace_back(specifier_string('t', CAP_TITLE, s->title()));
-    specifiers.emplace_back(specifier_string('a', CAP_ALBUM, s->album()));
-    specifiers.emplace_back(specifier_string('y', 1, s->year()));
-    specifiers.emplace_back(specifier_string_list('m', CAP_ARTIST, s->artists()));
-    specifiers.emplace_back(specifier_date('r', CAP_RELEASE));
-    specifiers.emplace_back(specifier_int('d', CAP_DISC_NUMBER, s->disc()));
-    specifiers.emplace_back(specifier_int('n', CAP_TRACK_NUMBER, s->track()));
-    specifiers.emplace_back(specifier_int('p', CAP_PROGRESS, s->progress()));
-    specifiers.emplace_back(specifier_int('l', CAP_DURATION, s->duration()));
+    specifiers.emplace_back(std::make_unique<specifier_string>('t', CAP_TITLE));
+    specifiers.emplace_back(std::make_unique<specifier_string>('a', CAP_ALBUM));
+    specifiers.emplace_back(std::make_unique<specifier_string>('y', CAP_RELEASE));
+    specifiers.emplace_back(std::make_unique<specifier_string_list>('m', CAP_ARTIST));
+    specifiers.emplace_back(std::make_unique<specifier_date>('r', CAP_RELEASE));
+    specifiers.emplace_back(std::make_unique<specifier_int>('d', CAP_DISC_NUMBER));
+    specifiers.emplace_back(std::make_unique<specifier_int>('n', CAP_TRACK_NUMBER));
+    specifiers.emplace_back(std::make_unique<specifier_time>('p', CAP_PROGRESS));
+    specifiers.emplace_back(std::make_unique<specifier_time>('l', CAP_DURATION));
+    specifiers.emplace_back(std::make_unique<specifier_static>('b', "\n"));
 }
 
 void execute(QString& q)
@@ -98,6 +98,7 @@ void execute(QString& q)
         if (sp)
             sp->do_format(split, config::selected_source->song_info());
     }
+    q = splits.join("");
 }
 
 bool specifier::replace(QString& slice, const song* s, const QString& data) const
@@ -107,31 +108,55 @@ bool specifier::replace(QString& slice, const song* s, const QString& data) cons
 
     /* get truncation, if specified */
     int max_length = get_truncate_arg(slice);
-    slice.replace(m_id, data);
-    if (slice.length() > max_length) {
+    QString copy = data;
+    if (slice[0].isUpper())
+        copy = copy.toUpper();
+    slice = slice.remove(0, 1);
+    slice.prepend(copy);
+
+    if (max_length && slice.length() > max_length) {
         slice.truncate(max_length);
         slice.append("...");
     }
     return true;
 }
 
-bool specifier_int::do_format(QString& slice, const song* s) const
+bool specifier::do_format(QString& slice, const song* s) const
 {
-    return replace(slice, s, QString::number(*m_data));
+    return replace(slice, s);
 }
 
 bool specifier_string::do_format(QString& slice, const song* s) const
 {
-    return replace(slice, s, *m_data);
+    return replace(slice, s, s->get_string_value(m_id));
+}
+
+bool specifier_static::do_format(QString& slice, const song* s) const
+{
+    slice = slice.remove(0, 1);
+    slice.prepend(m_static_value);
+    return true;
+}
+
+bool specifier_time::do_format(QString& slice, const song* s) const
+{
+    QString value = time_format(s->get_int_value(m_id));
+    return replace(slice, s, value);
+}
+
+bool specifier_int::do_format(QString& slice, const song* s) const
+{
+    QString value = QString::number(s->get_int_value(m_id));
+    return replace(slice, s, value);
 }
 
 bool specifier_string_list::do_format(QString& slice, const song* s) const
 {
     QString concatenated_list;
-    for (auto str : *m_data) {
+    for (auto str : s->artists())
         concatenated_list += str + ", ";
-    }
-    concatenated_list.truncate(2);
+
+    concatenated_list.chop(2);
     return replace(slice, s, concatenated_list);
 }
 

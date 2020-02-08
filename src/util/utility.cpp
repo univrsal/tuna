@@ -21,7 +21,15 @@
 #include "config.hpp"
 #include "constants.hpp"
 #include "format.hpp"
+
+#if DISABLE_TUNA_VLC
+bool load_libvlc_module() { return false; }
+bool load_vlc_funcs() { return false; }
+bool load_libvlc() { return false; }
+void unload_libvlc() {}
+#else
 #include "vlc_internal.h"
+#endif
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
@@ -53,6 +61,8 @@ void load_vlc()
         if (result) {
             bwarn("User force enabled VLC support");
         }
+    } else {
+        /* reset warning boolean */
     }
 
     if (vlc_loaded) {
@@ -77,13 +87,13 @@ write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
     return written;
 }
 
-bool curl_download(const QString& url, const QString& path)
+bool curl_download(const char* url, const char* path)
 {
     CURL* curl = curl_easy_init();
     FILE* fp = nullptr;
 #ifdef _WIN32
     wchar_t* wstr = NULL;
-    os_utf8_to_wcs_ptr(qt_to_utf8(path), path.length(), &wstr);
+    os_utf8_to_wcs_ptr(path, strlen(path), &wstr);
     fp = _wfopen(wstr, L"wb");
     bfree(wstr);
 #else
@@ -92,7 +102,7 @@ bool curl_download(const QString& url, const QString& path)
 
     bool result = false;
     if (fp && curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, qt_to_utf8(url));
+        curl_easy_setopt(curl, CURLOPT_URL, url);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 #ifdef DEBUG
@@ -101,33 +111,34 @@ bool curl_download(const QString& url, const QString& path)
         CURLcode res = curl_easy_perform(curl);
 
         if (res != CURLE_OK)
-            berr("Couldn't fetch file from %s to %s", qt_to_utf8(url), qt_to_utf8(path));
+            berr("Couldn't fetch file from %s to %s", url, path);
         else
-            bdebug("Fetched %s to %s", qt_to_utf8(url), qt_to_utf8(path));
-        fclose(fp);
+            bdebug("Fetched %s to %s", url, path);
         result = true;
     }
+
+    if (fp)
+        fclose(fp);
 
     if (curl)
         curl_easy_cleanup(curl);
     return true;
 }
 
-bool move_file(const QString& src, const QString& dest)
+bool move_file(const char* src, const char* dest)
 {
 #ifdef _WIN32
-    wchar_t* in_path = nullptr;
-    wchar_t* out_path = nullptr;
-    os_utf8_to_wcs_ptr(qt_to_utf8(dest), dest.length(), &out_path);
-    os_utf8_to_wcs_ptr(qt_to_utf8(src), src.length(), &in_path);
-
-    std::wifstream in(in_path, std::ios::binary);
-    std::wofstream out(out_path, std::ios::binary);
-    bfree(in_path);
-    bfree(out_path);
+    wchar_t* wsrc = nullptr;
+    wchar_t* wdest = nullptr;
+    os_utf8_to_wcs_ptr(src, strlen(src), &wsrc);
+    os_utf8_to_wcs_ptr(dest, strlen(dest), &wdest);
+    std::wifstream in(wsrc, std::ios::binary);
+    std::wofstream out(wdest, std::ios::binary);
+    bfree(wsrc);
+    bfree(wdest);
 #else
-    std::ifstream in(qt_to_utf8(src), std::ios::binary);
-    std::ofstream out(qt_to_utf8(dest), std::ios::binary);
+    std::ifstream in(src, std::ios::binary);
+    std::ofstream out(dest, std::ios::binary);
 #endif
 
     bool result = false;
@@ -147,7 +158,7 @@ void download_lyrics(const song* song)
 
     if (song->data() & CAP_LYRICS && last_lyrics != song->lyrics()) {
         last_lyrics = song->lyrics();
-        if (!curl_download(song->lyrics(), config::lyrics_path)) {
+        if (!curl_download(qt_to_utf8(song->lyrics()), config::lyrics_path)) {
             berr("Couldn't dowload lyrics from '%s' to '%s'",
                 qt_to_utf8(song->lyrics()), config::lyrics_path);
         }
@@ -156,7 +167,7 @@ void download_lyrics(const song* song)
 
 void download_cover(const song* song)
 {
-    static QString last_cover = "";
+    static QString last_cover = "n/a";
     bool is_url = song->cover().startsWith("http")
         || song->cover().startsWith("file://");
 
@@ -170,11 +181,11 @@ void download_cover(const song* song)
             found_cover = curl_download(qt_to_utf8(song->cover()), qt_to_utf8(tmp));
             /* Replace cover only after download is done */
             if (found_cover) {
-                move_file(tmp, config::cover_path);
+                move_file(tmp.toStdString().c_str(), config::cover_path);
             }
         } else if (!is_url) {
             last_cover = song->cover();
-            found_cover = move_file(song->cover(), config::cover_path);
+            found_cover = move_file(qt_to_utf8(song->cover()), config::cover_path);
         }
     }
 

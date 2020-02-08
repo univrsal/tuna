@@ -74,8 +74,9 @@ void window_source::refresh()
             matches = regex.match(title.c_str()).hasMatch();
         } else {
             /* Direct search */
-            matches = title.find(m_title.toStdString()) != std::string::npos;
-            if (matches && !m_pause.isEmpty() && title.find(m_pause.toStdString()) != std::string::npos)
+            QString tmp(title.c_str());
+            matches = tmp.contains(m_title);
+            if (matches && !m_pause.isEmpty() && !tmp.contains(m_pause))
                 matches = false;
         }
 

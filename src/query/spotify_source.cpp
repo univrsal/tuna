@@ -92,19 +92,24 @@ bool spotify_source::valid_format(const QString& str)
 }
 
 /* implementation further down */
-void execute_command(const QString& auth_token, const QString& url, QString& response_header,
+long execute_command(const char* auth_token, const char* url, std::string& response_header,
     QJsonDocument& response_json);
 
-void extract_timeout(const QString& header, uint64_t& timeout)
+void extract_timeout(const std::string& header, uint64_t& timeout)
 {
-    static const QString what = "Retry-After: ";
+    static const std::string what = "Retry-After: ";
     timeout = 0;
-    auto idx = header.indexOf(what);
+    size_t pos = header.find(what);
+    size_t end;
 
-    if (idx > -1) {
-        idx += what.length();
-        QStringRef tmp(&header, idx, what.length());
-        timeout = tmp.toULong();
+    if (pos != std::string::npos) {
+        pos += what.length();
+        end = pos;
+        std::string tmp;
+        while (header.at(end) != '\n')
+            end++;
+        tmp = header.substr(pos, end - pos);
+        timeout = std::stoi(tmp);
     }
 }
 
@@ -130,20 +135,26 @@ void spotify_source::refresh()
         }
     }
 
-    QString header = "";
+    std::string header = "";
     QJsonDocument response;
-    execute_command(m_token, PLAYER_URL, header, response);
+    QJsonObject obj;
 
-    if (response["error"].isNull()) {
-        const auto& progress = response["progress_ms"];
-        const auto& device = response["device"];
-        const auto& playing = response["is_playing"];
+    auto http_code = execute_command(m_token.toStdString().c_str(), PLAYER_URL, header, response);
+
+    if (response.isObject())
+        obj = response.object();
+    QString str(response.toJson());
+
+    if (http_code == 200) {
+        const auto& progress = obj["progress_ms"];
+        const auto& device = obj["device"];
+        const auto& playing = obj["is_playing"];
 
         if (device.isObject() && playing.isBool()) {
-            if (device["is_private"].toBool()) {
+            if (device.toObject()["is_private"].toBool()) {
                 berr("Spotify session is private! Can't read track");
             } else {
-                parse_track_json(response["item"]);
+                parse_track_json(obj["item"]);
                 m_current.set_playing(playing.toBool());
             }
             m_current.set_progress(progress.toInt());
@@ -152,14 +163,16 @@ void spotify_source::refresh()
             berr("Couldn't fetch song data from spotify json: %s", str.toStdString().c_str());
         }
     } else {
-        int code = response["status"].toInt(-1);
-        if (code == STATUS_RETRY_AFTER && !header.isEmpty()) {
+        if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
-                bwarn("Spotify-API Rate limit hit, waiting %s seconds\n", m_timeout_length);
+                bwarn("Spotify-API Rate limit hit, waiting %ull seconds\n", m_timeout_length);
                 m_timeout_length *= SECOND_TO_NS;
                 m_timout_start = os_gettime_ns();
             }
+        } else {
+            bwarn("Unknown error occured when querying Spotify-API: %i (response: %s)", http_code,
+                str.toStdString().c_str());
         }
     }
 }
@@ -174,12 +187,15 @@ void spotify_source::parse_track_json(const QJsonValue& track)
 
         /* Get All artists */
         for (const auto artist : artists.toArray())
-            m_current.append_artist(artist.toString());
+            m_current.append_artist(artist.toObject()["name"].toString());
 
         /* Cover link */
         const auto& covers = album["images"];
-        if (covers.isArray())
-            m_current.set_cover_link(covers.toArray()[0].toString());
+        if (covers.isArray()) {
+            QJsonValue v = covers.toArray()[0];
+            if (v.isObject() && v.toObject().contains("url"))
+                m_current.set_cover_link(v.toObject()["url"].toString());
+        }
 
         /* Other stuff */
         m_current.set_title(track["name"].toString());
@@ -199,7 +215,7 @@ void spotify_source::parse_track_json(const QJsonValue& track)
             case 2: /* Fallthrough */
                 m_current.set_month(list[1]);
             case 1: /* Fallthrough */
-                m_current.set_day(list[0]);
+                m_current.set_year(list[0]);
             default:;
             }
         }
@@ -229,12 +245,11 @@ bool spotify_source::execute_capability(capability c)
 
 /* === CURL/Spotify API handling === */
 
-size_t write_callback(char* ptr, size_t size, size_t nmemb, QString* str)
+size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
 {
     size_t new_length = size * nmemb;
     try {
-        str->resize(new_length);
-        str->append(ptr);
+        str->append(ptr, new_length);
     } catch (std::bad_alloc& e) {
         berr("Error reading curl response: %s", e.what());
         return 0;
@@ -242,12 +257,11 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, QString* str)
     return new_length;
 }
 
-size_t header_callback(char* ptr, size_t size, size_t nmemb, QString* str)
+size_t header_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
 {
     size_t new_length = size * nmemb;
     try {
-        str->resize(new_length);
-        str->append(ptr);
+        str->append(ptr, new_length);
     } catch (std::bad_alloc& e) {
         berr("Error reading curl header: %s", e.what());
         return 0;
@@ -255,15 +269,15 @@ size_t header_callback(char* ptr, size_t size, size_t nmemb, QString* str)
     return new_length;
 }
 
-CURL* prepare_curl(struct curl_slist* header, QString* response, QString* response_header,
-    const QString& request)
+CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string* response_header,
+    const std::string& request)
 {
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, TOKEN_URL);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, request.length());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, qt_to_utf8(request));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(request.c_str()));
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
@@ -276,25 +290,25 @@ CURL* prepare_curl(struct curl_slist* header, QString* response, QString* respon
 
 /* Requests an access token via request body
  * over a POST request to spotify */
-void request_token(const QString& request, const QString& credentials, QJsonDocument& response_json)
+void request_token(const std::string& request, const std::string& credentials, QJsonDocument& response_json)
 {
-    if (request.isEmpty() || credentials.isEmpty()) {
+    if (request.empty() || credentials.empty()) {
         berr("Cannot request token without valid credentials"
              " and/or auth code!");
         return;
     }
 
-    QString response, response_header;
-    QString header = "Authorization: Basic ";
+    std::string response, response_header;
+    std::string header = "Authorization: Basic ";
     header.append(credentials);
 
-    auto* list = curl_slist_append(nullptr, qt_to_utf8(header));
+    auto* list = curl_slist_append(nullptr, header.c_str());
     CURL* curl = prepare_curl(list, &response, &response_header, request);
     CURLcode res = curl_easy_perform(curl);
 
     if (res == CURLE_OK) {
         QJsonParseError err;
-        response_json = QJsonDocument::fromJson(response.toUtf8(), &err);
+        response_json = QJsonDocument::fromJson(response.c_str(), &err);
         if (response_json.isNull()) {
             berr("Couldn't parse response to json: %s",
                 err.errorString().toStdString().c_str());
@@ -318,12 +332,12 @@ void request_token(const QString& request, const QString& credentials, QJsonDocu
 /* Gets a new token using the refresh token */
 bool spotify_source::do_refresh_token(QString& log)
 {
-    static QString request;
+    static std::string request;
     bool result = true;
     QJsonDocument response;
     request = "grant_type=refresh_token&refresh_token=";
-    request.append(m_refresh_token);
-    request_token(request, m_creds, response);
+    request.append(m_refresh_token.toStdString());
+    request_token(request, m_creds.toStdString(), response);
 
     if (response.isNull()) {
         return false;
@@ -356,12 +370,13 @@ bool spotify_source::do_refresh_token(QString& log)
 /* Gets the first token from the access code */
 bool spotify_source::new_token(QString& log)
 {
-    static QString request;
+    static std::string request;
     bool result = true;
     QJsonDocument response;
     request = "grant_type=authorization_code&code=";
-    request.append(m_auth_code).append("&redirect_uri=").append(REDIRECT_URI);
-    request_token(request, m_creds, response);
+    request.append(m_auth_code.toStdString());
+    request.append("&redirect_uri=").append(REDIRECT_URI);
+    request_token(request, m_creds.toStdString(), response);
 
     if (response.isObject()) {
         const auto& token = response["access_token"];
@@ -391,33 +406,37 @@ bool spotify_source::new_token(QString& log)
 
 /* Sends commands to spotify api via url */
 
-void execute_command(const QString& auth_token, const QString& url,
-    QString& response_header, QJsonDocument& response_json)
+long execute_command(const char* auth_token, const char* url, std::string& response_header,
+    QJsonDocument& response_json)
 {
-    QString response;
-    QString header = "Authorization: Bearer ";
+    std::string response;
+    std::string header = "Authorization: Bearer ";
+    long http_code = -1;
     header.append(auth_token);
-    auto* list = curl_slist_append(nullptr, qt_to_utf8(header));
+    auto* list = curl_slist_append(nullptr, header.c_str());
 
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_URL, qt_to_utf8(url));
+    curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
-    if (!response_header.isEmpty())
-        bdebug("Response header: %s", qt_to_utf8(response_header));
+    if (!response_header.empty())
+        bdebug("Response header: %s", response_header.c_str());
 
 #ifdef DEBUG
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 #endif
     CURLcode res = curl_easy_perform(curl);
+
     if (res == CURLE_OK) {
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
         QJsonParseError err;
-        response_json = QJsonDocument::fromJson(response.toUtf8(), &err);
-        if (response_json.isNull() && !response.isEmpty())
-            berr("Failed to parse json response: %s, Error: %s", qt_to_utf8(response),
+
+        response_json = QJsonDocument::fromJson(response.c_str(), &err);
+        if (response_json.isNull() && !response.empty())
+            berr("Failed to parse json response: %s, Error: %s", response.c_str(),
                 qt_to_utf8(err.errorString()));
     } else {
         berr("CURL failed while sending spotify command");
@@ -425,4 +444,5 @@ void execute_command(const QString& auth_token, const QString& url,
 
     curl_slist_free_all(list);
     curl_easy_cleanup(curl);
+    return http_code;
 }

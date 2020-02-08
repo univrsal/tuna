@@ -41,19 +41,26 @@ public:
     {
     }
 
-    virtual bool do_format(QString& slice, const song* s) const { return false; };
-    bool replace(QString& slice, const song* s, const QString& data) const;
+    virtual bool do_format(QString& slice, const song* s) const;
+    bool replace(QString& slice, const song* s, const QString& data = "") const;
 
     char get_id() const { return m_id; }
 };
 
-class specifier_int : public specifier {
-    const int* m_data = nullptr;
-
+class specifier_time : public specifier {
 public:
-    specifier_int(char id, int tag_id, const int* data)
+    specifier_time(char id, int tag_id)
         : specifier(id, tag_id)
-        , m_data(data)
+    {
+    }
+
+    bool do_format(QString& slice, const song* s) const override;
+};
+
+class specifier_int : public specifier {
+public:
+    specifier_int(char id, int tag_id)
+        : specifier(id, tag_id)
     {
     }
 
@@ -61,12 +68,22 @@ public:
 };
 
 class specifier_string : public specifier {
-    const QString* m_data;
+public:
+    specifier_string(char id, int tag_id)
+        : specifier(id, tag_id)
+    {
+    }
+
+    bool do_format(QString& slice, const song* s) const override;
+};
+
+class specifier_static : public specifier {
+    QString m_static_value;
 
 public:
-    specifier_string(char id, int tag_id, const QString* data)
-        : specifier(id, tag_id)
-        , m_data(data)
+    specifier_static(char id, const QString& value)
+        : specifier(id, 0)
+        , m_static_value(value)
     {
     }
 
@@ -77,9 +94,8 @@ class specifier_string_list : public specifier {
     const QList<QString>* m_data;
 
 public:
-    specifier_string_list(char id, int tag_id, const QList<QString>* data)
+    specifier_string_list(char id, int tag_id)
         : specifier(id, tag_id)
-        , m_data(data)
     {
     }
 
@@ -95,7 +111,5 @@ public:
 
     bool do_format(QString& slice, const song* s) const override;
 };
-
-extern std::vector<specifier> specifiers;
 
 }

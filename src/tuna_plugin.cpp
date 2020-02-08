@@ -20,6 +20,7 @@
 #include "query/vlc_obs_source.hpp"
 #include "util/config.hpp"
 #include "util/constants.hpp"
+#include "util/format.hpp"
 #include "util/utility.hpp"
 #include <QAction>
 #include <QMainWindow>
@@ -46,6 +47,7 @@ void register_gui()
 
 bool obs_module_load()
 {
+    format::init();
     util::load_vlc();
     config::load();
     register_gui();

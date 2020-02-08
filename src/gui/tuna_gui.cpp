@@ -112,12 +112,12 @@ void tuna_gui::toggleShowHide()
         config::load_gui_values();
 
         /* setup config values */
-        ui->txt_song_cover->setText(utf8_to_qt(CGET_STR(CFG_COVER_PATH)));
-        ui->txt_song_lyrics->setText(utf8_to_qt(CGET_STR(CFG_LYRICS_PATH)));
+        ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
+        ui->txt_song_lyrics->setText(utf8_to_qt(config::lyrics_path));
         ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
-        ui->sb_refresh_rate->setValue(CGET_UINT(CFG_REFRESH_RATE));
-        ui->txt_song_placeholder->setText(utf8_to_qt(CGET_STR(CFG_SONG_PLACEHOLDER)));
-        ui->cb_dl_cover->setChecked(CGET_BOOL(CFG_DOWNLOAD_COVER));
+        ui->sb_refresh_rate->setValue(config::refresh_rate);
+        ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
+        ui->cb_dl_cover->setChecked(config::download_cover);
         set_state();
 
         /* Load table contents */
@@ -209,7 +209,9 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
 
-    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
+    auto tmp = ui->txt_song_placeholder->text();
+    //    tmp = tmp.prepend("|").append("|"); /* Prevent trimming of leading and trailing spaces */
+    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(tmp));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */

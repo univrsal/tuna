@@ -91,8 +91,7 @@ void vlc_obs_source::refresh()
         m_current.clear();
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_time_(vlc->media_player));
-        m_current.set_playing(libvlc_media_player_get_state_(vlc->media_player)
-            == libvlc_Playing);
+        m_current.set_playing(libvlc_media_player_get_state_(vlc->media_player) == libvlc_Playing);
 
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
         if (media) {

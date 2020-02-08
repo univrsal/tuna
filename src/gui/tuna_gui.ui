@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -1372,14 +1372,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span
-                                            style=&quot; font-size:16pt;&quot;&gt;tuna&lt;/span&gt;&lt;/p&gt;&lt;p
-                                            align=&quot;center&quot;&gt;&lt;a href=&quot;https://github.com/univrsal/tuna&quot;&gt;&lt;span
-                                            style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;github.com/univrsal/tuna&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Display
-                                            information about currently playing music directly within obs.&lt;/p&gt;&lt;p&gt;Depends
-                                            on Qt, libobs, libmpdclient, curl and jansson.&lt;/p&gt;&lt;p&gt;Tuna is
-                                            licensed under the GPL v2.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
-                                        </string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;tuna&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;https://github.com/univrsal/tuna&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;github.com/univrsal/tuna&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Display information about currently playing music directly within obs.&lt;/p&gt;&lt;p&gt;Depends on Qt, libobs, libmpdclient and curl.&lt;/p&gt;&lt;p&gt;Tuna is licensed under the GPL v2.0 &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>

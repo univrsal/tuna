@@ -42,7 +42,7 @@ void load_vlc();
 
 void unload_vlc();
 
-bool curl_download(const QString& url, const QString& path);
+bool curl_download(const char* url, const char* path);
 
 void download_cover(const song* song);
 
@@ -50,7 +50,7 @@ void download_lyrics(const song* song);
 
 void handle_outputs(const song* song);
 
-bool move_file(const QString& src, const QString& dest);
+bool move_file(const char* src, const char* dest);
 
 int64_t epoch();
 

@@ -60,15 +60,11 @@ public:
     uint16_t data() const { return m_data; }
     const QString& cover() const { return m_cover; }
     const QString& lyrics() const { return m_lyrics; }
-    const QString* title() const { return &m_title; }
-    const QString* album() const { return &m_album; }
-    const QString* year() const { return &m_year; }
-    const QString* month() const { return &m_month; }
-    const QString* day() const { return &m_day; }
-    const QList<QString>* artists() const { return &m_artists; }
-    const int32_t* disc() const { return &m_disc_number; }
-    const int32_t* track() const { return &m_track_number; }
-    const int32_t* progress() const { return &m_progress_ms; }
-    const int32_t* duration() const { return &m_duration_ms; }
+    const QString& year() const { return m_year; }
+    const QString& month() const { return m_month; }
+    const QString& day() const { return m_day; }
+    const QString& get_string_value(char specififer) const;
+    const QList<QString>& artists() const { return m_artists; }
+    int32_t get_int_value(char specifier) const;
     date_precision release_precision() const { return m_release_precision; }
 };

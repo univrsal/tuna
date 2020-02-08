@@ -38,9 +38,9 @@ void song::clear()
     m_progress_ms = 0;
     m_is_playing = false;
     m_is_explicit = false;
-    m_day = "n/a";
-    m_month = "n/a";
-    m_year = "n/a";
+    m_day = "";
+    m_month = "";
+    m_year = "";
 }
 
 void song::update_release_precision()
@@ -143,4 +143,34 @@ void song::set_day(const QString& d)
     m_data |= CAP_RELEASE;
     m_day = d;
     update_release_precision();
+}
+
+const QString& song::get_string_value(char specifier) const
+{
+    switch (specifier) {
+    case 't':
+        return m_title;
+    case 'a':
+        return m_album;
+    case 'y':
+        return m_year;
+    default:
+        return "";
+    }
+}
+
+int32_t song::get_int_value(char specifier) const
+{
+    switch (specifier) {
+    case 'd':
+        return m_disc_number;
+    case 'a':
+        return m_track_number;
+    case 'p':
+        return m_progress_ms;
+    case 'l':
+        return m_duration_ms;
+    default:
+        return 0;
+    }
 }
