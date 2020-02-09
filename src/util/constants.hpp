@@ -49,7 +49,7 @@
 
 #define T_VLC_NONE 				T_("tuna.gui.vlc.none")
 #define T_VLC_VERSION_ISSUE		T_("tuna.gui.vlc.issue.message")
-#define T_ERROR_TITLE			T_("tuna.gui.error.title")
+#define T_ERROR_TITLE			T_("tuna.gui.issue.title")
 #define FILTER(name, type) 		name " (" type ");;All Files(*)"
 
 /* Outputs are saved into config folder on linux, but on windows

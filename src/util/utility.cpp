@@ -47,7 +47,7 @@ bool vlc_loaded = true;
 void load_vlc()
 {
     auto ver = obs_get_version();
-    if (obs_get_version() != LIBOBS_API_VER) {
+    if (obs_get_version() != 0){//LIBOBS_API_VER) {
         int major = ver >> 24 & 0xFF;
         int minor = ver >> 16 & 0xFF;
         int patch = ver & 0xFF;
@@ -56,13 +56,23 @@ void load_vlc()
               " VLC sources to work",
             major, minor, patch, LIBOBS_API_MAJOR_VER,
             LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
-        bool result = QMessageBox::question(nullptr, T_ERROR_TITLE, T_VLC_VERSION_ISSUE)
-            == QMessageBox::StandardButton::Yes;
-        if (result) {
-            bwarn("User force enabled VLC support");
+
+        bool result = CGET_BOOL(CFG_FORCE_VLC_DECISION);
+
+        /* If this is the first startup with the new version
+         * ask user */
+        if (!CGET_BOOL(CFG_ERROR_MESSAGE_SHOWN)) {
+            result = QMessageBox::question(nullptr, T_ERROR_TITLE, T_VLC_VERSION_ISSUE)
+                == QMessageBox::StandardButton::Yes;
         }
+
+        if (result)
+            bwarn("User force enabled VLC support");
+        CSET_BOOL(CFG_FORCE_VLC_DECISION, result);
     } else {
-        /* reset warning boolean */
+        /* reset warning config */
+        CSET_BOOL(CFG_ERROR_MESSAGE_SHOWN, false);
+        CSET_BOOL(CFG_FORCE_VLC_DECISION, false);
     }
 
     if (vlc_loaded) {

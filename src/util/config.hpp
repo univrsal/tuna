@@ -72,6 +72,8 @@
 #define CFG_MPD_LOCAL 					"mpd.local"
 
 #define CFG_VLC_ID 						"vlc.id"
+#define CFG_FORCE_VLC_DECISION			"vlc.force.enable"
+#define CFG_ERROR_MESSAGE_SHOWN			"vlc.error.message.shown"
 
 #define CFG_WINDOW_TITLE 				"window.title"
 #define CFG_WINDOW_PAUSE 				"window.title.pause"

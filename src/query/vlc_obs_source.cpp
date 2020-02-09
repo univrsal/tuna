@@ -91,6 +91,9 @@ struct vlc_source* vlc_obs_source::get_vlc()
         if (data) {
             return reinterpret_cast<struct vlc_source*>(data);
         }
+    } else if (m_weak_src) { /* The actual source is gone -> clear the weak source */
+        obs_weak_source_release(m_weak_src);
+        load(); /* Try and load it again */
     }
     return nullptr;
 }
