@@ -3,7 +3,6 @@
 extern "C" {
 #endif
 
-#include <libvlc.h>
 #include <obs-module.h>
 
 #ifdef _MSC_VER
@@ -11,14 +10,18 @@ extern "C" {
 typedef SSIZE_T ssize_t;
 #endif
 
-/* clang-format off */
+#ifndef DISABLE_TUNA_VLC
+
+// clang-format off
 /* Include order is important, otherwise it won't compile */
-#include <libvlc_events.h>
+#include <libvlc.h>
 #include <libvlc_media.h>
 #include <libvlc_media_list.h>
-#include <libvlc_media_list_player.h>
+#include <libvlc_events.h>
 #include <libvlc_media_player.h>
-/* clang-format on */
+#include <libvlc_media_list_player.h>
+
+// clang-format on
 
 /* Lord forgive me for this atrocity */
 #define private priv
@@ -103,6 +106,14 @@ struct vlc_source {
     obs_hotkey_id playlist_next_hotkey;
     obs_hotkey_id playlist_prev_hotkey;
 };
+
+#else
+bool load_libvlc(void) { return false; }
+
+bool load_libvlc_module() { return false;}
+bool load_vlc_funcs() { return false; }
+void unload_libvlc() {}
+#endif /* DISABLE VLC*/
 
 #ifdef __cplusplus
 }

@@ -2,6 +2,8 @@
 #include <windows.h>
 #endif
 
+#ifndef DISABLE_TUNA_VLC
+
 #include "vlc_internal.h"
 #include <util/platform.h>
 
@@ -138,3 +140,4 @@ void unload_libvlc(void)
     if (libvlc_module)
         os_dlclose(libvlc_module);
 }
+#endif /* DISABLE VLC */

@@ -107,7 +107,13 @@ void load()
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
-    placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
+
+    /* The config system seems to remove leading and trailing spaces
+     * so the user can use '\s' as a placeholder, which will then
+     * be turned into actual spaces here */
+    auto tmp = utf8_to_qt(CGET_STR(CFG_SONG_PLACEHOLDER));
+    tmp.replace("\\s", " ");
+    placeholder = qt_to_utf8(tmp);
 
     /* Sources */
     if (!spotify)

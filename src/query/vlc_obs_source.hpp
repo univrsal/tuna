@@ -24,14 +24,8 @@
 class vlc_obs_source : public music_source {
     const char* m_target_source_name;
     obs_weak_source_t* m_weak_src = nullptr;
-
-    /* If obs version changed since the plugin was
-     * compiled, vlc source will be disabled since its
-     * functionality is based on some hacks that can easily
-     * break in between obs versions */
-    struct vlc_source* get_vlc();
     bool m_lib_vlc_loaded = false;
-
+    struct vlc_source* get_vlc();
 public:
     vlc_obs_source();
     ~vlc_obs_source();
@@ -43,17 +37,3 @@ public:
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;
 };
-
-#if DISABLE_TUNA_VLC
-
-/* Stubs */
-vlc_obs_source::vlc_obs_source() {}
-vlc_obs_source::~vlc_obs_source() {}
-
-void vlc_obs_source::load() {}
-void vlc_obs_source::save() {}
-void vlc_obs_source::refresh() {}
-void vlc_obs_source::load_gui_values() {}
-bool vlc_obs_source::execute_capability(capability c) { return true; }
-
-#endif

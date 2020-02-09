@@ -209,9 +209,7 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
 
-    auto tmp = ui->txt_song_placeholder->text();
-    //    tmp = tmp.prepend("|").append("|"); /* Prevent trimming of leading and trailing spaces */
-    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(tmp));
+    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */

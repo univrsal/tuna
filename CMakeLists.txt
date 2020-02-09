@@ -26,6 +26,7 @@ set(tuna_ui
         src/gui/tuna_gui.ui
         src/gui/output_edit_dialog.ui)
 
+find_package(LibVLC QUIET)
 
 if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     add_definitions(-DLINUX=1)
@@ -35,15 +36,12 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     set(tuna_platform_deps
             mpdclient)
     set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
-    find_package(LibVLC QUIET)
 endif ()
 
 if (MSVC)
    set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
    set(tuna_platform_deps
             w32-pthreads)
-   set(LIBVLC_INCLUDE_DIRS "./libvlc/include")
-   set(LIBVLC_INCLUDES_FOUND TRUE)
 endif ()
 
 if (NOT LIBVLC_INCLUDES_FOUND AND ENABLE_VLC)
@@ -54,6 +52,7 @@ elseif (NOT LIBVLC_INCLUDES_FOUND)
     add_definitions(-DDISABLE_TUNA_VLC=1)
 else()
     message(STATUS "[tuna] LibVLC headers found, VLC source support enabled")
+    message(STATUS "[tuna] If you want VLC support, clone the VLC repo and point LIBVLC_INCLUDE_DIRS to it")
 endif()
 
 if (DISABLE_VLC)

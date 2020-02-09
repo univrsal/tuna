@@ -17,6 +17,20 @@
  *************************************************************************/
 
 #include "vlc_obs_source.hpp"
+
+#ifdef DISABLE_TUNA_VLC
+/* Stubs */
+vlc_obs_source::vlc_obs_source() {}
+vlc_obs_source::~vlc_obs_source() {}
+
+void vlc_obs_source::load() {}
+void vlc_obs_source::save() {}
+void vlc_obs_source::refresh() {}
+void vlc_obs_source::load_gui_values() {}
+bool vlc_obs_source::execute_capability(capability c) { return true; }
+bool vlc_obs_source::valid_format(const QString &str) { return true; }
+struct vlc_source *vlc_obs_source::get_vlc() { return nullptr; }
+#else
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
 #include "../util/utility.hpp"
@@ -157,3 +171,4 @@ bool vlc_obs_source::valid_format(const QString& str)
 {
     return true;
 }
+#endif
