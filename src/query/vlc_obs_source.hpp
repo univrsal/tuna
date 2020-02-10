@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #pragma once
+#include "../util/constants.hpp"
 #include "music_source.hpp"
 #include <QString>
 #include <obs-module.h>
@@ -27,6 +28,7 @@ class vlc_obs_source : public music_source {
     struct vlc_source* get_vlc();
 
     void reload();
+
 public:
     vlc_obs_source();
     ~vlc_obs_source();
@@ -34,7 +36,30 @@ public:
     void load() override;
     void save() override;
     void refresh() override;
-    void load_gui_values() override;
+    void set_gui_values() override;
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;
+    const char* name() const override;
+    bool enabled() const override;
 };
+
+#ifdef DISABLE_TUNA_VLC
+vlc_obs_source::vlc_obs_source()
+{
+}
+vlc_obs_source::~vlc_obs_source() {}
+
+void vlc_obs_source::load() {}
+void vlc_obs_source::save() {}
+void vlc_obs_source::refresh() {}
+void vlc_obs_source::load_gui_values() {}
+bool vlc_obs_source::execute_capability(capability c) { return true; }
+bool vlc_obs_source::valid_format(const QString& str) { return true; }
+struct vlc_source* vlc_obs_source::get_vlc() { return nullptr; }
+bool vlc_obs_source::enabled() const { return false; }
+
+const char* vlc_obs_source::name() const
+{
+    return T_SOURCE_VLC;
+}
+#endif

@@ -38,6 +38,7 @@
 #include <obs-module.h>
 #include <random>
 #include <util/platform.h>
+#include <exception>
 
 tuna_gui* tuna_dialog = nullptr;
 
@@ -69,9 +70,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     }
     ui->btn_performrefresh->setEnabled(logged_in);
 
-#ifdef LINUX
-    ui->cb_source->addItem(T_SOURCE_MPD);
-#else
+#ifndef LINUX
     ui->settings_tabs->removeTab(2);
 #endif
 
@@ -81,6 +80,12 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->lbl_vlc_disabled->setVisible(!util::vlc_loaded);
     ui->btn_refresh_vlc->setEnabled(util::vlc_loaded);
     ui->cb_vlc_source_name->setEnabled(util::vlc_loaded);
+
+    /* Add sources */
+    for (const auto& src : source::instances) {
+        if (src->enabled())
+            ui->cb_source->addItem(utf8_to_qt(src->name()));
+    }
 
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
@@ -111,7 +116,7 @@ void tuna_gui::toggleShowHide()
     if (isVisible()) {
         /* Load config values for sources on dialog show */
         load_vlc_sources();
-        config::load_gui_values();
+        source::set_gui_values();
 
         /* setup config values */
         ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
@@ -167,9 +172,14 @@ void tuna_gui::on_txt_auth_code_textChanged(const QString& arg1)
 void tuna_gui::apply_login_state(bool state, const QString& log)
 {
     if (state) {
-        ui->txt_token->setText(config::spotify->token());
-        ui->txt_refresh_token->setText(
-            config::spotify->refresh_token());
+        try {
+            auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
+            ui->txt_token->setText(spotify->token());
+            ui->txt_refresh_token->setText(
+                spotify->refresh_token());
+        } catch (std::invalid_argument& e) {
+            berr("apply_login_state failed with: %s", e.what());
+        }
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
         ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
                                             "font-weight: bold;}");
@@ -191,16 +201,32 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
 void tuna_gui::on_btn_request_token_clicked()
 {
     QString log;
-    config::spotify->set_auth_code(ui->txt_auth_code->text());
-    bool result = config::spotify->new_token(log);
+    bool result = false;
+    try {
+        auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
+        spotify->set_auth_code(ui->txt_auth_code->text());
+        result = spotify->new_token(log);
+    } catch (std::invalid_argument& e) {
+        log = "on_btn_request_clicked failed with: ";
+        log += e.what();
+        berr("on_btn_request_clicked failed with: %s", e.what());
+    }
     apply_login_state(result, log);
 }
 
 void tuna_gui::on_btn_performrefresh_clicked()
 {
     QString log;
-    config::spotify->set_auth_code(ui->txt_auth_code->text());
-    bool result = config::spotify->do_refresh_token(log);
+    bool result = false;
+    try {
+        auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
+        spotify->set_auth_code(ui->txt_auth_code->text());
+        result = spotify->do_refresh_token(log);
+    } catch (std::invalid_argument& e) {
+        log = "on_btn_performrefresh_clicked failed with: ";
+        log += e.what();
+        berr("on_btn_performrefresh_clicked failed with: %s", e.what());
+    }
     apply_login_state(result, log);
 }
 

@@ -39,27 +39,18 @@ class spotify_source : public music_source {
 public:
     spotify_source();
 
+    const char* name() const override;
+    bool enabled() const override;
     void load() override;
-
     void save() override;
-
     void refresh() override;
-
-    void load_gui_values() override;
-
+    void set_gui_values() override;
     bool execute_capability(capability c) override;
-
     bool valid_format(const QString& str) override;
-
     bool do_refresh_token(QString& log);
-
     bool new_token(QString& log);
-
     void set_auth_code(const QString& auth_code) { m_auth_code = auth_code; }
-
     const QString& auth_code() const { return m_auth_code; }
-
     const QString& token() const { return m_token; }
-
     const QString& refresh_token() const { return m_refresh_token; }
 };

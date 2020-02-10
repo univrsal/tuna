@@ -85,31 +85,9 @@
 
 /* clang-format on */
 
-class spotify_source;
-
-class window_source;
-
-class mpd_source;
-
-class vlc_obs_source;
-
-class music_source;
-
 namespace config {
-enum source {
-    src_spotify,
-    src_window_title,
-    src_vlc_obs,
-    src_mpd,
-    src_count
-};
 
-extern music_source* selected_source;
 extern config_t* instance;
-extern vlc_obs_source* vlc_obs;
-extern spotify_source* spotify;
-extern window_source* window;
-extern mpd_source* mpd;
 
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
@@ -120,8 +98,6 @@ extern QList<QPair<QString, QString>> outputs;
 extern const char* cover_placeholder;
 extern bool download_cover;
 
-void load_gui_values();
-
 void init();
 
 void load();
@@ -129,8 +105,6 @@ void load();
 void save();
 
 void close();
-
-void select_source(source s);
 
 void load_outputs(QList<QPair<QString, QString>>& table_content);
 

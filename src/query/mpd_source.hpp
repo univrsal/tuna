@@ -17,9 +17,10 @@
  *************************************************************************/
 
 #pragma once
-#ifdef LINUX
-
+#include "../util/constants.hpp"
 #include "music_source.hpp"
+
+#ifdef LINUX
 #include <mpd/client.h>
 
 class mpd_source : public music_source {
@@ -49,10 +50,33 @@ public:
 
     bool valid_format(const QString& str) override;
 
+    const char* name() const override;
+
+    bool enabled() const override;
+
 private:
     void connect();
 
     void disconnect();
 };
+#else
 
+class mpd_source : public music_source {
+public:
+    mpd_source() = default;
+    ~mpd_source() {}
+    void load() override {}
+    void save() override {}
+    void refresh() override {}
+    void set_gui_values() override {}
+    bool execute_capability(capability c) override { return false; }
+    bool valid_format(const QString& str) override { return false; }
+    const char* name() const override;
+    bool enabled() const override { return false; }
+};
 #endif
+
+const char* mpd_source::name() const
+{
+    return T_SOURCE_MPD;
+}

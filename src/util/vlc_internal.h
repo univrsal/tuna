@@ -110,7 +110,7 @@ struct vlc_source {
 #else
 bool load_libvlc(void) { return false; }
 
-bool load_libvlc_module() { return false;}
+bool load_libvlc_module() { return false; }
 bool load_vlc_funcs() { return false; }
 void unload_libvlc() {}
 #endif /* DISABLE VLC*/

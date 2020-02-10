@@ -20,6 +20,7 @@
 
 #include "song.hpp"
 #include <QDate>
+#include <memory>
 #include <stdint.h>
 
 /* clang-format off */
@@ -70,19 +71,38 @@ public:
     const song* song_info() { return &m_current; }
 
     /* Abstract stuff */
-
+    virtual const char* name() const = 0;
+    virtual bool enabled() const = 0;
     /* Save/load config values */
     virtual void load() = 0;
-
     virtual void save() = 0;
-
     /* Perform information query */
     virtual void refresh() = 0;
-
     /* Execute and return true if successful */
     virtual bool execute_capability(capability c) = 0;
-
-    virtual void load_gui_values() = 0;
-
+    virtual void set_gui_values() = 0;
     virtual bool valid_format(const QString& str) = 0;
 };
+
+namespace source {
+extern QList<std::shared_ptr<music_source>> instances;
+extern void init();
+extern void load();
+extern void save();
+extern void set_gui_values();
+extern void deinit();
+extern void select(const char* id);
+extern std::shared_ptr<music_source> selected_source();
+
+template <class T>
+std::shared_ptr<T> get(const char* id)
+{
+    for (auto src : instances) {
+        if (strcmp(src->name(), id) == 0) {
+            return std::dynamic_pointer_cast<T>(src);
+        }
+    }
+
+    throw std::invalid_argument("Couldn't get music source for provided id");
+}
+}

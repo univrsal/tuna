@@ -78,6 +78,7 @@ set(tuna_sources
     ./src/gui/output_edit_dialog.cpp
     ./src/gui/output_edit_dialog.hpp
     ./src/query/music_source.hpp
+    ./src/query/music_source.cpp
     ./src/query/spotify_source.cpp
     ./src/query/spotify_source.hpp
     ./src/query/mpd_source.cpp

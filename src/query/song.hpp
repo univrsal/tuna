@@ -19,7 +19,6 @@
 #pragma once
 #include <QList>
 #include <QString>
-#include <memory>
 #include <stdint.h>
 
 enum date_precision {

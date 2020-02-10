@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="settings_tabs">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -495,21 +495,6 @@
               <height>0</height>
              </size>
             </property>
-            <item>
-             <property name="text">
-              <string>tuna.gui.tab.spotify</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>tuna.gui.tab.window_title</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>tuna.gui.tab.vlc</string>
-             </property>
-            </item>
            </widget>
           </item>
          </layout>

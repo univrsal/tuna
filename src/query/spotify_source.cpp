@@ -42,6 +42,16 @@ spotify_source::spotify_source()
     m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
 }
 
+const char *spotify_source::name() const
+{
+    return T_SOURCE_SPOTIFY;
+}
+
+bool spotify_source::enabled() const
+{
+    return true;
+}
+
 void spotify_source::load()
 {
     CDEF_BOOL(CFG_SPOTIFY_LOGGEDIN, false);
@@ -69,7 +79,7 @@ void spotify_source::load()
     }
 }
 
-void spotify_source::load_gui_values()
+void spotify_source::set_gui_values()
 {
     tuna_dialog->set_spotify_auth_code(m_auth_code);
     tuna_dialog->set_spotify_auth_token(m_token);

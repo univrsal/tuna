@@ -16,21 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+
+#ifndef DISABLE_TUNA_VLC
 #include "vlc_obs_source.hpp"
-
-#ifdef DISABLE_TUNA_VLC
-/* Stubs */
-vlc_obs_source::vlc_obs_source() {}
-vlc_obs_source::~vlc_obs_source() {}
-
-void vlc_obs_source::load() {}
-void vlc_obs_source::save() {}
-void vlc_obs_source::refresh() {}
-void vlc_obs_source::load_gui_values() {}
-bool vlc_obs_source::execute_capability(capability c) { return true; }
-bool vlc_obs_source::valid_format(const QString &str) { return true; }
-struct vlc_source *vlc_obs_source::get_vlc() { return nullptr; }
-#else
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
 #include "../util/utility.hpp"
@@ -50,11 +38,21 @@ vlc_obs_source::~vlc_obs_source()
     m_weak_src = nullptr;
 }
 
+const char *vlc_obs_source::name() const
+{
+    return T_SOURCE_VLC;
+}
+
 void vlc_obs_source::reload()
 {
     if (m_weak_src)
         return;
     load();
+}
+
+bool vlc_obs_source::enabled() const
+{
+    return util::vlc_loaded;
 }
 
 void vlc_obs_source::load()
@@ -120,7 +118,9 @@ void vlc_obs_source::refresh()
     auto* vlc = get_vlc();
 
     if (vlc) {
-//        pthread_mutex_lock(&vlc->mutex);
+        /* Locking source mutex (vlc->mutex) here
+         * seems to cause a crash
+         **/
         m_current.clear();
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_time_(vlc->media_player));
@@ -152,7 +152,6 @@ void vlc_obs_source::refresh()
             if (disc)
                 m_current.set_disc_number(std::stoi(disc));
         }
-//        pthread_mutex_unlock(&vlc->mutex);
     } else {
         m_current.clear();
     }
@@ -160,29 +159,11 @@ void vlc_obs_source::refresh()
 
 bool vlc_obs_source::execute_capability(capability c)
 {
-    auto* vlc = get_vlc();
-    if (vlc) {
-        switch (c) {
-        case CAP_NEXT_SONG:
-            break;
-        case CAP_PREV_SONG:
-            break;
-        case CAP_VOLUME_UP:
-            break;
-        case CAP_VOLUME_DOWN:
-            break;
-        case CAP_VOLUME_MUTE:
-            break;
-        case CAP_PLAY_PAUSE:
-            //if (libvlc_media_player_can_pause(vlc->media_player))
-            //    libvlc_media_player_pause(vlc->media_player);
-            break;
-        }
-    }
+    /* vlc source already has hotkeys in obs */
     return true;
 }
 
-void vlc_obs_source::load_gui_values()
+void vlc_obs_source::set_gui_values()
 {
     if (m_target_source_name)
         tuna_dialog->select_vlc_source(utf8_to_qt(m_target_source_name));

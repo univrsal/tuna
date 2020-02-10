@@ -76,15 +76,14 @@ void* thread_method(void*)
 {
     while (thread_state) {
         mutex.lock();
-        if (config::selected_source) {
-            config::selected_source->refresh();
-            auto* s = config::selected_source->song_info();
+        auto ref = source::selected_source();
+        ref->refresh();
+        auto* s = ref->song_info();
 
-            /* Process song data */
-            util::download_cover(s);
-            util::download_lyrics(s);
-            util::handle_outputs(s);
-        }
+        /* Process song data */
+        util::download_cover(s);
+        util::download_lyrics(s);
+        util::handle_outputs(s);
 
         mutex.unlock();
         os_sleep_ms(config::refresh_rate);

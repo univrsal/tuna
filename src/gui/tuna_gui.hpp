@@ -35,90 +35,49 @@ public:
     ~tuna_gui();
 
     void toggleShowHide();
-
     void apply_login_state(bool state, const QString& log);
-
     void select_vlc_source(const QString& id);
-
     void set_spotify_auth_code(const QString& str);
-
     void set_spotify_auth_token(const QString& str);
-
     void set_spotify_refresh_token(const QString& str);
-
     void set_mpd_ip(const QString& ip);
-
     void set_mpd_port(uint16_t port);
-
     void set_mpd_local(bool state);
-
     void set_window_title(const QString& str);
-
     void set_window_search(const QString& str);
-
     void set_window_pause(const QString& str);
-
     void set_window_replace(const QString& str);
-
     void set_window_cut_begin(uint16_t n);
-
     void set_window_cut_end(uint16_t n);
-
     void set_window_regex(bool state);
-
     void add_output(const QString& format, const QString& path);
-
     void edit_output(const QString& format, const QString& path);
-
     void get_selected_output(QString& format, QString& path);
 private slots:
 
     void choose_file(QString& path, const char* title, const char* file_types);
-
     void on_apply_pressed();
-
     void on_btn_sp_show_auth_pressed();
-
     void on_btn_sp_show_auth_released();
-
     void on_btn_open_login_clicked();
-
     void on_txt_auth_code_textChanged(const QString& arg1);
-
     void on_btn_request_token_clicked();
-
     void on_btn_performrefresh_clicked();
-
     void on_tuna_gui_accepted();
-
     void on_btn_start_clicked();
-
     void set_state();
-
     void on_btn_stop_clicked();
-
     void on_btn_sp_show_token_pressed();
-
     void on_btn_sp_show_token_released();
-
     void on_btn_sp_show_refresh_token_pressed();
-
     void on_btn_sp_show_refresh_token_released();
-
     void on_checkBox_stateChanged(int arg1);
-
     void on_btn_browse_song_cover_clicked();
-
     void on_btn_browse_song_lyrics_clicked();
-
     void on_btn_add_output_clicked();
-
     void on_btn_remove_output_clicked();
-
     void on_btn_edit_output_clicked();
-
     void on_cb_local_clicked(bool checked);
-
     void on_pb_refresh_vlc_clicked();
 
 private:
