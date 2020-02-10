@@ -2,19 +2,20 @@
 param([string]$version)
 [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
 
-$base_dir = "C:\Users\usr\Documents\git\"
+$base_dir = "E:\projects\obs\obs-studio\"
 $data_dir = "../data"
 $project = "tuna"
 $arch_both = "win32.64"
 $arch_64 = "win64"
 $msvc = "2017"
-$qt = "5_9_8"
+$qt = "5_12_2"
+$build = "RelWithDebInfo"
 
 $build_location_x32 = $base_dir + "build\x32\rundir\Release\obs-plugins\32bit"
-$qtc_build_location_x32 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_32bit-Release\rundir\Release\obs-plugins\32bit"
+$qtc_build_location_x32 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_32bit-" + $build +"\rundir\" + $build + "\obs-plugins\32bit"
 
 $build_location_x64 = $base_dir + "build\x64\rundir\Release\obs-plugins\64bit"
-$qtc_build_location_x64 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_64bit-Release\rundir\Release\obs-plugins\64bit"
+$qtc_build_location_x64 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_64bit-" + $build + "\rundir\" + $build + "\obs-plugins\64bit"
 
 
 $zip = "C:/Program Files/7-Zip/7z.exe"
@@ -66,10 +67,12 @@ New-Item $build_dir/plugin/obs-plugins/64bit -itemtype directory
 if ($x86) {
     echo("Fetching build from $build_location_x32")
     Copy-Item $build_location_x32/$project.dll -Destination $build_dir/plugin/obs-plugins/32bit/
+    Copy-Item $build_location_x32/$project.pdb -Destination $build_dir/plugin/obs-plugins/32bit/
 }
 
 echo("Fetching build from $build_location_x64")
 Copy-Item $build_location_x64/$project.dll -Destination $build_dir/plugin/obs-plugins/64bit/
+Copy-Item $build_location_x64/$project.pdb -Destination $build_dir/plugin/obs-plugins/64bit/
 
 echo("Fetching data")
 Copy-Item $data_dir/* -Destination $build_dir/plugin/data/obs-plugins/$project/ -Recurse
