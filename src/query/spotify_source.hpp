@@ -40,6 +40,7 @@ public:
     spotify_source();
 
     const char* name() const override;
+    const char* id() const override;
     bool enabled() const override;
     void load() override;
     void save() override;

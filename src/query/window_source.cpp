@@ -19,8 +19,8 @@
 #include "window_source.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
-#include "../util/utility.hpp"
 #include "../util/constants.hpp"
+#include "../util/utility.hpp"
 #include "../util/window/window_helper.hpp"
 #include <QRegularExpression>
 
@@ -29,9 +29,14 @@ window_source::window_source()
     m_capabilities = CAP_TITLE;
 }
 
-const char *window_source::name() const
+const char* window_source::name() const
 {
     return T_SOURCE_WINDOW_TITLE;
+}
+
+const char* window_source::id() const
+{
+    return S_SOURCE_WINDOW_TITLE;
 }
 
 bool window_source::enabled() const

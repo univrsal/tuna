@@ -55,7 +55,7 @@
 #define CFG_SONG_PATH 					"song_path"
 #define CFG_COVER_PATH 					"cover_path"
 #define CFG_LYRICS_PATH 				"lyrics_path"
-#define CFG_SELECTED_SOURCE 			"source"
+#define CFG_SELECTED_SOURCE 			"music.source"
 #define CFG_REFRESH_RATE 				"refresh_rate"
 #define CFG_SONG_FORMAT 				"song_format"
 #define CFG_SONG_PLACEHOLDER 			"song_placeholder"

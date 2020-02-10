@@ -184,7 +184,7 @@ void download_lyrics(const song* song)
 
 void download_cover(const song* song)
 {
-    static QString last_cover = "n/a";
+    static QString last_cover = "";
     bool is_url = song->cover().startsWith("http")
         || song->cover().startsWith("file://");
 

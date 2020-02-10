@@ -38,6 +38,7 @@ void song::clear()
     m_progress_ms = 0;
     m_is_playing = false;
     m_is_explicit = false;
+    m_release_precision = prec_unknown;
     m_day = "";
     m_month = "";
     m_year = "";
@@ -52,7 +53,7 @@ void song::update_release_precision()
     } else if (!m_year.isEmpty()) {
         m_release_precision = prec_year;
     } else {
-        m_release_precision = prec_unkown;
+        m_release_precision = prec_unknown;
     }
 }
 

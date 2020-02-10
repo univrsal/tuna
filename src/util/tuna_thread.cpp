@@ -84,7 +84,7 @@ void* thread_method(void*)
         util::download_cover(s);
         util::download_lyrics(s);
         util::handle_outputs(s);
-
+        ref.reset();
         mutex.unlock();
         os_sleep_ms(config::refresh_rate);
     }

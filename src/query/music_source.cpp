@@ -16,70 +16,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#include "../util/utility.hpp"
 #include "music_source.hpp"
-#include "spotify_source.hpp"
+#include "../util/utility.hpp"
 #include "mpd_source.hpp"
+#include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "window_source.hpp"
 #include <exception>
 
 namespace source {
-    int selected_index = 0;
-    QList<std::shared_ptr<music_source>> instances;
+int selected_index = 0;
+QList<std::shared_ptr<music_source>> instances;
 
-    void init()
-    {
-        instances.append(std::make_shared<spotify_source>());
-        instances.append(std::make_shared<mpd_source>());
-        instances.append(std::make_shared<vlc_obs_source>());
-        instances.append(std::make_shared<window_source>());
+void init()
+{
+    instances.append(std::make_shared<spotify_source>());
+    instances.append(std::make_shared<mpd_source>());
+    instances.append(std::make_shared<vlc_obs_source>());
+    instances.append(std::make_shared<window_source>());
+}
+
+void load()
+{
+    for (auto& src : instances)
+        src->load();
+}
+
+void save()
+{
+    for (auto& src : instances)
+        src->save();
+}
+
+void select(const char* id)
+{
+    if (!id)
+        return;
+    int i = 0;
+    for (auto src : instances) {
+        if (strcmp(src->id(), id) == 0) {
+            selected_index = i;
+            break;
+        }
+        i++;
     }
+}
 
-    void load()
-    {
-        for (auto src : instances)
-            src->load();
-    }
+void set_gui_values()
+{
+    for (auto src : instances)
+        src->set_gui_values();
+}
 
-    void save()
-    {
-        for (auto src : instances)
-            src->save();
-    }
+std::shared_ptr<music_source> selected_source()
+{
+    return std::shared_ptr<music_source>(instances[selected_index]);
+}
 
-    void select(const char* id)
-    {
-        if (!id) return;
-        int i = 0;
-        for (auto src : instances) {
-            if (strcmp(src->name(), id) == 0) {
-                selected_index = i;
-                break;
-            }
-            i++;
+void deinit()
+{
+    /* check if all source references were decreased correctly */
+    for (int i = 0; i < instances.count(); i++) {
+        if (instances[i].use_count() > 1) {
+            berr("Shared pointer of source %s is still in use!"
+                 " (use count: %i)",
+                instances[i]->id(),
+                instances[i].use_count());
         }
     }
-
-    void set_gui_values()
-    {
-        for (auto src : instances)
-            src->set_gui_values();
-    }
-
-    std::shared_ptr<music_source> selected_source()
-    {
-        return std::shared_ptr<music_source>(instances[selected_index]);
-    }
-
-    void deinit()
-    {
-        /* check if all source references were decreased correctly */
-        for (auto src : instances) {
-            if (src.use_count() > 1)
-                berr("Shared pointer of source %s is still in use!"
-                     " (use count: i%)", src->name(), src.use_count());
-        }
-        instances.clear();
-    }
+    instances.clear();
+}
 }

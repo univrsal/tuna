@@ -72,5 +72,7 @@
 #define JSON_FORMAT_ID 			"format"
 
 #define STATUS_RETRY_AFTER 		429
+#define HTTP_NO_CONTENT			204
+#define HTTP_OK					200
 
 /* clang-format on */

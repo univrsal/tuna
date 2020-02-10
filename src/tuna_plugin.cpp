@@ -53,6 +53,7 @@ bool obs_module_load()
     format::init();
     config::init();
     util::load_vlc();
+    source::init();
     config::load();
     register_gui();
     return true;

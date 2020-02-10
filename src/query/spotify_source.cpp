@@ -42,9 +42,14 @@ spotify_source::spotify_source()
     m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
 }
 
-const char *spotify_source::name() const
+const char* spotify_source::name() const
 {
     return T_SOURCE_SPOTIFY;
+}
+
+const char* spotify_source::id() const
+{
+    return S_SOURCE_SPOTIFY;
 }
 
 bool spotify_source::enabled() const
@@ -128,12 +133,8 @@ void spotify_source::refresh()
     if (!m_logged_in)
         return;
 
-    if (util::epoch() > m_token_termination) {
-        QString log;
-        bool result = do_refresh_token(log);
-        tuna_dialog->apply_login_state(result, log);
+    if (util::epoch() > m_token_termination)
         save();
-    }
 
     if (m_timout_start) {
         if (os_gettime_ns() - m_timout_start >= m_timeout_length) {
@@ -155,7 +156,7 @@ void spotify_source::refresh()
         obj = response.object();
     QString str(response.toJson());
 
-    if (http_code == 200) {
+    if (http_code == HTTP_OK) {
         const auto& progress = obj["progress_ms"];
         const auto& device = obj["device"];
         const auto& playing = obj["is_playing"];
@@ -172,6 +173,9 @@ void spotify_source::refresh()
             QString str(response.toJson());
             berr("Couldn't fetch song data from spotify json: %s", str.toStdString().c_str());
         }
+    } else if (http_code == HTTP_NO_CONTENT) {
+        /* No session running */
+        m_current.clear();
     } else {
         if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);

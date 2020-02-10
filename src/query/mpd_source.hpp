@@ -35,23 +35,16 @@ class mpd_source : public music_source {
 
 public:
     mpd_source();
-
     ~mpd_source() override;
 
     void load() override;
-
     void save() override;
-
     void refresh() override;
-
     void load_gui_values() override;
-
     bool execute_capability(capability c) override;
-
     bool valid_format(const QString& str) override;
-
     const char* name() const override;
-
+    const char* id() const override;
     bool enabled() const override;
 
 private:
@@ -72,6 +65,7 @@ public:
     bool execute_capability(capability c) override { return false; }
     bool valid_format(const QString& str) override { return false; }
     const char* name() const override;
+    const char* id() const override;
     bool enabled() const override { return false; }
 };
 #endif
@@ -79,4 +73,9 @@ public:
 const char* mpd_source::name() const
 {
     return T_SOURCE_MPD;
+}
+
+const char* mpd_source::id() const
+{
+    return S_SOURCE_MPD;
 }

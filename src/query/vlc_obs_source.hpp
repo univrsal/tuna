@@ -40,6 +40,7 @@ public:
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;
     const char* name() const override;
+    const char* id() const override;
     bool enabled() const override;
 };
 
@@ -61,5 +62,10 @@ bool vlc_obs_source::enabled() const { return false; }
 const char* vlc_obs_source::name() const
 {
     return T_SOURCE_VLC;
+}
+
+const char* vlc_obs_source::id() const
+{
+    return S_SOURCE_VLC;
 }
 #endif

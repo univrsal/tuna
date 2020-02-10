@@ -105,6 +105,7 @@ void execute(QString& q)
         if (sp)
             sp->do_format(split, src_ref->song_info());
     }
+    src_ref.reset();
     q = splits.join("");
 }
 

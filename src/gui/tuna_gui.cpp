@@ -34,11 +34,11 @@
 #include <QPixmap>
 #include <QString>
 #include <QTimer>
+#include <exception>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <random>
 #include <util/platform.h>
-#include <exception>
 
 tuna_gui* tuna_dialog = nullptr;
 
@@ -84,7 +84,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     /* Add sources */
     for (const auto& src : source::instances) {
         if (src->enabled())
-            ui->cb_source->addItem(utf8_to_qt(src->name()));
+            ui->cb_source->addItem(utf8_to_qt(src->name()), src->id());
     }
 
     /* TODO Lyrics */
@@ -177,6 +177,7 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
             ui->txt_token->setText(spotify->token());
             ui->txt_refresh_token->setText(
                 spotify->refresh_token());
+            spotify.reset();
         } catch (std::invalid_argument& e) {
             berr("apply_login_state failed with: %s", e.what());
         }
@@ -206,6 +207,7 @@ void tuna_gui::on_btn_request_token_clicked()
         auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
         spotify->set_auth_code(ui->txt_auth_code->text());
         result = spotify->new_token(log);
+        spotify.reset();
     } catch (std::invalid_argument& e) {
         log = "on_btn_request_clicked failed with: ";
         log += e.what();
@@ -222,6 +224,7 @@ void tuna_gui::on_btn_performrefresh_clicked()
         auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
         spotify->set_auth_code(ui->txt_auth_code->text());
         result = spotify->do_refresh_token(log);
+        spotify.reset();
     } catch (std::invalid_argument& e) {
         log = "on_btn_performrefresh_clicked failed with: ";
         log += e.what();
@@ -234,7 +237,8 @@ void tuna_gui::on_tuna_gui_accepted()
 {
     CSET_STR(CFG_COVER_PATH, qt_to_utf8(ui->txt_song_cover->text()));
     CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(ui->txt_song_lyrics->text()));
-    CSET_INT(CFG_SELECTED_SOURCE, ui->cb_source->currentIndex());
+    QString tmp = ui->cb_source->currentData().toByteArray();
+    CSET_STR(CFG_SELECTED_SOURCE, tmp.toStdString().c_str());
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
 
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));

@@ -25,7 +25,7 @@ enum date_precision {
     prec_day,
     prec_month,
     prec_year,
-    prec_unkown
+    prec_unknown
 };
 
 class song {

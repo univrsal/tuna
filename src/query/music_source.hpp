@@ -72,6 +72,7 @@ public:
 
     /* Abstract stuff */
     virtual const char* name() const = 0;
+    virtual const char* id() const = 0;
     virtual bool enabled() const = 0;
     /* Save/load config values */
     virtual void load() = 0;
@@ -98,7 +99,7 @@ template <class T>
 std::shared_ptr<T> get(const char* id)
 {
     for (auto src : instances) {
-        if (strcmp(src->name(), id) == 0) {
+        if (strcmp(src->id(), id) == 0) {
             return std::dynamic_pointer_cast<T>(src);
         }
     }

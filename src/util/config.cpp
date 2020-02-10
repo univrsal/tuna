@@ -66,8 +66,6 @@ void init()
 
     if (!cover_placeholder)
         cover_placeholder = obs_module_file("placeholder.png");
-
-    source::init();
 }
 
 void load()

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-
 #ifndef DISABLE_TUNA_VLC
 #include "vlc_obs_source.hpp"
 #include "../gui/tuna_gui.hpp"
@@ -38,9 +37,14 @@ vlc_obs_source::~vlc_obs_source()
     m_weak_src = nullptr;
 }
 
-const char *vlc_obs_source::name() const
+const char* vlc_obs_source::name() const
 {
     return T_SOURCE_VLC;
+}
+
+const char* vlc_obs_source::id() const
+{
+    return S_SOURCE_VLC;
 }
 
 void vlc_obs_source::reload()
@@ -104,7 +108,7 @@ struct vlc_source* vlc_obs_source::get_vlc()
         load();
     }
 
-    end:
+end:
     obs_source_release(src);
     return data;
 }
