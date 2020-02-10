@@ -6,5 +6,6 @@ Currently supports
 - Spotify
 - MPD
 - Any Window title
+- OBS VLC source
 
 <img src="/data/tuna.png" alt="hey tuna" width="180px">
