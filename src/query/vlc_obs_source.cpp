@@ -40,16 +40,21 @@ vlc_obs_source::vlc_obs_source()
 {
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 
-    if (!load_libvlc()) {
-        binfo("Couldn't load libVLC, VLC support disabled");
-    } else {
-        m_lib_vlc_loaded = true;
-    }
+    if (!util::vlc_loaded)
+        binfo("libVLC wasn't loaded, VLC support disabled");
 }
 
 vlc_obs_source::~vlc_obs_source()
 {
     obs_weak_source_release(m_weak_src);
+    m_weak_src = nullptr;
+}
+
+void vlc_obs_source::reload()
+{
+    if (m_weak_src)
+        return;
+    load();
 }
 
 void vlc_obs_source::load()
@@ -68,13 +73,16 @@ void vlc_obs_source::load()
                 obs_weak_source_release(m_weak_src);
             m_weak_src = obs_source_get_weak_source(src);
         } else {
-            binfo("%s is not a valid vlc source", id);
+            auto* name = obs_source_get_name(src);
+            binfo("%s (%s) is not a valid vlc source", name, id);
         }
+        obs_source_release(src);
     }
 }
 
 void vlc_obs_source::save()
 {
+    return;
     if (!util::vlc_loaded)
         return;
     CSET_STR(CFG_VLC_ID, m_target_source_name);
@@ -82,29 +90,37 @@ void vlc_obs_source::save()
 
 struct vlc_source* vlc_obs_source::get_vlc()
 {
-    if (!m_weak_src || !m_lib_vlc_loaded)
-        return nullptr;
+    struct vlc_source* data = nullptr;
+    obs_source_t* src = nullptr;
+    if (!m_weak_src || !util::vlc_loaded)
+        goto end;
 
-    auto* src = obs_weak_source_get_source(m_weak_src);
+    src = obs_weak_source_get_source(m_weak_src);
     if (src) {
-        void* data = src->context.data;
-        if (data) {
-            return reinterpret_cast<struct vlc_source*>(data);
-        }
+        void* private_data = src->context.data;
+        if (private_data)
+            data = reinterpret_cast<struct vlc_source*>(private_data);
     } else if (m_weak_src) { /* The actual source is gone -> clear the weak source */
         obs_weak_source_release(m_weak_src);
-        load(); /* Try and load it again */
+        m_weak_src = nullptr;
+        load();
     }
-    return nullptr;
+
+    end:
+    obs_source_release(src);
+    return data;
 }
 
 void vlc_obs_source::refresh()
 {
     if (!util::vlc_loaded)
         return;
+
+    reload();
     auto* vlc = get_vlc();
 
     if (vlc) {
+//        pthread_mutex_lock(&vlc->mutex);
         m_current.clear();
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_time_(vlc->media_player));
@@ -136,8 +152,9 @@ void vlc_obs_source::refresh()
             if (disc)
                 m_current.set_disc_number(std::stoi(disc));
         }
+//        pthread_mutex_unlock(&vlc->mutex);
     } else {
-        m_current = {};
+        m_current.clear();
     }
 }
 
@@ -167,11 +184,13 @@ bool vlc_obs_source::execute_capability(capability c)
 
 void vlc_obs_source::load_gui_values()
 {
-    tuna_dialog->select_vlc_source(utf8_to_qt(m_target_source_name));
+    if (m_target_source_name)
+        tuna_dialog->select_vlc_source(utf8_to_qt(m_target_source_name));
 }
 
 bool vlc_obs_source::valid_format(const QString& str)
 {
+    UNUSED_PARAMETER(str);
     return true;
 }
 #endif

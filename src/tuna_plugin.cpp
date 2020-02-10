@@ -27,6 +27,8 @@
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 
+#define TUNA_VERSION "1.4.0"
+
 OBS_DECLARE_MODULE()
 
 OBS_MODULE_USE_DEFAULT_LOCALE(S_PLUGIN_ID, "en-US")
@@ -47,7 +49,9 @@ void register_gui()
 
 bool obs_module_load()
 {
+    binfo("Loading v%s", TUNA_VERSION);
     format::init();
+    config::init();
     util::load_vlc();
     config::load();
     register_gui();

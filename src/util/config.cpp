@@ -50,8 +50,11 @@ QList<QPair<QString, QString>> outputs;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;
 
-void init_default()
+void init()
 {
+    if (!instance)
+        instance = obs_frontend_get_global_config();
+
     QDir home = QDir::homePath();
     QString path_song_file = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
     QString path_cover_art = QDir::toNativeSeparators(home.absoluteFilePath("cover.png"));
@@ -99,8 +102,7 @@ void select_source(source s)
 void load()
 {
     if (!instance)
-        instance = obs_frontend_get_global_config();
-    init_default();
+        init();
     bool run = CGET_BOOL(CFG_RUNNING);
 
     cover_path = CGET_STR(CFG_COVER_PATH);
@@ -110,12 +112,7 @@ void load()
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
 
-    /* The config system seems to remove leading and trailing spaces
-     * so the user can use '\s' as a placeholder, which will then
-     * be turned into actual spaces here */
-    auto tmp = utf8_to_qt(CGET_STR(CFG_SONG_PLACEHOLDER));
-    tmp.replace("\\s", " ");
-    placeholder = qt_to_utf8(tmp);
+    placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
 
     /* Sources */
     if (!spotify)
@@ -182,6 +179,9 @@ void close()
     delete mpd;
 #endif
     delete window;
+    delete vlc_obs;
+
+    vlc_obs = nullptr;
     window = nullptr;
     spotify = nullptr;
     mpd = nullptr;

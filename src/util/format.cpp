@@ -37,30 +37,36 @@ const specifier* get_matching_specifier(char c)
 
 /* Find the number in between '[]' in
  * a string like t[123] abc
- * and remove the '[123] part
+ * and remove the '[123]' part
  */
 int get_truncate_arg(QString& str)
 {
     int number = 0;
-    if (str[1] != '[')
-        return 0;
-    while (str[number] != ']') {
-        number++;
-        if (number >= str.length())
-            return 0;
-    }
-
-    /* Cut the string down */
-    QStringRef r(&str, 1, number);
+    QString tmp = "", copy = str;
     bool ok = false;
-    number = r.toInt(&ok);
 
-    if (ok) {
-        /* cut [123] */
-        str = str[0] + str.right(number);
-    } else {
-        number = 0;
+    if (str[1] != '[' || str.length() < 4)
+        return number;
+    copy.remove(1, 1); /* remove '[' */
+
+    bool flag = true;
+    while (!copy.isEmpty() && flag) {
+        if (copy[1].isNumber())
+            tmp.append(copy[1]);
+        else if (copy[1] == ']')
+            flag = false; /* We're donw */
+        else
+            break; /* Unknown character -> stop */
+        copy.remove(1, 1); /* consume character */
     }
+
+    number = tmp.toInt(&ok);
+
+    if (ok)
+        str = copy;
+    else
+        number = 0;
+
     return number;
 }
 
@@ -87,6 +93,7 @@ void init()
     specifiers.emplace_back(std::make_unique<specifier_time>('p', CAP_PROGRESS));
     specifiers.emplace_back(std::make_unique<specifier_time>('l', CAP_DURATION));
     specifiers.emplace_back(std::make_unique<specifier_static>('b', "\n"));
+    specifiers.emplace_back(std::make_unique<specifier_static>('s', " "));
 }
 
 void execute(QString& q)
@@ -111,13 +118,13 @@ bool specifier::replace(QString& slice, const song* s, const QString& data) cons
     QString copy = data;
     if (slice[0].isUpper())
         copy = copy.toUpper();
+    if (max_length && copy.length() > max_length) {
+        copy.truncate(max_length);
+        copy.append("...");
+    }
     slice = slice.remove(0, 1);
     slice.prepend(copy);
 
-    if (max_length && slice.length() > max_length) {
-        slice.truncate(max_length);
-        slice.append("...");
-    }
     return true;
 }
 

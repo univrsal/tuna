@@ -77,8 +77,10 @@ tuna_gui::tuna_gui(QWidget* parent)
 
     /* Notify user, if vlc source is disabled */
     ui->lbl_vlc_disabled->setStyleSheet("QLabel { color: red;"
-                                        "font-weight: bold;");
+                                        "font-weight: bold; }");
     ui->lbl_vlc_disabled->setVisible(!util::vlc_loaded);
+    ui->btn_refresh_vlc->setEnabled(util::vlc_loaded);
+    ui->cb_vlc_source_name->setEnabled(util::vlc_loaded);
 
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
@@ -439,7 +441,7 @@ static bool add_source(void* data, obs_source_t* src)
     if (strcmp(id, "vlc_source") == 0) {
         auto* name = obs_source_get_name(src);
         QComboBox* cb = reinterpret_cast<QComboBox*>(data);
-        cb->addItem(name);
+        cb->addItem(utf8_to_qt(name));
     }
     return true;
 }
@@ -458,7 +460,8 @@ void tuna_gui::on_pb_refresh_vlc_clicked()
 
 void tuna_gui::select_vlc_source(const QString& id)
 {
-    auto idx = ui->cb_source->findText(id);
+    auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchFixedString);
+
     if (idx >= 0)
         ui->cb_vlc_source_name->setCurrentIndex(idx);
     else

@@ -22,10 +22,11 @@
 #include <obs-module.h>
 
 class vlc_obs_source : public music_source {
-    const char* m_target_source_name;
+    const char* m_target_source_name = nullptr;
     obs_weak_source_t* m_weak_src = nullptr;
-    bool m_lib_vlc_loaded = false;
     struct vlc_source* get_vlc();
+
+    void reload();
 public:
     vlc_obs_source();
     ~vlc_obs_source();

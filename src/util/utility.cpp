@@ -42,12 +42,15 @@ void unload_libvlc() {}
 
 namespace util {
 
-bool vlc_loaded = true;
+bool vlc_loaded = false;
 
 void load_vlc()
 {
+#ifndef DISABLE_TUNA_VLC
     auto ver = obs_get_version();
-    if (obs_get_version() != 0){//LIBOBS_API_VER) {
+    bool result = true;
+
+    if (obs_get_version() != LIBOBS_API_VER) {
         int major = ver >> 24 & 0xFF;
         int minor = ver >> 16 & 0xFF;
         int patch = ver & 0xFF;
@@ -57,7 +60,7 @@ void load_vlc()
             major, minor, patch, LIBOBS_API_MAJOR_VER,
             LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
 
-        bool result = CGET_BOOL(CFG_FORCE_VLC_DECISION);
+        result = CGET_BOOL(CFG_FORCE_VLC_DECISION);
 
         /* If this is the first startup with the new version
          * ask user */
@@ -68,6 +71,7 @@ void load_vlc()
 
         if (result)
             bwarn("User force enabled VLC support");
+        CSET_BOOL(CFG_ERROR_MESSAGE_SHOWN, true);
         CSET_BOOL(CFG_FORCE_VLC_DECISION, result);
     } else {
         /* reset warning config */
@@ -75,13 +79,16 @@ void load_vlc()
         CSET_BOOL(CFG_FORCE_VLC_DECISION, false);
     }
 
-    if (vlc_loaded) {
-        if (!load_libvlc_module() || !load_vlc_funcs() || !load_libvlc()) {
+    if (result) {
+        if (load_libvlc_module() && load_vlc_funcs() && load_libvlc()) {
+            binfo("Loaded libVLC. VLC source support enabled");
+            vlc_loaded = true;
+        } else {
             bwarn("Couldn't load libVLC,"
                   " VLC source support disabled");
-            vlc_loaded = false;
         }
     }
+#endif
 }
 
 void unload_vlc()
@@ -191,7 +198,7 @@ void download_cover(const song* song)
             found_cover = curl_download(qt_to_utf8(song->cover()), qt_to_utf8(tmp));
             /* Replace cover only after download is done */
             if (found_cover) {
-                move_file(tmp.toStdString().c_str(), config::cover_path);
+                move_file(qt_to_utf8(tmp), config::cover_path);
             }
         } else if (!is_url) {
             last_cover = song->cover();
@@ -230,8 +237,13 @@ void handle_outputs(const song* s)
         tmp_text = output.first;
         format::execute(tmp_text);
 
-        if (tmp_text.isEmpty() || !s->playing())
+        if (tmp_text.isEmpty() || !s->playing()) {
             tmp_text = config::placeholder;
+            /* OBS seems to cut leading and trailing spaces
+             * when loading the config file so this workaround
+             * allows users to still use them */
+            tmp_text.replace("%s", " ");
+        }
         write_song(tmp_text, output.second);
     }
 }

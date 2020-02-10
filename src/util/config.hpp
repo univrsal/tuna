@@ -122,7 +122,7 @@ extern bool download_cover;
 
 void load_gui_values();
 
-void init_default();
+void init();
 
 void load();
 
