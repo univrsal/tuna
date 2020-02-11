@@ -79,12 +79,14 @@ void vlc_obs_source::load()
             binfo("%s (%s) is not a valid vlc source", name, id);
         }
         obs_source_release(src);
-    }
+	} else if (m_weak_src) {
+		obs_weak_source_release(m_weak_src);
+		m_weak_src = nullptr;
+	}
 }
 
 void vlc_obs_source::save()
 {
-    return;
     if (!util::vlc_loaded)
         return;
     CSET_STR(CFG_VLC_ID, m_target_source_name);

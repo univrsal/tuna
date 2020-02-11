@@ -2,7 +2,7 @@
 param([string]$version)
 [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
 
-$base_dir = "..\..\..\"
+$base_dir = "..\..\..\..\"
 $data_dir = "../data"
 $project = "tuna"
 $arch_both = "win32.64"
@@ -11,10 +11,10 @@ $msvc = "2017"
 $qt = "5_10_1"
 $build = "RelWithDebInfo"
 
-$build_location_x32 = $base_dir + "build32\rundir\Release\obs-plugins\32bit"
+$build_location_x32 = $base_dir + "build32\rundir\" + $build + "\obs-plugins\32bit"
 $qtc_build_location_x32 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_32bit-" + $build +"\rundir\" + $build + "\obs-plugins\32bit"
 
-$build_location_x64 = $base_dir + "build64\rundir\Release\obs-plugins\64bit"
+$build_location_x64 = $base_dir + "build64\rundir\" + $build + "\obs-plugins\64bit"
 $qtc_build_location_x64 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_64bit-" + $build + "\rundir\" + $build + "\obs-plugins\64bit"
 
 
@@ -42,8 +42,6 @@ If ($result -eq "Yes") {
     $x86 = $false
     $arch = $arch_64
     echo("64bit only build...")
-    $build_location_x32 = $qtc_build_location_x32
-    $build_location_x64 = $qtc_build_location_x64
 } else {
     $x86 = $true
     $arch = $arch_both

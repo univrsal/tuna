@@ -92,6 +92,7 @@ extern config_t* instance;
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
 extern const char* placeholder;
+extern const char* selected_source;
 extern const char* cover_path;
 extern const char* lyrics_path;
 extern QList<QPair<QString, QString>> outputs;

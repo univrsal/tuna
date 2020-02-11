@@ -38,6 +38,7 @@ uint16_t refresh_rate = 1000;
 const char* placeholder = nullptr;
 const char* cover_path = nullptr;
 const char* lyrics_path = nullptr;
+const char *selected_source = nullptr;
 QList<QPair<QString, QString>> outputs;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;
@@ -80,7 +81,7 @@ void load()
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
-    placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
+    selected_source = CGET_STR(CFG_SELECTED_SOURCE);
 
     /* Sources */
     source::load();
@@ -88,7 +89,7 @@ void load()
     if (run && !thread::start())
         berr("Couldn't start thread");
 
-    source::select(CGET_STR(CFG_SELECTED_SOURCE));
+    source::select(selected_source);
 }
 
 void save()

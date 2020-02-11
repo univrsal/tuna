@@ -121,10 +121,10 @@ void tuna_gui::toggleShowHide()
         /* setup config values */
         ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
         ui->txt_song_lyrics->setText(utf8_to_qt(config::lyrics_path));
-        ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
         ui->cb_dl_cover->setChecked(config::download_cover);
+		ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
         set_state();
 
         /* Load table contents */
