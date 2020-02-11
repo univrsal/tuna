@@ -22,6 +22,7 @@
 #include "util/constants.hpp"
 #include "util/format.hpp"
 #include "util/utility.hpp"
+#include "util/tuna_thread.hpp"
 #include <QAction>
 #include <QMainWindow>
 #include <obs-frontend-api.h>
@@ -61,6 +62,8 @@ bool obs_module_load()
 
 void obs_module_unload()
 {
-    config::close();
+    thread::mutex.lock();
     util::unload_vlc();
+    thread::mutex.unlock();
+    config::close();
 }

@@ -2,19 +2,19 @@
 param([string]$version)
 [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
 
-$base_dir = "E:\projects\obs\obs-studio\"
+$base_dir = "..\..\..\"
 $data_dir = "../data"
 $project = "tuna"
 $arch_both = "win32.64"
 $arch_64 = "win64"
 $msvc = "2017"
-$qt = "5_12_2"
+$qt = "5_10_1"
 $build = "RelWithDebInfo"
 
-$build_location_x32 = $base_dir + "build\x32\rundir\Release\obs-plugins\32bit"
+$build_location_x32 = $base_dir + "build32\rundir\Release\obs-plugins\32bit"
 $qtc_build_location_x32 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_32bit-" + $build +"\rundir\" + $build + "\obs-plugins\32bit"
 
-$build_location_x64 = $base_dir + "build\x64\rundir\Release\obs-plugins\64bit"
+$build_location_x64 = $base_dir + "build64\rundir\Release\obs-plugins\64bit"
 $qtc_build_location_x64 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_64bit-" + $build + "\rundir\" + $build + "\obs-plugins\64bit"
 
 

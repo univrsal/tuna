@@ -94,6 +94,7 @@ void load_vlc()
 void unload_vlc()
 {
     unload_libvlc();
+    vlc_loaded = false;
 }
 
 size_t
