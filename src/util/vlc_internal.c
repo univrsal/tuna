@@ -15,6 +15,7 @@ LIBVLC_EVENT_ATTACH libvlc_event_attach_;
 
 /* libvlc media player */
 LIBVLC_MEDIA_PLAYER_GET_TIME libvlc_media_player_get_time_;
+LIBVLC_MEDIA_PLAYER_GET_LENGTH libvlc_media_player_get_length_;
 LIBVLC_MEDIA_PLAYER_GET_STATE libvlc_media_player_get_state_;
 
 /* libvlc media */
@@ -57,6 +58,7 @@ bool load_vlc_funcs(void)
 
     /* libvlc media player */
     LOAD_VLC_FUNC(libvlc_media_player_get_time);
+    LOAD_VLC_FUNC(libvlc_media_player_get_length);
     LOAD_VLC_FUNC(libvlc_media_player_get_state);
     LOAD_VLC_FUNC(libvlc_media_player_can_pause);
     LOAD_VLC_FUNC(libvlc_media_player_pause);

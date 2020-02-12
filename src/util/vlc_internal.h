@@ -56,6 +56,8 @@ extern LIBVLC_EVENT_ATTACH libvlc_event_attach_;
 /* libvlc media player methods */
 typedef libvlc_time_t (*LIBVLC_MEDIA_PLAYER_GET_TIME)(
     libvlc_media_player_t* p_mi);
+typedef libvlc_time_t (*LIBVLC_MEDIA_PLAYER_GET_LENGTH)(
+    libvlc_media_player_t* p_mi);
 typedef libvlc_state_t (*LIBVLC_MEDIA_PLAYER_GET_STATE)(
     libvlc_media_player_t* p_mi);
 typedef int (*LIBVLC_MEDIA_PLAYER_CAN_PAUSE)(
@@ -64,8 +66,10 @@ typedef void (*LIBVLC_MEDIA_PLAYER_PAUSE)(
     libvlc_media_player_t* p_mi);
 typedef libvlc_media_t* (*LIBVLC_MEDIA_PLAYER_GET_MEDIA)(
     libvlc_media_player_t* p_mi);
+t
 
 extern LIBVLC_MEDIA_PLAYER_GET_TIME libvlc_media_player_get_time_;
+extern LIBVLC_MEDIA_PLAYER_GET_LENGTH libvlc_media_player_get_length_;
 extern LIBVLC_MEDIA_PLAYER_GET_STATE libvlc_media_player_get_state_;
 extern LIBVLC_MEDIA_PLAYER_CAN_PAUSE libvlc_media_player_can_pause_;
 extern LIBVLC_MEDIA_PLAYER_PAUSE libvlc_media_player_pause_;
