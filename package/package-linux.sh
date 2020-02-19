@@ -26,7 +26,7 @@ cp -R $data_dir $build_dir/plugin
 echo "Fetching misc files"
 cp ../LICENSE $build_dir/LICENSE.txt
 cp ./README.txt $build_dir/README.txt
-
+cp ./install-linux.sh $build_dir/
 echo "Writing version number $version"
 sed -i -e "s/@VERSION/$version/g" $build_dir/README.txt
 

@@ -194,47 +194,47 @@ void spotify_source::refresh()
 
 void spotify_source::parse_track_json(const QJsonValue& track)
 {
-    const auto& album = track["album"];
-    const auto& artists = track["artists"];
+    const auto& trackObj = track.toObject();
+    const auto& album = trackObj["album"].toObject();
+    const auto& artists = trackObj["artists"].toArray();
 
-    if (album.isObject() && artists.isArray()) {
-        m_current.clear();
+    m_current.clear();
 
-        /* Get All artists */
-        for (const auto artist : artists.toArray())
-            m_current.append_artist(artist.toObject()["name"].toString());
+    /* Get All artists */
+    for (const auto artist : artists)
+        m_current.append_artist(artist.toObject()["name"].toString());
 
-        /* Cover link */
-        const auto& covers = album["images"];
-        if (covers.isArray()) {
-            QJsonValue v = covers.toArray()[0];
-            if (v.isObject() && v.toObject().contains("url"))
-                m_current.set_cover_link(v.toObject()["url"].toString());
-        }
+    /* Cover link */
+    const auto& covers = album["images"];
+    if (covers.isArray()) {
+        QJsonValue v = covers.toArray()[0];
+        if (v.isObject() && v.toObject().contains("url"))
+            m_current.set_cover_link(v.toObject()["url"].toString());
+    }
 
-        /* Other stuff */
-        m_current.set_title(track["name"].toString());
-        m_current.set_duration(track["duration_ms"].toInt());
-        m_current.set_album(album["name"].toString());
-        m_current.set_explicit(track["explicit"].toBool());
-        m_current.set_disc_number(track["disc_number"].toInt());
-        m_current.set_track_number(track["track_number"].toInt());
+    /* Other stuff */
+    m_current.set_title(trackObj["name"].toString());
+    m_current.set_duration(trackObj["duration_ms"].toInt());
+    m_current.set_album(album["name"].toString());
+    m_current.set_explicit(trackObj["explicit"].toBool());
+    m_current.set_disc_number(trackObj["disc_number"].toInt());
+    m_current.set_track_number(trackObj["track_number"].toInt());
 
-        /* Release date */
-        const auto& date = album["release_date"].toString();
-        if (date.length() > 0) {
-            QStringList list = date.split("-");
-            switch (list.length()) {
-            case 3:
-                m_current.set_day(list[2]);
-            case 2: /* Fallthrough */
-                m_current.set_month(list[1]);
-            case 1: /* Fallthrough */
-                m_current.set_year(list[0]);
-            default:;
-            }
+    /* Release date */
+    const auto& date = album["release_date"].toString();
+    if (date.length() > 0) {
+        QStringList list = date.split("-");
+        switch (list.length()) {
+        case 3:
+            m_current.set_day(list[2]);
+        case 2: /* Fallthrough */
+            m_current.set_month(list[1]);
+        case 1: /* Fallthrough */
+            m_current.set_year(list[0]);
+        default:;
         }
     }
+
 }
 
 bool spotify_source::execute_capability(capability c)
@@ -357,9 +357,10 @@ bool spotify_source::do_refresh_token(QString& log)
     if (response.isNull()) {
         return false;
     } else {
-        const auto& token = response["access_token"];
-        const auto& expires = response["expires_in"];
-        const auto& refresh_token = response["refresh_token"];
+        const auto& response_obj = response.object();
+        const auto& token = response_obj["access_token"];
+        const auto& expires = response_obj["expires_in"];
+        const auto& refresh_token = response_obj["refresh_token"];
 
         /* Dump the json into the log text */
         log = QString(response.toJson(QJsonDocument::Indented));
@@ -394,9 +395,10 @@ bool spotify_source::new_token(QString& log)
     request_token(request, m_creds.toStdString(), response);
 
     if (response.isObject()) {
-        const auto& token = response["access_token"];
-        const auto& refresh = response["refresh_token"];
-        const auto& expires = response["expires_in"];
+        const auto& response_obj = response.object();
+        const auto& token = response_obj["access_token"];
+        const auto& refresh = response_obj["refresh_token"];
+        const auto& expires = response_obj["expires_in"];
 
         /* Dump the json into the log textbox */
         log = QString(response.toJson(QJsonDocument::Indented));
