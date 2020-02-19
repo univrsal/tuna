@@ -22,8 +22,8 @@
 #include <obs-module.h>
 #include <stdint.h>
 
-#define utf8_to_qt(str) QString::fromUtf8(str)
-#define qt_to_utf8(str) str.toUtf8().constData()
+#define utf8_to_qt(_str) QString::fromUtf8(_str)
+#define qt_to_utf8(_str) _str.toUtf8().constData()
 
 #define write_log(log_level, format, ...) blog(log_level, "[tuna] " format, ##__VA_ARGS__)
 

@@ -114,7 +114,7 @@ bool curl_download(const char* url, const char* path)
     fp = _wfopen(wstr, L"wb");
     bfree(wstr);
 #else
-    fp = fopen(qt_to_utf8(path), "wb");
+    fp = fopen(path, "wb");
 #endif
 
     bool result = false;

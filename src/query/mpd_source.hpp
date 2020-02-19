@@ -28,7 +28,8 @@ class mpd_source : public music_source {
     struct mpd_status* m_status = nullptr;
     struct mpd_song* m_mpd_song = nullptr;
     enum mpd_state m_mpd_state;
-    const char* m_address;
+    QString m_address;
+    QString m_base_folder;
     bool m_connected;
     uint16_t m_port;
     bool m_local;
@@ -40,7 +41,7 @@ public:
     void load() override;
     void save() override;
     void refresh() override;
-    void load_gui_values() override;
+    void set_gui_values() override;
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;
     const char* name() const override;
@@ -64,18 +65,8 @@ public:
     void set_gui_values() override {}
     bool execute_capability(capability c) override { return false; }
     bool valid_format(const QString& str) override { return false; }
-    const char* name() const override;
-    const char* id() const override;
+    const char* name() const override { return T_SOURCE_MPD; }
+    const char* id() const override { return S_SOURCE_MPD; }
     bool enabled() const override { return false; }
 };
 #endif
-
-const char* mpd_source::name() const
-{
-    return T_SOURCE_MPD;
-}
-
-const char* mpd_source::id() const
-{
-    return S_SOURCE_MPD;
-}

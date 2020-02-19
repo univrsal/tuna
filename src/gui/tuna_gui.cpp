@@ -121,11 +121,19 @@ void tuna_gui::toggleShowHide()
         /* setup config values */
         ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
         ui->txt_song_lyrics->setText(utf8_to_qt(config::lyrics_path));
-        ui->cb_source->setCurrentIndex(CGET_UINT(CFG_SELECTED_SOURCE));
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
         ui->cb_dl_cover->setChecked(config::download_cover);
         set_state();
+
+        const char* s = CGET_STR(CFG_SELECTED_SOURCE);
+        int i = 0;
+        for (const auto& src : source::instances) {
+            if (strcmp(src->id(), s) == 0)
+                break;
+            i++;
+        }
+        ui->cb_source->setCurrentIndex(i);
 
         /* Load table contents */
         int row = 1; /* Clear all rows except headers */
@@ -245,9 +253,15 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */
+#if LINUX
     CSET_STR(CFG_MPD_IP, qPrintable(ui->txt_ip->text()));
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
     CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
+    auto path = ui->txt_base_folder->text();
+    if (!path.endsWith("/"))
+        path.append("/");
+    CSET_STR(CFG_MPD_BASE_FOLDER, qt_to_utf8(path));
+#endif
 
     CSET_STR(CFG_WINDOW_TITLE, qt_to_utf8(ui->txt_title->text()));
     CSET_STR(CFG_WINDOW_PAUSE, qt_to_utf8(ui->txt_paused->text()));
@@ -309,6 +323,11 @@ void tuna_gui::set_mpd_local(bool state)
     ui->cb_local->setChecked(state);
     ui->txt_ip->setEnabled(!state);
     ui->sb_port->setEnabled(!state);
+}
+
+void tuna_gui::set_mpd_base_folder(const QString& path)
+{
+    ui->txt_base_folder->setText(path);
 }
 
 void tuna_gui::set_spotify_auth_code(const QString& str)
@@ -496,4 +515,10 @@ void tuna_gui::select_vlc_source(const QString& id)
         ui->cb_vlc_source_name->setCurrentIndex(idx);
     else
         ui->cb_vlc_source_name->setCurrentIndex(0);
+}
+
+void tuna_gui::on_btn_browse_base_folder_clicked()
+{
+    ui->txt_base_folder->setText(
+        QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER));
 }
