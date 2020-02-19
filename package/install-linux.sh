@@ -4,7 +4,7 @@ deps_arch="taglib fftw"
 deps_rh="libtag1v5 libfftw3-3"
 deps_suse="fftw3 taglib"
 deps_debian="taglib fftw fftw-libs"
-base_dir="~/.config/obs-studio/plugins/"
+base_dir="/home/$USER/.config/obs-studio/plugins/"
 plugin_name="tuna"
 
 # Get distro
