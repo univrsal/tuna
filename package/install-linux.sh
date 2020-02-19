@@ -1,9 +1,9 @@
 #!/bin/sh
 
-deps_arch="taglib fftw"
-deps_rh="libtag1v5 libfftw3-3"
-deps_suse="fftw3 taglib"
-deps_debian="taglib fftw fftw-libs"
+deps_arch="taglib libmpdclient"
+deps_rh="libtag1v5 libmpdclient"
+deps_suse="fftw3 libmpdclient"
+deps_debian="taglib libmpdclient2"
 base_dir="/home/$USER/.config/obs-studio/plugins/"
 plugin_name="tuna"
 
