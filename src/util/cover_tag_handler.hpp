@@ -21,7 +21,7 @@
 
 namespace cover {
 /* Tries to get the song embbeded in the file */
-extern bool find_embedded_cover(const QString& path);
+extern bool find_embedded_cover(const QString& path, bool reset = false);
 
 /* Tries to find the cover in the folder that the file is located in */
 extern bool find_local_cover(const QString& path, QString& cover_out);

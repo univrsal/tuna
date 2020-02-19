@@ -117,10 +117,12 @@ void mpd_source::refresh()
 {
     if (!m_connected)
         connect();
-    if (!m_connected)
-        return;
-
     m_current.clear();
+    if (!m_connected) {
+        util::download_cover(&m_current);
+        return;
+    }
+
     m_status = mpd_run_status(m_connection);
     m_mpd_song = mpd_run_current_song(m_connection);
 
@@ -157,16 +159,31 @@ void mpd_source::refresh()
         QString tmp;
         file_path.prepend(m_base_folder);
 
-        if (!cover::find_embedded_cover(file_path)) {
-            cover::get_file_folder(file_path);
+        if (m_current.playing()) {
+            /* Reset last downloaded cover
+             * to make sure that the next time mpd is paused
+             * it'll get the placeholder */
+            util::download_cover(nullptr, true);
+            if (!cover::find_embedded_cover(file_path)) {
+                cover::get_file_folder(file_path);
 
-            if (!file_path.startsWith("http")) /* this is not a url */
-                file_path.prepend("file:///");
-            cover::find_local_cover(file_path, tmp);
-            m_current.set_cover_link(tmp);
-            util::download_cover(&m_current);
-        }
-    }
+				if (!file_path.startsWith("http")) /* this is not a url */
+					file_path.prepend("file:///");
+				cover::find_local_cover(file_path, tmp);
+				m_current.set_cover_link(tmp);
+				util::download_cover(&m_current);
+			}
+		} else {
+			/* Reset the last embedded cover path to make
+			 * sure that when playback is resumed it'll
+			 * grab the cover again */
+			cover::find_embedded_cover("", true);
+			util::download_cover(&m_current);
+		}
+	} else {
+		cover::find_embedded_cover("", true);
+		util::download_cover(&m_current);
+	}
 
     if (m_mpd_song)
         mpd_song_free(m_mpd_song);

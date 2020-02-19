@@ -83,6 +83,10 @@ private slots:
 
     void on_btn_browse_base_folder_clicked();
 
+    void on_rb_remote_clicked(bool checked);
+
+    void on_rb_local_clicked(bool checked);
+
 private:
     Ui::tuna_gui* ui;
 };

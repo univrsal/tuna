@@ -159,10 +159,15 @@ bool get_embedded(const TagLib::FileRef& fr)
     return found;
 }
 
-bool find_embedded_cover(const QString& path)
+bool find_embedded_cover(const QString& path, bool reset)
 {
     static QString last_file = "";
     bool result = false;
+
+    if (reset) {
+        last_file = "";
+        return false;
+    }
 
     if (last_file == path) {
         result = true;

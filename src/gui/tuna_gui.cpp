@@ -124,7 +124,7 @@ void tuna_gui::toggleShowHide()
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
         ui->cb_dl_cover->setChecked(config::download_cover);
-		ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
+        ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
         set_state();
 
         const char* s = CGET_STR(CFG_SELECTED_SOURCE);
@@ -257,7 +257,7 @@ void tuna_gui::on_tuna_gui_accepted()
 #if LINUX
     CSET_STR(CFG_MPD_IP, qPrintable(ui->txt_ip->text()));
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
-    CSET_BOOL(CFG_MPD_LOCAL, ui->cb_local->isChecked());
+    CSET_BOOL(CFG_MPD_LOCAL, ui->rb_local->isChecked());
     auto path = ui->txt_base_folder->text();
     if (!path.endsWith("/"))
         path.append("/");
@@ -321,9 +321,11 @@ void tuna_gui::set_mpd_port(uint16_t port)
 
 void tuna_gui::set_mpd_local(bool state)
 {
-    ui->cb_local->setChecked(state);
+    ui->rb_local->setChecked(state);
     ui->txt_ip->setEnabled(!state);
     ui->sb_port->setEnabled(!state);
+    ui->txt_base_folder->setEnabled(state);
+    ui->btn_browse_base_folder->setEnabled(state);
 }
 
 void tuna_gui::set_mpd_base_folder(const QString& path)
@@ -481,8 +483,6 @@ void tuna_gui::on_btn_edit_output_clicked()
 
 void tuna_gui::on_cb_local_clicked(bool checked)
 {
-    ui->txt_ip->setEnabled(!checked);
-    ui->sb_port->setEnabled(!checked);
 }
 
 static bool add_source(void* data, obs_source_t* src)
@@ -522,4 +522,14 @@ void tuna_gui::on_btn_browse_base_folder_clicked()
 {
     ui->txt_base_folder->setText(
         QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER));
+}
+
+void tuna_gui::on_rb_remote_clicked(bool checked)
+{
+    set_mpd_local(!checked);
+}
+
+void tuna_gui::on_rb_local_clicked(bool checked)
+{
+    set_mpd_local(checked);
 }
