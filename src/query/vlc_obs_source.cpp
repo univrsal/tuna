@@ -157,6 +157,8 @@ void vlc_obs_source::refresh()
 
             if (disc)
                 m_current.set_disc_number(std::stoi(disc));
+
+            util::download_cover(&m_current);
         }
     } else {
         m_current.clear();

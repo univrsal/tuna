@@ -167,6 +167,7 @@ void spotify_source::refresh()
             } else {
                 parse_track_json(obj["item"]);
                 m_current.set_playing(playing.toBool());
+                util::download_cover(&m_current);
             }
             m_current.set_progress(progress.toInt());
         } else {

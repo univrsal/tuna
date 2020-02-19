@@ -21,12 +21,14 @@
 #include "mpd_source.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
+#include "../util/cover_tag_handler.hpp"
 #include "../util/utility.hpp"
 #include <obs-module.h>
+#include <taglib/fileref.h>
 
 mpd_source::mpd_source()
 {
-    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
+    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
     m_connection = nullptr;
     m_port = 0;
@@ -61,11 +63,11 @@ void mpd_source::connect()
     if (m_local)
         m_connection = mpd_connection_new(nullptr, 0, 0);
     else
-        m_connection = mpd_connection_new(m_address, m_port, 2000);
+        m_connection = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
 
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
         berr("mpd connection to %s:%hu failed with error %s",
-            m_address,
+            qt_to_utf8(m_address),
             m_port,
             mpd_connection_get_error_message(m_connection));
         mpd_connection_free(m_connection);
@@ -75,20 +77,38 @@ void mpd_source::connect()
     }
 }
 
+const char* mpd_source::name() const
+{
+    return T_SOURCE_MPD;
+}
+
+const char* mpd_source::id() const
+{
+    return S_SOURCE_MPD;
+}
+
+bool mpd_source::enabled() const
+{
+    return true;
+}
+
 void mpd_source::load()
 {
     CDEF_INT(CFG_MPD_PORT, 0);
     CDEF_STR(CFG_MPD_IP, "localhost");
     CDEF_BOOL(CFG_MPD_LOCAL, true);
+    CDEF_STR(CFG_MPD_BASE_FOLDER, "");
 
-    m_address = CGET_STR(CFG_MPD_IP);
+    m_address = utf8_to_qt(CGET_STR(CFG_MPD_IP));
+    m_base_folder = utf8_to_qt(CGET_STR(CFG_MPD_BASE_FOLDER));
     m_port = CGET_UINT(CFG_MPD_PORT);
     m_local = CGET_BOOL(CFG_MPD_LOCAL);
 }
 
 void mpd_source::save()
 {
-    CSET_STR(CFG_MPD_IP, m_address);
+    CSET_STR(CFG_MPD_IP, qt_to_utf8(m_address));
+    CSET_STR(CFG_MPD_BASE_FOLDER, qt_to_utf8(m_base_folder));
     CSET_UINT(CFG_MPD_PORT, m_port);
     CSET_BOOL(CFG_MPD_LOCAL, m_local);
 }
@@ -132,6 +152,20 @@ void mpd_source::refresh()
             m_current.set_disc_number(std::atoi(disc));
 
         m_current.set_duration(mpd_song_get_duration_ms(m_mpd_song));
+
+        QString file_path = mpd_song_get_uri(m_mpd_song);
+        QString tmp;
+        file_path.prepend(m_base_folder);
+
+        if (!cover::find_embedded_cover(file_path)) {
+            cover::get_file_folder(file_path);
+
+            if (!file_path.startsWith("http")) /* this is not a url */
+                file_path.prepend("file:///");
+            cover::find_local_cover(file_path, tmp);
+            m_current.set_cover_link(tmp);
+            util::download_cover(&m_current);
+        }
     }
 
     if (m_mpd_song)
@@ -165,11 +199,12 @@ bool mpd_source::execute_capability(capability c)
     return false;
 }
 
-void mpd_source::load_gui_values()
+void mpd_source::set_gui_values()
 {
     tuna_dialog->set_mpd_ip(m_address);
     tuna_dialog->set_mpd_port(m_port);
     tuna_dialog->set_mpd_local(m_local);
+    tuna_dialog->set_mpd_base_folder(m_base_folder);
 }
 
 bool mpd_source::valid_format(const QString& str)

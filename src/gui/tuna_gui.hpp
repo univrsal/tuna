@@ -43,6 +43,7 @@ public:
     void set_mpd_ip(const QString& ip);
     void set_mpd_port(uint16_t port);
     void set_mpd_local(bool state);
+    void set_mpd_base_folder(const QString& path);
     void set_window_title(const QString& str);
     void set_window_search(const QString& str);
     void set_window_pause(const QString& str);
@@ -79,6 +80,8 @@ private slots:
     void on_btn_edit_output_clicked();
     void on_cb_local_clicked(bool checked);
     void on_pb_refresh_vlc_clicked();
+
+    void on_btn_browse_base_folder_clicked();
 
 private:
     Ui::tuna_gui* ui;

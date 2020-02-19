@@ -75,18 +75,21 @@ void* thread_method(void*)
 #endif
 {
     while (thread_state) {
+        auto time = util::epoch();
         mutex.lock();
         auto ref = source::selected_source();
         ref->refresh();
         auto* s = ref->song_info();
 
         /* Process song data */
-        util::download_cover(s);
-        util::download_lyrics(s);
         util::handle_outputs(s);
         ref.reset();
         mutex.unlock();
-        os_sleep_ms(config::refresh_rate);
+
+        /* Calculate how long refresh took and only wait the remaining time */
+        auto delta = util::epoch() - time;
+        auto wait = config::refresh_rate - delta;
+        os_sleep_ms(wait);
     }
 
 #ifdef _WIN32

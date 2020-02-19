@@ -79,7 +79,7 @@ void deinit()
     for (int i = 0; i < instances.count(); i++) {
         if (instances[i].use_count() > 1) {
             berr("Shared pointer of source %s is still in use!"
-                 " (use count: %i)",
+                 " (use count: %li)",
                 instances[i]->id(),
                 instances[i].use_count());
         }
