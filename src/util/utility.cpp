@@ -115,7 +115,7 @@ bool curl_download(const char* url, const char* path)
     fp = _wfopen(wstr, L"wb");
     bfree(wstr);
 #else
-    fp = fopen(qt_to_utf8(path), "wb");
+    fp = fopen(path, "wb");
 #endif
 
     bool result = false;
@@ -183,9 +183,15 @@ void download_lyrics(const song* song)
     }
 }
 
-void download_cover(const song* song)
+void download_cover(const song* song, bool reset)
 {
     static QString last_cover = "";
+
+    if (reset) {
+        last_cover = "";
+        return;
+    }
+
     bool is_url = song->cover().startsWith("http")
         || song->cover().startsWith("file://");
 
@@ -207,7 +213,7 @@ void download_cover(const song* song)
         }
     }
 
-    if (!found_cover && last_cover != "n/a") {
+    if ((!found_cover && last_cover != "n/a")) {
         last_cover = "n/a";
         /* no cover => use place placeholder */
         if (!move_file(config::cover_placeholder, config::cover_path))

@@ -70,6 +70,7 @@
 #define CFG_MPD_IP 						"mpd.ip"
 #define CFG_MPD_PORT 					"mpd.port"
 #define CFG_MPD_LOCAL 					"mpd.local"
+#define CFG_MPD_BASE_FOLDER				"mpd.base.folder"
 
 #define CFG_VLC_ID 						"vlc.id"
 #define CFG_FORCE_VLC_DECISION			"vlc.force.enable"

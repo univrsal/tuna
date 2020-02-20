@@ -73,12 +73,13 @@ void spotify_source::load()
 
     /* Token handling */
     if (m_logged_in) {
+        int epoch = util::epoch();
         if (util::epoch() > m_token_termination) {
+            binfo("Refreshing Spotify token");
             QString log;
             bool result = do_refresh_token(log);
-            if (result) {
-                bdebug("Successfully renewed Spotify token");
-            }
+            if (result)
+                binfo("Successfully renewed Spotify token");
             save();
         }
     }
@@ -133,13 +134,19 @@ void spotify_source::refresh()
     if (!m_logged_in)
         return;
 
-    if (util::epoch() > m_token_termination)
-        save();
+	if (util::epoch() > m_token_termination) {
+		binfo("Refreshing Spotify token");
+		QString log;
+		bool result = do_refresh_token(log);
+		tuna_dialog->apply_login_state(result, log);
+		save();
+	}
 
     if (m_timout_start) {
         if (os_gettime_ns() - m_timout_start >= m_timeout_length) {
             m_timout_start = 0;
             m_timeout_length = 0;
+            binfo("API timeout is over");
         } else {
             binfo("Waiting for Spotify-API timeout");
             return;
@@ -167,6 +174,7 @@ void spotify_source::refresh()
             } else {
                 parse_track_json(obj["item"]);
                 m_current.set_playing(playing.toBool());
+                util::download_cover(&m_current);
             }
             m_current.set_progress(progress.toInt());
         } else {
@@ -180,12 +188,12 @@ void spotify_source::refresh()
         if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
-                bwarn("Spotify-API Rate limit hit, waiting %ull seconds\n", m_timeout_length);
+                bwarn("Spotify-API Rate limit hit, waiting %li seconds\n", m_timeout_length);
                 m_timeout_length *= SECOND_TO_NS;
                 m_timout_start = os_gettime_ns();
             }
         } else {
-            bwarn("Unknown error occured when querying Spotify-API: %i (response: %s)", http_code,
+            bwarn("Unknown error occured when querying Spotify-API: %li (response: %s)", http_code,
                 str.toStdString().c_str());
         }
     }
@@ -193,47 +201,48 @@ void spotify_source::refresh()
 
 void spotify_source::parse_track_json(const QJsonValue& track)
 {
-    const auto& album = track["album"];
-    const auto& artists = track["artists"];
+    const auto& trackObj = track.toObject();
+    const auto& album = trackObj["album"].toObject();
+    const auto& artists = trackObj["artists"].toArray();
 
-    if (album.isObject() && artists.isArray()) {
-        m_current.clear();
+    m_current.clear();
 
-        /* Get All artists */
-        for (const auto artist : artists.toArray())
-            m_current.append_artist(artist.toObject()["name"].toString());
+    /* Get All artists */
+    for (const auto artist : artists)
+        m_current.append_artist(artist.toObject()["name"].toString());
 
-        /* Cover link */
-        const auto& covers = album["images"];
-        if (covers.isArray()) {
-            QJsonValue v = covers.toArray()[0];
-            if (v.isObject() && v.toObject().contains("url"))
-                m_current.set_cover_link(v.toObject()["url"].toString());
-        }
+    /* Cover link */
+    const auto& covers = album["images"];
+    if (covers.isArray()) {
+        QJsonValue v = covers.toArray()[0];
+        if (v.isObject() && v.toObject().contains("url"))
+            m_current.set_cover_link(v.toObject()["url"].toString());
+    }
 
-        /* Other stuff */
-        m_current.set_title(track["name"].toString());
-        m_current.set_duration(track["duration_ms"].toInt());
-        m_current.set_album(album["name"].toString());
-        m_current.set_explicit(track["explicit"].toBool());
-        m_current.set_disc_number(track["disc_number"].toInt());
-        m_current.set_track_number(track["track_number"].toInt());
+    /* Other stuff */
+    m_current.set_title(trackObj["name"].toString());
+    m_current.set_duration(trackObj["duration_ms"].toInt());
+    m_current.set_album(album["name"].toString());
+    m_current.set_explicit(trackObj["explicit"].toBool());
+    m_current.set_disc_number(trackObj["disc_number"].toInt());
+    m_current.set_track_number(trackObj["track_number"].toInt());
 
-        /* Release date */
-        const auto& date = album["release_date"].toString();
-        if (date.length() > 0) {
-            QStringList list = date.split("-");
-            switch (list.length()) {
-            case 3:
-                m_current.set_day(list[2]);
-            case 2: /* Fallthrough */
-                m_current.set_month(list[1]);
-            case 1: /* Fallthrough */
-                m_current.set_year(list[0]);
-            default:;
-            }
+    /* Release date */
+    const auto& date = album["release_date"].toString();
+    if (date.length() > 0) {
+        QStringList list = date.split("-");
+        switch (list.length()) {
+        case 3:
+            m_current.set_day(list[2]);
+            [[clang::fallthrough]];
+        case 2:
+            m_current.set_month(list[1]);
+            [[clang::fallthrough]];
+        case 1:
+            m_current.set_year(list[0]);
         }
     }
+
 }
 
 bool spotify_source::execute_capability(capability c)
@@ -354,11 +363,13 @@ bool spotify_source::do_refresh_token(QString& log)
     request_token(request, m_creds.toStdString(), response);
 
     if (response.isNull()) {
+        berr("Couldn't refresh Spotify token, response was null");
         return false;
     } else {
-        const auto& token = response["access_token"];
-        const auto& expires = response["expires_in"];
-        const auto& refresh_token = response["refresh_token"];
+        const auto& response_obj = response.object();
+        const auto& token = response_obj["access_token"];
+        const auto& expires = response_obj["expires_in"];
+        const auto& refresh_token = response_obj["refresh_token"];
 
         /* Dump the json into the log text */
         log = QString(response.toJson(QJsonDocument::Indented));
@@ -366,7 +377,6 @@ bool spotify_source::do_refresh_token(QString& log)
             m_token = token.toString();
             m_token_termination = util::epoch() + expires.toInt();
             m_logged_in = true;
-            save();
         } else {
             berr("Couldn't parse json response");
             result = false;
@@ -393,9 +403,10 @@ bool spotify_source::new_token(QString& log)
     request_token(request, m_creds.toStdString(), response);
 
     if (response.isObject()) {
-        const auto& token = response["access_token"];
-        const auto& refresh = response["refresh_token"];
-        const auto& expires = response["expires_in"];
+        const auto& response_obj = response.object();
+        const auto& token = response_obj["access_token"];
+        const auto& refresh = response_obj["refresh_token"];
+        const auto& expires = response_obj["expires_in"];
 
         /* Dump the json into the log textbox */
         log = QString(response.toJson(QJsonDocument::Indented));

@@ -22,8 +22,8 @@
 #include <obs-module.h>
 #include <stdint.h>
 
-#define utf8_to_qt(str) QString::fromUtf8(str)
-#define qt_to_utf8(str) str.toUtf8().constData()
+#define utf8_to_qt(_str) QString::fromUtf8(_str)
+#define qt_to_utf8(_str) _str.toUtf8().constData()
 
 #define write_log(log_level, format, ...) blog(log_level, "[tuna] " format, ##__VA_ARGS__)
 
@@ -44,7 +44,7 @@ void unload_vlc();
 
 bool curl_download(const char* url, const char* path);
 
-void download_cover(const song* song);
+void download_cover(const song* song, bool reset = false);
 
 void download_lyrics(const song* song);
 

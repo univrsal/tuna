@@ -12,5 +12,6 @@ Linux:
   $ mv plugin/* ~/.config/obs-studio/plugins/tuna
 
 Windows:
+--------
 1. Extract the archive
 2. Move the contents of plugin into your obs installation directory

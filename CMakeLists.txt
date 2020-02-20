@@ -5,6 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Libcurl REQUIRED)
@@ -25,17 +26,25 @@ add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 set(tuna_ui
         src/gui/tuna_gui.ui
         src/gui/output_edit_dialog.ui)
-
 find_package(LibVLC QUIET)
+
 
 if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     add_definitions(-DLINUX=1)
     add_definitions(-DUNIX=1)
 
-    find_path(MPD_INCLUDE_DIRS mpd.h)
+    find_package(Taglib)
+
+    set(tuna_platform_includes
+        ${TAGLIB_INCLUDES}
+        )
     set(tuna_platform_deps
-            mpdclient)
-    set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
+            mpdclient
+            tag)
+
+    set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp"
+        "./src/util/cover_tag_handler.cpp"
+        "./src/util/cover_tag_handler.hpp")
 endif ()
 
 if (MSVC)
@@ -105,6 +114,7 @@ add_library(tuna MODULE
 include_directories(
         SYSTEM "${CMAKE_SOURCE_DIR}/libobs"
         "../../UI/obs-frontend-api"
+        ${tuna_platform_includes}
         ${Qt5Core_INCLUDES}
         ${Qt5Widgets_INCLUDES})
 
@@ -116,5 +126,7 @@ target_link_libraries(tuna
     obs-frontend-api
     ${LIBCURL_LIBRARIES}
     ${tuna_platform_deps})
+
+set_property(TARGET tuna PROPERTY CXX_STANDARD 14)
 
 install_obs_plugin_with_data(tuna data)
