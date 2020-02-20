@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#ifndef DISABLE_TUNA_VLC
 #include "vlc_obs_source.hpp"
+#ifndef DISABLE_TUNA_VLC
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
 #include "../util/utility.hpp"
@@ -181,5 +181,39 @@ bool vlc_obs_source::valid_format(const QString& str)
 {
     UNUSED_PARAMETER(str);
     return true;
+}
+#else
+vlc_obs_source::vlc_obs_source() {}
+vlc_obs_source::~vlc_obs_source() {}
+
+void vlc_obs_source::load() {}
+void vlc_obs_source::save() {}
+void vlc_obs_source::refresh() {}
+void vlc_obs_source::set_gui_values() {}
+bool vlc_obs_source::execute_capability(capability c)
+{
+    return true;
+}
+bool vlc_obs_source::valid_format(const QString& str)
+{
+    return true;
+}
+struct vlc_source* vlc_obs_source::get_vlc()
+{
+    return nullptr;
+}
+bool vlc_obs_source::enabled() const
+{
+    return false;
+}
+
+const char* vlc_obs_source::name() const
+{
+    return T_SOURCE_VLC;
+}
+
+const char* vlc_obs_source::id() const
+{
+    return S_SOURCE_VLC;
 }
 #endif

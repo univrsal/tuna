@@ -43,29 +43,3 @@ public:
     const char* id() const override;
     bool enabled() const override;
 };
-
-#ifdef DISABLE_TUNA_VLC
-vlc_obs_source::vlc_obs_source()
-{
-}
-vlc_obs_source::~vlc_obs_source() {}
-
-void vlc_obs_source::load() {}
-void vlc_obs_source::save() {}
-void vlc_obs_source::refresh() {}
-void vlc_obs_source::load_gui_values() {}
-bool vlc_obs_source::execute_capability(capability c) { return true; }
-bool vlc_obs_source::valid_format(const QString& str) { return true; }
-struct vlc_source* vlc_obs_source::get_vlc() { return nullptr; }
-bool vlc_obs_source::enabled() const { return false; }
-
-const char* vlc_obs_source::name() const
-{
-    return T_SOURCE_VLC;
-}
-
-const char* vlc_obs_source::id() const
-{
-    return S_SOURCE_VLC;
-}
-#endif

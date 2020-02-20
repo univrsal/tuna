@@ -65,7 +65,9 @@ void select(const char* id)
     }
     /* ensure cover will be refreshed after changing source */
     util::download_cover(nullptr, true);
+#ifdef LINUX
     cover::find_embedded_cover("", true);
+#endif
     thread::mutex.unlock();
 }
 
