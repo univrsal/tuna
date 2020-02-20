@@ -79,10 +79,10 @@ void vlc_obs_source::load()
             binfo("%s (%s) is not a valid vlc source", name, id);
         }
         obs_source_release(src);
-	} else if (m_weak_src) {
-		obs_weak_source_release(m_weak_src);
-		m_weak_src = nullptr;
-	}
+    } else if (m_weak_src) {
+        obs_weak_source_release(m_weak_src);
+        m_weak_src = nullptr;
+    }
 }
 
 void vlc_obs_source::save()
@@ -101,7 +101,7 @@ struct vlc_source* vlc_obs_source::get_vlc()
 
     src = obs_weak_source_get_source(m_weak_src);
     if (src) {
-        void* private_data = src->context.data;
+        void* private_data = obs_obj_get_data(src);
         if (private_data)
             data = reinterpret_cast<struct vlc_source*>(private_data);
     } else if (m_weak_src) { /* The actual source is gone -> clear the weak source */

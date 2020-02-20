@@ -38,7 +38,7 @@ uint16_t refresh_rate = 1000;
 const char* placeholder = nullptr;
 const char* cover_path = nullptr;
 const char* lyrics_path = nullptr;
-const char *selected_source = nullptr;
+const char* selected_source = nullptr;
 QList<QPair<QString, QString>> outputs;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;

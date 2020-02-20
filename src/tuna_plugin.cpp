@@ -21,8 +21,8 @@
 #include "util/config.hpp"
 #include "util/constants.hpp"
 #include "util/format.hpp"
-#include "util/utility.hpp"
 #include "util/tuna_thread.hpp"
+#include "util/utility.hpp"
 #include <QAction>
 #include <QMainWindow>
 #include <obs-frontend-api.h>

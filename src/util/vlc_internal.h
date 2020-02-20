@@ -66,7 +66,6 @@ typedef void (*LIBVLC_MEDIA_PLAYER_PAUSE)(
     libvlc_media_player_t* p_mi);
 typedef libvlc_media_t* (*LIBVLC_MEDIA_PLAYER_GET_MEDIA)(
     libvlc_media_player_t* p_mi);
-t
 
 extern LIBVLC_MEDIA_PLAYER_GET_TIME libvlc_media_player_get_time_;
 extern LIBVLC_MEDIA_PLAYER_GET_LENGTH libvlc_media_player_get_length_;
