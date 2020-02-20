@@ -17,13 +17,13 @@
  *************************************************************************/
 
 #include "music_source.hpp"
+#include "../util/cover_tag_handler.hpp"
+#include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
 #include "mpd_source.hpp"
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "window_source.hpp"
-#include "../util/tuna_thread.hpp"
-#include "../util/cover_tag_handler.hpp"
 #include <exception>
 
 namespace source {

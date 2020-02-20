@@ -167,23 +167,23 @@ void mpd_source::refresh()
             if (!cover::find_embedded_cover(file_path)) {
                 cover::get_file_folder(file_path);
 
-				if (!file_path.startsWith("http")) /* this is not a url */
-					file_path.prepend("file:///");
-				cover::find_local_cover(file_path, tmp);
-				m_current.set_cover_link(tmp);
-				util::download_cover(&m_current);
-			}
-		} else {
-			/* Reset the last embedded cover path to make
+                if (!file_path.startsWith("http")) /* this is not a url */
+                    file_path.prepend("file:///");
+                cover::find_local_cover(file_path, tmp);
+                m_current.set_cover_link(tmp);
+                util::download_cover(&m_current);
+            }
+        } else {
+            /* Reset the last embedded cover path to make
 			 * sure that when playback is resumed it'll
 			 * grab the cover again */
-			cover::find_embedded_cover("", true);
-			util::download_cover(&m_current);
-		}
-	} else {
-		cover::find_embedded_cover("", true);
-		util::download_cover(&m_current);
-	}
+            cover::find_embedded_cover("", true);
+            util::download_cover(&m_current);
+        }
+    } else {
+        cover::find_embedded_cover("", true);
+        util::download_cover(&m_current);
+    }
 
     if (m_mpd_song)
         mpd_song_free(m_mpd_song);

@@ -134,13 +134,13 @@ void spotify_source::refresh()
     if (!m_logged_in)
         return;
 
-	if (util::epoch() > m_token_termination) {
-		binfo("Refreshing Spotify token");
-		QString log;
-		bool result = do_refresh_token(log);
-		tuna_dialog->apply_login_state(result, log);
-		save();
-	}
+    if (util::epoch() > m_token_termination) {
+        binfo("Refreshing Spotify token");
+        QString log;
+        bool result = do_refresh_token(log);
+        tuna_dialog->apply_login_state(result, log);
+        save();
+    }
 
     if (m_timout_start) {
         if (os_gettime_ns() - m_timout_start >= m_timeout_length) {
@@ -242,7 +242,6 @@ void spotify_source::parse_track_json(const QJsonValue& track)
             m_current.set_year(list[0]);
         }
     }
-
 }
 
 bool spotify_source::execute_capability(capability c)
