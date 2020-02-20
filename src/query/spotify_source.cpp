@@ -73,12 +73,13 @@ void spotify_source::load()
 
     /* Token handling */
     if (m_logged_in) {
+        int epoch = util::epoch();
         if (util::epoch() > m_token_termination) {
+            binfo("Refreshing Spotify token");
             QString log;
             bool result = do_refresh_token(log);
-            if (result) {
-                bdebug("Successfully renewed Spotify token");
-            }
+            if (result)
+                binfo("Successfully renewed Spotify token");
             save();
         }
     }
@@ -133,13 +134,19 @@ void spotify_source::refresh()
     if (!m_logged_in)
         return;
 
-    if (util::epoch() > m_token_termination)
-        save();
+	if (util::epoch() > m_token_termination) {
+		binfo("Refreshing Spotify token");
+		QString log;
+		bool result = do_refresh_token(log);
+		tuna_dialog->apply_login_state(result, log);
+		save();
+	}
 
     if (m_timout_start) {
         if (os_gettime_ns() - m_timout_start >= m_timeout_length) {
             m_timout_start = 0;
             m_timeout_length = 0;
+            binfo("API timeout is over");
         } else {
             binfo("Waiting for Spotify-API timeout");
             return;
@@ -181,12 +188,12 @@ void spotify_source::refresh()
         if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
-                bwarn("Spotify-API Rate limit hit, waiting %ull seconds\n", m_timeout_length);
+                bwarn("Spotify-API Rate limit hit, waiting %li seconds\n", m_timeout_length);
                 m_timeout_length *= SECOND_TO_NS;
                 m_timout_start = os_gettime_ns();
             }
         } else {
-            bwarn("Unknown error occured when querying Spotify-API: %i (response: %s)", http_code,
+            bwarn("Unknown error occured when querying Spotify-API: %li (response: %s)", http_code,
                 str.toStdString().c_str());
         }
     }
@@ -227,11 +234,12 @@ void spotify_source::parse_track_json(const QJsonValue& track)
         switch (list.length()) {
         case 3:
             m_current.set_day(list[2]);
-        case 2: /* Fallthrough */
+            [[clang::fallthrough]];
+        case 2:
             m_current.set_month(list[1]);
-        case 1: /* Fallthrough */
+            [[clang::fallthrough]];
+        case 1:
             m_current.set_year(list[0]);
-        default:;
         }
     }
 
@@ -355,6 +363,7 @@ bool spotify_source::do_refresh_token(QString& log)
     request_token(request, m_creds.toStdString(), response);
 
     if (response.isNull()) {
+        berr("Couldn't refresh Spotify token, response was null");
         return false;
     } else {
         const auto& response_obj = response.object();
@@ -368,7 +377,6 @@ bool spotify_source::do_refresh_token(QString& log)
             m_token = token.toString();
             m_token_termination = util::epoch() + expires.toInt();
             m_logged_in = true;
-            save();
         } else {
             berr("Couldn't parse json response");
             result = false;

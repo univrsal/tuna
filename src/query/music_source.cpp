@@ -22,6 +22,8 @@
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "window_source.hpp"
+#include "../util/tuna_thread.hpp"
+#include "../util/cover_tag_handler.hpp"
 #include <exception>
 
 namespace source {
@@ -52,6 +54,7 @@ void select(const char* id)
 {
     if (!id)
         return;
+    thread::mutex.lock();
     int i = 0;
     for (auto src : instances) {
         if (strcmp(src->id(), id) == 0) {
@@ -60,6 +63,10 @@ void select(const char* id)
         }
         i++;
     }
+    /* ensure cover will be refreshed after changing source */
+    util::download_cover(nullptr, true);
+    cover::find_embedded_cover("", true);
+    thread::mutex.unlock();
 }
 
 void set_gui_values()

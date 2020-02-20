@@ -84,7 +84,9 @@ void load()
     selected_source = CGET_STR(CFG_SELECTED_SOURCE);
 
     /* Sources */
+    thread::mutex.lock();
     source::load();
+    thread::mutex.unlock();
 
     if (run && !thread::start())
         berr("Couldn't start thread");
@@ -125,7 +127,7 @@ void load_outputs(QList<QPair<QString, QString>>& table_content)
         if (doc.isArray())
             array = doc.array();
 
-        for (const auto& val : array) {
+        for (const auto val : array) {
             QJsonObject obj = val.toObject();
             table_content.push_back(QPair<QString, QString>(
                 obj[JSON_FORMAT_ID].toString(),
@@ -166,7 +168,7 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
             auto wrote = save_file.write(data);
             if (data.length() != wrote) {
                 berr("Couldn't write outputs to %s only"
-                     "wrote %i bytes out of %i",
+                     "wrote %lli bytes out of %i",
                     path.toStdString().c_str(),
                     wrote, data.length());
             }
