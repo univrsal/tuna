@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#ifdef LINUX
+#ifdef UNIX
 
 #include "mpd_source.hpp"
 #include "../gui/tuna_gui.hpp"
@@ -71,6 +71,7 @@ void mpd_source::connect()
             m_port,
             mpd_connection_get_error_message(m_connection));
         mpd_connection_free(m_connection);
+        m_connection = nullptr;
     } else {
         m_connected = true;
         mpd_connection_set_keepalive(m_connection, true);

@@ -20,7 +20,7 @@
 #include "../util/constants.hpp"
 #include "music_source.hpp"
 
-#ifdef LINUX
+#ifdef UNIX
 #include <mpd/client.h>
 
 class mpd_source : public music_source {

@@ -29,20 +29,42 @@ set(tuna_ui
 find_package(LibVLC QUIET)
 
 
-if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-    add_definitions(-DLINUX=1)
-    add_definitions(-DUNIX=1)
-
-    find_package(Taglib)
-
-    set(tuna_platform_includes
-        ${TAGLIB_INCLUDES}
-        )
-    set(tuna_platform_deps
+if (UNIX AND NOT APPLE)
+	add_definitions(-DLINUX=1)
+        find_package(Taglib)
+	set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
+        set(tuna_platform_deps
             mpdclient
             tag)
+        set(tuna_platform_includes
+            ${TAGLIB_INCLUDES})
+endif()
 
-    set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp"
+if (APPLE)
+	add_definitions(-DMACOS=1)
+	set(tuna_platform_sources "./src/util/window/window_helper_mac.mm")
+        find_library(COCOA Cocoa)
+        find_Library(MPDCLIENT mpdclient)
+        find_library(TAG tag)
+        find_path(MPDCLIENT_INCLUDES mpd/client.h)
+        find_path(TAG_INCLUDES taglib/tag.h)
+
+	include_directories(${COCOA})
+        include_directories(${TAG_INCLUDES})
+        include_directories(${MPDCLIENT_INCLUDES})
+	set_source_files_properties("./src/util/window/window_helper_mac.mm"
+		PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+
+        set(tuna_platform_deps
+                ${COCOA}
+                ${MPDCLIENT}
+                ${TAG})
+endif()
+
+if (UNIX)
+    add_definitions(-DUNIX=1)
+
+    set(tuna_platform_sources ${tuna_platform_sources} 
         "./src/util/cover_tag_handler.cpp"
         "./src/util/cover_tag_handler.hpp")
 endif ()

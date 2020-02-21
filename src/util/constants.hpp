@@ -63,7 +63,7 @@
 /* Outputs are saved into config folder on linux, but on windows
  * the home directory isn't really used anyways so just save it
  * there */
-#if LINUX
+#if UNIX
 #define OUTPUT_FILE ".config/outputs.json"
 #else
 #define OUTPUT_FILE "outputs.json"

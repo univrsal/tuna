@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>707</width>
+    <width>683</width>
     <height>701</height>
    </rect>
   </property>
@@ -35,7 +35,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -714,7 +714,7 @@
           <item>
            <widget class="QLineEdit" name="txt_auth_code">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -1018,13 +1018,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>tuna.gui.tab.mpd.server</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QFrame" name="frame_14">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -1055,6 +1048,13 @@
          </property>
          <property name="checked">
           <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>tuna.gui.tab.mpd.server</string>
          </property>
         </widget>
        </item>

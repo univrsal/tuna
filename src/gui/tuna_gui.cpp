@@ -70,7 +70,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     }
     ui->btn_performrefresh->setEnabled(logged_in);
 
-#ifndef LINUX
+#ifndef UNIX
     ui->settings_tabs->removeTab(2);
 #endif
 
@@ -254,7 +254,7 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */
-#if LINUX
+#if UNIX
     CSET_STR(CFG_MPD_IP, qPrintable(ui->txt_ip->text()));
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
     CSET_BOOL(CFG_MPD_LOCAL, ui->rb_local->isChecked());

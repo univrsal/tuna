@@ -1,2 +1,3 @@
 creds.txt
 *.autosave
+.DS_Store
