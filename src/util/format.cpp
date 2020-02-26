@@ -102,7 +102,10 @@ void execute(QString& q)
     auto src_ref = source::selected_source();
     bool first = true;
     for (auto& split : splits) {
-        if (first) { first = false; continue; }
+        if (first) {
+            first = false;
+            continue;
+        }
         auto sp = get_matching_specifier(split[0].toLower().toLatin1());
         if (sp)
             sp->do_format(split, src_ref->song_info());
