@@ -28,6 +28,12 @@
 #define S_SOURCE_VLC			"vlc"
 #define S_SOURCE_WINDOW_TITLE	"window"
 
+#define S_PROGRESS_FG			"fg"
+#define S_PROGRESS_BG			"bg"
+#define S_PROGRESS_CX			"cx"
+#define S_PROGRESS_CY			"cy"
+#define S_PROGRESS_ID           "progress_bar"
+
 /* Translation */
 #define T_(s) 					obs_module_text(s)
 #define T_MENU_TUNA 			T_("tuna.gui.menu")
@@ -58,6 +64,12 @@
 #define T_VLC_NONE 				T_("tuna.gui.vlc.none")
 #define T_VLC_VERSION_ISSUE		T_("tuna.gui.vlc.issue.message")
 #define T_ERROR_TITLE			T_("tuna.gui.issue.title")
+
+#define T_PROGRESS_FG			T_("tuna.source.progress.color.fg")
+#define T_PROGRESS_BG			T_("tuna.source.progress.color.bg")
+#define T_PROGRESS_CX			T_("tuna.source.progress.cx")
+#define T_PROGRESS_CY			T_("tuna.source.progress.cy")
+#define T_PROGRESS_NAME			T_("tuna.source.progress.name")
 #define FILTER(name, type) 		name " (" type ");;All Files(*)"
 
 /* Outputs are saved into config folder on linux, but on windows

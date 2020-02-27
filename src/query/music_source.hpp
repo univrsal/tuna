@@ -85,7 +85,7 @@ public:
     virtual bool valid_format(const QString& str) = 0;
 };
 
-namespace source {
+namespace music_sources {
 extern QList<std::shared_ptr<music_source>> instances;
 extern void init();
 extern void load();

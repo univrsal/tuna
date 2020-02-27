@@ -99,7 +99,7 @@ void init()
 void execute(QString& q)
 {
     auto splits = q.split("%");
-    auto src_ref = source::selected_source();
+    auto src_ref = music_sources::selected_source();
     bool first = !q.startsWith("%");
     for (auto& split : splits) {
         if (first) {

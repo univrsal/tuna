@@ -30,9 +30,9 @@ find_package(LibVLC QUIET)
 
 
 if (UNIX AND NOT APPLE)
-	add_definitions(-DLINUX=1)
+    add_definitions(-DLINUX=1)
         find_package(Taglib)
-	set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
+    set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
         set(tuna_platform_deps
             mpdclient
             tag)
@@ -41,19 +41,19 @@ if (UNIX AND NOT APPLE)
 endif()
 
 if (APPLE)
-	add_definitions(-DMACOS=1)
-	set(tuna_platform_sources "./src/util/window/window_helper_mac.mm")
+    add_definitions(-DMACOS=1)
+    set(tuna_platform_sources "./src/util/window/window_helper_mac.mm")
         find_library(COCOA Cocoa)
         find_Library(MPDCLIENT mpdclient)
         find_library(TAG tag)
         find_path(MPDCLIENT_INCLUDES mpd/client.h)
         find_path(TAG_INCLUDES taglib/tag.h)
 
-	include_directories(${COCOA})
+    include_directories(${COCOA})
         include_directories(${TAG_INCLUDES})
         include_directories(${MPDCLIENT_INCLUDES})
-	set_source_files_properties("./src/util/window/window_helper_mac.mm"
-		PROPERTIES COMPILE_FLAGS "-fobjc-arc")
+    set_source_files_properties("./src/util/window/window_helper_mac.mm"
+        PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 
         set(tuna_platform_deps
                 ${COCOA}
@@ -64,7 +64,7 @@ endif()
 if (UNIX)
     add_definitions(-DUNIX=1)
 
-    set(tuna_platform_sources ${tuna_platform_sources} 
+    set(tuna_platform_sources ${tuna_platform_sources}
         "./src/util/cover_tag_handler.cpp"
         "./src/util/cover_tag_handler.hpp")
 endif ()
@@ -120,6 +120,8 @@ set(tuna_sources
     ./src/query/song.hpp
     ./src/util/format.cpp
     ./src/util/format.hpp
+    ./src/source/progress.cpp
+    ./src/source/progress.hpp
     ${tuna_vlc_source}
     ./src/query/vlc_obs_source.hpp
     ./src/util/tuna_thread.cpp

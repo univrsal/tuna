@@ -23,6 +23,7 @@
 #include "util/format.hpp"
 #include "util/tuna_thread.hpp"
 #include "util/utility.hpp"
+#include "source/progress.hpp"
 #include <QAction>
 #include <QMainWindow>
 #include <obs-frontend-api.h>
@@ -51,12 +52,13 @@ void register_gui()
 bool obs_module_load()
 {
     binfo("Loading v%s", TUNA_VERSION);
-    source::init();
+    music_sources::init();
     register_gui();
     format::init();
     config::init();
     util::load_vlc();
     config::load();
+    obs_sources::register_progress();
     return true;
 }
 

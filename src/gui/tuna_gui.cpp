@@ -73,7 +73,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->cb_vlc_source_name->setEnabled(util::vlc_loaded);
 
     /* Add sources */
-    for (const auto& src : source::instances) {
+    for (const auto& src : music_sources::instances) {
         if (src->enabled())
             ui->cb_source->addItem(utf8_to_qt(src->name()), src->id());
     }
@@ -107,7 +107,7 @@ void tuna_gui::toggleShowHide()
     if (isVisible()) {
         /* Load config values for sources on dialog show */
         load_vlc_sources();
-        source::set_gui_values();
+        music_sources::set_gui_values();
 
         /* setup config values */
         ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
@@ -120,7 +120,7 @@ void tuna_gui::toggleShowHide()
 
         const char* s = CGET_STR(CFG_SELECTED_SOURCE);
         int i = 0;
-        for (const auto& src : source::instances) {
+        for (const auto& src : music_sources::instances) {
             if (strcmp(src->id(), s) == 0)
                 break;
             i++;
@@ -173,7 +173,7 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
 {
     if (state) {
         try {
-            auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
+            auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
             ui->txt_token->setText(spotify->token());
             ui->txt_refresh_token->setText(
                 spotify->refresh_token());
@@ -205,7 +205,7 @@ void tuna_gui::on_btn_request_token_clicked()
     QString log;
     bool result = false;
     try {
-        auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
+        auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
         spotify->set_auth_code(ui->txt_auth_code->text());
         result = spotify->new_token(log);
         spotify.reset();
@@ -222,7 +222,7 @@ void tuna_gui::on_btn_performrefresh_clicked()
     QString log;
     bool result = false;
     try {
-        auto spotify = source::get<spotify_source>(S_SOURCE_SPOTIFY);
+        auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
         spotify->set_auth_code(ui->txt_auth_code->text());
         result = spotify->do_refresh_token(log);
         spotify.reset();

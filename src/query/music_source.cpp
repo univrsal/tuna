@@ -26,7 +26,7 @@
 #include "window_source.hpp"
 #include <exception>
 
-namespace source {
+namespace music_sources {
 int selected_index = 0;
 QList<std::shared_ptr<music_source>> instances;
 

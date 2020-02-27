@@ -77,7 +77,7 @@ void* thread_method(void*)
     while (thread_state) {
         auto time = util::epoch();
         mutex.lock();
-        auto ref = source::selected_source();
+        auto ref = music_sources::selected_source();
         ref->refresh();
         auto* s = ref->song_info();
 

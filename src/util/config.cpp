@@ -85,18 +85,18 @@ void load()
 
     /* Sources */
     thread::mutex.lock();
-    source::load();
+    music_sources::load();
     thread::mutex.unlock();
 
     if (run && !thread::start())
         berr("Couldn't start thread");
 
-    source::select(selected_source);
+    music_sources::select(selected_source);
 }
 
 void save()
 {
-    source::save();
+    music_sources::save();
     save_outputs(outputs);
 }
 
@@ -112,7 +112,7 @@ void close()
         os_sleep_ms(5);
     bfree((void*)cover_placeholder);
     thread::mutex.lock();
-    source::deinit();
+    music_sources::deinit();
     thread::mutex.unlock();
 }
 
