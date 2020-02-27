@@ -60,15 +60,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     bfree((void*)path);
 
     ui->settings_tabs->setCurrentIndex(0);
-    bool logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
-    if (logged_in) {
-        ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
-        ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
-                                            "font-weight: bold;}");
-    } else {
-        ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDOUT);
-    }
-    ui->btn_performrefresh->setEnabled(logged_in);
 
 #ifndef UNIX
     ui->settings_tabs->removeTab(2);
@@ -186,6 +177,7 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
             ui->txt_token->setText(spotify->token());
             ui->txt_refresh_token->setText(
                 spotify->refresh_token());
+            ui->txt_auth_code->setText(spotify->auth_code());
             spotify.reset();
         } catch (std::invalid_argument& e) {
             berr("apply_login_state failed with: %s", e.what());
@@ -201,7 +193,7 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
     ui->btn_performrefresh->setEnabled(state);
 
     /* Log */
-    if (ui->cb_use_log->isChecked()) {
+    if (ui->cb_use_log->isChecked() && !log.isEmpty()) {
         QDateTime now = QDateTime::currentDateTime();
         ui->txt_json_log->append("= " + now.toString("yyyy.MM.dd hh:mm") + " =");
         ui->txt_json_log->append(log);
@@ -295,9 +287,8 @@ void tuna_gui::on_apply_pressed()
 
 void tuna_gui::on_btn_start_clicked()
 {
-    if (!thread::start()) {
+    if (!thread::start())
         QMessageBox::warning(this, "Error", "Thread couldn't be started!");
-    }
     CSET_BOOL(CFG_RUNNING, thread::thread_state);
     set_state();
 }

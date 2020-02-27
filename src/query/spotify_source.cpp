@@ -87,9 +87,8 @@ void spotify_source::load()
 
 void spotify_source::set_gui_values()
 {
-    tuna_dialog->set_spotify_auth_code(m_auth_code);
-    tuna_dialog->set_spotify_auth_token(m_token);
-    tuna_dialog->set_spotify_refresh_token(m_refresh_token);
+    bool logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
+    tuna_dialog->apply_login_state(logged_in, "");
 }
 
 void spotify_source::save()
@@ -337,8 +336,10 @@ void request_token(const std::string& request, const std::string& credentials, Q
         } else {
             /* Log response without tokens */
             auto obj = response_json.object();
-            obj["access_token"] = "REDACTED";
-            obj["refresh_token"] = "REDACTED";
+            if (obj["access_token"].isString())
+                obj["access_token"] = "REDACTED";
+            if (obj["refresh_token"].isString())
+                obj["refresh_token"] = "REDACTED";
             auto doc = QJsonDocument(obj);
             QString str(doc.toJson());
             binfo("Spotify response: %s", qt_to_utf8(str));
@@ -357,6 +358,12 @@ bool spotify_source::do_refresh_token(QString& log)
     static std::string request;
     bool result = true;
     QJsonDocument response;
+
+    if (m_refresh_token.isEmpty()) {
+        berr("Refresh token is empty!");
+        return false;
+    }
+
     request = "grant_type=refresh_token&refresh_token=";
     request.append(m_refresh_token.toStdString());
     request_token(request, m_creds.toStdString(), response);
@@ -368,6 +375,7 @@ bool spotify_source::do_refresh_token(QString& log)
         const auto& response_obj = response.object();
         const auto& token = response_obj["access_token"];
         const auto& expires = response_obj["expires_in"];
+
         const auto& refresh_token = response_obj["refresh_token"];
 
         /* Dump the json into the log text */
@@ -376,14 +384,20 @@ bool spotify_source::do_refresh_token(QString& log)
             m_token = token.toString();
             m_token_termination = util::epoch() + expires.toInt();
             m_logged_in = true;
+            binfo("Successfully logged in");
         } else {
             berr("Couldn't parse json response");
             result = false;
         }
 
         /* Refreshing the token can return a new refresh token */
-        if (!refresh_token.isNull())
-            m_refresh_token = refresh_token.toString();
+        if (refresh_token.isString()) {
+            QString tmp = refresh_token.toString();
+            if (!tmp.isEmpty()) {
+                binfo("Received a new fresh token");
+                m_refresh_token = refresh_token.toString();
+            }
+        }
     }
 
     m_logged_in = result;

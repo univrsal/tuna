@@ -51,12 +51,12 @@ void register_gui()
 bool obs_module_load()
 {
     binfo("Loading v%s", TUNA_VERSION);
+    source::init();
+    register_gui();
     format::init();
     config::init();
     util::load_vlc();
-    source::init();
     config::load();
-    register_gui();
     return true;
 }
 

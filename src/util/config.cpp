@@ -111,7 +111,9 @@ void close()
     while (thread::thread_state)
         os_sleep_ms(5);
     bfree((void*)cover_placeholder);
+    thread::mutex.lock();
     source::deinit();
+    thread::mutex.unlock();
 }
 
 void load_outputs(QList<QPair<QString, QString>>& table_content)

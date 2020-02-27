@@ -176,8 +176,8 @@ void mpd_source::refresh()
             }
         } else {
             /* Reset the last embedded cover path to make
-			 * sure that when playback is resumed it'll
-			 * grab the cover again */
+             * sure that when playback is resumed it'll
+             * grab the cover again */
             cover::find_embedded_cover("", true);
             util::download_cover(&m_current);
         }

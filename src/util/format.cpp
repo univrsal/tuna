@@ -100,7 +100,7 @@ void execute(QString& q)
 {
     auto splits = q.split("%");
     auto src_ref = source::selected_source();
-    bool first = true;
+    bool first = !q.startsWith("%");
     for (auto& split : splits) {
         if (first) {
             first = false;
