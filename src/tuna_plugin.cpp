@@ -18,12 +18,12 @@
 
 #include "gui/tuna_gui.hpp"
 #include "query/vlc_obs_source.hpp"
+#include "source/progress.hpp"
 #include "util/config.hpp"
 #include "util/constants.hpp"
 #include "util/format.hpp"
 #include "util/tuna_thread.hpp"
 #include "util/utility.hpp"
-#include "source/progress.hpp"
 #include <QAction>
 #include <QMainWindow>
 #include <obs-frontend-api.h>
