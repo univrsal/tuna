@@ -27,8 +27,14 @@ class progress_source {
 	obs_source_t *m_source = nullptr;
 	float m_progress = 0.f;
 	float m_bounce_progress = 0.f;
+
+	/* Song progress grabbed from current music source */
+	int32_t m_synced_progress = 0.f;
+	/* Song progress adjusted with frame time */
+	float m_adjusted_progress = 0.f;
 	bool m_bounce_up = true;
 	bool m_active = false;
+	bool m_use_bg = true;
 public:
 	progress_source(obs_source_t *src, obs_data_t *settings);
 	~progress_source();

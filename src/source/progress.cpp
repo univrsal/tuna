@@ -42,17 +42,22 @@ void progress_source::tick(float seconds)
 		const song* s;
 		if (src && (s = src->song_info())) {
 			if ((s->data() & CAP_DURATION) && (s->data() & CAP_PROGRESS)) {
-				float progress = s->get_int_value('p');
+				if (s->get_int_value('p') == m_synced_progress) {
+
+				} else {
+					m_synced_progress = s->get_int_value('p');
+					m_adjusted_progress = m_synced_progress + seconds;
+				}
 				float duration = s->get_int_value('l');
 				if (duration > 0)
-					m_progress = progress / duration;
+					m_progress = m_adjusted_progress / duration;
 			}
 		}
 	}
 	thread::mutex.unlock();
 
 	if (!m_active) {
-		float step = 0.001f * m_cx;
+		float step = 0.0005f * m_cx;
 		if (m_bounce_up)
 			m_bounce_progress = fmin(m_bounce_progress + seconds * step, 1.f);
 		else
@@ -75,34 +80,36 @@ void progress_source::render(gs_effect_t *effect)
 	vec4_from_rgba(&bg, m_bg);
 	vec4_from_rgba(&fg, m_fg);
 
-	gs_effect_set_vec4(color, &bg);
+	if (m_use_bg) {
+		gs_effect_set_vec4(color, &bg);
 
-	gs_technique_begin(tech);
-	gs_technique_begin_pass(tech, 0);
-	gs_draw_sprite(0, 0, m_cx, m_cy);
-	gs_technique_end_pass(tech);
-	gs_technique_end(tech);
+		gs_technique_begin(tech);
+		gs_technique_begin_pass(tech, 0);
+		gs_draw_sprite(nullptr, 0, m_cx, m_cy);
+		gs_technique_end_pass(tech);
+		gs_technique_end(tech);
+	}
 
 	gs_effect_set_vec4(color, &fg);
 
 	if (m_active) {
-		uint32_t progress = m_cx * m_progress;
+		uint32_t progress = static_cast<uint32_t>(m_cx * m_progress);
 		if (progress > 0) {
 			gs_technique_begin(tech);
 			gs_technique_begin_pass(tech, 0);
-			gs_draw_sprite(0, 0, progress, m_cy);
+			gs_draw_sprite(nullptr, 0, progress, m_cy);
 			gs_technique_end_pass(tech);
 			gs_technique_end(tech);
 		}
 	} else {
-		uint32_t w = m_cx * .25;
-		uint32_t x = m_bounce_progress * (m_cx - w);
+		uint32_t w = static_cast<uint32_t>(m_cx * .25);
+		uint32_t x = static_cast<uint32_t>(m_bounce_progress * (m_cx - w));
 		if (w > 0) {
 			gs_matrix_push();
 			gs_technique_begin(tech);
 			gs_technique_begin_pass(tech, 0);
 			gs_matrix_translate3f(x, 0, 0);
-			gs_draw_sprite(0, 0, w, m_cy);
+			gs_draw_sprite(nullptr, 0, w, m_cy);
 			gs_technique_end_pass(tech);
 			gs_technique_end(tech);
 			gs_matrix_pop();
@@ -112,16 +119,29 @@ void progress_source::render(gs_effect_t *effect)
 
 void progress_source::update(obs_data_t *settings)
 {
-	m_cx = obs_data_get_int(settings, S_PROGRESS_CX);
-	m_cy = obs_data_get_int(settings, S_PROGRESS_CY);
-	m_fg = obs_data_get_int(settings, S_PROGRESS_FG);
-	m_bg = obs_data_get_int(settings, S_PROGRESS_BG);
+	m_cx = static_cast<uint32_t>(obs_data_get_int(settings, S_PROGRESS_CX));
+	m_cy = static_cast<uint32_t>(obs_data_get_int(settings, S_PROGRESS_CY));
+	m_fg = static_cast<uint32_t>(obs_data_get_int(settings, S_PROGRESS_FG));
+	m_bg = static_cast<uint32_t>(obs_data_get_int(settings, S_PROGRESS_BG));
+	m_use_bg = obs_data_get_bool(settings, S_PROGRESS_USE_BG);
+}
+
+static bool use_bg_changed(obs_properties_t *props, obs_property_t *property,
+                           obs_data_t *settings)
+{
+    UNUSED_PARAMETER(property);
+    auto *prop = obs_properties_get(props, S_PROGRESS_BG);
+    obs_property_set_visible(prop, obs_data_get_bool(settings, S_PROGRESS_USE_BG));
+    return true;
 }
 
 obs_properties_t *get_properties_for_progress(void *data)
 {
+    UNUSED_PARAMETER(data);
     auto *p = obs_properties_create();
     obs_properties_add_color(p, S_PROGRESS_FG, T_PROGRESS_FG);
+    auto *use_bg = obs_properties_add_bool(p, S_PROGRESS_USE_BG, T_PROGRESS_USE_BG);
+    obs_property_set_modified_callback(use_bg, use_bg_changed);
     obs_properties_add_color(p, S_PROGRESS_BG, T_PROGRESS_BG);
     obs_properties_add_int(p, S_PROGRESS_CX, T_PROGRESS_CX, 2, UINT16_MAX, 1);
     obs_properties_add_int(p, S_PROGRESS_CY, T_PROGRESS_CY, 2, UINT16_MAX, 1);

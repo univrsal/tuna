@@ -33,6 +33,7 @@
 #define S_PROGRESS_CX			"cx"
 #define S_PROGRESS_CY			"cy"
 #define S_PROGRESS_ID           "progress_bar"
+#define S_PROGRESS_USE_BG		"use_bg"
 
 /* Translation */
 #define T_(s) 					obs_module_text(s)
@@ -70,6 +71,8 @@
 #define T_PROGRESS_CX			T_("tuna.source.progress.cx")
 #define T_PROGRESS_CY			T_("tuna.source.progress.cy")
 #define T_PROGRESS_NAME			T_("tuna.source.progress.name")
+#define T_PROGRESS_USE_BG		T_("tuna.source.progress.use.bg")
+
 #define FILTER(name, type) 		name " (" type ");;All Files(*)"
 
 /* Outputs are saved into config folder on linux, but on windows

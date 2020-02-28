@@ -68,21 +68,21 @@ public:
         return m_capabilities & ((uint16_t)c);
     }
 
-    const song* song_info() { return &m_current; }
-
-    /* Abstract stuff */
-    virtual const char* name() const = 0;
-    virtual const char* id() const = 0;
-    virtual bool enabled() const = 0;
-    /* Save/load config values */
-    virtual void load() = 0;
-    virtual void save() = 0;
-    /* Perform information query */
-    virtual void refresh() = 0;
-    /* Execute and return true if successful */
-    virtual bool execute_capability(capability c) = 0;
-    virtual void set_gui_values() = 0;
-    virtual bool valid_format(const QString& str) = 0;
+	const song* song_info() { return &m_current; }
+	void reset_info() { m_current.clear(); }
+	/* Abstract stuff */
+	virtual const char* name() const = 0;
+	virtual const char* id() const = 0;
+	virtual bool enabled() const = 0;
+	/* Save/load config values */
+	virtual void load() = 0;
+	virtual void save() = 0;
+	/* Perform information query */
+	virtual void refresh() = 0;
+	/* Execute and return true if successful */
+	virtual bool execute_capability(capability c) = 0;
+	virtual void set_gui_values() = 0;
+	virtual bool valid_format(const QString& str) = 0;
 };
 
 namespace music_sources {

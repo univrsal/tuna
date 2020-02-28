@@ -63,7 +63,13 @@ bool start()
 
 void stop()
 {
+    mutex.lock();
     thread_state = false;
+    /* Set status to noting before stopping */
+    auto src = music_sources::selected_source();
+    src->reset_info();
+    util::handle_outputs(src->song_info());
+    mutex.unlock();
 }
 
 #ifdef _WIN32
