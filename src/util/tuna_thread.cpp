@@ -63,23 +63,21 @@ bool start()
 
 void stop()
 {
-    mutex.lock();
     thread_state = false;
     /* Set status to noting before stopping */
     auto src = music_sources::selected_source();
     src->reset_info();
     util::handle_outputs(src->song_info());
-    mutex.unlock();
 }
 
 #ifdef _WIN32
 DWORD WINAPI
 thread_method(LPVOID arg)
 #else
-
-void* thread_method(void*)
+void* thread_method(void* arg)
 #endif
 {
+	UNUSED_PARAMETER(arg);	
     while (thread_state) {
         auto time = util::epoch();
         mutex.lock();

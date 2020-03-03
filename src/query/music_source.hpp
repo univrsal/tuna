@@ -20,6 +20,7 @@
 
 #include "song.hpp"
 #include <QDate>
+#include <QObject>
 #include <memory>
 #include <stdint.h>
 
@@ -50,7 +51,8 @@ enum capability {
 
 /* clang-format on */
 
-class music_source {
+class music_source : public QObject{
+	Q_OBJECT
 protected:
     uint32_t m_capabilities = 0x0;
     song m_current = {};

@@ -24,6 +24,8 @@ typedef SSIZE_T ssize_t;
 // clang-format on
 
 /* Lord forgive me for this atrocity */
+#undef private
+#undef signals
 #define private priv
 #define signals sigs
 #include <obs-internal.h>

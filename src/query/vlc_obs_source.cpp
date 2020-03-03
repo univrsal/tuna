@@ -168,13 +168,14 @@ void vlc_obs_source::refresh()
 bool vlc_obs_source::execute_capability(capability c)
 {
     /* vlc source already has hotkeys in obs */
+	UNUSED_PARAMETER(c);
     return true;
 }
 
 void vlc_obs_source::set_gui_values()
 {
     if (m_target_source_name)
-        tuna_dialog->select_vlc_source(utf8_to_qt(m_target_source_name));
+        emit tuna_dialog->vlc_source_selected(utf8_to_qt(m_target_source_name));
 }
 
 bool vlc_obs_source::valid_format(const QString& str)
