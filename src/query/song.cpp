@@ -148,6 +148,8 @@ void song::set_day(const QString& d)
 
 const QString& song::get_string_value(char specifier) const
 {
+    static QString empty("");
+
     switch (specifier) {
     case 't':
         return m_title;
@@ -156,7 +158,7 @@ const QString& song::get_string_value(char specifier) const
     case 'y':
         return m_year;
     default:
-        return "";
+        return empty;
     }
 }
 

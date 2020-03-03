@@ -35,7 +35,5 @@ public:
     bool execute_capability(capability c) override;
     void set_gui_values() override;
     bool valid_format(const QString& str) override;
-    const char* name() const override;
-    const char* id() const override;
     bool enabled() const override;
 };

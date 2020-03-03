@@ -27,6 +27,7 @@
 #include <taglib/fileref.h>
 
 mpd_source::mpd_source()
+    : music_source(S_SOURCE_MPD, T_SOURCE_MPD)
 {
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
@@ -76,16 +77,6 @@ void mpd_source::connect()
         m_connected = true;
         mpd_connection_set_keepalive(m_connection, true);
     }
-}
-
-const char* mpd_source::name() const
-{
-    return T_SOURCE_MPD;
-}
-
-const char* mpd_source::id() const
-{
-    return S_SOURCE_MPD;
 }
 
 bool mpd_source::enabled() const

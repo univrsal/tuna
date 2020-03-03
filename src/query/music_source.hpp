@@ -24,6 +24,8 @@
 #include <memory>
 #include <stdint.h>
 
+#include "src/util/utility.hpp"
+
 /* clang-format off */
 
 enum capability {
@@ -51,14 +53,16 @@ enum capability {
 
 /* clang-format on */
 
-class music_source : public QObject{
-	Q_OBJECT
+class music_source : public QObject {
+    Q_OBJECT
+    const char *m_id, *m_name;
+
 protected:
     uint32_t m_capabilities = 0x0;
     song m_current = {};
 
 public:
-    music_source() = default;
+    music_source(const char* id, const char* name);
 
     virtual ~music_source() {}
 
@@ -70,11 +74,12 @@ public:
         return m_capabilities & ((uint16_t)c);
     }
 
-    const song* song_info() { return &m_current; }
+    const song& song_info() const { return m_current; }
     void reset_info() { m_current.clear(); }
+    const char* name() const { return m_name; }
+    const char* id() const { return m_id; }
+
     /* Abstract stuff */
-    virtual const char* name() const = 0;
-    virtual const char* id() const = 0;
     virtual bool enabled() const = 0;
     /* Save/load config values */
     virtual void load() = 0;
@@ -100,7 +105,8 @@ extern std::shared_ptr<music_source> selected_source();
 template <class T>
 std::shared_ptr<T> get(const char* id)
 {
-    for (auto src : instances) {
+    for (const auto src : instances) {
+        bdebug("Searching %s for %s", src->id(), id);
         if (strcmp(src->id(), id) == 0) {
             return std::dynamic_pointer_cast<T>(src);
         }

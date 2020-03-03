@@ -25,9 +25,13 @@
 #include <QString>
 #include <mutex>
 
+#include "src/query/song.hpp"
+
 namespace thread {
 extern volatile bool thread_state;
-extern std::mutex mutex;
+extern std::mutex thread_mutex;
+extern std::mutex copy_mutex;
+extern song copy;
 
 bool start();
 
