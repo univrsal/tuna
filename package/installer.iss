@@ -4,7 +4,6 @@
 #define MyAppVersion "@VERSION"
 #define MyAppPublisher "univrsal"
 #define MyAppURL "http://github.com/unvirsal/@PROJECT"
-#define Uninstall "Uninstall " + MyAppName
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -35,7 +34,7 @@ Source: "..\LICENSE"; Flags: dontcopy
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
-Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{#Uninstall}"
+Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{#MyAppName}"
 
 [Code]
 procedure InitializeWizard();

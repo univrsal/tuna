@@ -27,7 +27,7 @@ class vlc_obs_source : public music_source {
     obs_weak_source_t* m_weak_src = nullptr;
     struct vlc_source* get_vlc();
 
-    void reload();
+    bool reload();
 
 public:
     vlc_obs_source();
