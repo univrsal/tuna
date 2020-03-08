@@ -28,7 +28,8 @@
 #include "src/query/song.hpp"
 
 namespace thread {
-extern volatile bool thread_state;
+extern volatile bool thread_flag;
+extern volatile bool thread_running;
 extern std::mutex thread_mutex;
 extern std::mutex copy_mutex;
 extern song copy;

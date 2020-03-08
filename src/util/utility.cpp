@@ -21,7 +21,6 @@
 #include "config.hpp"
 #include "constants.hpp"
 #include "format.hpp"
-#include <QUrl>
 
 #if DISABLE_TUNA_VLC
 bool load_libvlc_module()
@@ -45,7 +44,6 @@ void unload_libvlc() {}
 #include <QTextStream>
 #include <ctime>
 #include <curl/curl.h>
-#include <fstream>
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>

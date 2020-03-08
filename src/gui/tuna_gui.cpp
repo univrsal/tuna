@@ -87,7 +87,7 @@ void tuna_gui::choose_file(QString& path, const char* title, const char* file_ty
 
 void tuna_gui::set_state()
 {
-    if (thread::thread_state)
+    if (thread::thread_flag)
         ui->lbl_status->setText(T_STATUS_RUNNING);
     else
         ui->lbl_status->setText(T_STATUS_STOPPED);
@@ -310,14 +310,14 @@ void tuna_gui::on_btn_start_clicked()
 {
     if (!thread::start())
         QMessageBox::warning(this, "Error", "Thread couldn't be started!");
-    CSET_BOOL(CFG_RUNNING, thread::thread_state);
+    CSET_BOOL(CFG_RUNNING, thread::thread_flag);
     set_state();
 }
 
 void tuna_gui::on_btn_stop_clicked()
 {
     thread::stop();
-    CSET_BOOL(CFG_RUNNING, thread::thread_state);
+    CSET_BOOL(CFG_RUNNING, thread::thread_flag);
     set_state();
 }
 

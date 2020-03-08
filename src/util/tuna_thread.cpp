@@ -30,7 +30,8 @@
 
 #endif
 namespace thread {
-volatile bool thread_state = false;
+volatile bool thread_flag = false;
+volatile bool thread_running = false;
 song copy;
 std::mutex thread_mutex;
 std::mutex copy_mutex;
@@ -44,9 +45,9 @@ static pthread_t thread_handle;
 bool start()
 {
     bool result = true;
-    if (thread_state)
+    if (thread_flag)
         return result;
-    thread_state = true;
+    thread_flag = true;
 
 #ifdef _WIN32
     thread_handle = CreateThread(nullptr,
@@ -59,13 +60,14 @@ bool start()
 #else
     result = pthread_create(&thread_handle, nullptr, thread_method, nullptr) == 0;
 #endif
-    thread_state = result;
+    thread_flag = result;
+	thread_running = result;
     return result;
 }
 
 void stop()
 {
-    thread_state = false;
+    thread_flag = false;
     /* Set status to noting before stopping */
     auto src = music_sources::selected_source();
     src->reset_info();
@@ -80,8 +82,8 @@ void* thread_method(void* arg)
 #endif
 {
     UNUSED_PARAMETER(arg);
-    while (thread_state) {
-        auto time = util::epoch();
+    while (thread_flag) {
+        const auto time = util::epoch();
         thread_mutex.lock();
         auto ref = music_sources::selected_source();
         ref->refresh();
@@ -99,11 +101,11 @@ void* thread_method(void* arg)
         thread_mutex.unlock();
 
         /* Calculate how long refresh took and only wait the remaining time */
-        auto delta = util::epoch() - time;
-        auto wait = config::refresh_rate - delta;
+        const auto delta = util::epoch() - time;
+        const auto wait = config::refresh_rate - delta;
         os_sleep_ms(wait);
     }
-
+	thread_running = false;
 #ifdef _WIN32
     return 0;
 #else

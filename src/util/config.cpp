@@ -108,7 +108,7 @@ void close()
     thread::thread_mutex.unlock();
 
     /* Wait for thread to exit to delete resources */
-    while (thread::thread_state)
+    while (thread::thread_running)
         os_sleep_ms(5);
     bfree((void*)cover_placeholder);
     thread::thread_mutex.lock();
