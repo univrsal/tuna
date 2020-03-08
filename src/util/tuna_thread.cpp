@@ -61,7 +61,7 @@ bool start()
     result = pthread_create(&thread_handle, nullptr, thread_method, nullptr) == 0;
 #endif
     thread_flag = result;
-	thread_running = result;
+    thread_running = result;
     return result;
 }
 
@@ -105,7 +105,7 @@ void* thread_method(void* arg)
         const auto wait = config::refresh_rate - delta;
         os_sleep_ms(wait);
     }
-	thread_running = false;
+    thread_running = false;
 #ifdef _WIN32
     return 0;
 #else
