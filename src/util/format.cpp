@@ -24,7 +24,7 @@
 
 namespace format {
 
-std::vector<std::unique_ptr<specifier>> specifiers;
+static std::vector<std::unique_ptr<specifier>> specifiers;
 
 const specifier* get_matching_specifier(char c)
 {
@@ -70,7 +70,7 @@ int get_truncate_arg(QString& str)
     return number;
 }
 
-QString time_format(uint32_t ms)
+QString time_format(int32_t ms)
 {
     int secs = (ms / 1000) % 60;
     int minute = (ms / 1000) / 60 % 60;
@@ -146,6 +146,7 @@ bool specifier_string::do_format(QString& slice, const song* s) const
 
 bool specifier_static::do_format(QString& slice, const song* s) const
 {
+    UNUSED_PARAMETER(s);
     slice = slice.remove(0, 1);
     slice.prepend(m_static_value);
     return true;
