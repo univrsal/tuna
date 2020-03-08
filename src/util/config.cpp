@@ -84,9 +84,9 @@ void load()
     selected_source = CGET_STR(CFG_SELECTED_SOURCE);
 
     /* Sources */
-    thread::mutex.lock();
+    thread::thread_mutex.lock();
     music_sources::load();
-    thread::mutex.unlock();
+    thread::thread_mutex.unlock();
 
     if (run && !thread::start())
         berr("Couldn't start thread");
@@ -102,18 +102,18 @@ void save()
 
 void close()
 {
-    thread::mutex.lock();
+    thread::thread_mutex.lock();
     save();
     thread::stop();
-    thread::mutex.unlock();
+    thread::thread_mutex.unlock();
 
     /* Wait for thread to exit to delete resources */
     while (thread::thread_state)
         os_sleep_ms(5);
     bfree((void*)cover_placeholder);
-    thread::mutex.lock();
+    thread::thread_mutex.lock();
     music_sources::deinit();
-    thread::mutex.unlock();
+    thread::thread_mutex.unlock();
 }
 
 void load_outputs(QList<QPair<QString, QString>>& table_content)

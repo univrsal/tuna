@@ -114,9 +114,9 @@ void execute(QString& q)
     q = splits.join("");
 }
 
-bool specifier::replace(QString& slice, const song* s, const QString& data) const
+bool specifier::replace(QString& slice, const song& s, const QString& data) const
 {
-    if (!(s->data() & m_tag_id))
+    if (!(s.data() & m_tag_id))
         return false; /* We do not have the information needed for this specifier */
 
     /* get truncation, if specified */
@@ -134,17 +134,17 @@ bool specifier::replace(QString& slice, const song* s, const QString& data) cons
     return true;
 }
 
-bool specifier::do_format(QString& slice, const song* s) const
+bool specifier::do_format(QString& slice, const song& s) const
 {
     return replace(slice, s);
 }
 
-bool specifier_string::do_format(QString& slice, const song* s) const
+bool specifier_string::do_format(QString& slice, const song& s) const
 {
-    return replace(slice, s, s->get_string_value(m_id));
+    return replace(slice, s, s.get_string_value(m_id));
 }
 
-bool specifier_static::do_format(QString& slice, const song* s) const
+bool specifier_static::do_format(QString& slice, const song& s) const
 {
     UNUSED_PARAMETER(s);
     slice = slice.remove(0, 1);
@@ -152,37 +152,37 @@ bool specifier_static::do_format(QString& slice, const song* s) const
     return true;
 }
 
-bool specifier_time::do_format(QString& slice, const song* s) const
+bool specifier_time::do_format(QString& slice, const song& s) const
 {
-    QString value = time_format(s->get_int_value(m_id));
+    QString value = time_format(s.get_int_value(m_id));
     return replace(slice, s, value);
 }
 
-bool specifier_int::do_format(QString& slice, const song* s) const
+bool specifier_int::do_format(QString& slice, const song& s) const
 {
-    QString value = QString::number(s->get_int_value(m_id));
+    QString value = QString::number(s.get_int_value(m_id));
     return replace(slice, s, value);
 }
 
-bool specifier_string_list::do_format(QString& slice, const song* s) const
+bool specifier_string_list::do_format(QString& slice, const song& s) const
 {
     QString concatenated_list;
-    for (auto str : s->artists())
+    for (auto str : s.artists())
         concatenated_list += str + ", ";
 
     concatenated_list.chop(2);
     return replace(slice, s, concatenated_list);
 }
 
-bool specifier_date::do_format(QString& slice, const song* s) const
+bool specifier_date::do_format(QString& slice, const song& s) const
 {
     QString data;
-    if (s->release_precision() == prec_day) {
-        data.append(s->year()).append(".").append(s->month()).append(".").append(s->day());
-    } else if (s->release_precision() == prec_month) {
-        data.append(s->year()).append(".").append(s->month()).append(".");
+    if (s.release_precision() == prec_day) {
+        data.append(s.year()).append(".").append(s.month()).append(".").append(s.day());
+    } else if (s.release_precision() == prec_month) {
+        data.append(s.year()).append(".").append(s.month()).append(".");
     } else {
-        data.append(s->year());
+        data.append(s.year());
     }
     return replace(slice, s, data);
 }

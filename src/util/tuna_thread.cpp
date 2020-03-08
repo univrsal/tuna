@@ -31,7 +31,9 @@
 #endif
 namespace thread {
 volatile bool thread_state = false;
-std::mutex mutex;
+song copy;
+std::mutex thread_mutex;
+std::mutex copy_mutex;
 
 #ifdef _WIN32
 static HANDLE thread_handle;
@@ -63,34 +65,38 @@ bool start()
 
 void stop()
 {
-    mutex.lock();
     thread_state = false;
     /* Set status to noting before stopping */
     auto src = music_sources::selected_source();
     src->reset_info();
     util::handle_outputs(src->song_info());
-    mutex.unlock();
 }
 
 #ifdef _WIN32
 DWORD WINAPI
 thread_method(LPVOID arg)
 #else
-
-void* thread_method(void*)
+void* thread_method(void* arg)
 #endif
 {
+    UNUSED_PARAMETER(arg);
     while (thread_state) {
         auto time = util::epoch();
-        mutex.lock();
+        thread_mutex.lock();
         auto ref = music_sources::selected_source();
         ref->refresh();
-        auto* s = ref->song_info();
+        auto s = ref->song_info();
 
+        /* Make a copy for the progress bar source, because it can't
+		  * wait for the other processes to finish, otherwise it'll block
+		  * the video thread
+		  */
+        copy_mutex.lock();
+        copy = s;
+        copy_mutex.unlock();
         /* Process song data */
         util::handle_outputs(s);
-        ref.reset();
-        mutex.unlock();
+        thread_mutex.unlock();
 
         /* Calculate how long refresh took and only wait the remaining time */
         auto delta = util::epoch() - time;

@@ -34,6 +34,7 @@ protected:
     int m_tag_id;
 
 public:
+    virtual ~specifier() = default;
     specifier() = default;
     specifier(char id, int tag_id)
         : m_id(id)
@@ -41,8 +42,8 @@ public:
     {
     }
 
-    virtual bool do_format(QString& slice, const song* s) const;
-    bool replace(QString& slice, const song* s, const QString& data = "") const;
+    virtual bool do_format(QString& slice, const song& s) const;
+    bool replace(QString& slice, const song& s, const QString& data = "") const;
 
     char get_id() const { return m_id; }
 };
@@ -54,7 +55,7 @@ public:
     {
     }
 
-    bool do_format(QString& slice, const song* s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_int : public specifier {
@@ -64,7 +65,7 @@ public:
     {
     }
 
-    bool do_format(QString& slice, const song* s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_string : public specifier {
@@ -74,7 +75,7 @@ public:
     {
     }
 
-    bool do_format(QString& slice, const song* s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_static : public specifier {
@@ -87,7 +88,7 @@ public:
     {
     }
 
-    bool do_format(QString& slice, const song* s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_string_list : public specifier {
@@ -99,7 +100,7 @@ public:
     {
     }
 
-    bool do_format(QString& slice, const song* s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_date : public specifier {
@@ -109,7 +110,7 @@ public:
     {
     }
 
-    bool do_format(QString& slice, const song* s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 }

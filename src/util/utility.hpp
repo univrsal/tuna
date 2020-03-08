@@ -44,13 +44,11 @@ void unload_vlc();
 
 bool curl_download(const char* url, const char* path);
 
-void download_cover(const song* song, bool reset = false);
+void download_cover(const song& song, bool reset = false);
 
-void download_lyrics(const song* song);
+void download_lyrics(const song& song);
 
-void handle_outputs(const song* song);
-
-bool move_file(const char* src, const char* dest);
+void handle_outputs(const song& song);
 
 int64_t epoch();
 

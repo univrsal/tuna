@@ -24,6 +24,7 @@
 #include "../util/vlc_internal.h"
 
 vlc_obs_source::vlc_obs_source()
+    : music_source(S_SOURCE_VLC, T_SOURCE_VLC)
 {
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 
@@ -35,16 +36,6 @@ vlc_obs_source::~vlc_obs_source()
 {
     obs_weak_source_release(m_weak_src);
     m_weak_src = nullptr;
-}
-
-const char* vlc_obs_source::name() const
-{
-    return T_SOURCE_VLC;
-}
-
-const char* vlc_obs_source::id() const
-{
-    return S_SOURCE_VLC;
 }
 
 void vlc_obs_source::reload()
@@ -97,7 +88,7 @@ struct vlc_source* vlc_obs_source::get_vlc()
     struct vlc_source* data = nullptr;
     obs_source_t* src = nullptr;
     if (!m_weak_src || !util::vlc_loaded)
-        goto end;
+        return data;
 
     src = obs_weak_source_get_source(m_weak_src);
     if (src) {
@@ -110,7 +101,6 @@ struct vlc_source* vlc_obs_source::get_vlc()
         load();
     }
 
-end:
     obs_source_release(src);
     return data;
 }
@@ -158,7 +148,7 @@ void vlc_obs_source::refresh()
             if (disc)
                 m_current.set_disc_number(std::stoi(disc));
 
-            util::download_cover(&m_current);
+            util::download_cover(m_current);
         }
     } else {
         m_current.clear();
@@ -168,13 +158,14 @@ void vlc_obs_source::refresh()
 bool vlc_obs_source::execute_capability(capability c)
 {
     /* vlc source already has hotkeys in obs */
+    UNUSED_PARAMETER(c);
     return true;
 }
 
 void vlc_obs_source::set_gui_values()
 {
     if (m_target_source_name)
-        tuna_dialog->select_vlc_source(utf8_to_qt(m_target_source_name));
+        emit tuna_dialog->vlc_source_selected(utf8_to_qt(m_target_source_name));
 }
 
 bool vlc_obs_source::valid_format(const QString& str)

@@ -34,26 +34,25 @@ progress_source::~progress_source()
 
 void progress_source::tick(float seconds)
 {
-    thread::mutex.lock();
-    m_active = thread::thread_state;
-    if (thread::thread_state) {
-        auto src = music_sources::selected_source();
-        const song* s;
-        if (src && (s = src->song_info())) {
-            if ((s->data() & CAP_DURATION) && (s->data() & CAP_PROGRESS)) {
-                if (s->get_int_value('p') == m_synced_progress) {
+    song tmp;
+    thread::copy_mutex.lock();
+    tmp = thread::copy;
+    thread::copy_mutex.unlock();
+    m_active = tmp.playing();
 
-                } else {
-                    m_synced_progress = s->get_int_value('p');
-                    m_adjusted_progress = m_synced_progress + seconds;
-                }
-                float duration = s->get_int_value('l');
-                if (duration > 0)
-                    m_progress = m_adjusted_progress / duration;
+    if (m_active) {
+        if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
+            if (tmp.get_int_value('p') == m_synced_progress) {
+
+            } else {
+                m_synced_progress = tmp.get_int_value('p');
+                m_adjusted_progress = m_synced_progress + seconds;
             }
+            float duration = tmp.get_int_value('l');
+            if (duration > 0)
+                m_progress = m_adjusted_progress / duration;
         }
     }
-    thread::mutex.unlock();
 
     if (!m_active) {
         float step = 0.0005f * m_cx;

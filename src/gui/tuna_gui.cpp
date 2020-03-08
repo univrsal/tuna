@@ -47,10 +47,14 @@ tuna_gui::tuna_gui(QWidget* parent)
     , ui(new Ui::tuna_gui)
 {
     ui->setupUi(this);
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply),
-        SIGNAL(clicked()),
-        this,
-        SLOT(on_apply_pressed()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(on_apply_pressed()));
+
+    /* Settings loading signals */
+    connect(this, &tuna_gui::login_state_changed, this, &tuna_gui::apply_login_state);
+    connect(this, &tuna_gui::vlc_source_selected, this, &tuna_gui::select_vlc_source);
+    connect(this, &tuna_gui::window_source_changed, this, &tuna_gui::update_window);
+    connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
+
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     /* load logo */
@@ -72,20 +76,13 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->btn_refresh_vlc->setEnabled(util::vlc_loaded);
     ui->cb_vlc_source_name->setEnabled(util::vlc_loaded);
 
-    /* Add sources */
-    for (const auto& src : music_sources::instances) {
-        if (src->enabled())
-            ui->cb_source->addItem(utf8_to_qt(src->name()), src->id());
-    }
-
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
 }
 
 void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)
 {
-    path = QFileDialog::getSaveFileName(
-        this, tr(title), QDir::home().path(), tr(file_types));
+    path = QFileDialog::getSaveFileName(this, tr(title), QDir::home().path(), tr(file_types));
 }
 
 void tuna_gui::set_state()
@@ -118,8 +115,8 @@ void tuna_gui::toggleShowHide()
         ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
         set_state();
 
-        const char* s = CGET_STR(CFG_SELECTED_SOURCE);
-        int i = 0;
+        const auto s = CGET_STR(CFG_SELECTED_SOURCE);
+        auto i = 0;
         for (const auto& src : music_sources::instances) {
             if (strcmp(src->id(), s) == 0)
                 break;
@@ -164,19 +161,18 @@ void tuna_gui::on_btn_open_login_clicked()
     QDesktopServices::openUrl(QUrl(base_url + QString::number(dist(rng))));
 }
 
-void tuna_gui::on_txt_auth_code_textChanged(const QString& arg1)
+void tuna_gui::on_txt_auth_code_textChanged(const QString& arg1) const
 {
     ui->btn_request_token->setEnabled(arg1.length() > 0);
 }
 
-void tuna_gui::apply_login_state(bool state, const QString& log)
+void tuna_gui::apply_login_state(bool state, const QString& log) const
 {
     if (state) {
         try {
             auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
             ui->txt_token->setText(spotify->token());
-            ui->txt_refresh_token->setText(
-                spotify->refresh_token());
+            ui->txt_refresh_token->setText(spotify->refresh_token());
             ui->txt_auth_code->setText(spotify->auth_code());
             spotify.reset();
         } catch (std::invalid_argument& e) {
@@ -200,10 +196,36 @@ void tuna_gui::apply_login_state(bool state, const QString& log)
     }
 }
 
+void tuna_gui::update_mpd(const QString& ip, uint16_t port, bool local, const QString& base_folder) const
+{
+    ui->txt_ip->setText(ip);
+    ui->sb_port->setValue(port);
+    ui->btn_browse_base_folder->setEnabled(local);
+    ui->txt_base_folder->setText(base_folder);
+    set_mpd_local(local);
+}
+
+void tuna_gui::update_window(const QString& title, const QString& replace, const QString& with, const QString& pause_if,
+    bool regex, uint16_t cut_begin, uint16_t cut_end) const
+{
+    ui->cb_regex->setChecked(regex);
+    ui->txt_title->setText(title);
+    ui->txt_search->setText(replace);
+    ui->txt_replace->setText(with);
+    ui->txt_paused->setText(pause_if);
+    ui->sb_begin->setValue(cut_begin);
+    ui->sb_end->setValue(cut_end);
+}
+
+void tuna_gui::add_music_source(const QString& display, const QString& id)
+{
+    ui->cb_source->addItem(display, id);
+}
+
 void tuna_gui::on_btn_request_token_clicked()
 {
     QString log;
-    bool result = false;
+    auto result = false;
     try {
         auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
         spotify->set_auth_code(ui->txt_auth_code->text());
@@ -268,14 +290,13 @@ void tuna_gui::on_tuna_gui_accepted()
 
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
-        config::outputs.push_back(QPair<QString, QString>(
-            ui->tbl_outputs->item(row, 0)->text(),
-            ui->tbl_outputs->item(row, 1)->text()));
+        config::outputs.push_back(
+            QPair<QString, QString>(ui->tbl_outputs->item(row, 0)->text(), ui->tbl_outputs->item(row, 1)->text()));
     }
     config::save_outputs(config::outputs);
-    thread::mutex.lock();
+    thread::thread_mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
-    thread::mutex.unlock();
+    thread::thread_mutex.unlock();
 
     config::load();
 }
@@ -298,80 +319,6 @@ void tuna_gui::on_btn_stop_clicked()
     thread::stop();
     CSET_BOOL(CFG_RUNNING, thread::thread_state);
     set_state();
-}
-
-void tuna_gui::set_mpd_ip(const QString& ip)
-{
-    ui->txt_ip->setText(ip);
-}
-
-void tuna_gui::set_mpd_port(uint16_t port)
-{
-    ui->sb_port->setValue(port);
-}
-
-void tuna_gui::set_mpd_local(bool state)
-{
-    ui->rb_local->setChecked(state);
-    ui->txt_ip->setEnabled(!state);
-    ui->sb_port->setEnabled(!state);
-    ui->txt_base_folder->setEnabled(state);
-    ui->btn_browse_base_folder->setEnabled(state);
-}
-
-void tuna_gui::set_mpd_base_folder(const QString& path)
-{
-    ui->txt_base_folder->setText(path);
-}
-
-void tuna_gui::set_spotify_auth_code(const QString& str)
-{
-    ui->txt_auth_code->setText(str);
-}
-
-void tuna_gui::set_spotify_auth_token(const QString& str)
-{
-    ui->txt_token->setText(str);
-}
-
-void tuna_gui::set_window_regex(bool state)
-{
-    ui->cb_regex->setChecked(state);
-}
-
-void tuna_gui::set_window_title(const QString& str)
-{
-    ui->txt_title->setText(str);
-}
-
-void tuna_gui::set_window_search(const QString& str)
-{
-    ui->txt_search->setText(str);
-}
-
-void tuna_gui::set_window_pause(const QString& str)
-{
-    ui->txt_paused->setText(str);
-}
-
-void tuna_gui::set_window_replace(const QString& str)
-{
-    ui->txt_replace->setText(str);
-}
-
-void tuna_gui::set_window_cut_begin(uint16_t n)
-{
-    ui->sb_begin->setValue(n);
-}
-
-void tuna_gui::set_window_cut_end(uint16_t n)
-{
-    ui->sb_end->setValue(n);
-}
-
-void tuna_gui::set_spotify_refresh_token(const QString& str)
-{
-    ui->txt_refresh_token->setText(str);
 }
 
 void tuna_gui::on_btn_sp_show_token_pressed()
@@ -472,10 +419,6 @@ void tuna_gui::on_btn_edit_output_clicked()
     }
 }
 
-void tuna_gui::on_cb_local_clicked(bool checked)
-{
-}
-
 static bool add_source(void* data, obs_source_t* src)
 {
     auto* id = obs_source_get_id(src);
@@ -499,6 +442,14 @@ void tuna_gui::on_pb_refresh_vlc_clicked()
     load_vlc_sources();
 }
 
+void tuna_gui::set_mpd_local(bool local) const
+{
+    ui->rb_local->setChecked(local);
+    ui->txt_ip->setEnabled(!local);
+    ui->sb_port->setEnabled(!local);
+    ui->txt_base_folder->setEnabled(local);
+}
+
 void tuna_gui::select_vlc_source(const QString& id)
 {
     auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchFixedString);
@@ -511,8 +462,7 @@ void tuna_gui::select_vlc_source(const QString& id)
 
 void tuna_gui::on_btn_browse_base_folder_clicked()
 {
-    ui->txt_base_folder->setText(
-        QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER));
+    ui->txt_base_folder->setText(QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER));
 }
 
 void tuna_gui::on_rb_remote_clicked(bool checked)

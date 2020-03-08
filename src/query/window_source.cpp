@@ -25,18 +25,9 @@
 #include <QRegularExpression>
 
 window_source::window_source()
+    : music_source(S_SOURCE_WINDOW_TITLE, T_SOURCE_WINDOW_TITLE)
 {
     m_capabilities = CAP_TITLE;
-}
-
-const char* window_source::name() const
-{
-    return T_SOURCE_WINDOW_TITLE;
-}
-
-const char* window_source::id() const
-{
-    return S_SOURCE_WINDOW_TITLE;
 }
 
 bool window_source::enabled() const
@@ -119,6 +110,7 @@ void window_source::refresh()
 bool window_source::execute_capability(capability c)
 {
     /* NO-OP */
+    UNUSED_PARAMETER(c);
     return true;
 }
 
@@ -131,11 +123,5 @@ bool window_source::valid_format(const QString& str)
 
 void window_source::set_gui_values()
 {
-    tuna_dialog->set_window_regex(m_regex);
-    tuna_dialog->set_window_title(m_title);
-    tuna_dialog->set_window_search(m_search);
-    tuna_dialog->set_window_replace(m_replace);
-    tuna_dialog->set_window_pause(m_pause);
-    tuna_dialog->set_window_cut_begin(m_cut_begin);
-    tuna_dialog->set_window_cut_end(m_cut_end);
+    emit tuna_dialog->window_source_changed(m_title, m_search, m_replace, m_pause, m_regex, m_cut_begin, m_cut_end);
 }

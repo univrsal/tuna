@@ -35,21 +35,12 @@
 #define REDIRECT_URI "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
 
 spotify_source::spotify_source()
+    : music_source(S_SOURCE_SPOTIFY, T_SOURCE_SPOTIFY)
 {
     /* builds credentials for spotify api */
     QString str = SPOTIFY_CREDENTIALS;
     m_creds = str.toUtf8().toBase64();
     m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
-}
-
-const char* spotify_source::name() const
-{
-    return T_SOURCE_SPOTIFY;
-}
-
-const char* spotify_source::id() const
-{
-    return S_SOURCE_SPOTIFY;
 }
 
 bool spotify_source::enabled() const
@@ -73,11 +64,10 @@ void spotify_source::load()
 
     /* Token handling */
     if (m_logged_in) {
-        int epoch = util::epoch();
         if (util::epoch() > m_token_termination) {
             binfo("Refreshing Spotify token");
             QString log;
-            bool result = do_refresh_token(log);
+            const auto result = do_refresh_token(log);
             if (result)
                 binfo("Successfully renewed Spotify token");
             save();
@@ -87,8 +77,9 @@ void spotify_source::load()
 
 void spotify_source::set_gui_values()
 {
-    bool logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
-    tuna_dialog->apply_login_state(logged_in, "");
+    const auto logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
+    QString tmp;
+    emit tuna_dialog->login_state_changed(logged_in, tmp);
 }
 
 void spotify_source::save()
@@ -103,6 +94,7 @@ void spotify_source::save()
 bool spotify_source::valid_format(const QString& str)
 {
     /* Supports all specifiers */
+    UNUSED_PARAMETER(str);
     return true;
 }
 
@@ -114,16 +106,14 @@ void extract_timeout(const std::string& header, uint64_t& timeout)
 {
     static const std::string what = "Retry-After: ";
     timeout = 0;
-    size_t pos = header.find(what);
-    size_t end;
+    auto pos = header.find(what);
 
     if (pos != std::string::npos) {
         pos += what.length();
-        end = pos;
-        std::string tmp;
+        auto end = pos;
         while (header.at(end) != '\n')
             end++;
-        tmp = header.substr(pos, end - pos);
+        const auto tmp = header.substr(pos, end - pos);
         timeout = std::stoi(tmp);
     }
 }
@@ -136,8 +126,8 @@ void spotify_source::refresh()
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
         QString log;
-        bool result = do_refresh_token(log);
-        tuna_dialog->apply_login_state(result, log);
+        const auto result = do_refresh_token(log);
+        emit tuna_dialog->login_state_changed(result, log);
         save();
     }
 
@@ -156,11 +146,11 @@ void spotify_source::refresh()
     QJsonDocument response;
     QJsonObject obj;
 
-    auto http_code = execute_command(m_token.toStdString().c_str(), PLAYER_URL, header, response);
+    const auto http_code = execute_command(m_token.toStdString().c_str(), PLAYER_URL, header, response);
 
     if (response.isObject())
         obj = response.object();
-    QString str(response.toJson());
+    const QString str(response.toJson());
 
     if (http_code == HTTP_OK) {
         const auto& progress = obj["progress_ms"];
@@ -173,7 +163,7 @@ void spotify_source::refresh()
             } else {
                 parse_track_json(obj["item"]);
                 m_current.set_playing(playing.toBool());
-                util::download_cover(&m_current);
+                util::download_cover(m_current);
             }
             m_current.set_progress(progress.toInt());
         } else {
@@ -213,7 +203,7 @@ void spotify_source::parse_track_json(const QJsonValue& track)
     /* Cover link */
     const auto& covers = album["images"];
     if (covers.isArray()) {
-        QJsonValue v = covers.toArray()[0];
+        const QJsonValue v = covers.toArray()[0];
         if (v.isObject() && v.toObject().contains("url"))
             m_current.set_cover_link(v.toObject()["url"].toString());
     }
@@ -245,23 +235,8 @@ void spotify_source::parse_track_json(const QJsonValue& track)
 
 bool spotify_source::execute_capability(capability c)
 {
-    bool result = true;
-    switch (c) {
-    case CAP_NEXT_SONG:
-        break;
-    case CAP_PREV_SONG:
-        break;
-    case CAP_PLAY_PAUSE:
-        break;
-    case CAP_VOLUME_UP:
-        break;
-    case CAP_VOLUME_DOWN:
-        break;
-    case CAP_VOLUME_MUTE:
-        break;
-    default:;
-    }
-    return result;
+    UNUSED_PARAMETER(c);
+    return false; /* TODO */
 }
 
 /* === CURL/Spotify API handling === */
@@ -331,8 +306,7 @@ void request_token(const std::string& request, const std::string& credentials, Q
         QJsonParseError err;
         response_json = QJsonDocument::fromJson(response.c_str(), &err);
         if (response_json.isNull()) {
-            berr("Couldn't parse response to json: %s",
-                err.errorString().toStdString().c_str());
+            berr("Couldn't parse response to json: %s", err.errorString().toStdString().c_str());
         } else {
             /* Log response without tokens */
             auto obj = response_json.object();
@@ -474,8 +448,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
 
         response_json = QJsonDocument::fromJson(response.c_str(), &err);
         if (response_json.isNull() && !response.empty())
-            berr("Failed to parse json response: %s, Error: %s", response.c_str(),
-                qt_to_utf8(err.errorString()));
+            berr("Failed to parse json response: %s, Error: %s", response.c_str(), qt_to_utf8(err.errorString()));
     } else {
         berr("CURL failed while sending spotify command");
     }

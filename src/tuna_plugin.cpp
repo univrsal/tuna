@@ -52,11 +52,12 @@ void register_gui()
 bool obs_module_load()
 {
     binfo("Loading v%s", TUNA_VERSION);
-    music_sources::init();
-    register_gui();
-    format::init();
+
     config::init();
     util::load_vlc();
+    register_gui();
+    format::init();
+    music_sources::init();
     config::load();
     obs_sources::register_progress();
     return true;
@@ -64,8 +65,8 @@ bool obs_module_load()
 
 void obs_module_unload()
 {
-    thread::mutex.lock();
+    thread::thread_mutex.lock();
     util::unload_vlc();
-    thread::mutex.unlock();
+    thread::thread_mutex.unlock();
     config::close();
 }
