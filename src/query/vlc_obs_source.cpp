@@ -162,6 +162,7 @@ bool vlc_obs_source::execute_capability(capability c)
 
 void vlc_obs_source::set_gui_values()
 {
+	m_target_source_name = CGET_STR(CFG_VLC_ID);
 	if (m_target_source_name)
 		emit tuna_dialog->vlc_source_selected(utf8_to_qt(m_target_source_name));
 }

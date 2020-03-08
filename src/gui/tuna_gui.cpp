@@ -452,7 +452,7 @@ void tuna_gui::set_mpd_local(bool local) const
 
 void tuna_gui::select_vlc_source(const QString& id)
 {
-    auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchFixedString);
+    const auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchExactly);
 
     if (idx >= 0)
         ui->cb_vlc_source_name->setCurrentIndex(idx);
