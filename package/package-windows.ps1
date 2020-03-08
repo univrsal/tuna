@@ -10,6 +10,8 @@ $arch_64 = "win64"
 $msvc = "2017"
 $qt = "5_10_1"
 $build = "RelWithDebInfo"
+$appid = "A34796B1-6A14-4DC9-A37F-43D23BA9DF17"
+$innoc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 
 $build_location_x32 = $base_dir + "build32\rundir\" + $build + "\obs-plugins\32bit"
 $qtc_build_location_x32 = $base_dir + "build-obs-studio-Desktop_Qt_" + $qt + "_MSVC" + $msvc + "_32bit-" + $build +"\rundir\" + $build + "\obs-plugins\32bit"
@@ -76,12 +78,25 @@ echo("Fetching data")
 Copy-Item $data_dir/* -Destination $build_dir/plugin/data/obs-plugins/$project/ -Recurse
 Copy-Item ../LICENSE -Destination $build_dir/LICENSE.txt
 Copy-Item ./README.txt $build_dir/README.txt
+
 replace $build_dir/README.txt "@VERSION" $version
+replace $build_dir/README.txt "@PROJECT" $project
 
 echo("Making archive")
 cd $build_dir
 sz a -r "../$build_dir.zip" "./*"
 cd ..
 
+echo("Preparing installer")
+Copy-Item ./installer.iss ./installer.tmp.iss
+replace ./installer.tmp.iss "@VERSION" $version
+replace ./installer.tmp.iss "@PROJECT" $project
+replace ./installer.tmp.iss "@APPID" $appid
+replace ./installer.tmp.iss "@BUILDDIR" "$build_dir/plugin"
+replace ./installer.tmp.iss "@ARCH" $arch
+echo("Creating installer")
+& $innoc /O./ "./installer.tmp.iss"
+
 echo("Cleaning up")
 Remove-Item $build_dir/ -Recurse
+Remove-item ./installer.tmp.iss

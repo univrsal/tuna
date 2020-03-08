@@ -1,6 +1,6 @@
-tuna v1.4.0
+tuna v@VERSION
 This program is licensed under the GPL v2.0 See LICENSE.txt
-github.com/univrsal/tuna
+github.com/univrsal/@PROJECT
 
 INSTALLATION
 
