@@ -14,11 +14,11 @@ if [ -z "$version" ]; then
 fi
 
 echo "Creating build directory"
-mkdir -p $build_dir/plugin
-mkdir -p $build_dir/plugin/bin/64bit
+mkdir -p $build_dir/$project
+mkdir -p $build_dir/$project/bin/64bit
 
 echo "Fetching build from $build_location"
-cp $build_location/$project.so $build_dir/plugin/bin/64bit/
+cp $build_location/$project.so $build_dir/$project/bin/64bit/
 
 echo "Fetching locale from $data_dir"
 cp -R $data_dir $build_dir/plugin
@@ -27,8 +27,10 @@ echo "Fetching misc files"
 cp ../LICENSE $build_dir/LICENSE.txt
 cp ./README.txt $build_dir/README.txt
 cp ./install-linux.sh $build_dir/
-echo "Writing version number $version"
+
+echo "Writing version number $version and project id $project"
 sed -i -e "s/@VERSION/$version/g" $build_dir/README.txt
+sed -i -e "s/@PROJECT/$project/g" $build_dir/README.txt
 
 echo "Zipping to $project.v$version.$arch.zip"
 cd $build_dir

@@ -4,8 +4,8 @@ deps_arch="taglib libmpdclient"
 deps_rh="libtag1v5 libmpdclient"
 deps_suse="fftw3 libmpdclient"
 deps_debian="taglib libmpdclient2"
-base_dir="/home/$USER/.config/obs-studio/plugins/"
 plugin_name="tuna"
+install_dir="/home/$USER/.config/obs-studio/plugins/$plugin_name"
 
 # Get distro
 if [ -f /etc/os-release ]; then
@@ -55,8 +55,7 @@ case $OS in
 esac
 
 echo "Uninstalling old plugin"
-rm -rf $base_dir/$plugin_name
+rm -r $install_dir/
 echo "Installing plugin"
-mkdir -p $base_dir/$plugin_name/
-mv ./plugin/data $base_dir/$plugin_name/
-mv ./plugin/bin $base_dir/$plugin_name/
+mkdir -p $install_dir/
+mv ./$plugin_name $install_dir/

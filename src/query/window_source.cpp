@@ -72,6 +72,7 @@ void window_source::refresh()
 
     std::vector<std::string> window_titles;
     GetWindowList(window_titles);
+
     QRegularExpression regex(m_title);
     QString result = "";
 

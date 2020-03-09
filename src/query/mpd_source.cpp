@@ -111,7 +111,7 @@ void mpd_source::refresh()
         connect();
     m_current.clear();
     if (!m_connected) {
-        util::download_cover(&m_current);
+        util::download_cover(m_current);
         return;
     }
 
@@ -155,7 +155,7 @@ void mpd_source::refresh()
             /* Reset last downloaded cover
              * to make sure that the next time mpd is paused
              * it'll get the placeholder */
-            util::download_cover(nullptr, true);
+            util::download_cover(m_current, true);
             if (!cover::find_embedded_cover(file_path)) {
                 cover::get_file_folder(file_path);
 
@@ -163,18 +163,18 @@ void mpd_source::refresh()
                     file_path.prepend("file:///");
                 cover::find_local_cover(file_path, tmp);
                 m_current.set_cover_link(tmp);
-                util::download_cover(&m_current);
+                util::download_cover(m_current);
             }
         } else {
             /* Reset the last embedded cover path to make
              * sure that when playback is resumed it'll
              * grab the cover again */
             cover::find_embedded_cover("", true);
-            util::download_cover(&m_current);
+            util::download_cover(m_current);
         }
     } else {
         cover::find_embedded_cover("", true);
-        util::download_cover(&m_current);
+        util::download_cover(m_current);
     }
 
     if (m_mpd_song)
@@ -210,10 +210,7 @@ bool mpd_source::execute_capability(capability c)
 
 void mpd_source::set_gui_values()
 {
-    tuna_dialog->set_mpd_ip(m_address);
-    tuna_dialog->set_mpd_port(m_port);
-    tuna_dialog->set_mpd_local(m_local);
-    tuna_dialog->set_mpd_base_folder(m_base_folder);
+    emit tuna_dialog->mpd_source_changed(m_address, m_port, m_local, m_base_folder);
 }
 
 bool mpd_source::valid_format(const QString& str)

@@ -1,5 +1,7 @@
 #!/bin/sh
-project=tuna
+project_name=tuna
+install_dir="/Users/$USER/Library/Application Support/obs-studio/plugins"
+
 echo "Checking for brew.."
 if ! [ -x "$(command -v brew)" ]; then
 	echo 'Error: brew is not installed!'
@@ -21,9 +23,19 @@ check_pkg libmpdclient
 check_pkg taglib
 
 echo "Uninstalling old version"
-rm -rf "/Users/$USER/Library/Application Support/obs-studio/plugins/$project"
+read -p "Deleting $install_dir/$project_name, is this ok? [y/N] " choice
+echo
+case "$choice" in
+	y|Y )
+	echo "Deleting..."
+	rm -rf $install_dir/$project_name;;
+	* ) echo "Exiting"
+	exit 1;;
+esac
+
 echo "Creating plugin folder"
-mkdir -p "/Users/$USER/Library/Application Support/obs-studio/plugins/$project"
+mkdir -p "$install_dir"
+
 echo "Moving plugin over"
-mv plugin/* "/Users/$USER/Library/Application Support/obs-studio/plugins/$project"
+mv "$project_name" "$install_dir/"
 echo "Done!"

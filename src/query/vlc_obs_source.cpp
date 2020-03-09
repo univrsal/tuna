@@ -180,7 +180,7 @@ bool vlc_obs_source::valid_format(const QString &str)
 	return true;
 }
 #else
-vlc_obs_source::vlc_obs_source() {}
+vlc_obs_source::vlc_obs_source() : music_source(S_SOURCE_VLC, T_SOURCE_VLC) {}
 vlc_obs_source::~vlc_obs_source() {}
 
 void vlc_obs_source::load() {}
@@ -202,15 +202,5 @@ struct vlc_source *vlc_obs_source::get_vlc()
 bool vlc_obs_source::enabled() const
 {
 	return false;
-}
-
-const char *vlc_obs_source::name() const
-{
-	return T_SOURCE_VLC;
-}
-
-const char *vlc_obs_source::id() const
-{
-	return S_SOURCE_VLC;
 }
 #endif

@@ -18,20 +18,22 @@ if [ -z "$version" ]; then
 fi
 
 echo "Creating build directory"
-mkdir -p $build_dir/plugin
-mkdir -p $build_dir/plugin/bin
+mkdir -p $build_dir/$project
+mkdir -p $build_dir/$project/bin
 
 echo "Fetching build from $build_location"
-cp $build_location/$project.so $build_dir/plugin/bin
+cp $build_location/$project.so $build_dir/$project/bin
 
 echo "Fetching locale from $data_dir"
-cp -R $data_dir $build_dir/plugin
+cp -R $data_dir $build_dir/$project
 
 echo "Fetching misc files"
 cp ../LICENSE $build_dir/LICENSE.txt
 cp ./install-mac.sh $build_dir/
-echo "Writing version number $version"
+
+echo "Writing version number $version and project id $project"
 sed -i -e "s/@VERSION/$version/g" ./README.txt
+sed -i -e "s/@PROJECT/$project/g" ./README.txt
 mv ./README.txt-e $build_dir/README.txt
 
 echo "Zipping to $project.v$version.$arch.zip"
