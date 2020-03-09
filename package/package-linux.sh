@@ -25,7 +25,7 @@ cp -R $data_dir $build_dir/plugin
 
 echo "Fetching misc files"
 cp ../LICENSE $build_dir/LICENSE.txt
-cp ./README.txt $build_dir/README.txt
+cp ./README $build_dir/README.txt
 cp ./install-linux.sh $build_dir/
 
 echo "Writing version number $version and project id $project"
