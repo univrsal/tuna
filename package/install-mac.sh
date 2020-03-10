@@ -28,7 +28,7 @@ echo
 case "$choice" in
 	y|Y )
 	echo "Deleting..."
-	rm -rf $install_dir/$project_name;;
+	rm -rf "$install_dir/$project_name";;
 	* ) echo "Exiting"
 	exit 1;;
 esac
