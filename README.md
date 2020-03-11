@@ -8,4 +8,4 @@ Currently supports
 - Any Window title
 - OBS VLC source
 
-<img src="/data/tuna.png" alt="hey tuna" width="180px">
+<img src="src/gui/images/tuna.png" alt="hey tuna" width="180px">
