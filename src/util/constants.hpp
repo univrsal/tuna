@@ -73,6 +73,10 @@
 #define T_PROGRESS_NAME			T_("tuna.source.progress.name")
 #define T_PROGRESS_USE_BG		T_("tuna.source.progress.use.bg")
 
+#define T_DOCK_MENU_TITLE		T_("tuna.dock.menu.title")
+#define T_DOCK_TOGGLE_VOLUME	T_("tuna.dock.menu.toggle.volume")
+#define T_DOCK_TOGGLE_INFO		T_("tuna.dock.menu.toggle.info")
+#define T_DOCK_SONG_INFO		T_("tuna.dock.label.song")
 #define FILTER(name, type) 		name " (" type ");;All Files(*)"
 
 /* Outputs are saved into config folder on linux, but on windows

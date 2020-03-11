@@ -45,7 +45,7 @@ int get_truncate_arg(QString& str)
     QString tmp = "", copy = str;
     bool ok = false;
 
-    if (str[1] != '[' || str.length() < 4)
+    if (str.length() < 4 || str[1] != '[')
         return number;
     copy.remove(1, 1); /* remove '[' */
 
@@ -54,7 +54,7 @@ int get_truncate_arg(QString& str)
         if (copy[1].isNumber())
             tmp.append(copy[1]);
         else if (copy[1] == ']')
-            flag = false; /* We're donw */
+            flag = false; /* We're done */
         else
             break; /* Unknown character -> stop */
         copy.remove(1, 1); /* consume character */
@@ -106,6 +106,10 @@ void execute(QString& q)
             first = false;
             continue;
         }
+
+        if (split.isEmpty())
+            continue;
+
         auto sp = get_matching_specifier(split[0].toLower().toLatin1());
         if (sp)
             sp->do_format(split, src_ref->song_info());
@@ -124,7 +128,7 @@ bool specifier::replace(QString& slice, const song& s, const QString& data) cons
     QString copy = data;
     if (slice[0].isUpper())
         copy = copy.toUpper();
-    if (max_length && copy.length() > max_length) {
+    if (max_length > 0 && copy.length() > max_length) {
         copy.truncate(max_length);
         copy.append("...");
     }
@@ -167,11 +171,11 @@ bool specifier_int::do_format(QString& slice, const song& s) const
 bool specifier_string_list::do_format(QString& slice, const song& s) const
 {
     QString concatenated_list;
-    for (auto str : s.artists())
-        concatenated_list += str + ", ";
+    concatenated_list = s.artists().join(", ");
 
-    concatenated_list.chop(2);
-    return replace(slice, s, concatenated_list);
+	if (concatenated_list.isEmpty())
+		concatenated_list = "n/a";
+	return replace(slice, s, concatenated_list);
 }
 
 bool specifier_date::do_format(QString& slice, const song& s) const

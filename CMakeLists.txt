@@ -25,7 +25,12 @@ add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 
 set(tuna_ui
         src/gui/tuna_gui.ui
-        src/gui/output_edit_dialog.ui)
+        src/gui/output_edit_dialog.ui
+        src/gui/music_control.ui)
+
+qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
+qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
+
 find_package(LibVLC QUIET)
 
 
@@ -108,6 +113,10 @@ set(tuna_sources
     ./src/gui/tuna_gui.hpp
     ./src/gui/output_edit_dialog.cpp
     ./src/gui/output_edit_dialog.hpp
+    ./src/gui/music_control.cpp
+    ./src/gui/music_control.hpp
+    ./src/gui/scrolltext.cpp
+    ./src/gui/scrolltext.hpp
     ./src/query/music_source.hpp
     ./src/query/music_source.cpp
     ./src/query/spotify_source.cpp
@@ -128,12 +137,14 @@ set(tuna_sources
     ./src/util/tuna_thread.hpp
     ./src/util/utility.cpp
     ./src/util/utility.hpp
-    ./src/util/window/window_helper.hpp)
+    ./src/util/window/window_helper.hpp
+    ${tuna_ui_headers})
 
 add_library(tuna MODULE
     ${tuna_sources}
     ${tuna_ui}
-    ${tuna_platform_sources})
+    ${tuna_platform_sources}
+    ${tuna_qrc_sources})
 
 include_directories(
         SYSTEM "${CMAKE_SOURCE_DIR}/libobs"

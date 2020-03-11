@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>641</width>
+    <width>707</width>
     <height>701</height>
    </rect>
   </property>
@@ -1397,6 +1397,9 @@
             <property name="text">
              <string/>
             </property>
+            <property name="pixmap">
+             <pixmap resource="tuna.qrc">:/images/tuna.png</pixmap>
+            </property>
            </widget>
           </item>
           <item>
@@ -1833,6 +1836,7 @@ Public License instead of this License.</string>
   </layout>
  </widget>
  <resources>
+  <include location="tuna.qrc"/>
   <include location="../../../../UI/forms/obs.qrc"/>
  </resources>
  <connections>

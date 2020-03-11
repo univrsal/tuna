@@ -46,9 +46,10 @@ enum capability {
     CAP_NEXT_SONG = 1 << 16, 	/* Skip to next song		*/
     CAP_PREV_SONG = 1 << 17, 	/* Go to previous song		*/
     CAP_PLAY_PAUSE = 1 << 18,	/* Toggle play/pause		*/
-    CAP_VOLUME_UP = 1 << 19, 	/* Increase volume			*/
-    CAP_VOLUME_DOWN = 1 << 20, 	/* Decrease volume			*/
-    CAP_VOLUME_MUTE = 1 << 21, 	/* Toggle mute				*/
+    CAP_STOP_SONG = 1 << 19,    /* Stop playback            */
+    CAP_VOLUME_UP = 1 << 20, 	/* Increase volume			*/
+    CAP_VOLUME_DOWN = 1 << 21, 	/* Decrease volume			*/
+    CAP_VOLUME_MUTE = 1 << 22, 	/* Toggle mute				*/
 };
 
 /* clang-format on */

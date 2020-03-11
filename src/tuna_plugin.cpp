@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #include "gui/tuna_gui.hpp"
+#include "gui/music_control.hpp"
 #include "query/vlc_obs_source.hpp"
 #include "source/progress.hpp"
 #include "util/config.hpp"
@@ -47,6 +48,10 @@ void register_gui()
     obs_frontend_pop_ui_translation();
     const auto menu_cb = [] { tuna_dialog->toggleShowHide(); };
     QAction::connect(menu_action, &QAction::triggered, menu_cb);
+
+    obs_frontend_push_ui_translation(obs_module_get_string);
+    music_control = reinterpret_cast<music_Control *>(obs_frontend_add_dock(new music_Control(main_window)));
+    obs_frontend_pop_ui_translation();
 }
 
 bool obs_module_load()

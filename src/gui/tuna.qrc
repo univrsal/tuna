@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/tuna.png</file>
+        <file>images/icons/pause.svg</file>
+        <file>images/icons/prev.svg</file>
+        <file>images/icons/stop.svg</file>
+        <file>images/icons/next.svg</file>
+        <file>images/icons/play.svg</file>
+        <file>images/icons/volup.svg</file>
+        <file>images/icons/voldown.svg</file>
+    </qresource>
+</RCC>

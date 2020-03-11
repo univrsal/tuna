@@ -28,6 +28,7 @@ class mpd_source : public music_source {
     struct mpd_status* m_status = nullptr;
     struct mpd_song* m_mpd_song = nullptr;
     enum mpd_state m_mpd_state;
+    bool m_stopped = false;
     QString m_address;
     QString m_base_folder;
     bool m_connected;

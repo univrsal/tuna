@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #include "tuna_gui.hpp"
+#include "music_control.hpp"
 #include "../query/spotify_source.hpp"
 #include "../query/vlc_obs_source.hpp"
 #include "../util/config.hpp"
@@ -56,12 +57,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-    /* load logo */
-    const char* path = obs_module_file("tuna.png");
-    QPixmap img(path);
-    ui->lbl_img->setPixmap(img);
-    bfree((void*)path);
 
     ui->settings_tabs->setCurrentIndex(0);
 
@@ -299,6 +294,9 @@ void tuna_gui::on_tuna_gui_accepted()
     thread::thread_mutex.unlock();
 
     config::load();
+
+    emit music_control->source_changed();
+    emit music_control->thread_changed();
 }
 
 void tuna_gui::on_apply_pressed()

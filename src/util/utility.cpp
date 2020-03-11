@@ -145,7 +145,7 @@ bool curl_download(const char* url, const char* path)
 
     if (curl)
         curl_easy_cleanup(curl);
-    return true;
+    return result;
 }
 
 void download_lyrics(const song& song)
