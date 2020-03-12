@@ -25,8 +25,8 @@
 
 vlc_obs_source::vlc_obs_source() : music_source(S_SOURCE_VLC, T_SOURCE_VLC)
 {
-	m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE |
-					 CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
+	m_capabilities = CAP_TITLE | CAP_LABEL | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE |
+	                 CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 
 	if (!util::vlc_loaded)
 		binfo("libVLC wasn't loaded, VLC support disabled");
@@ -120,8 +120,8 @@ void vlc_obs_source::refresh()
 
 	if (vlc) {
 		/* Locking source mutex (vlc->mutex) here
-         * seems to cause a crash
-         **/
+		 * seems to cause a crash
+		 **/
 		m_current.clear();
 		m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
 		m_current.set_duration(libvlc_media_player_get_length_(vlc->media_player));
@@ -136,6 +136,7 @@ void vlc_obs_source::refresh()
 			const char *num = libvlc_media_get_meta_(media, libvlc_meta_TrackID);
 			const char *disc = libvlc_media_get_meta_(media, libvlc_meta_DiscNumber);
 			const char *cover = libvlc_media_get_meta_(media, libvlc_meta_ArtworkURL);
+			const char *label = libvlc_media_get_meta_(media, libvlc_meta_Publisher);
 
 			if (title)
 				m_current.set_title(title);
@@ -149,9 +150,10 @@ void vlc_obs_source::refresh()
 				m_current.set_album(album);
 			if (num)
 				m_current.set_track_number(std::stoi(num));
-
 			if (disc)
 				m_current.set_disc_number(std::stoi(disc));
+			if (label)
+				m_current.set_label(label);
 
 			util::download_cover(m_current);
 		}
@@ -162,8 +164,8 @@ void vlc_obs_source::refresh()
 
 bool vlc_obs_source::execute_capability(capability c)
 {
-	/* vlc source already has hotkeys in obs */
-	UNUSED_PARAMETER(c);
+	auto* vlc = get_vlc();
+
 	return true;
 }
 

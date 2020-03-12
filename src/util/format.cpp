@@ -86,6 +86,7 @@ void init()
     specifiers.emplace_back(std::make_unique<specifier_string>('t', CAP_TITLE));
     specifiers.emplace_back(std::make_unique<specifier_string>('a', CAP_ALBUM));
     specifiers.emplace_back(std::make_unique<specifier_string>('y', CAP_RELEASE));
+    specifiers.emplace_back(std::make_unique<specifier_string>('b', CAP_LABEL));
     specifiers.emplace_back(std::make_unique<specifier_string_list>('m', CAP_ARTIST));
     specifiers.emplace_back(std::make_unique<specifier_date>('r', CAP_RELEASE));
     specifiers.emplace_back(std::make_unique<specifier_int>('d', CAP_DISC_NUMBER));

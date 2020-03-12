@@ -30,7 +30,7 @@ enum date_precision {
 
 class song {
     uint16_t m_data;
-    QString m_title, m_album, m_cover, m_lyrics;
+    QString m_title, m_album, m_cover, m_lyrics, m_label;
     QList<QString> m_artists;
     QString m_year, m_month, m_day;
     int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
@@ -53,6 +53,7 @@ public:
     void set_year(const QString& y);
     void set_month(const QString& m);
     void set_day(const QString& d);
+    void set_label(const QString &l);
     void clear();
 
     bool playing() const { return m_is_playing; }
@@ -62,6 +63,7 @@ public:
     const QString& year() const { return m_year; }
     const QString& month() const { return m_month; }
     const QString& day() const { return m_day; }
+    const QString& label() const { return m_label; }
     const QString& get_string_value(char specififer) const;
     const QList<QString>& artists() const { return m_artists; }
     int32_t get_int_value(char specifier) const;

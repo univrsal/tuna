@@ -30,7 +30,7 @@
 mpd_source::mpd_source()
     : music_source(S_SOURCE_MPD, T_SOURCE_MPD)
 {
-    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
+    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
     m_connection = nullptr;
     m_port = 0;
@@ -132,6 +132,7 @@ void mpd_source::refresh()
         const char* album = mpd_song_get_tag(m_mpd_song, MPD_TAG_ALBUM, 0);
         const char* num = mpd_song_get_tag(m_mpd_song, MPD_TAG_TRACK, 0);
         const char* disc = mpd_song_get_tag(m_mpd_song, MPD_TAG_DISC, 0);
+        const char* label = mpd_song_get_tag(m_mpd_song, MPD_TAG_LABEL, 0);
 
         if (title)
             m_current.set_title(title);
@@ -145,6 +146,8 @@ void mpd_source::refresh()
             m_current.set_track_number(std::stoi(num));
         if (disc)
             m_current.set_disc_number(std::atoi(disc));
+        if (label)
+            m_current.set_label(label);
 
         m_current.set_duration(mpd_song_get_duration_ms(m_mpd_song));
 

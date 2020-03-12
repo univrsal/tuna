@@ -65,6 +65,13 @@ void song::append_artist(const QString& a)
         m_data |= CAP_ARTIST;
 }
 
+void song::set_label(const QString &l)
+{
+	if (!l.isEmpty())
+		m_data |= CAP_LABEL;
+	m_label = l;
+}
+
 void song::set_cover_link(const QString& link)
 {
     if (!link.isEmpty())
@@ -157,6 +164,8 @@ const QString& song::get_string_value(char specifier) const
         return m_album;
     case 'y':
         return m_year;
+    case 'b':
+        return m_label;
     default:
         return empty;
     }
