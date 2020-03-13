@@ -90,6 +90,8 @@
 
 #define JSON_OUTPUT_PATH_ID 	"output"
 #define JSON_FORMAT_ID 			"format"
+#define JSON_FORMAT_LOG_MODE	"log_mode"
+#define JSON_LAST_OUTPUT		"last_output"
 
 #define STATUS_RETRY_AFTER 		429
 #define HTTP_NO_CONTENT			204

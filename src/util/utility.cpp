@@ -196,27 +196,39 @@ void download_cover(const song& song, bool reset)
     }
 }
 
-void write_song(const QString& str, const QString& output)
+void write_song(config::output &o, const QString &str)
 {
-    QFile out(output);
-    if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QTextStream stream(&out);
-        stream.setCodec("UTF-8");
-        stream << str;
-        stream.flush();
-        out.close();
-    } else {
-        berr("Couldn't open song output file %s", output.toStdString().c_str());
-    }
+	if (o.last_output == str)
+		return;
+	o.last_output = str;
+
+    QFile out(o.path);
+    bool success = false;
+    if (o.log_mode)
+        success = out.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    else
+        success = out.open(QIODevice::WriteOnly | QIODevice::Text);
+
+	if (success) {
+		QTextStream stream(&out);
+		stream.setCodec("UTF-8");
+		stream << str;
+		if (o.log_mode)
+			stream << "\n";
+		stream.flush();
+		out.close();
+	} else {
+		berr("Couldn't open song output file %s", qt_to_utf8(o.path));
+	}
 }
 
 void handle_outputs(const song& s)
 {
     static QString tmp_text = "";
 
-    for (const auto& output : config::outputs) {
+    for (auto& o : config::outputs) {
         tmp_text.clear();
-        tmp_text = output.first;
+        tmp_text = o.format;
         format::execute(tmp_text);
 
         if (tmp_text.isEmpty() || !s.playing()) {
@@ -226,7 +238,9 @@ void handle_outputs(const song& s)
              * allows users to still use them */
             tmp_text.replace("%s", " ");
         }
-        write_song(tmp_text, output.second);
+        if (!s.playing() && o.log_mode)
+            continue; /* No song playing text doesn't make sense in the log */
+        write_song(o, tmp_text);
     }
 }
 

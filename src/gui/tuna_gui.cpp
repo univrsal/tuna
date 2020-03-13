@@ -126,8 +126,9 @@ void tuna_gui::toggleShowHide()
         row = 0; /* Load rows */
         ui->tbl_outputs->setRowCount(config::outputs.size());
         for (const auto& entry : config::outputs) {
-            ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(entry.first));
-            ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(entry.second));
+            ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(entry.format));
+            ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(entry.path));
+            ui->tbl_outputs->setItem(row, 2, new QTableWidgetItem(entry.log_mode ? "Yes" : "No"));
             row++;
         }
     }
@@ -285,9 +286,13 @@ void tuna_gui::on_tuna_gui_accepted()
 
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
-        config::outputs.push_back(
-            QPair<QString, QString>(ui->tbl_outputs->item(row, 0)->text(), ui->tbl_outputs->item(row, 1)->text()));
+        config::output tmp;
+        tmp.format = ui->tbl_outputs->item(row, 0)->text();
+        tmp.path = ui->tbl_outputs->item(row, 1)->text();
+        tmp.log_mode = ui->tbl_outputs->item(row, 2)->text() == "Yes";
+        config::outputs.push_back(tmp);
     }
+
     config::save_outputs(config::outputs);
     thread::thread_mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
@@ -361,20 +366,22 @@ void tuna_gui::on_btn_browse_song_lyrics_clicked()
         ui->txt_song_lyrics->setText(path);
 }
 
-void tuna_gui::add_output(const QString& format, const QString& path)
+void tuna_gui::add_output(const QString& format, const QString& path, bool log_mode)
 {
     int row = ui->tbl_outputs->rowCount();
     ui->tbl_outputs->insertRow(row);
     ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(format));
     ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(path));
+    ui->tbl_outputs->setItem(row, 2, new QTableWidgetItem(log_mode ? "Yes" : "No"));
 }
 
-void tuna_gui::edit_output(const QString& format, const QString& path)
+void tuna_gui::edit_output(const QString& format, const QString& path, bool log_mode)
 {
     auto selection = ui->tbl_outputs->selectedItems();
     if (!selection.empty() && selection.size() > 1) {
         selection.at(0)->setText(format);
         selection.at(1)->setText(path);
+        selection.at(2)->setText(log_mode ? "Yes" : "No");
     }
 }
 
@@ -397,12 +404,13 @@ void tuna_gui::on_btn_remove_output_clicked()
     }
 }
 
-void tuna_gui::get_selected_output(QString& format, QString& path)
+void tuna_gui::get_selected_output(QString& format, QString& path, bool& log_mode)
 {
     auto selection = ui->tbl_outputs->selectedItems();
     if (!selection.empty() && selection.size() > 1) {
         format = selection.at(0)->text();
         path = selection.at(1)->text();
+        log_mode = selection.at(2)->text() == "Yes";
     }
 }
 

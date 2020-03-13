@@ -35,7 +35,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>5</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -303,6 +303,20 @@
               <column>
                <property name="text">
                 <string>tuna.gui.tab.basics.song.info</string>
+               </property>
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>tuna.gui.tab.basics.song.logmode</string>
                </property>
                <property name="font">
                 <font>

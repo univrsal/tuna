@@ -39,9 +39,11 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
 
     if (m == edit_mode::modify) {
         QString format, path;
-        m_tuna->get_selected_output(format, path);
+        bool log_mode = false;
+        m_tuna->get_selected_output(format, path, log_mode);
         ui->txt_format->setText(format);
         ui->txt_path->setText(path);
+        ui->cb_logmode->setChecked(log_mode);
     }
 }
 
@@ -78,9 +80,11 @@ void output_edit_dialog::on_buttonBox_accepted()
     }
 
     if (m_mode == edit_mode::create) {
-        m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text());
+        m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text(),
+                           ui->cb_logmode->isChecked());
     } else {
-        m_tuna->edit_output(ui->txt_format->text(), ui->txt_path->text());
+        m_tuna->edit_output(ui->txt_format->text(), ui->txt_path->text(),
+                            ui->cb_logmode->isChecked());
     }
 }
 

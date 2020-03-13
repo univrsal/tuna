@@ -36,9 +36,9 @@ public:
 
     void toggleShowHide();
 
-    void add_output(const QString& format, const QString& path);
-    void edit_output(const QString& format, const QString& path);
-    void get_selected_output(QString& format, QString& path);
+    void add_output(const QString& format, const QString& path, bool log_mode);
+    void edit_output(const QString& format, const QString& path, bool log_mode);
+    void get_selected_output(QString& format, QString& path, bool& log_mode);
 
 signals:
     void login_state_changed(bool sate, QString& log);

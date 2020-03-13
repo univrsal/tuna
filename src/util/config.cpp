@@ -39,7 +39,7 @@ const char* placeholder = nullptr;
 const char* cover_path = nullptr;
 const char* lyrics_path = nullptr;
 const char* selected_source = nullptr;
-QList<QPair<QString, QString>> outputs;
+QList<output> outputs;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;
 
@@ -116,7 +116,7 @@ void close()
     thread::thread_mutex.unlock();
 }
 
-void load_outputs(QList<QPair<QString, QString>>& table_content)
+void load_outputs(QList<output>& table_content)
 {
     table_content.clear();
     QDir home = QDir::homePath();
@@ -131,21 +131,34 @@ void load_outputs(QList<QPair<QString, QString>>& table_content)
 
         for (const auto val : array) {
             QJsonObject obj = val.toObject();
-            table_content.push_back(QPair<QString, QString>(
-                obj[JSON_FORMAT_ID].toString(),
-                obj[JSON_OUTPUT_PATH_ID].toString()));
+            output tmp;
+            tmp.format = obj[JSON_FORMAT_ID].toString();
+            tmp.path = obj[JSON_OUTPUT_PATH_ID].toString();
+            if (obj[JSON_FORMAT_LOG_MODE].isBool())
+                tmp.log_mode = obj[JSON_FORMAT_LOG_MODE].toBool();
+            else
+                tmp.log_mode = false;
+
+            if (obj[JSON_LAST_OUTPUT].isString())
+                tmp.last_output = obj[JSON_LAST_OUTPUT].isString();
+            else
+                tmp.last_output = "";
+            table_content.push_back(tmp);
         }
         binfo("Loaded %i outputs", array.size());
     } else {
         /* Nothing to load, add default */
         binfo("No config exists, creating default");
         QDir home = QDir::homePath();
-        QString default_output = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
-        table_content.push_back(QPair<QString, QString>(T_SONG_FORMAT_DEFAULT, default_output));
+        output tmp;
+        tmp.format = T_SONG_FORMAT_DEFAULT;
+        tmp.path = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
+        tmp.log_mode = false;
+        table_content.push_back(tmp);
     }
 }
 
-void save_outputs(const QList<QPair<QString, QString>>& table_content)
+void save_outputs(const QList<output>& outputs)
 {
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
@@ -153,10 +166,12 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
 
     QJsonArray output_array;
 
-    for (const auto& pair : table_content) {
+    for (const auto& o : outputs) {
         QJsonObject output;
-        output[JSON_FORMAT_ID] = pair.first;
-        output[JSON_OUTPUT_PATH_ID] = QDir::toNativeSeparators(pair.second);
+        output[JSON_FORMAT_ID] = o.format;
+        output[JSON_OUTPUT_PATH_ID] = QDir::toNativeSeparators(o.path);
+        output[JSON_FORMAT_LOG_MODE] = o.log_mode;
+        output[JSON_LAST_OUTPUT] = o.last_output;
         output_array.append(output);
     }
 
@@ -171,7 +186,7 @@ void save_outputs(const QList<QPair<QString, QString>>& table_content)
             if (data.length() != wrote) {
                 berr("Couldn't write outputs to %s only"
                      "wrote %lli bytes out of %i",
-                    path.toStdString().c_str(),
+                    qt_to_utf8(path),
                     wrote, data.length());
             }
             save_file.close();

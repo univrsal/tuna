@@ -19,7 +19,6 @@
 #pragma once
 
 #include <QList>
-#include <QPair>
 #include <QString>
 #include <util/config-file.h>
 
@@ -87,6 +86,12 @@
 /* clang-format on */
 
 namespace config {
+struct output {
+    QString format;
+    QString path;
+    QString last_output;
+    bool log_mode;
+};
 
 extern config_t* instance;
 
@@ -96,7 +101,7 @@ extern const char* placeholder;
 extern const char* selected_source;
 extern const char* cover_path;
 extern const char* lyrics_path;
-extern QList<QPair<QString, QString>> outputs;
+extern QList<output> outputs;
 extern const char* cover_placeholder;
 extern bool download_cover;
 
@@ -108,7 +113,7 @@ void save();
 
 void close();
 
-void load_outputs(QList<QPair<QString, QString>>& table_content);
+void load_outputs(QList<output>& table_content);
 
-void save_outputs(const QList<QPair<QString, QString>>& table_content);
+void save_outputs(const QList<output>& table_content);
 } // namespace config

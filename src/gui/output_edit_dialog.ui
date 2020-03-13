@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>525</width>
-    <height>213</height>
+    <height>230</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -74,6 +74,13 @@
      </item>
      <item>
       <widget class="QLineEdit" name="txt_format"/>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cb_logmode">
+       <property name="text">
+        <string>tuna.gui.output.edit.dialog.logmode</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="verticalSpacer">
