@@ -27,7 +27,7 @@
 #include "window_source.hpp"
 
 namespace music_sources {
-int selected_index = 0;
+static int selected_index = 0;
 QList<std::shared_ptr<music_source>> instances;
 
 void init()
@@ -59,7 +59,6 @@ void select(const char* id)
     for (auto src : instances) {
         if (strcmp(src->id(), id) == 0) {
             selected_index = i;
-            src.reset();
             break;
         }
         i++;
@@ -67,7 +66,8 @@ void select(const char* id)
     /* ensure cover will be refreshed after changing source */
     song s;
     util::download_cover(s, true);
-#ifdef LINUX
+    util::reset_cover();
+#ifdef UNIX
     cover::find_embedded_cover("", true);
 #endif
     thread::thread_mutex.unlock();

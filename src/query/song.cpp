@@ -29,7 +29,7 @@ void song::clear()
     m_data = 0x0;
     m_title = "n/a";
     m_album = "n/a";
-    m_cover = "";
+    m_cover = "n/a";
     m_lyrics = "n/a";
     m_artists.clear();
     m_disc_number = 0;

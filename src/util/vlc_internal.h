@@ -76,6 +76,22 @@ extern LIBVLC_MEDIA_PLAYER_CAN_PAUSE libvlc_media_player_can_pause_;
 extern LIBVLC_MEDIA_PLAYER_PAUSE libvlc_media_player_pause_;
 extern LIBVLC_MEDIA_PLAYER_GET_MEDIA libvlc_media_player_get_media_;
 
+/* libvlc media list player */
+typedef void (*LIBVLC_MEDIA_LIST_PLAYER_PLAY)(libvlc_media_list_player_t *p_mlp);
+typedef void (*LIBVLC_MEDIA_LIST_PLAYER_PAUSE)(
+    libvlc_media_list_player_t *p_mlp);
+typedef void (*LIBVLC_MEDIA_LIST_PLAYER_STOP)(libvlc_media_list_player_t *p_mlp);
+
+typedef int (*LIBVLC_MEDIA_LIST_PLAYER_NEXT)(libvlc_media_list_player_t *p_mlp);
+typedef int (*LIBVLC_MEDIA_LIST_PLAYER_PREVIOUS)(
+    libvlc_media_list_player_t *p_mlp);
+
+extern LIBVLC_MEDIA_LIST_PLAYER_PLAY libvlc_media_list_player_play_;
+extern LIBVLC_MEDIA_LIST_PLAYER_PAUSE libvlc_media_list_player_pause_;
+extern LIBVLC_MEDIA_LIST_PLAYER_STOP libvlc_media_list_player_stop_;
+extern LIBVLC_MEDIA_LIST_PLAYER_NEXT libvlc_media_list_player_next_;
+extern LIBVLC_MEDIA_LIST_PLAYER_PREVIOUS libvlc_media_list_player_previous_;
+
 /* libvlc media methods */
 typedef char* (*LIBVLC_MEDIA_GET_META)(
     libvlc_media_t* p_md, libvlc_meta_t e_meta);

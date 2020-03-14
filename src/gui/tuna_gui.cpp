@@ -55,6 +55,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     connect(this, &tuna_gui::vlc_source_selected, this, &tuna_gui::select_vlc_source);
     connect(this, &tuna_gui::window_source_changed, this, &tuna_gui::update_window);
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
+    connect(this, &tuna_gui::mpd_source_changed, this, &tuna_gui::update_mpd);
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 

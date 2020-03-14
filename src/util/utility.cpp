@@ -133,11 +133,12 @@ bool curl_download(const char* url, const char* path)
 #endif
         CURLcode res = curl_easy_perform(curl);
 
-        if (res != CURLE_OK)
+        if (res != CURLE_OK) {
             berr("Couldn't fetch file from %s to %s", url, path);
-        else
+        } else {
+            result = true;
             bdebug("Fetched %s to %s", url, path);
-        result = true;
+        }
     }
 
     if (fp)
@@ -173,27 +174,35 @@ void download_cover(const song& song, bool reset)
         return;
 
     auto found_cover = false;
-
     auto path = utf8_to_qt(config::cover_path);
     auto tmp = path + ".tmp";
 
-    last_cover = song.cover();
-    if (!song.cover().isEmpty())
+    if (song.cover() != "n/a")
         found_cover = curl_download(qt_to_utf8(song.cover()), qt_to_utf8(tmp));
 
     /* Replace cover only after download is done */
     QFile current(path);
     current.remove();
 
-    if (found_cover && !QFile::rename(tmp, utf8_to_qt(config::cover_path)))
+    if (found_cover && QFile::rename(tmp, utf8_to_qt(config::cover_path))) {
+        last_cover = song.cover();
+    } else {
         berr("Couldn't rename temporary cover file");
+    }
 
     if (!found_cover && last_cover != "n/a") {
         last_cover = "n/a";
-        /* no cover => use place placeholder */
-        if (!QFile::copy(utf8_to_qt(config::cover_placeholder), utf8_to_qt(config::cover_path)))
-            berr("Couldn't move placeholder cover");
+        reset_cover();
     }
+}
+
+void reset_cover()
+{
+    auto path = utf8_to_qt(config::cover_path);
+    QFile current(path);
+    current.remove();
+    if (!QFile::copy(utf8_to_qt(config::cover_placeholder), path))
+        berr("Couldn't move placeholder cover");
 }
 
 void write_song(config::output &o, const QString &str)

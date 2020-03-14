@@ -18,6 +18,7 @@
 
 #include "spotify_source.hpp"
 #include "../gui/tuna_gui.hpp"
+#include "../gui/music_control.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/creds.hpp"
@@ -32,6 +33,12 @@
 
 #define TOKEN_URL "https://accounts.spotify.com/api/token"
 #define PLAYER_URL "https://api.spotify.com/v1/me/player"
+#define PLAYER_PAUSE_URL (PLAYER_URL "/pause")
+#define PLAYER_PLAY_URL (PLAYER_URL "/play")
+#define PLAYER_NEXT_URL (PLAYER_URL "/next")
+#define PLAYER_PREVIOUS_URL (PLAYER_URL "/previous")
+#define PLAYER_VOLUME_URL (PLAYER_URL "/volume")
+
 #define REDIRECT_URI "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
 
 spotify_source::spotify_source()
@@ -40,7 +47,7 @@ spotify_source::spotify_source()
     /* builds credentials for spotify api */
     QString str = SPOTIFY_CREDENTIALS;
     m_creds = str.toUtf8().toBase64();
-    m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
+    m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
 }
 
 bool spotify_source::enabled() const
@@ -146,7 +153,7 @@ void spotify_source::refresh()
     QJsonDocument response;
     QJsonObject obj;
 
-    const auto http_code = execute_command(m_token.toStdString().c_str(), PLAYER_URL, header, response);
+    const auto http_code = execute_command(qt_to_utf8(m_token), PLAYER_URL, header, response);
 
     if (response.isObject())
         obj = response.object();
@@ -183,7 +190,7 @@ void spotify_source::refresh()
             }
         } else {
             bwarn("Unknown error occured when querying Spotify-API: %li (response: %s)", http_code,
-                str.toStdString().c_str());
+                qt_to_utf8(str));
         }
     }
 }
@@ -235,8 +242,48 @@ void spotify_source::parse_track_json(const QJsonValue& track)
 
 bool spotify_source::execute_capability(capability c)
 {
-    UNUSED_PARAMETER(c);
-    return false; /* TODO */
+    std::string header;
+    long http_code = -1;
+    QJsonDocument response;
+
+    switch (c) {
+        case CAP_PLAY_PAUSE:
+            if (m_current.playing()) {
+            [[clang::fallthrough]];
+        case CAP_STOP_SONG:
+                http_code = execute_command(qt_to_utf8(m_auth_code),
+                                            PLAYER_PAUSE_URL, header, response);
+            } else {
+                http_code = execute_command(qt_to_utf8(m_auth_code),
+                                            PLAYER_PLAY_URL, header, response);
+            }
+            break;
+        case CAP_PREV_SONG:
+                http_code = execute_command(qt_to_utf8(m_auth_code),
+                                            PLAYER_PREVIOUS_URL, header, response);
+            break;
+        case CAP_NEXT_SONG:
+                http_code = execute_command(qt_to_utf8(m_auth_code),
+                                            PLAYER_NEXT_URL, header, response);
+            break;
+        case CAP_VOLUME_UP:
+            /* TODO? */
+            break;
+        case CAP_VOLUME_DOWN:
+            /* TODO? */
+            break;
+        default: ;
+    }
+
+    /* Parse response */
+    if (http_code != HTTP_NO_CONTENT) {
+        QString r(response.toJson());
+        binfo("Couldn't run spotify command! HTTP code: %li", http_code);
+        binfo("Spotify controls only work for premium users!");
+        binfo("Response: %s", qt_to_utf8(r));
+    }
+
+    return http_code == HTTP_NO_CONTENT;
 }
 
 /* === CURL/Spotify API handling === */

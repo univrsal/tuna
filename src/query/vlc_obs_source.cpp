@@ -165,8 +165,38 @@ void vlc_obs_source::refresh()
 bool vlc_obs_source::execute_capability(capability c)
 {
 	auto* vlc = get_vlc();
+	obs_source_t *src = obs_weak_source_get_source(m_weak_src);
+	float vol = 0.0f;
+	if (src)
+		vol = obs_source_get_volume(src);
 
-	return true;
+	switch (c) {
+		case CAP_PREV_SONG:
+			libvlc_media_list_player_previous_(vlc->media_list_player);
+			break;
+		case CAP_NEXT_SONG:
+			libvlc_media_list_player_next_(vlc->media_list_player);
+			break;
+		case CAP_PLAY_PAUSE:
+			if (libvlc_media_player_get_state_(vlc->media_player) == libvlc_Playing)
+				libvlc_media_list_player_pause_(vlc->media_list_player);
+			else
+				libvlc_media_list_player_play_(vlc->media_list_player);
+			break;
+		case CAP_STOP_SONG:
+			libvlc_media_list_player_stop_(vlc->media_list_player);
+			break;
+		case CAP_VOLUME_UP:
+			if (src)
+				obs_source_set_volume(src, vol + (vol / 10));
+			break;
+		case CAP_VOLUME_DOWN:
+			if (src)
+				obs_source_set_volume(src, vol - (vol / 10));
+			break;
+	}
+	obs_source_release(src);
+	return vlc;
 }
 
 void vlc_obs_source::set_gui_values()

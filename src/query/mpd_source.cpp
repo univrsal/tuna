@@ -108,6 +108,8 @@ void mpd_source::save()
 
 void mpd_source::refresh()
 {
+    static bool have_reset = false;
+
     if (!m_connected)
         connect();
     m_current.clear();
@@ -126,6 +128,7 @@ void mpd_source::refresh()
     }
 
     if (m_mpd_song) {
+        have_reset = false;
         const char* title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
         const char* artists = mpd_song_get_tag(m_mpd_song, MPD_TAG_ARTIST, 0);
         const char* year = mpd_song_get_tag(m_mpd_song, MPD_TAG_DATE, 0);
@@ -164,7 +167,7 @@ void mpd_source::refresh()
                 cover::get_file_folder(file_path);
 
                 if (!file_path.startsWith("http")) /* this is not a url */
-                    file_path.prepend("file:///");
+                    file_path.prepend("file://");
                 cover::find_local_cover(file_path, tmp);
                 m_current.set_cover_link(tmp);
                 util::download_cover(m_current);

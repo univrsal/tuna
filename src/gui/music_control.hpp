@@ -18,15 +18,16 @@ public:
 signals:
     void source_changed();
     void thread_changed();
-private Q_SLOTS:
-	void refresh_play_state();
-	void showcontextmenu(const QPoint &pos);
-	void toggle_title();
-	void toggle_volume();
-private slots:
 
+private Q_SLOTS:
     void on_source_changed();
     void on_thread_changed();
+    void refresh_play_state();
+    void showcontextmenu(const QPoint &pos);
+    void toggle_title();
+    void toggle_volume();
+private slots:
+
     void on_btn_prev_clicked();
 
     void on_btn_play_pause_clicked();

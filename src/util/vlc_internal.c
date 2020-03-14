@@ -24,6 +24,14 @@ LIBVLC_MEDIA_PLAYER_CAN_PAUSE libvlc_media_player_can_pause_;
 LIBVLC_MEDIA_PLAYER_PAUSE libvlc_media_player_pause_;
 LIBVLC_MEDIA_PLAYER_GET_MEDIA libvlc_media_player_get_media_;
 
+/* libvlc media list player */
+LIBVLC_MEDIA_LIST_PLAYER_PLAY libvlc_media_list_player_play_;
+LIBVLC_MEDIA_LIST_PLAYER_PAUSE libvlc_media_list_player_pause_;
+LIBVLC_MEDIA_LIST_PLAYER_STOP libvlc_media_list_player_stop_;
+
+LIBVLC_MEDIA_LIST_PLAYER_NEXT libvlc_media_list_player_next_;
+LIBVLC_MEDIA_LIST_PLAYER_PREVIOUS libvlc_media_list_player_previous_;
+
 void* libvlc_module = NULL;
 
 #ifdef __APPLE__
@@ -64,7 +72,14 @@ bool load_vlc_funcs(void)
     LOAD_VLC_FUNC(libvlc_media_player_pause);
     LOAD_VLC_FUNC(libvlc_media_player_get_media);
 
-    return true;
+	/* libvlc media list player */
+	LOAD_VLC_FUNC(libvlc_media_list_player_play);
+	LOAD_VLC_FUNC(libvlc_media_list_player_pause);
+	LOAD_VLC_FUNC(libvlc_media_list_player_stop);
+	LOAD_VLC_FUNC(libvlc_media_list_player_next);
+	LOAD_VLC_FUNC(libvlc_media_list_player_previous);
+
+	return true;
 }
 
 bool load_libvlc_module(void)

@@ -46,6 +46,8 @@ bool curl_download(const char* url, const char* path);
 
 void download_cover(const song& song, bool reset = false);
 
+void reset_cover();
+
 void download_lyrics(const song& song);
 
 void handle_outputs(const song& song);

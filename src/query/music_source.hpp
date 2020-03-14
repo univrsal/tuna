@@ -69,7 +69,7 @@ public:
     virtual ~music_source() {}
 
     /* util */
-    uint16_t get_capabilities() const { return m_capabilities; }
+    uint32_t get_capabilities() const { return m_capabilities; }
 
     bool has_capability(capability c) const
     {
