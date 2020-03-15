@@ -20,7 +20,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={code:GetDirName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=tuna-@ARCH
+OutputBaseFilename=tuna-installer.@ARCH.@VERSION
 Compression=lzma
 SolidCompression=yes
 
