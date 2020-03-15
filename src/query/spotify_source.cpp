@@ -17,8 +17,8 @@
  *************************************************************************/
 
 #include "spotify_source.hpp"
-#include "../gui/tuna_gui.hpp"
 #include "../gui/music_control.hpp"
+#include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/creds.hpp"
@@ -247,32 +247,32 @@ bool spotify_source::execute_capability(capability c)
     QJsonDocument response;
 
     switch (c) {
-        case CAP_PLAY_PAUSE:
-            if (m_current.playing()) {
+    case CAP_PLAY_PAUSE:
+        if (m_current.playing()) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
-                http_code = execute_command(qt_to_utf8(m_auth_code),
-                                            PLAYER_PAUSE_URL, header, response);
-            } else {
-                http_code = execute_command(qt_to_utf8(m_auth_code),
-                                            PLAYER_PLAY_URL, header, response);
-            }
-            break;
-        case CAP_PREV_SONG:
-                http_code = execute_command(qt_to_utf8(m_auth_code),
-                                            PLAYER_PREVIOUS_URL, header, response);
-            break;
-        case CAP_NEXT_SONG:
-                http_code = execute_command(qt_to_utf8(m_auth_code),
-                                            PLAYER_NEXT_URL, header, response);
-            break;
-        case CAP_VOLUME_UP:
-            /* TODO? */
-            break;
-        case CAP_VOLUME_DOWN:
-            /* TODO? */
-            break;
-        default: ;
+            http_code = execute_command(qt_to_utf8(m_auth_code),
+                PLAYER_PAUSE_URL, header, response);
+        } else {
+            http_code = execute_command(qt_to_utf8(m_auth_code),
+                PLAYER_PLAY_URL, header, response);
+        }
+        break;
+    case CAP_PREV_SONG:
+        http_code = execute_command(qt_to_utf8(m_auth_code),
+            PLAYER_PREVIOUS_URL, header, response);
+        break;
+    case CAP_NEXT_SONG:
+        http_code = execute_command(qt_to_utf8(m_auth_code),
+            PLAYER_NEXT_URL, header, response);
+        break;
+    case CAP_VOLUME_UP:
+        /* TODO? */
+        break;
+    case CAP_VOLUME_DOWN:
+        /* TODO? */
+        break;
+    default:;
     }
 
     /* Parse response */

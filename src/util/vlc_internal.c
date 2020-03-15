@@ -72,14 +72,14 @@ bool load_vlc_funcs(void)
     LOAD_VLC_FUNC(libvlc_media_player_pause);
     LOAD_VLC_FUNC(libvlc_media_player_get_media);
 
-	/* libvlc media list player */
-	LOAD_VLC_FUNC(libvlc_media_list_player_play);
-	LOAD_VLC_FUNC(libvlc_media_list_player_pause);
-	LOAD_VLC_FUNC(libvlc_media_list_player_stop);
-	LOAD_VLC_FUNC(libvlc_media_list_player_next);
-	LOAD_VLC_FUNC(libvlc_media_list_player_previous);
+    /* libvlc media list player */
+    LOAD_VLC_FUNC(libvlc_media_list_player_play);
+    LOAD_VLC_FUNC(libvlc_media_list_player_pause);
+    LOAD_VLC_FUNC(libvlc_media_list_player_stop);
+    LOAD_VLC_FUNC(libvlc_media_list_player_next);
+    LOAD_VLC_FUNC(libvlc_media_list_player_previous);
 
-	return true;
+    return true;
 }
 
 bool load_libvlc_module(void)

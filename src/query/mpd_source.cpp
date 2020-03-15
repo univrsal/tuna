@@ -19,8 +19,8 @@
 #ifdef UNIX
 
 #include "mpd_source.hpp"
-#include "../gui/tuna_gui.hpp"
 #include "../gui/music_control.hpp"
+#include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
 #include "../util/cover_tag_handler.hpp"
 #include "../util/utility.hpp"
@@ -201,29 +201,29 @@ bool mpd_source::execute_capability(capability c)
     switch (c) {
     case CAP_NEXT_SONG:
         result = mpd_run_next(m_connection);
-            break;
+        break;
     case CAP_PREV_SONG:
         result = mpd_run_previous(m_connection);
-            break;
+        break;
     case CAP_VOLUME_UP:
         result = mpd_run_change_volume(m_connection, 2);
-            break;
+        break;
     case CAP_VOLUME_DOWN:
         result = mpd_run_change_volume(m_connection, -2);
-            break;
+        break;
     case CAP_VOLUME_MUTE:
         result = mpd_run_set_volume(m_connection, 0);
-            break;
+        break;
     case CAP_PLAY_PAUSE:
         result = mpd_run_toggle_pause(m_connection);
         if (m_stopped)
             result = mpd_run_play_pos(m_connection, 0);
         m_stopped = false;
-            break;
+        break;
     case CAP_STOP_SONG:
         m_stopped = true;
         result = mpd_run_stop(m_connection);
-            break;
+        break;
     default:;
     }
 

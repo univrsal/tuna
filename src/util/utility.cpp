@@ -205,11 +205,11 @@ void reset_cover()
         berr("Couldn't move placeholder cover");
 }
 
-void write_song(config::output &o, const QString &str)
+void write_song(config::output& o, const QString& str)
 {
-	if (o.last_output == str)
-		return;
-	o.last_output = str;
+    if (o.last_output == str)
+        return;
+    o.last_output = str;
 
     QFile out(o.path);
     bool success = false;
@@ -218,17 +218,17 @@ void write_song(config::output &o, const QString &str)
     else
         success = out.open(QIODevice::WriteOnly | QIODevice::Text);
 
-	if (success) {
-		QTextStream stream(&out);
-		stream.setCodec("UTF-8");
-		stream << str;
-		if (o.log_mode)
-			stream << "\n";
-		stream.flush();
-		out.close();
-	} else {
-		berr("Couldn't open song output file %s", qt_to_utf8(o.path));
-	}
+    if (success) {
+        QTextStream stream(&out);
+        stream.setCodec("UTF-8");
+        stream << str;
+        if (o.log_mode)
+            stream << "\n";
+        stream.flush();
+        out.close();
+    } else {
+        berr("Couldn't open song output file %s", qt_to_utf8(o.path));
+    }
 }
 
 void handle_outputs(const song& s)

@@ -174,9 +174,9 @@ bool specifier_string_list::do_format(QString& slice, const song& s) const
     QString concatenated_list;
     concatenated_list = s.artists().join(", ");
 
-	if (concatenated_list.isEmpty())
-		concatenated_list = "n/a";
-	return replace(slice, s, concatenated_list);
+    if (concatenated_list.isEmpty())
+        concatenated_list = "n/a";
+    return replace(slice, s, concatenated_list);
 }
 
 bool specifier_date::do_format(QString& slice, const song& s) const

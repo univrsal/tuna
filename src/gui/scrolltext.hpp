@@ -21,18 +21,17 @@
  *************************************************************************/
 
 #pragma once
-#include <QWidget>
 #include <QStaticText>
 #include <QTimer>
+#include <QWidget>
 
-class scroll_text : public QWidget
-{
+class scroll_text : public QWidget {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE set_text)
     Q_PROPERTY(QString separator READ separator WRITE set_separator)
 
 public:
-    explicit scroll_text(QWidget *parent = nullptr);
+    explicit scroll_text(QWidget* parent = nullptr);
 
 public slots:
     QString text() const;
@@ -42,8 +41,8 @@ public slots:
     void set_separator(QString separator);
 
 protected:
-    virtual void paintEvent(QPaintEvent *);
-    virtual void resizeEvent(QResizeEvent *);
+    virtual void paintEvent(QPaintEvent*);
+    virtual void resizeEvent(QResizeEvent*);
 
 private:
     void update_text();

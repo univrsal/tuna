@@ -1,18 +1,17 @@
 #pragma once
 
+#include "scrolltext.hpp"
 #include <QDockWidget>
 #include <QTimer>
-#include "scrolltext.hpp"
 
 namespace Ui {
 class music_Control;
 }
 
-class music_Control : public QDockWidget
-{
+class music_Control : public QDockWidget {
     Q_OBJECT
 public:
-    explicit music_Control(QWidget *parent = nullptr);
+    explicit music_Control(QWidget* parent = nullptr);
     ~music_Control();
 
 signals:
@@ -23,7 +22,7 @@ private Q_SLOTS:
     void on_source_changed();
     void on_thread_changed();
     void refresh_play_state();
-    void showcontextmenu(const QPoint &pos);
+    void showcontextmenu(const QPoint& pos);
     void toggle_title();
     void toggle_volume();
 private slots:
@@ -41,9 +40,9 @@ private slots:
     void on_btn_volup_clicked();
 
 private:
-    Ui::music_Control *ui;
-    QTimer *m_timer = nullptr;
-    scroll_text *m_song_text = nullptr;
+    Ui::music_Control* ui;
+    QTimer* m_timer = nullptr;
+    scroll_text* m_song_text = nullptr;
 };
 
-extern music_Control *music_control;
+extern music_Control* music_control;

@@ -65,11 +65,11 @@ void song::append_artist(const QString& a)
         m_data |= CAP_ARTIST;
 }
 
-void song::set_label(const QString &l)
+void song::set_label(const QString& l)
 {
-	if (!l.isEmpty())
-		m_data |= CAP_LABEL;
-	m_label = l;
+    if (!l.isEmpty())
+        m_data |= CAP_LABEL;
+    m_label = l;
 }
 
 void song::set_cover_link(const QString& link)

@@ -53,7 +53,7 @@ public:
     void set_year(const QString& y);
     void set_month(const QString& m);
     void set_day(const QString& d);
-    void set_label(const QString &l);
+    void set_label(const QString& l);
     void clear();
 
     bool playing() const { return m_is_playing; }

@@ -81,10 +81,10 @@ void output_edit_dialog::on_buttonBox_accepted()
 
     if (m_mode == edit_mode::create) {
         m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text(),
-                           ui->cb_logmode->isChecked());
+            ui->cb_logmode->isChecked());
     } else {
         m_tuna->edit_output(ui->txt_format->text(), ui->txt_path->text(),
-                            ui->cb_logmode->isChecked());
+            ui->cb_logmode->isChecked());
     }
 }
 

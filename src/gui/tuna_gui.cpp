@@ -17,13 +17,13 @@
  *************************************************************************/
 
 #include "tuna_gui.hpp"
-#include "music_control.hpp"
 #include "../query/spotify_source.hpp"
 #include "../query/vlc_obs_source.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
+#include "music_control.hpp"
 #include "output_edit_dialog.hpp"
 #include "ui_tuna_gui.h"
 #include <QDate>
