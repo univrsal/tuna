@@ -83,6 +83,9 @@
 #define CFG_WINDOW_CUT_END 				"window.cut.end"
 #define CFG_WINDOW_REGEX 				"window.regex"
 
+#define CFG_DOCK_VISIBLE				"dock_visible"
+#define CFG_DOCK_INFO_VISIBLE			"dock_info_visible"
+#define CFG_DOCK_VOLUME_VISIBLE			"dock_volume_visible"
 /* clang-format on */
 
 namespace config {

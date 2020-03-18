@@ -10,10 +10,17 @@ class music_Control;
 
 class music_Control : public QDockWidget {
     Q_OBJECT
+	bool m_visible = false; /* I don't know any other way to keep track of this */
 public:
     explicit music_Control(QWidget* parent = nullptr);
     ~music_Control();
 
+	void save_settings();
+	void setVisible(bool visible) override;
+	bool visible()
+	{
+		return m_visible;
+	}
 signals:
     void source_changed();
     void thread_changed();
