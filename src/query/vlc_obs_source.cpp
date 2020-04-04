@@ -120,8 +120,8 @@ void vlc_obs_source::refresh()
 
     if (vlc) {
         /* Locking source mutex (vlc->mutex) here
-		 * seems to cause a crash
-		 **/
+         * seems to cause a crash
+         **/
         m_current.clear();
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_length_(vlc->media_player));
@@ -194,6 +194,7 @@ bool vlc_obs_source::execute_capability(capability c)
         if (src)
             obs_source_set_volume(src, vol - (vol / 10));
         break;
+    default: ;
     }
     obs_source_release(src);
     return vlc;

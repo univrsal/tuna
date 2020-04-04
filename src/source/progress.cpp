@@ -100,6 +100,8 @@ void progress_source::render(gs_effect_t* effect)
             gs_technique_end(tech);
         }
     } else {
+        if (m_hide_paused)
+            return;
         uint32_t w = static_cast<uint32_t>(m_cx * .25);
         uint32_t x = static_cast<uint32_t>(m_bounce_progress * (m_cx - w));
         if (w > 0) {
@@ -122,6 +124,7 @@ void progress_source::update(obs_data_t* settings)
     m_fg = static_cast<uint32_t>(obs_data_get_int(settings, S_PROGRESS_FG));
     m_bg = static_cast<uint32_t>(obs_data_get_int(settings, S_PROGRESS_BG));
     m_use_bg = obs_data_get_bool(settings, S_PROGRESS_USE_BG);
+    m_hide_paused = obs_data_get_bool(settings, S_PROGRESS_HIDE_PAUSED);
 }
 
 static bool use_bg_changed(obs_properties_t* props, obs_property_t* property,
@@ -143,6 +146,7 @@ obs_properties_t* get_properties_for_progress(void* data)
     obs_properties_add_color(p, S_PROGRESS_BG, T_PROGRESS_BG);
     obs_properties_add_int(p, S_PROGRESS_CX, T_PROGRESS_CX, 2, UINT16_MAX, 1);
     obs_properties_add_int(p, S_PROGRESS_CY, T_PROGRESS_CY, 2, UINT16_MAX, 1);
+    obs_properties_add_bool(p, S_PROGRESS_HIDE_PAUSED, T_PROGRESS_HIDE_PAUSED);
     return p;
 }
 
@@ -165,6 +169,7 @@ void register_progress()
         obs_data_set_default_int(settings, S_PROGRESS_BG, 0xFF323232);
         obs_data_set_default_int(settings, S_PROGRESS_CX, 300);
         obs_data_set_default_int(settings, S_PROGRESS_CY, 30);
+        obs_data_set_default_bool(settings, S_PROGRESS_HIDE_PAUSED, false);
     };
 
     si.update = [](void* data, obs_data_t* settings) { reinterpret_cast<progress_source*>(data)->update(settings); };
