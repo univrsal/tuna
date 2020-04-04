@@ -21,6 +21,8 @@
 #include "config.hpp"
 #include "constants.hpp"
 #include "format.hpp"
+#include <QGuiApplication>
+#include <QScreen>
 
 #if DISABLE_TUNA_VLC
 bool load_libvlc_module()
@@ -256,6 +258,15 @@ void handle_outputs(const song& s)
 int64_t epoch()
 {
     return time(nullptr);
+}
+
+bool window_pos_valid(QRect rect)
+{
+    for (QScreen *screen : QGuiApplication::screens()) {
+        if (screen->availableGeometry().intersects(rect))
+            return true;
+    }
+    return false;
 }
 
 } // namespace util
