@@ -163,6 +163,13 @@ void spotify_source::refresh()
         const auto& progress = obj["progress_ms"];
         const auto& device = obj["device"];
         const auto& playing = obj["is_playing"];
+        const auto& play_type = obj["currently_playing_type"];
+
+        /* If an ad is playing we assume playback is paused */
+        if (play_type.isString() && play_type.toString() == "ad") {
+            m_current.set_playing(false);
+            return;
+        }
 
         if (device.isObject() && playing.isBool()) {
             if (device.toObject()["is_private"].toBool()) {
