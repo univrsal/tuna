@@ -83,7 +83,8 @@
  * the home directory isn't really used anyways so just save it
  * there */
 #if UNIX
-#define OUTPUT_FILE ".config/outputs.json"
+#define OUTPUT_FOLDER ".config/"
+#define OUTPUT_FILE OUTPUT_FOLDER "outputs.json"
 #else
 #define OUTPUT_FILE "outputs.json"
 #endif
@@ -97,4 +98,4 @@
 #define HTTP_NO_CONTENT			204
 #define HTTP_OK					200
 
-	/* clang-format on */
+    /* clang-format on */
