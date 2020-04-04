@@ -93,7 +93,7 @@ void init()
     specifiers.emplace_back(std::make_unique<specifier_int>('n', CAP_TRACK_NUMBER));
     specifiers.emplace_back(std::make_unique<specifier_time>('p', CAP_PROGRESS));
     specifiers.emplace_back(std::make_unique<specifier_time>('l', CAP_DURATION));
-    specifiers.emplace_back(std::make_unique<specifier_static>('b', "\n"));
+    specifiers.emplace_back(std::make_unique<specifier_static>('e', "\n"));
     specifiers.emplace_back(std::make_unique<specifier_static>('s', " "));
 }
 
