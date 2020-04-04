@@ -100,4 +100,4 @@
 #define HTTP_NO_CONTENT			204
 #define HTTP_OK					200
 
-    /* clang-format on */
+/* clang-format on */

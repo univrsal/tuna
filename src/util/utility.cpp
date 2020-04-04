@@ -262,7 +262,7 @@ int64_t epoch()
 
 bool window_pos_valid(QRect rect)
 {
-    for (QScreen *screen : QGuiApplication::screens()) {
+    for (QScreen* screen : QGuiApplication::screens()) {
         if (screen->availableGeometry().intersects(rect))
             return true;
     }

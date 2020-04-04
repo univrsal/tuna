@@ -27,7 +27,7 @@
 #include "window_source.hpp"
 
 namespace music_sources {
-static int selected_index = 0;
+static int selected_index = -1;
 QList<std::shared_ptr<music_source>> instances;
 
 void init()
@@ -81,7 +81,9 @@ void set_gui_values()
 
 std::shared_ptr<music_source> selected_source()
 {
-    return std::shared_ptr<music_source>(instances[selected_index]);
+    if (selected_index >= 0)
+        return std::shared_ptr<music_source>(instances[selected_index]);
+    return nullptr;
 }
 
 void deinit()

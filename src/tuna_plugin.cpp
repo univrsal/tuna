@@ -41,18 +41,18 @@ void register_gui()
     /* UI registration from
      * https://github.com/Palakis/obs-websocket/
      */
-    const auto menu_action = static_cast<QAction *>(obs_frontend_add_tools_menu_qaction(T_MENU_TUNA));
+    const auto menu_action = static_cast<QAction*>(obs_frontend_add_tools_menu_qaction(T_MENU_TUNA));
     obs_frontend_push_ui_translation(obs_module_get_string);
-    const auto main_window = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+    const auto main_window = static_cast<QMainWindow*>(obs_frontend_get_main_window());
     tuna_dialog = new tuna_gui(main_window);
     obs_frontend_pop_ui_translation();
     const auto menu_cb = [] { tuna_dialog->toggleShowHide(); };
     QAction::connect(menu_action, &QAction::triggered, menu_cb);
 
     obs_frontend_push_ui_translation(obs_module_get_string);
-    auto *tmp = new music_Control(main_window);
+    auto* tmp = new music_Control(main_window);
 
-    music_control = reinterpret_cast<music_Control *>(obs_frontend_add_dock(tmp));
+    music_control = reinterpret_cast<music_Control*>(obs_frontend_add_dock(tmp));
     obs_frontend_pop_ui_translation();
 }
 

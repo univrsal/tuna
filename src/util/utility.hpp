@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <QString>
 #include <QRect>
+#include <QString>
 #include <obs-module.h>
 #include <stdint.h>
 

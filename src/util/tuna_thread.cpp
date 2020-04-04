@@ -86,18 +86,20 @@ void* thread_method(void* arg)
         const auto time = util::epoch();
         thread_mutex.lock();
         auto ref = music_sources::selected_source();
-        ref->refresh();
-        auto s = ref->song_info();
+        if (ref) {
+            ref->refresh();
+            auto s = ref->song_info();
 
-        /* Make a copy for the progress bar source, because it can't
-		 * wait for the other processes to finish, otherwise it'll block
-		 * the video thread
-		 */
-        copy_mutex.lock();
-        copy = s;
-        copy_mutex.unlock();
-        /* Process song data */
-        util::handle_outputs(s);
+            /* Make a copy for the progress bar source, because it can't
+             * wait for the other processes to finish, otherwise it'll block
+             * the video thread
+             */
+            copy_mutex.lock();
+            copy = s;
+            copy_mutex.unlock();
+            /* Process song data */
+            util::handle_outputs(s);
+        }
         thread_mutex.unlock();
 
         /* Calculate how long refresh took and only wait the remaining time */

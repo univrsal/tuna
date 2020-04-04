@@ -33,14 +33,14 @@
 
 namespace config {
 
-config_t *instance = nullptr;
+config_t* instance = nullptr;
 uint16_t refresh_rate = 1000;
-const char *placeholder = nullptr;
-const char *cover_path = nullptr;
-const char *lyrics_path = nullptr;
-const char *selected_source = nullptr;
+const char* placeholder = nullptr;
+const char* cover_path = nullptr;
+const char* lyrics_path = nullptr;
+const char* selected_source = nullptr;
 QList<output> outputs;
-const char *cover_placeholder = nullptr;
+const char* cover_placeholder = nullptr;
 bool download_cover = true;
 
 void init()
@@ -114,13 +114,13 @@ void close()
     /* Wait for thread to exit to delete resources */
     while (thread::thread_running)
         os_sleep_ms(5);
-    bfree((void *)cover_placeholder);
+    bfree((void*)cover_placeholder);
     thread::thread_mutex.lock();
     music_sources::deinit();
     thread::thread_mutex.unlock();
 }
 
-void load_outputs(QList<output> &table_content)
+void load_outputs(QList<output>& table_content)
 {
     table_content.clear();
     QDir home = QDir::homePath();
@@ -162,7 +162,7 @@ void load_outputs(QList<output> &table_content)
     }
 }
 
-void save_outputs(const QList<output> &outputs)
+void save_outputs(const QList<output>& outputs)
 {
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
@@ -172,13 +172,12 @@ void save_outputs(const QList<output> &outputs)
 
     QJsonArray output_array;
 
-
     if (!folder.exists() && !folder.mkdir(".")) {
         berr("Couldn't create config folder");
         return;
     }
 
-    for (const auto &o : outputs) {
+    for (const auto& o : outputs) {
         QJsonObject output;
         output[JSON_FORMAT_ID] = o.format;
         output[JSON_OUTPUT_PATH_ID] = QDir::toNativeSeparators(o.path);
@@ -198,7 +197,7 @@ void save_outputs(const QList<output> &outputs)
             if (data.length() != wrote) {
                 berr("Couldn't write outputs to %s only"
                      "wrote %lli bytes out of %i",
-                     qt_to_utf8(path), wrote, data.length());
+                    qt_to_utf8(path), wrote, data.length());
             }
             save_file.close();
         } else {

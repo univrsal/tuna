@@ -30,7 +30,7 @@
 mpd_source::mpd_source()
     : music_source(S_SOURCE_MPD, T_SOURCE_MPD)
 {
-    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
+    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_STOP_SONG | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
     m_connection = nullptr;
     m_port = 0;

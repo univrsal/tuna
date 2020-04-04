@@ -194,7 +194,7 @@ bool vlc_obs_source::execute_capability(capability c)
         if (src)
             obs_source_set_volume(src, vol - (vol / 10));
         break;
-    default: ;
+    default:;
     }
     obs_source_release(src);
     return vlc;
