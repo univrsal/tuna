@@ -66,7 +66,7 @@ void select(const char* id)
     /* ensure cover will be refreshed after changing source */
     song s;
     util::download_cover(s, true);
-    util::reset_cover();
+    util::set_placeholder(true);
 #ifdef UNIX
     cover::find_embedded_cover("", true);
 #endif

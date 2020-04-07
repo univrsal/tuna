@@ -112,19 +112,23 @@ void mpd_source::refresh()
 
     if (!m_connected)
         connect();
-    m_current.clear();
     if (!m_connected) {
-        util::download_cover(m_current);
+        util::set_placeholder(true);
         return;
     }
+
+    bool old_state = m_current.playing();
+    m_current.clear();
 
     m_status = mpd_run_status(m_connection);
     m_mpd_song = mpd_run_current_song(m_connection);
 
     if (m_status) {
-        m_mpd_state = mpd_status_get_state(m_status);
+        bool new_state = mpd_status_get_state(m_status) == MPD_STATE_PLAY;
         m_current.set_progress(mpd_status_get_elapsed_ms(m_status));
-        m_current.set_playing(m_mpd_state == MPD_STATE_PLAY);
+        if (new_state != old_state)
+            util::set_placeholder(!new_state);
+        m_current.set_playing(new_state);
     }
 
     if (m_mpd_song) {
@@ -159,10 +163,6 @@ void mpd_source::refresh()
         file_path.prepend(m_base_folder);
 
         if (m_current.playing()) {
-            /* Reset last downloaded cover
-             * to make sure that the next time mpd is paused
-             * it'll get the placeholder */
-            util::download_cover(m_current, true);
             if (!cover::find_embedded_cover(file_path)) {
                 cover::get_file_folder(file_path);
 
@@ -173,10 +173,6 @@ void mpd_source::refresh()
                 util::download_cover(m_current);
             }
         } else {
-            /* Reset the last embedded cover path to make
-             * sure that when playback is resumed it'll
-             * grab the cover again */
-            cover::find_embedded_cover("", true);
             util::download_cover(m_current);
         }
     } else {

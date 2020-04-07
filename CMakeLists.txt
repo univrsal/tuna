@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(tuna)
 
+string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
+add_definitions(-DBUILD_TIME="${TODAY}")
+
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)

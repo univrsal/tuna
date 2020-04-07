@@ -194,7 +194,7 @@ void download_cover(const song& song, bool reset)
 
     if (!found_cover && last_cover != "n/a") {
         last_cover = "n/a";
-        reset_cover();
+        set_placeholder(true);
     }
 }
 
@@ -267,6 +267,25 @@ bool window_pos_valid(QRect rect)
             return true;
     }
     return false;
+}
+
+void set_placeholder(bool on)
+{
+    if (on) {
+        auto path = utf8_to_qt(config::cover_path);
+        QFile current(path);
+        if (!current.rename((current.fileName() + ".off")))
+            berr("Couldn't move existing cover to temp file");
+        if (!QFile::copy(utf8_to_qt(config::cover_placeholder), path))
+            berr("Couldn't move placeholder cover");
+    } else {
+        auto path = utf8_to_qt(config::cover_path);
+        QFile current(path);
+        if (!current.remove())
+            berr("Couldn't remove placeholder");
+        if (!QFile::rename((QString(path) + ".off"), path))
+            berr("Couldn't move placeholder cover");
+    }
 }
 
 } // namespace util
