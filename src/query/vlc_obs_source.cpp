@@ -121,7 +121,7 @@ void vlc_obs_source::refresh()
     auto* vlc = get_vlc();
     /* we keep a refernce here to make sure that this source won't be freed
      * while we still need it */
-    obs_source_t *src = obs_weak_source_get_source(m_weak_src);
+    obs_source_t* src = obs_weak_source_get_source(m_weak_src);
     if (!src)
         return;
 
@@ -130,7 +130,7 @@ void vlc_obs_source::refresh()
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_length_(vlc->media_player));
         m_current.set_playing(libvlc_media_player_get_state_(vlc->media_player) == libvlc_Playing);
-    	
+
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
         if (m_current.playing() && media) {
             const char* title = libvlc_media_get_meta_(media, libvlc_meta_Title);
@@ -160,14 +160,14 @@ void vlc_obs_source::refresh()
                 m_current.set_label(label);
 
             util::download_cover(m_current);
-		} else {
-			m_current.clear();
-			util::download_cover(m_current, true);
-			util::reset_cover();   
-		}
+        } else {
+            m_current.clear();
+            util::download_cover(m_current, true);
+            util::reset_cover();
+        }
     } else {
         m_current.clear();
-		util::reset_cover();
+        util::reset_cover();
     }
 
     obs_source_release(src);

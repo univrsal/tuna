@@ -142,9 +142,9 @@ void spotify_source::refresh()
         if (os_gettime_ns() - m_timout_start >= m_timeout_length) {
             m_timout_start = 0;
             m_timeout_length = 0;
-            binfo("API timeout is over");
+            binfo("API timeout of %li seconds is over", m_timeout_length);
         } else {
-            binfo("Waiting for Spotify-API timeout");
+            bdebug("Waiting for Spotify-API timeout");
             return;
         }
     }
@@ -168,6 +168,8 @@ void spotify_source::refresh()
         /* If an ad is playing we assume playback is paused */
         if (play_type.isString() && play_type.toString() == "ad") {
             m_current.set_playing(false);
+            util::reset_cover();
+            util::download_cover(m_current, true);
             return;
         }
 
@@ -177,7 +179,13 @@ void spotify_source::refresh()
             } else {
                 parse_track_json(obj["item"]);
                 m_current.set_playing(playing.toBool());
-                util::download_cover(m_current);
+
+                if (m_current.playing()) {
+                    util::download_cover(m_current);
+                } else {
+                    util::reset_cover();
+                    util::download_cover(m_current, true);
+                }
             }
             m_current.set_progress(progress.toInt());
         } else {
@@ -187,7 +195,13 @@ void spotify_source::refresh()
     } else if (http_code == HTTP_NO_CONTENT) {
         /* No session running */
         m_current.clear();
+        util::reset_cover();
+        util::download_cover(m_current, true);
     } else {
+        /* Don't reset cover or info here since
+		 * we're just waiting for the API to give a proper
+		 * response again
+		 */
         if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
@@ -196,8 +210,7 @@ void spotify_source::refresh()
                 m_timout_start = os_gettime_ns();
             }
         } else {
-            bwarn("Unknown error occured when querying Spotify-API: %li (response: %s)", http_code,
-                qt_to_utf8(str));
+            bwarn("Unknown error occured when querying Spotify-API: %li (response: %s)", http_code, qt_to_utf8(str));
         }
     }
 }
@@ -258,20 +271,16 @@ bool spotify_source::execute_capability(capability c)
         if (m_current.playing()) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
-            http_code = execute_command(qt_to_utf8(m_auth_code),
-                PLAYER_PAUSE_URL, header, response);
+            http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_PAUSE_URL, header, response);
         } else {
-            http_code = execute_command(qt_to_utf8(m_auth_code),
-                PLAYER_PLAY_URL, header, response);
+            http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_PLAY_URL, header, response);
         }
         break;
     case CAP_PREV_SONG:
-        http_code = execute_command(qt_to_utf8(m_auth_code),
-            PLAYER_PREVIOUS_URL, header, response);
+        http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_PREVIOUS_URL, header, response);
         break;
     case CAP_NEXT_SONG:
-        http_code = execute_command(qt_to_utf8(m_auth_code),
-            PLAYER_NEXT_URL, header, response);
+        http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_NEXT_URL, header, response);
         break;
     case CAP_VOLUME_UP:
         /* TODO? */

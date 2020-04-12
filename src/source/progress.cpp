@@ -69,6 +69,8 @@ void progress_source::tick(float seconds)
 void progress_source::render(gs_effect_t* effect)
 {
     UNUSED_PARAMETER(effect);
+    if (m_hide_paused && !m_active)
+        return;
 
     gs_effect_t* solid = obs_get_base_effect(OBS_EFFECT_SOLID);
     gs_eparam_t* color = gs_effect_get_param_by_name(solid, "color");
@@ -100,8 +102,6 @@ void progress_source::render(gs_effect_t* effect)
             gs_technique_end(tech);
         }
     } else {
-        if (m_hide_paused)
-            return;
         uint32_t w = static_cast<uint32_t>(m_cx * .25);
         uint32_t x = static_cast<uint32_t>(m_bounce_progress * (m_cx - w));
         if (w > 0) {

@@ -164,18 +164,19 @@ void load_outputs(QList<output>& table_content)
 
 void save_outputs(const QList<output>& outputs)
 {
+    QJsonArray output_array;
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
+
+#ifdef UNIX
     QDir folder = QDir::home();
     folder.cd(OUTPUT_FOLDER);
-    QFileInfo check(path);
-
-    QJsonArray output_array;
 
     if (!folder.exists() && !folder.mkdir(".")) {
         berr("Couldn't create config folder");
         return;
     }
+#endif
 
     for (const auto& o : outputs) {
         QJsonObject output;
