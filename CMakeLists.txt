@@ -36,12 +36,12 @@ find_package(LibVLC QUIET)
 
 if (UNIX AND NOT APPLE)
     add_definitions(-DLINUX=1)
-        find_package(Taglib)
+    find_package(Taglib)
     set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
-        set(tuna_platform_deps
+    set(tuna_platform_deps
             mpdclient
             tag)
-        set(tuna_platform_includes
+    set(tuna_platform_includes
             ${TAGLIB_INCLUDES})
 endif()
 

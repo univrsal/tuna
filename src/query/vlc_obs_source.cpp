@@ -126,9 +126,9 @@ void vlc_obs_source::refresh()
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_length_(vlc->media_player));
         m_current.set_playing(libvlc_media_player_get_state_(vlc->media_player) == libvlc_Playing);
-
+    	
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
-        if (media) {
+        if (m_current.playing() && media) {
             const char* title = libvlc_media_get_meta_(media, libvlc_meta_Title);
             const char* artists = libvlc_media_get_meta_(media, libvlc_meta_Artist);
             const char* year = libvlc_media_get_meta_(media, libvlc_meta_Date);
@@ -156,9 +156,14 @@ void vlc_obs_source::refresh()
                 m_current.set_label(label);
 
             util::download_cover(m_current);
-        }
+		} else {
+			m_current.clear();
+			util::download_cover(m_current, true);
+			util::reset_cover();   
+		}
     } else {
         m_current.clear();
+		util::reset_cover();
     }
 }
 
