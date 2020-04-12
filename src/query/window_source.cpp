@@ -117,8 +117,8 @@ bool window_source::execute_capability(capability c)
 
 bool window_source::valid_format(const QString& str)
 {
-    QRegularExpression reg("/%[m|M]|%[a|A]|%[r|R]|%[y|Y]|%[d|D]|%[n|N]"
-                           "%[p|P]%[l|L]/gm");
+    static QRegularExpression reg("/%[m|M]|%[a|A]|%[r|R]|%[y|Y]|%[d|D]|%[n|N]"
+                                  "%[p|P]%[l|L]/gm");
     return !reg.match(str).hasMatch();
 }
 

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <QRect>
 #include <QString>
 #include <obs-module.h>
 #include <stdint.h>
@@ -52,6 +53,10 @@ void download_lyrics(const song& song);
 
 void handle_outputs(const song& song);
 
+void set_placeholder(bool on);
+
 int64_t epoch();
+
+bool window_pos_valid(QRect rect);
 
 } // namespace util

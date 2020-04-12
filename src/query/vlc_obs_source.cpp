@@ -96,10 +96,13 @@ struct vlc_source* vlc_obs_source::get_vlc()
         return data;
 
     src = obs_weak_source_get_source(m_weak_src);
+
     if (src) {
-        void* private_data = obs_obj_get_data(src);
-        if (private_data)
-            data = reinterpret_cast<struct vlc_source*>(private_data);
+        if (obs_source_active(src)) {
+            void* private_data = obs_obj_get_data(src);
+            if (private_data)
+                data = reinterpret_cast<struct vlc_source*>(private_data);
+        }
     } else if (m_weak_src) { /* The actual source is gone -> clear the weak source */
         obs_weak_source_release(m_weak_src);
         m_weak_src = nullptr;
@@ -115,13 +118,14 @@ void vlc_obs_source::refresh()
 
     if (!reload())
         return;
-
     auto* vlc = get_vlc();
+    /* we keep a refernce here to make sure that this source won't be freed
+     * while we still need it */
+    obs_source_t *src = obs_weak_source_get_source(m_weak_src);
+    if (!src)
+        return;
 
     if (vlc) {
-        /* Locking source mutex (vlc->mutex) here
-		 * seems to cause a crash
-		 **/
         m_current.clear();
         m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
         m_current.set_duration(libvlc_media_player_get_length_(vlc->media_player));
@@ -165,12 +169,19 @@ void vlc_obs_source::refresh()
         m_current.clear();
 		util::reset_cover();
     }
+
+    obs_source_release(src);
 }
 
 bool vlc_obs_source::execute_capability(capability c)
 {
     auto* vlc = get_vlc();
+    if (!vlc)
+        return false;
     obs_source_t* src = obs_weak_source_get_source(m_weak_src);
+    if (!src)
+        return false;
+
     float vol = 0.0f;
     if (src)
         vol = obs_source_get_volume(src);
@@ -199,7 +210,9 @@ bool vlc_obs_source::execute_capability(capability c)
         if (src)
             obs_source_set_volume(src, vol - (vol / 10));
         break;
+    default:;
     }
+
     obs_source_release(src);
     return vlc;
 }

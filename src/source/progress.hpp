@@ -35,6 +35,7 @@ class progress_source {
     bool m_bounce_up = true;
     bool m_active = false;
     bool m_use_bg = true;
+    bool m_hide_paused = false;
 
 public:
     progress_source(obs_source_t* src, obs_data_t* settings);

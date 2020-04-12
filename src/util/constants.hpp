@@ -34,6 +34,7 @@
 #define S_PROGRESS_CY			"cy"
 #define S_PROGRESS_ID           "progress_bar"
 #define S_PROGRESS_USE_BG		"use_bg"
+#define S_PROGRESS_HIDE_PAUSED	"hide_paused"
 
 /* Translation */
 #define T_(s) 					obs_module_text(s)
@@ -72,6 +73,7 @@
 #define T_PROGRESS_CY			T_("tuna.source.progress.cy")
 #define T_PROGRESS_NAME			T_("tuna.source.progress.name")
 #define T_PROGRESS_USE_BG		T_("tuna.source.progress.use.bg")
+#define T_PROGRESS_HIDE_PAUSED	T_("tuna.source.progress.hide.paused")
 
 #define T_DOCK_MENU_TITLE		T_("tuna.dock.menu.title")
 #define T_DOCK_TOGGLE_VOLUME	T_("tuna.dock.menu.toggle.volume")
@@ -83,7 +85,8 @@
  * the home directory isn't really used anyways so just save it
  * there */
 #if UNIX
-#define OUTPUT_FILE ".config/outputs.json"
+#define OUTPUT_FOLDER ".config/"
+#define OUTPUT_FILE OUTPUT_FOLDER "outputs.json"
 #else
 #define OUTPUT_FILE "outputs.json"
 #endif
@@ -97,4 +100,4 @@
 #define HTTP_NO_CONTENT			204
 #define HTTP_OK					200
 
-	/* clang-format on */
+/* clang-format on */
