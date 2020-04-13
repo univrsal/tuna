@@ -133,7 +133,7 @@ void mpd_source::refresh()
 
 /* Thanks ubuntu for using ancient packages */
 #ifndef MPD_TAG_LABEL
-#define MPD_TAG_LABEL 21
+#define MPD_TAG_LABEL (mpd_tag_type)21
 #endif
     if (m_mpd_song) {
         have_reset = false;
