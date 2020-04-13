@@ -108,6 +108,7 @@ void close()
 {
     thread::thread_mutex.lock();
     save();
+    util::reset_cover();
     thread::stop();
     thread::thread_mutex.unlock();
 

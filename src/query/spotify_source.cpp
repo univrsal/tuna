@@ -107,7 +107,7 @@ bool spotify_source::valid_format(const QString& str)
 
 /* implementation further down */
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json);
+    QJsonDocument& response_json, bool put = false);
 
 void extract_timeout(const std::string& header, uint64_t& timeout)
 {
@@ -199,9 +199,9 @@ void spotify_source::refresh()
         util::download_cover(m_current, true);
     } else {
         /* Don't reset cover or info here since
-		 * we're just waiting for the API to give a proper
-		 * response again
-		 */
+         * we're just waiting for the API to give a proper
+         * response again
+         */
         if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
@@ -271,16 +271,16 @@ bool spotify_source::execute_capability(capability c)
         if (m_current.playing()) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
-            http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_PAUSE_URL, header, response);
+            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, true);
         } else {
-            http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_PLAY_URL, header, response);
+            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PLAY_URL, header, response, true);
         }
         break;
     case CAP_PREV_SONG:
-        http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_PREVIOUS_URL, header, response);
+        http_code = execute_command(qt_to_utf8(m_token), PLAYER_PREVIOUS_URL, header, response, true);
         break;
     case CAP_NEXT_SONG:
-        http_code = execute_command(qt_to_utf8(m_auth_code), PLAYER_NEXT_URL, header, response);
+        http_code = execute_command(qt_to_utf8(m_token), PLAYER_NEXT_URL, header, response, true);
         break;
     case CAP_VOLUME_UP:
         /* TODO? */
@@ -332,6 +332,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
     const std::string& request)
 {
     CURL* curl = curl_easy_init();
+
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, TOKEN_URL);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
@@ -482,7 +483,7 @@ bool spotify_source::new_token(QString& log)
 /* Sends commands to spotify api via url */
 
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json)
+    QJsonDocument& response_json, bool put)
 {
     std::string response;
     std::string header = "Authorization: Bearer ";
@@ -493,10 +494,16 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
+    if (put) {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
+    } else {
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+        curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
+    }
+
     if (!response_header.empty())
         bdebug("Response header: %s", response_header.c_str());
 
