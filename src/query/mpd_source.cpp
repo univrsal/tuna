@@ -131,6 +131,10 @@ void mpd_source::refresh()
         m_current.set_playing(new_state);
     }
 
+/* Thanks ubuntu for using ancient packages */
+#ifndef MPD_TAG_LABEL
+#define MPD_TAG_LABEL (mpd_tag_type)21
+#endif
     if (m_mpd_song) {
         have_reset = false;
         const char* title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
