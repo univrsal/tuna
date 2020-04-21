@@ -41,6 +41,7 @@ fi
 echo "Installing dependencies"
 case $OS in
     "Arch Linux")
+    "Manjaro")
     sudo pacman -S $deps_arch
     ;;
 "Debian")
@@ -52,6 +53,8 @@ case $OS in
 "RedHat")
     sudo yum install $deps_rh
     ;;
+    *)
+    echo "Couldn't determine your distro, you will ahve to install $deps_debian manually"
 esac
 
 echo "Uninstalling old plugin"
