@@ -21,7 +21,7 @@ echo "Fetching build from $build_location"
 cp $build_location/$project.so $build_dir/$project/bin/64bit/
 
 echo "Fetching locale from $data_dir"
-cp -R $data_dir $build_dir/plugin
+cp -R $data_dir $build_dir/$project
 
 echo "Fetching misc files"
 cp ../LICENSE $build_dir/LICENSE.txt
