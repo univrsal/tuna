@@ -40,8 +40,7 @@ fi
 
 echo "Installing dependencies"
 case $OS in
-    "Arch Linux")
-    "Manjaro")
+    "Arch Linux" | "Manjaro")
     sudo pacman -S $deps_arch
     ;;
 "Debian")
@@ -54,11 +53,11 @@ case $OS in
     sudo yum install $deps_rh
     ;;
     *)
-    echo "Couldn't determine your distro, you will ahve to install $deps_debian manually"
+    echo "Couldn't determine your distro, you will have to install $deps_debian manually"
 esac
 
 echo "Uninstalling old plugin"
 rm -rf $base_dir/$plugin_name
 echo "Installing plugin"
-mkdir -p $base_dir/$plugin_name/
-mv ./plugin/* $base_dir/$plugin_name/
+mkdir -p $base_dir
+mv ./$plugin_name $base_dir/
