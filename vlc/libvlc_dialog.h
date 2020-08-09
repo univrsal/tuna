@@ -23,9 +23,9 @@
 
 #include <stdbool.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 typedef struct libvlc_dialog_id libvlc_dialog_id;
 
@@ -37,29 +37,26 @@ typedef struct libvlc_dialog_id libvlc_dialog_id;
  * LibVLC dialog external API
  */
 
-typedef enum libvlc_dialog_question_type
-{
-    LIBVLC_DIALOG_QUESTION_NORMAL,
-    LIBVLC_DIALOG_QUESTION_WARNING,
-    LIBVLC_DIALOG_QUESTION_CRITICAL,
+typedef enum libvlc_dialog_question_type {
+	LIBVLC_DIALOG_QUESTION_NORMAL,
+	LIBVLC_DIALOG_QUESTION_WARNING,
+	LIBVLC_DIALOG_QUESTION_CRITICAL,
 } libvlc_dialog_question_type;
 
 /**
  * Dialog callbacks to be implemented
  */
-typedef struct libvlc_dialog_cbs
-{
-    /**
+typedef struct libvlc_dialog_cbs {
+	/**
      * Called when an error message needs to be displayed
      *
      * @param p_data opaque pointer for the callback
      * @param psz_title title of the dialog
      * @param psz_text text of the dialog
      */
-    void (*pf_display_error)(void *p_data, const char *psz_title,
-                             const char *psz_text);
+	void (*pf_display_error)(void *p_data, const char *psz_title, const char *psz_text);
 
-    /**
+	/**
      * Called when a login dialog needs to be displayed
      *
      * You can interact with this dialog by calling libvlc_dialog_post_login()
@@ -76,12 +73,10 @@ typedef struct libvlc_dialog_cbs
      * @param b_ask_store if true, ask the user if he wants to save the
      * credentials
      */
-    void (*pf_display_login)(void *p_data, libvlc_dialog_id *p_id,
-                             const char *psz_title, const char *psz_text,
-                             const char *psz_default_username,
-                             bool b_ask_store);
+	void (*pf_display_login)(void *p_data, libvlc_dialog_id *p_id, const char *psz_title, const char *psz_text,
+							 const char *psz_default_username, bool b_ask_store);
 
-    /**
+	/**
      * Called when a question dialog needs to be displayed
      *
      * You can interact with this dialog by calling libvlc_dialog_post_action()
@@ -101,13 +96,11 @@ typedef struct libvlc_dialog_cbs
      * @param psz_action2 text of the second button, if NULL, don't display
      * this button
      */
-    void (*pf_display_question)(void *p_data, libvlc_dialog_id *p_id,
-                                const char *psz_title, const char *psz_text,
-                                libvlc_dialog_question_type i_type,
-                                const char *psz_cancel, const char *psz_action1,
-                                const char *psz_action2);
+	void (*pf_display_question)(void *p_data, libvlc_dialog_id *p_id, const char *psz_title, const char *psz_text,
+								libvlc_dialog_question_type i_type, const char *psz_cancel, const char *psz_action1,
+								const char *psz_action2);
 
-    /**
+	/**
      * Called when a progress dialog needs to be displayed
      *
      * If cancellable (psz_cancel != NULL), you can cancel this dialog by
@@ -126,12 +119,10 @@ typedef struct libvlc_dialog_cbs
      * @param psz_cancel text of the cancel button, if NULL the dialog is not
      * cancellable
      */
-    void (*pf_display_progress)(void *p_data, libvlc_dialog_id *p_id,
-                                const char *psz_title, const char *psz_text,
-                                bool b_indeterminate, float f_position,
-                                const char *psz_cancel);
+	void (*pf_display_progress)(void *p_data, libvlc_dialog_id *p_id, const char *psz_title, const char *psz_text,
+								bool b_indeterminate, float f_position, const char *psz_cancel);
 
-    /**
+	/**
      * Called when a displayed dialog needs to be cancelled
      *
      * The implementation must call libvlc_dialog_dismiss() to really release
@@ -140,9 +131,9 @@ typedef struct libvlc_dialog_cbs
      * @param p_data opaque pointer for the callback
      * @param p_id id of the dialog
      */
-    void (*pf_cancel)(void *p_data, libvlc_dialog_id *p_id);
+	void (*pf_cancel)(void *p_data, libvlc_dialog_id *p_id);
 
-    /**
+	/**
      * Called when a progress dialog needs to be updated
      *
      * @param p_data opaque pointer for the callback
@@ -150,8 +141,7 @@ typedef struct libvlc_dialog_cbs
      * @param f_position osition of the progress bar (between 0.0 and 1.0)
      * @param psz_text new text of the progress dialog
      */
-    void (*pf_update_progress)(void *p_data, libvlc_dialog_id *p_id,
-                               float f_position, const char *psz_text);
+	void (*pf_update_progress)(void *p_data, libvlc_dialog_id *p_id, float f_position, const char *psz_text);
 } libvlc_dialog_cbs;
 
 /**
@@ -162,25 +152,22 @@ typedef struct libvlc_dialog_cbs
  * @param p_cbs a pointer to callbacks, or NULL to unregister callbacks.
  * @param p_data opaque pointer for the callback
  */
-LIBVLC_API void
-libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance,
-                            const libvlc_dialog_cbs *p_cbs, void *p_data);
+LIBVLC_API void libvlc_dialog_set_callbacks(libvlc_instance_t *p_instance, const libvlc_dialog_cbs *p_cbs,
+											void *p_data);
 
 /**
  * Associate an opaque pointer with the dialog id
  *
  * @version LibVLC 3.0.0 and later.
  */
-LIBVLC_API void
-libvlc_dialog_set_context(libvlc_dialog_id *p_id, void *p_context);
+LIBVLC_API void libvlc_dialog_set_context(libvlc_dialog_id *p_id, void *p_context);
 
 /**
  * Return the opaque pointer associated with the dialog id
  *
  * @version LibVLC 3.0.0 and later.
  */
-LIBVLC_API void *
-libvlc_dialog_get_context(libvlc_dialog_id *p_id);
+LIBVLC_API void *libvlc_dialog_get_context(libvlc_dialog_id *p_id);
 
 /**
  * Post a login answer
@@ -197,9 +184,8 @@ libvlc_dialog_get_context(libvlc_dialog_id *p_id);
  * @param b_store if true, store the credentials
  * @return 0 on success, or -1 on error
  */
-LIBVLC_API int
-libvlc_dialog_post_login(libvlc_dialog_id *p_id, const char *psz_username,
-                         const char *psz_password, bool b_store);
+LIBVLC_API int libvlc_dialog_post_login(libvlc_dialog_id *p_id, const char *psz_username, const char *psz_password,
+										bool b_store);
 
 /**
  * Post a question answer
@@ -214,8 +200,7 @@ libvlc_dialog_post_login(libvlc_dialog_id *p_id, const char *psz_username,
  * @param i_action 1 for action1, 2 for action2
  * @return 0 on success, or -1 on error
  */
-LIBVLC_API int
-libvlc_dialog_post_action(libvlc_dialog_id *p_id, int i_action);
+LIBVLC_API int libvlc_dialog_post_action(libvlc_dialog_id *p_id, int i_action);
 
 /**
  * Dismiss a dialog
@@ -229,13 +214,12 @@ libvlc_dialog_post_action(libvlc_dialog_id *p_id, int i_action);
  * @param p_id id of the dialog
  * @return 0 on success, or -1 on error
  */
-LIBVLC_API int
-libvlc_dialog_dismiss(libvlc_dialog_id *p_id);
+LIBVLC_API int libvlc_dialog_dismiss(libvlc_dialog_id *p_id);
 
 /** @} */
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif /* LIBVLC_DIALOG_H */

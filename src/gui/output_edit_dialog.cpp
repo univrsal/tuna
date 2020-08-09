@@ -80,17 +80,15 @@ void output_edit_dialog::on_buttonBox_accepted()
     }
 
     if (m_mode == edit_mode::create) {
-        m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text(),
-            ui->cb_logmode->isChecked());
+        m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text(), ui->cb_logmode->isChecked());
     } else {
-        m_tuna->edit_output(ui->txt_format->text(), ui->txt_path->text(),
-            ui->cb_logmode->isChecked());
+        m_tuna->edit_output(ui->txt_format->text(), ui->txt_path->text(), ui->cb_logmode->isChecked());
     }
 }
 
 void output_edit_dialog::on_pushButton_clicked()
 {
-    QString path = QFileDialog::getSaveFileName(
-        this, tr(T_SELECT_SONG_FILE), QDir::home().path(), tr(FILTER("Text file", "*.txt")));
+    QString path = QFileDialog::getSaveFileName(this, tr(T_SELECT_SONG_FILE), QDir::home().path(),
+        tr(FILTER("Text file", "*.txt")));
     ui->txt_path->setText(path);
 }

@@ -13,8 +13,7 @@
 namespace x11util {
 static Display* xdisplay = 0;
 
-Display*
-disp()
+Display* disp()
 {
     if (!xdisplay)
         xdisplay = XOpenDisplay(nullptr);
@@ -32,18 +31,8 @@ bool ewmhIsSupported()
     unsigned char* data = nullptr;
     Window ewmh_window = 0;
 
-    int status = XGetWindowProperty(display,
-        DefaultRootWindow(display),
-        netSupportingWmCheck,
-        0L,
-        1L,
-        false,
-        XA_WINDOW,
-        &actualType,
-        &format,
-        &num,
-        &bytes,
-        &data);
+    int status = XGetWindowProperty(display, DefaultRootWindow(display), netSupportingWmCheck, 0L, 1L, false, XA_WINDOW,
+        &actualType, &format, &num, &bytes, &data);
 
     if (status == Success) {
         if (num > 0) {
@@ -56,18 +45,8 @@ bool ewmhIsSupported()
     }
 
     if (ewmh_window) {
-        status = XGetWindowProperty(display,
-            ewmh_window,
-            netSupportingWmCheck,
-            0L,
-            1L,
-            false,
-            XA_WINDOW,
-            &actualType,
-            &format,
-            &num,
-            &bytes,
-            &data);
+        status = XGetWindowProperty(display, ewmh_window, netSupportingWmCheck, 0L, 1L, false, XA_WINDOW, &actualType,
+            &format, &num, &bytes, &data);
         if (status != Success || num == 0 || ewmh_window != ((Window*)data)[0]) {
             ewmh_window = 0;
         }
@@ -79,17 +58,15 @@ bool ewmhIsSupported()
     return ewmh_window != 0;
 }
 
-std::list<Window>
-getTopLevelWindows()
+std::list<Window> getTopLevelWindows()
 {
     std::list<Window> res;
 
     if (!ewmhIsSupported()) {
-        blog(LOG_WARNING,
-            "Unable to query window list "
-            "because window manager "
-            "does not support extended "
-            "window manager Hints");
+        blog(LOG_WARNING, "Unable to query window list "
+                          "because window manager "
+                          "does not support extended "
+                          "window manager Hints");
         return res;
     }
 
@@ -102,23 +79,12 @@ getTopLevelWindows()
     for (int i = 0; i < ScreenCount(disp()); ++i) {
         Window rootWin = RootWindow(disp(), i);
 
-        int status = XGetWindowProperty(disp(),
-            rootWin,
-            netClList,
-            0L,
-            ~0L,
-            false,
-            AnyPropertyType,
-            &actualType,
-            &format,
-            &num,
-            &bytes,
-            (uint8_t**)&data);
+        int status = XGetWindowProperty(disp(), rootWin, netClList, 0L, ~0L, false, AnyPropertyType, &actualType,
+            &format, &num, &bytes, (uint8_t**)&data);
 
         if (status != Success) {
-            blog(LOG_WARNING,
-                "Failed getting root "
-                "window properties");
+            blog(LOG_WARNING, "Failed getting root "
+                              "window properties");
             continue;
         }
 
@@ -131,8 +97,7 @@ getTopLevelWindows()
     return res;
 }
 
-std::string
-getWindowAtom(Window win, const char* atom)
+std::string getWindowAtom(Window win, const char* atom)
 {
     Atom netWmName = XInternAtom(disp(), atom, false);
     int n;
@@ -169,14 +134,12 @@ getWindowAtom(Window win, const char* atom)
     return res;
 }
 
-inline std::string
-getWindowName(Window win)
+inline std::string getWindowName(Window win)
 {
     return getWindowAtom(win, "_NET_WM_NAME");
 }
 
-inline std::string
-getWindowClass(Window win)
+inline std::string getWindowClass(Window win)
 {
     return getWindowAtom(win, "WM_CLASS");
 }

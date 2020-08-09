@@ -28,9 +28,7 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     update(settings);
 }
 
-progress_source::~progress_source()
-{
-}
+progress_source::~progress_source() {}
 
 void progress_source::tick(float seconds)
 {
@@ -39,22 +37,24 @@ void progress_source::tick(float seconds)
     tmp = thread::copy;
     thread::copy_mutex.unlock();
     m_active = tmp.playing();
-
     if (m_active) {
+        seconds *= 1000; /* s -> ms */
         if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
-            if (tmp.get_int_value('p') == m_synced_progress) {
-
-            } else {
+            if (tmp.get_int_value('p') != m_synced_progress) {
                 m_synced_progress = tmp.get_int_value('p');
                 m_adjusted_progress = m_synced_progress + seconds;
+            } else {
+                m_adjusted_progress += seconds;
             }
-            float duration = tmp.get_int_value('l');
-            if (duration > 0)
-                m_progress = m_adjusted_progress / duration;
+        } else if (m_synced_progress > 0) {
+            m_adjusted_progress += seconds;
         }
-    }
 
-    if (!m_active) {
+
+        float duration = tmp.get_int_value('l');
+        if (duration > 0)
+            m_progress = m_adjusted_progress / duration;
+    } else {
         float step = 0.0005f * m_cx;
         if (m_bounce_up)
             m_bounce_progress = fmin(m_bounce_progress + seconds * step, 1.f);
@@ -127,8 +127,7 @@ void progress_source::update(obs_data_t* settings)
     m_hide_paused = obs_data_get_bool(settings, S_PROGRESS_HIDE_PAUSED);
 }
 
-static bool use_bg_changed(obs_properties_t* props, obs_property_t* property,
-    obs_data_t* settings)
+static bool use_bg_changed(obs_properties_t* props, obs_property_t* property, obs_data_t* settings)
 {
     UNUSED_PARAMETER(property);
     auto* prop = obs_properties_get(props, S_PROGRESS_BG);
@@ -158,9 +157,7 @@ void register_progress()
     si.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW;
     si.get_properties = get_properties_for_progress;
     si.get_name = [](void*) { return T_PROGRESS_NAME; };
-    si.create = [](obs_data_t* d, obs_source_t* s) {
-        return static_cast<void*>(new progress_source(s, d));
-    };
+    si.create = [](obs_data_t* d, obs_source_t* s) { return static_cast<void*>(new progress_source(s, d)); };
     si.destroy = [](void* data) { delete reinterpret_cast<progress_source*>(data); };
     si.get_width = [](void* data) { return reinterpret_cast<progress_source*>(data)->get_width(); };
     si.get_height = [](void* data) { return reinterpret_cast<progress_source*>(data)->get_height(); };

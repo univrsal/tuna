@@ -25,7 +25,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <jansson.h>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <util/config-file.h>

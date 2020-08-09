@@ -26,10 +26,8 @@ class output_edit_dialog;
 
 class tuna_gui;
 
-enum class edit_mode {
-    create,
-    modify
-};
+enum class edit_mode { create,
+    modify };
 
 class output_edit_dialog : public QDialog {
     Q_OBJECT

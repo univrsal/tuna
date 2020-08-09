@@ -25,9 +25,9 @@
 #ifndef LIBVLC_DEPRECATED_H
 #define LIBVLC_DEPRECATED_H 1
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 /**
  * \ingroup libvlc libvlc_media_player
@@ -47,7 +47,7 @@ extern "C" {
  * \return frames per second (fps) for this playing movie, or 0 if unspecified
  */
 LIBVLC_DEPRECATED
-LIBVLC_API float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi );
+LIBVLC_API float libvlc_media_player_get_fps(libvlc_media_player_t *p_mi);
 
 /** end bug */
 
@@ -55,19 +55,18 @@ LIBVLC_API float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi );
  * \deprecated Use libvlc_media_player_set_nsobject() instead
  */
 LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable );
+LIBVLC_API void libvlc_media_player_set_agl(libvlc_media_player_t *p_mi, uint32_t drawable);
 
 /**
  * \deprecated Use libvlc_media_player_get_nsobject() instead
  */
 LIBVLC_DEPRECATED
-LIBVLC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_mi );
+LIBVLC_API uint32_t libvlc_media_player_get_agl(libvlc_media_player_t *p_mi);
 
 /**
  * \deprecated Use libvlc_track_description_list_release() instead
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_track_description_release(libvlc_track_description_t *p_track_description);
 
 /** @}*/
 
@@ -83,8 +82,7 @@ void libvlc_track_description_release( libvlc_track_description_t *p_track_descr
  * \param p_mi the media player
  * \return the video pixel height or 0 if not applicable
  */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_video_get_height( libvlc_media_player_t *p_mi );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_get_height(libvlc_media_player_t *p_mi);
 
 /**
  * Get current video width.
@@ -93,8 +91,7 @@ int libvlc_video_get_height( libvlc_media_player_t *p_mi );
  * \param p_mi the media player
  * \return the video pixel width or 0 if not applicable
  */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_video_get_width( libvlc_media_player_t *p_mi );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_get_width(libvlc_media_player_t *p_mi);
 
 /**
  * Get the description of available titles.
@@ -104,7 +101,7 @@ int libvlc_video_get_width( libvlc_media_player_t *p_mi );
  * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
-        libvlc_video_get_title_description( libvlc_media_player_t *p_mi );
+libvlc_video_get_title_description(libvlc_media_player_t *p_mi);
 
 /**
  * Get the description of available chapters for specific title.
@@ -115,7 +112,7 @@ LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
  * It must be freed with libvlc_track_description_list_release()
  */
 LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
-        libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi, int i_title );
+libvlc_video_get_chapter_description(libvlc_media_player_t *p_mi, int i_title);
 
 /**
  * Set new video subtitle file.
@@ -125,8 +122,7 @@ LIBVLC_DEPRECATED LIBVLC_API libvlc_track_description_t *
  * \param psz_subtitle new video subtitle file
  * \return the success status (boolean)
  */
-LIBVLC_DEPRECATED LIBVLC_API int
-libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, const char *psz_subtitle );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_video_set_subtitle_file(libvlc_media_player_t *p_mi, const char *psz_subtitle);
 
 /**
  * Toggle teletext transparent status on video output.
@@ -134,8 +130,7 @@ libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi, const char *psz_sub
  *
  * \param p_mi the media player
  */
-LIBVLC_DEPRECATED LIBVLC_API void
-libvlc_toggle_teletext( libvlc_media_player_t *p_mi );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_toggle_teletext(libvlc_media_player_t *p_mi);
 
 /** @}*/
 
@@ -149,39 +144,37 @@ libvlc_toggle_teletext( libvlc_media_player_t *p_mi );
  * \deprecated Use libvlc_audio_output_device_list_get() instead.
  * \return always 0.
  */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_audio_output_device_count( libvlc_instance_t *p_instance, const char *psz_audio_output );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_audio_output_device_count(libvlc_instance_t *p_instance,
+																  const char *psz_audio_output);
 
 /**
  * Backward compatibility stub. Do not use in new code.
  * \deprecated Use libvlc_audio_output_device_list_get() instead.
  * \return always NULL.
  */
-LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_longname( libvlc_instance_t *p_instance, const char *psz_output,
-                                           int i_device );
+LIBVLC_DEPRECATED LIBVLC_API char *libvlc_audio_output_device_longname(libvlc_instance_t *p_instance,
+																	   const char *psz_output, int i_device);
 
 /**
  * Backward compatibility stub. Do not use in new code.
  * \deprecated Use libvlc_audio_output_device_list_get() instead.
  * \return always NULL.
  */
-LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_id( libvlc_instance_t *p_instance, const char *psz_audio_output, int i_device );
+LIBVLC_DEPRECATED LIBVLC_API char *libvlc_audio_output_device_id(libvlc_instance_t *p_instance,
+																 const char *psz_audio_output, int i_device);
 
 /**
  * Stub for backward compatibility.
  * \return always -1.
  */
 LIBVLC_DEPRECATED
-LIBVLC_API int libvlc_audio_output_get_device_type( libvlc_media_player_t *p_mi );
+LIBVLC_API int libvlc_audio_output_get_device_type(libvlc_media_player_t *p_mi);
 
 /**
  * Stub for backward compatibility.
  */
 LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *p_mp,
-                                                     int device_type );
+LIBVLC_API void libvlc_audio_output_set_device_type(libvlc_media_player_t *p_mp, int device_type);
 
 /** @}*/
 
@@ -205,8 +198,7 @@ LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *p_mp
  *
  * \param p_md media descriptor object
  */
-LIBVLC_DEPRECATED LIBVLC_API void
-libvlc_media_parse( libvlc_media_t *p_md );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_media_parse(libvlc_media_t *p_md);
 
 /**
  * Parse a media.
@@ -229,8 +221,7 @@ libvlc_media_parse( libvlc_media_t *p_md );
  *
  * \param p_md media descriptor object
  */
-LIBVLC_DEPRECATED LIBVLC_API void
-libvlc_media_parse_async( libvlc_media_t *p_md );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_media_parse_async(libvlc_media_t *p_md);
 
 /**
  * Return true is the media descriptor object is parsed
@@ -245,8 +236,7 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
  *
  * \libvlc_return_bool
  */
-LIBVLC_DEPRECATED LIBVLC_API int
-   libvlc_media_is_parsed( libvlc_media_t *p_md );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_media_is_parsed(libvlc_media_t *p_md);
 
 /**
  * Get media descriptor's elementary streams description
@@ -263,9 +253,7 @@ LIBVLC_DEPRECATED LIBVLC_API int
  *
  * \return the number of Elementary Streams
  */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
-                                  libvlc_media_track_info_t **tracks );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_media_get_tracks_info(libvlc_media_t *p_md, libvlc_media_track_info_t **tracks);
 
 /** @}*/
 
@@ -274,9 +262,7 @@ int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
  * @{
  */
 
-LIBVLC_DEPRECATED int
-    libvlc_media_list_add_file_content( libvlc_media_list_t * p_ml,
-                                        const char * psz_uri );
+LIBVLC_DEPRECATED int libvlc_media_list_add_file_content(libvlc_media_list_t *p_ml, const char *psz_uri);
 
 /** @}*/
 
@@ -288,9 +274,8 @@ LIBVLC_DEPRECATED int
 /**
  * \deprecated Use libvlc_media_discoverer_new() and libvlc_media_discoverer_start().
  */
-LIBVLC_DEPRECATED LIBVLC_API libvlc_media_discoverer_t *
-libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name );
+LIBVLC_DEPRECATED LIBVLC_API libvlc_media_discoverer_t *libvlc_media_discoverer_new_from_name(libvlc_instance_t *p_inst,
+																							  const char *psz_name);
 
 /**
  * Get media service discover object its localized name.
@@ -301,8 +286,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
  * \param p_mdis media discover object
  * \return localized name or NULL if the media_discoverer is not started
  */
-LIBVLC_DEPRECATED LIBVLC_API char *
-libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_DEPRECATED LIBVLC_API char *libvlc_media_discoverer_localized_name(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Get event manager from media service discover object.
@@ -314,7 +298,7 @@ libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
  * \return event manager object.
  */
 LIBVLC_DEPRECATED LIBVLC_API libvlc_event_manager_t *
-libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
+libvlc_media_discoverer_event_manager(libvlc_media_discoverer_t *p_mdis);
 
 /** @}*/
 
@@ -331,9 +315,7 @@ libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
  * \warning This function wastes one thread doing basically nothing.
  * libvlc_set_exit_handler() should be used instead.
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_wait( libvlc_instance_t *p_instance );
-
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_wait(libvlc_instance_t *p_instance);
 
 /** @}*/
 
@@ -346,13 +328,12 @@ void libvlc_wait( libvlc_instance_t *p_instance );
 /** This structure is opaque. It represents a libvlc log iterator */
 typedef struct libvlc_log_iterator_t libvlc_log_iterator_t;
 
-typedef struct libvlc_log_message_t
-{
-    int         i_severity;   /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
-    const char *psz_type;     /* module type */
-    const char *psz_name;     /* module name */
-    const char *psz_header;   /* optional header */
-    const char *psz_message;  /* message */
+typedef struct libvlc_log_message_t {
+	int i_severity;          /* 0=INFO, 1=ERR, 2=WARN, 3=DBG */
+	const char *psz_type;    /* module type */
+	const char *psz_name;    /* module name */
+	const char *psz_header;  /* optional header */
+	const char *psz_message; /* message */
 } libvlc_log_message_t;
 
 /**
@@ -362,8 +343,7 @@ typedef struct libvlc_log_message_t
  * \param p_instance ignored
  * \return always -1
  */
-LIBVLC_DEPRECATED LIBVLC_API
-unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance );
+LIBVLC_DEPRECATED LIBVLC_API unsigned libvlc_get_log_verbosity(const libvlc_instance_t *p_instance);
 
 /**
  * This function does nothing.
@@ -372,8 +352,7 @@ unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance );
  * \param p_instance ignored
  * \param level ignored
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_set_log_verbosity(libvlc_instance_t *p_instance, unsigned level);
 
 /**
  * This function does nothing useful.
@@ -382,16 +361,14 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level );
  * \param p_instance libvlc instance
  * \return an unique pointer or NULL on error
  */
-LIBVLC_DEPRECATED LIBVLC_API
-libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance );
+LIBVLC_DEPRECATED LIBVLC_API libvlc_log_t *libvlc_log_open(libvlc_instance_t *p_instance);
 
 /**
  * Frees memory allocated by libvlc_log_open().
  *
  * \param p_log libvlc log instance or NULL
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_log_close( libvlc_log_t *p_log );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_log_close(libvlc_log_t *p_log);
 
 /**
  * Always returns zero.
@@ -400,8 +377,7 @@ void libvlc_log_close( libvlc_log_t *p_log );
  * \param p_log ignored
  * \return always zero
  */
-LIBVLC_DEPRECATED LIBVLC_API
-unsigned libvlc_log_count( const libvlc_log_t *p_log );
+LIBVLC_DEPRECATED LIBVLC_API unsigned libvlc_log_count(const libvlc_log_t *p_log);
 
 /**
  * This function does nothing.
@@ -409,8 +385,7 @@ unsigned libvlc_log_count( const libvlc_log_t *p_log );
  *
  * \param p_log ignored
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_log_clear( libvlc_log_t *p_log );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_log_clear(libvlc_log_t *p_log);
 
 /**
  * This function does nothing useful.
@@ -419,16 +394,14 @@ void libvlc_log_clear( libvlc_log_t *p_log );
  * \param p_log ignored
  * \return an unique pointer or NULL on error or if the parameter was NULL
  */
-LIBVLC_DEPRECATED LIBVLC_API
-libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log );
+LIBVLC_DEPRECATED LIBVLC_API libvlc_log_iterator_t *libvlc_log_get_iterator(const libvlc_log_t *p_log);
 
 /**
  * Frees memory allocated by libvlc_log_get_iterator().
  *
  * \param p_iter libvlc log iterator or NULL
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_log_iterator_free(libvlc_log_iterator_t *p_iter);
 
 /**
  * Always returns zero.
@@ -437,8 +410,7 @@ void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter );
  * \param p_iter ignored
  * \return always zero
  */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter );
+LIBVLC_DEPRECATED LIBVLC_API int libvlc_log_iterator_has_next(const libvlc_log_iterator_t *p_iter);
 
 /**
  * Always returns NULL.
@@ -448,9 +420,8 @@ int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter );
  * \param p_buf ignored
  * \return always NULL
  */
-LIBVLC_DEPRECATED LIBVLC_API
-libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
-                                                libvlc_log_message_t *p_buf );
+LIBVLC_DEPRECATED LIBVLC_API libvlc_log_message_t *libvlc_log_iterator_next(libvlc_log_iterator_t *p_iter,
+																			libvlc_log_message_t *p_buf);
 
 /** @}*/
 
@@ -476,14 +447,13 @@ libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
  * \param i_options the number of options to add to the item
  * \param ppsz_options the options to add to the item
  */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
-                           int i_options, char **ppsz_options );
+LIBVLC_DEPRECATED LIBVLC_API void libvlc_playlist_play(libvlc_instance_t *p_instance, int i_id, int i_options,
+													   char **ppsz_options);
 
 /** @}*/
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif /* _LIBVLC_DEPRECATED_H */

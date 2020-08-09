@@ -39,8 +39,7 @@ bool start();
 void stop();
 
 #ifdef _WIN32
-DWORD WINAPI
-thread_method(LPVOID arg);
+DWORD WINAPI thread_method(LPVOID arg);
 #else
 
 void* thread_method(void*);

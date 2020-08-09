@@ -1,0 +1,2 @@
+This will automatically install the plugin to the appropriate directories.
+NOTICE: I offer no support for macOS versions.

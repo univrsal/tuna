@@ -26,23 +26,23 @@
 #ifndef VLC_LIBVLC_MEDIA_DISCOVERER_H
 #define VLC_LIBVLC_MEDIA_DISCOVERER_H 1
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 /**
  * Category of a media discoverer
  * \see libvlc_media_discoverer_list_get()
  */
 typedef enum libvlc_media_discoverer_category_t {
-    /** devices, like portable music player */
-    libvlc_media_discoverer_devices,
-    /** LAN/WAN services, like Upnp, SMB, or SAP */
-    libvlc_media_discoverer_lan,
-    /** Podcasts */
-    libvlc_media_discoverer_podcasts,
-    /** Local directories, like Video, Music or Pictures directories */
-    libvlc_media_discoverer_localdirs,
+	/** devices, like portable music player */
+	libvlc_media_discoverer_devices,
+	/** LAN/WAN services, like Upnp, SMB, or SAP */
+	libvlc_media_discoverer_lan,
+	/** Podcasts */
+	libvlc_media_discoverer_podcasts,
+	/** Local directories, like Video, Music or Pictures directories */
+	libvlc_media_discoverer_localdirs,
 } libvlc_media_discoverer_category_t;
 
 /**
@@ -50,9 +50,9 @@ typedef enum libvlc_media_discoverer_category_t {
  * \see libvlc_media_discoverer_list_get()
  */
 typedef struct libvlc_media_discoverer_description_t {
-    char *psz_name;
-    char *psz_longname;
-    libvlc_media_discoverer_category_t i_cat;
+	char *psz_name;
+	char *psz_longname;
+	libvlc_media_discoverer_category_t i_cat;
 } libvlc_media_discoverer_description_t;
 
 /** \defgroup libvlc_media_discoverer LibVLC media discovery
@@ -88,9 +88,7 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
  * \return media discover object or NULL in case of error
  * \version LibVLC 3.0.0 or later
  */
-LIBVLC_API libvlc_media_discoverer_t *
-libvlc_media_discoverer_new( libvlc_instance_t * p_inst,
-                             const char * psz_name );
+LIBVLC_API libvlc_media_discoverer_t *libvlc_media_discoverer_new(libvlc_instance_t *p_inst, const char *psz_name);
 
 /**
  * Start media discovery.
@@ -104,8 +102,7 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst,
  * \return -1 in case of error, 0 otherwise
  * \version LibVLC 3.0.0 or later
  */
-LIBVLC_API int
-libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API int libvlc_media_discoverer_start(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Stop media discovery.
@@ -115,8 +112,7 @@ libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis );
  * \param p_mdis media discover object
  * \version LibVLC 3.0.0 or later
  */
-LIBVLC_API void
-libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API void libvlc_media_discoverer_stop(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Release media discover object. If the reference count reaches 0, then
@@ -124,8 +120,7 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis );
  *
  * \param p_mdis media service discover object
  */
-LIBVLC_API void
-libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API void libvlc_media_discoverer_release(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Get media service discover media list.
@@ -133,8 +128,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis );
  * \param p_mdis media service discover object
  * \return list of media items
  */
-LIBVLC_API libvlc_media_list_t *
-libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API libvlc_media_list_t *libvlc_media_discoverer_media_list(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Query if media service discover object is running.
@@ -144,8 +138,7 @@ libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis );
  *
  * \libvlc_return_bool
  */
-LIBVLC_API int
-libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
+LIBVLC_API int libvlc_media_discoverer_is_running(libvlc_media_discoverer_t *p_mdis);
 
 /**
  * Get media discoverer services by category
@@ -160,10 +153,8 @@ libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
  *
  * \return the number of media discoverer services (0 on error)
  */
-LIBVLC_API size_t
-libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
-                                  libvlc_media_discoverer_category_t i_cat,
-                                  libvlc_media_discoverer_description_t ***ppp_services );
+LIBVLC_API size_t libvlc_media_discoverer_list_get(libvlc_instance_t *p_inst, libvlc_media_discoverer_category_t i_cat,
+												   libvlc_media_discoverer_description_t ***ppp_services);
 
 /**
  * Release an array of media discoverer services
@@ -175,14 +166,13 @@ libvlc_media_discoverer_list_get( libvlc_instance_t *p_inst,
  * \param pp_services array to release
  * \param i_count number of elements in the array
  */
-LIBVLC_API void
-libvlc_media_discoverer_list_release( libvlc_media_discoverer_description_t **pp_services,
-                                      size_t i_count );
+LIBVLC_API void libvlc_media_discoverer_list_release(libvlc_media_discoverer_description_t **pp_services,
+													 size_t i_count);
 
 /**@} */
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif /* <vlc/libvlc.h> */

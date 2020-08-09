@@ -39,6 +39,7 @@
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <random>
+#include <string>
 #include <util/platform.h>
 
 tuna_gui* tuna_dialog = nullptr;
@@ -61,7 +62,7 @@ tuna_gui::tuna_gui(QWidget* parent)
 
     ui->settings_tabs->setCurrentIndex(0);
 
-#ifndef UNIX
+#ifndef HAVE_MPD
     ui->settings_tabs->removeTab(2);
 #endif
 
@@ -265,8 +266,8 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* Source settings */
-#if UNIX
-    CSET_STR(CFG_MPD_IP, qPrintable(ui->txt_ip->text()));
+#if HAVE_MPD
+    CSET_STR(CFG_MPD_IP, qt_to_utf8(ui->txt_ip->text()));
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
     CSET_BOOL(CFG_MPD_LOCAL, ui->rb_local->isChecked());
     auto path = ui->txt_base_folder->text();
@@ -301,8 +302,10 @@ void tuna_gui::on_tuna_gui_accepted()
 
     config::load();
 
-    emit music_control->source_changed();
-    emit music_control->thread_changed();
+    if (music_control) {
+        emit music_control->source_changed();
+        emit music_control->thread_changed();
+    }
 }
 
 void tuna_gui::on_apply_pressed()
@@ -452,6 +455,7 @@ void tuna_gui::on_pb_refresh_vlc_clicked()
 void tuna_gui::set_mpd_local(bool local) const
 {
     ui->rb_local->setChecked(local);
+    ui->rb_remote->setChecked(!local);
     ui->txt_ip->setEnabled(!local);
     ui->sb_port->setEnabled(!local);
     ui->txt_base_folder->setEnabled(local);

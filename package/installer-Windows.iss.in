@@ -1,26 +1,22 @@
-; Taken from https://raw.githubusercontent.com/Palakis/obs-websocket/4.x-current/installer/installer.iss
-
-#define MyAppName "@PROJECT"
-#define MyAppVersion "@VERSION"
-#define MyAppPublisher "univrsal"
-#define MyAppURL "http://github.com/unvirsal/@PROJECT"
+#define MyAppName "@CMAKE_PROJECT_NAME@"
+#define MyAppVersion "@CMAKE_PROJECT_VERSION@"
+#define MyAppPublisher "@PLUGIN_AUTHOR@"
+#define MyAppURL "https://github.com/univrsal/@PLUGIN_GIT@"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{@APPID}
+AppId={{44b785ed-eef5-4b73-bef0-42ee3493c021}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={code:GetDirName}
 DefaultGroupName={#MyAppName}
-DisableProgramGroupPage=yes
-OutputBaseFilename=tuna-installer.@ARCH.@VERSION
+OutputBaseFilename={#MyAppName}-{#MyAppVersion}-Windows-Installer
 Compression=lzma
 SolidCompression=yes
 
@@ -28,13 +24,13 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "@BUILDDIR\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\LICENSE"; Flags: dontcopy
+Source: "..\release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\COPYING.txt"; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{group}\{cm:ProgramOnTheWeb,{#MyAppName}}"; Filename: "{#MyAppURL}"
-Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{#MyAppName}"
+Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 
 [Code]
 procedure InitializeWizard();
@@ -44,9 +40,8 @@ var
 begin
   ExtractTemporaryFile('LICENSE');
   LoadStringFromFile(ExpandConstant('{tmp}\LICENSE'), GPLText);
-
   Page := CreateOutputMsgMemoPage(wpWelcome,
-    'License Information', 'Please review the license terms before installing obs-websocket',
+    'License Information', 'Please review the license terms before installing {#MyAppName}',
     'Press Page Down to see the rest of the agreement. Once you are aware of your rights, click Next to continue.',
     String(GPLText)
   );
@@ -56,13 +51,13 @@ end;
 // following function come from https://github.com/Xaymar/obs-studio_amf-encoder-plugin/blob/master/%23Resources/Installer.in.iss#L45
 function GetDirName(Value: string): string;
 var
-	InstallPath: string;
+  InstallPath: string;
 begin
-	// initialize default path, which will be returned when the following registry
-	// key queries fail due to missing keys or for some different reason
-	Result := '{pf}\obs-studio';
-	// query the first registry value; if this succeeds, return the obtained value
-	if RegQueryStringValue(HKLM32, 'SOFTWARE\OBS Studio', '', InstallPath) then
-		Result := InstallPath
+  // initialize default path, which will be returned when the following registry
+  // key queries fail due to missing keys or for some different reason
+  Result := '{pf}\obs-studio';
+  // query the first registry value; if this succeeds, return the obtained value
+  if RegQueryStringValue(HKLM32, 'SOFTWARE\OBS Studio', '', InstallPath) then
+    Result := InstallPath
 end;
 

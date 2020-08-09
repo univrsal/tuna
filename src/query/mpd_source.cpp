@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#ifdef UNIX
+#ifdef HAVE_MPD
 
 #include "mpd_source.hpp"
 #include "../gui/music_control.hpp"
@@ -61,6 +61,7 @@ void mpd_source::disconnect()
 
 void mpd_source::connect()
 {
+    bdebug("Opening MPD connection to %s:%hu", qt_to_utf8(m_address), m_port);
     disconnect();
     if (m_local)
         m_connection = mpd_connection_new(nullptr, 0, 0);
@@ -68,9 +69,7 @@ void mpd_source::connect()
         m_connection = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
 
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
-        berr("mpd connection to %s:%hu failed with error %s",
-            qt_to_utf8(m_address),
-            m_port,
+        berr("mpd connection to %s:%hu failed with error %s", qt_to_utf8(m_address), m_port,
             mpd_connection_get_error_message(m_connection));
         mpd_connection_free(m_connection);
         m_connection = nullptr;
@@ -108,8 +107,6 @@ void mpd_source::save()
 
 void mpd_source::refresh()
 {
-    static bool have_reset = false;
-
     if (!m_connected)
         connect();
     if (!m_connected) {
@@ -136,7 +133,6 @@ void mpd_source::refresh()
 #define MPD_TAG_LABEL (mpd_tag_type)21
 #endif
     if (m_mpd_song) {
-        have_reset = false;
         const char* title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
         const char* artists = mpd_song_get_tag(m_mpd_song, MPD_TAG_ARTIST, 0);
         const char* year = mpd_song_get_tag(m_mpd_song, MPD_TAG_DATE, 0);

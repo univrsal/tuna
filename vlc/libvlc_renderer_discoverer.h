@@ -21,9 +21,9 @@
 #ifndef VLC_LIBVLC_RENDERER_DISCOVERER_H
 #define VLC_LIBVLC_RENDERER_DISCOVERER_H 1
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 /**
  * @defgroup libvlc_renderer_discoverer LibVLC renderer discoverer
@@ -42,10 +42,9 @@ typedef struct libvlc_renderer_discoverer_t libvlc_renderer_discoverer_t;
  *
  * \see libvlc_renderer_discoverer_list_get()
  */
-typedef struct libvlc_rd_description_t
-{
-    char *psz_name;
-    char *psz_longname;
+typedef struct libvlc_rd_description_t {
+	char *psz_name;
+	char *psz_longname;
 } libvlc_rd_description_t;
 
 /** The renderer can render audio */
@@ -66,7 +65,6 @@ typedef struct libvlc_rd_description_t
  */
 typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
 
-
 /**
  * Hold a renderer item, i.e. creates a new reference
  *
@@ -78,16 +76,14 @@ typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
  *
  * \return the current item
  */
-LIBVLC_API libvlc_renderer_item_t *
-libvlc_renderer_item_hold(libvlc_renderer_item_t *p_item);
+LIBVLC_API libvlc_renderer_item_t *libvlc_renderer_item_hold(libvlc_renderer_item_t *p_item);
 
 /**
  * Releases a renderer item, i.e. decrements its reference counter
  *
  * \version LibVLC 3.0.0 or later
  */
-LIBVLC_API void
-libvlc_renderer_item_release(libvlc_renderer_item_t *p_item);
+LIBVLC_API void libvlc_renderer_item_release(libvlc_renderer_item_t *p_item);
 
 /**
  * Get the human readable name of a renderer item
@@ -96,8 +92,7 @@ libvlc_renderer_item_release(libvlc_renderer_item_t *p_item);
  *
  * \return the name of the item (can't be NULL, must *not* be freed)
  */
-LIBVLC_API const char *
-libvlc_renderer_item_name(const libvlc_renderer_item_t *p_item);
+LIBVLC_API const char *libvlc_renderer_item_name(const libvlc_renderer_item_t *p_item);
 
 /**
  * Get the type (not translated) of a renderer item. For now, the type can only
@@ -107,8 +102,7 @@ libvlc_renderer_item_name(const libvlc_renderer_item_t *p_item);
  *
  * \return the type of the item (can't be NULL, must *not* be freed)
  */
-LIBVLC_API const char *
-libvlc_renderer_item_type(const libvlc_renderer_item_t *p_item);
+LIBVLC_API const char *libvlc_renderer_item_type(const libvlc_renderer_item_t *p_item);
 
 /**
  * Get the icon uri of a renderer item
@@ -117,8 +111,7 @@ libvlc_renderer_item_type(const libvlc_renderer_item_t *p_item);
  *
  * \return the uri of the item's icon (can be NULL, must *not* be freed)
  */
-LIBVLC_API const char *
-libvlc_renderer_item_icon_uri(const libvlc_renderer_item_t *p_item);
+LIBVLC_API const char *libvlc_renderer_item_icon_uri(const libvlc_renderer_item_t *p_item);
 
 /**
  * Get the flags of a renderer item
@@ -130,8 +123,7 @@ libvlc_renderer_item_icon_uri(const libvlc_renderer_item_t *p_item);
  *
  * \return bitwise flag: capabilities of the renderer, see
  */
-LIBVLC_API int
-libvlc_renderer_item_flags(const libvlc_renderer_item_t *p_item);
+LIBVLC_API int libvlc_renderer_item_flags(const libvlc_renderer_item_t *p_item);
 
 /**
  * Create a renderer discoverer object by name
@@ -152,9 +144,8 @@ libvlc_renderer_item_flags(const libvlc_renderer_item_t *p_item);
  * get a list of the discoverer names available in this libVLC instance
  * \return media discover object or NULL in case of error
  */
-LIBVLC_API libvlc_renderer_discoverer_t *
-libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
-                                const char *psz_name );
+LIBVLC_API libvlc_renderer_discoverer_t *libvlc_renderer_discoverer_new(libvlc_instance_t *p_inst,
+																		const char *psz_name);
 
 /**
  * Release a renderer discoverer object
@@ -163,8 +154,7 @@ libvlc_renderer_discoverer_new( libvlc_instance_t *p_inst,
  *
  * \param p_rd renderer discoverer object
  */
-LIBVLC_API void
-libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_rd );
+LIBVLC_API void libvlc_renderer_discoverer_release(libvlc_renderer_discoverer_t *p_rd);
 
 /**
  * Start renderer discovery
@@ -179,8 +169,7 @@ libvlc_renderer_discoverer_release( libvlc_renderer_discoverer_t *p_rd );
  * \param p_rd renderer discoverer object
  * \return -1 in case of error, 0 otherwise
  */
-LIBVLC_API int
-libvlc_renderer_discoverer_start( libvlc_renderer_discoverer_t *p_rd );
+LIBVLC_API int libvlc_renderer_discoverer_start(libvlc_renderer_discoverer_t *p_rd);
 
 /**
  * Stop renderer discovery.
@@ -191,8 +180,7 @@ libvlc_renderer_discoverer_start( libvlc_renderer_discoverer_t *p_rd );
  *
  * \param p_rd renderer discoverer object
  */
-LIBVLC_API void
-libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_rd );
+LIBVLC_API void libvlc_renderer_discoverer_stop(libvlc_renderer_discoverer_t *p_rd);
 
 /**
  * Get the event manager of the renderer discoverer
@@ -211,8 +199,7 @@ libvlc_renderer_discoverer_stop( libvlc_renderer_discoverer_t *p_rd );
  *
  * \return a valid event manager (can't fail)
  */
-LIBVLC_API libvlc_event_manager_t *
-libvlc_renderer_discoverer_event_manager( libvlc_renderer_discoverer_t *p_rd );
+LIBVLC_API libvlc_event_manager_t *libvlc_renderer_discoverer_event_manager(libvlc_renderer_discoverer_t *p_rd);
 
 /**
  * Get media discoverer services
@@ -228,9 +215,8 @@ libvlc_renderer_discoverer_event_manager( libvlc_renderer_discoverer_t *p_rd );
  *
  * \return the number of media discoverer services (0 on error)
  */
-LIBVLC_API size_t
-libvlc_renderer_discoverer_list_get( libvlc_instance_t *p_inst,
-                                     libvlc_rd_description_t ***ppp_services );
+LIBVLC_API size_t libvlc_renderer_discoverer_list_get(libvlc_instance_t *p_inst,
+													  libvlc_rd_description_t ***ppp_services);
 
 /**
  * Release an array of media discoverer services
@@ -242,14 +228,12 @@ libvlc_renderer_discoverer_list_get( libvlc_instance_t *p_inst,
  * \param pp_services array to release
  * \param i_count number of elements in the array
  */
-LIBVLC_API void
-libvlc_renderer_discoverer_list_release( libvlc_rd_description_t **pp_services,
-                                         size_t i_count );
+LIBVLC_API void libvlc_renderer_discoverer_list_release(libvlc_rd_description_t **pp_services, size_t i_count);
 
 /** @} */
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif

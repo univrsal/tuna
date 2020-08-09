@@ -47,11 +47,12 @@ void register_gui()
     const auto menu_cb = [] { tuna_dialog->toggleShowHide(); };
     QAction::connect(menu_action, &QAction::triggered, menu_cb);
 
+#ifndef __APPLE__
     obs_frontend_push_ui_translation(obs_module_get_string);
     auto* tmp = new music_Control(main_window);
-
     music_control = reinterpret_cast<music_Control*>(obs_frontend_add_dock(tmp));
     obs_frontend_pop_ui_translation();
+#endif
 }
 
 bool obs_module_load()

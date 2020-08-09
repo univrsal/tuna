@@ -35,31 +35,30 @@
 #ifndef VLC_LIBVLC_H
 #define VLC_LIBVLC_H 1
 
-#if defined (_WIN32) && defined (DLL_EXPORT)
-# define LIBVLC_API __declspec(dllexport)
-#elif defined (__GNUC__) && (__GNUC__ >= 4)
-# define LIBVLC_API __attribute__((visibility("default")))
+#if defined(_WIN32) && defined(DLL_EXPORT)
+#define LIBVLC_API __declspec(dllexport)
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
+#define LIBVLC_API __attribute__((visibility("default")))
 #else
-# define LIBVLC_API
+#define LIBVLC_API
 #endif
 
 #ifdef __LIBVLC__
 /* Avoid unhelpful warnings from libvlc with our deprecated APIs */
-#   define LIBVLC_DEPRECATED
-#elif defined(__GNUC__) && \
-      (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
-# define LIBVLC_DEPRECATED __attribute__((deprecated))
+#define LIBVLC_DEPRECATED
+#elif defined(__GNUC__) && (__GNUC__ > 3 || __GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#define LIBVLC_DEPRECATED __attribute__((deprecated))
 #else
-# define LIBVLC_DEPRECATED
+#define LIBVLC_DEPRECATED
 #endif
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdint.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 /** \defgroup libvlc_core LibVLC core
  * \ingroup libvlc
@@ -90,14 +89,14 @@ typedef int64_t libvlc_time_t;
  * @warning
  * This will be NULL if there was no error.
  */
-LIBVLC_API const char *libvlc_errmsg (void);
+LIBVLC_API const char *libvlc_errmsg(void);
 
 /**
  * Clears the LibVLC error status for the current thread. This is optional.
  * By default, the error status is automatically overridden when a new error
  * occurs, and destroyed when the thread exits.
  */
-LIBVLC_API void libvlc_clearerr (void);
+LIBVLC_API void libvlc_clearerr(void);
 
 /**
  * Sets the LibVLC error status and message for the current thread.
@@ -106,7 +105,7 @@ LIBVLC_API void libvlc_clearerr (void);
  * \param ap the arguments
  * \return a nul terminated string in any case
  */
-LIBVLC_API const char *libvlc_vprinterr (const char *fmt, va_list ap);
+LIBVLC_API const char *libvlc_vprinterr(const char *fmt, va_list ap);
 
 /**
  * Sets the LibVLC error status and message for the current thread.
@@ -115,7 +114,7 @@ LIBVLC_API const char *libvlc_vprinterr (const char *fmt, va_list ap);
  * \param args the arguments
  * \return a nul terminated string in any case
  */
-LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
+LIBVLC_API const char *libvlc_printerr(const char *fmt, ...);
 
 /**@} */
 
@@ -180,8 +179,7 @@ LIBVLC_API const char *libvlc_printerr (const char *fmt, ...);
  * \param argv list of arguments (should be NULL)
  * \return the libvlc instance or NULL in case of error
  */
-LIBVLC_API libvlc_instance_t *
-libvlc_new( int argc , const char *const *argv );
+LIBVLC_API libvlc_instance_t *libvlc_new(int argc, const char *const *argv);
 
 /**
  * Decrement the reference count of a libvlc instance, and destroy it
@@ -189,7 +187,7 @@ libvlc_new( int argc , const char *const *argv );
  *
  * \param p_instance the instance to destroy
  */
-LIBVLC_API void libvlc_release( libvlc_instance_t *p_instance );
+LIBVLC_API void libvlc_release(libvlc_instance_t *p_instance);
 
 /**
  * Increments the reference count of a libvlc instance.
@@ -197,7 +195,7 @@ LIBVLC_API void libvlc_release( libvlc_instance_t *p_instance );
  *
  * \param p_instance the instance to reference
  */
-LIBVLC_API void libvlc_retain( libvlc_instance_t *p_instance );
+LIBVLC_API void libvlc_retain(libvlc_instance_t *p_instance);
 
 /**
  * Try to start a user interface for the libvlc instance.
@@ -207,7 +205,7 @@ LIBVLC_API void libvlc_retain( libvlc_instance_t *p_instance );
  * \return 0 on success, -1 on error.
  */
 LIBVLC_API
-int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name );
+int libvlc_add_intf(libvlc_instance_t *p_instance, const char *name);
 
 /**
  * Registers a callback for the LibVLC exit event. This is mostly useful if
@@ -227,8 +225,7 @@ int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name );
  * \warning This function and libvlc_wait() cannot be used at the same time.
  */
 LIBVLC_API
-void libvlc_set_exit_handler( libvlc_instance_t *p_instance,
-                              void (*cb) (void *), void *opaque );
+void libvlc_set_exit_handler(libvlc_instance_t *p_instance, void (*cb)(void *), void *opaque);
 
 /**
  * Sets the application name. LibVLC passes this as the user agent string
@@ -240,8 +237,7 @@ void libvlc_set_exit_handler( libvlc_instance_t *p_instance,
  * \version LibVLC 1.1.1 or later
  */
 LIBVLC_API
-void libvlc_set_user_agent( libvlc_instance_t *p_instance,
-                            const char *name, const char *http );
+void libvlc_set_user_agent(libvlc_instance_t *p_instance, const char *name, const char *http);
 
 /**
  * Sets some meta-information about the application.
@@ -254,8 +250,7 @@ void libvlc_set_user_agent( libvlc_instance_t *p_instance,
  * \version LibVLC 2.1.0 or later.
  */
 LIBVLC_API
-void libvlc_set_app_id( libvlc_instance_t *p_instance, const char *id,
-                        const char *version, const char *icon );
+void libvlc_set_app_id(libvlc_instance_t *p_instance, const char *id, const char *version, const char *icon);
 
 /**
  * Retrieve libvlc version.
@@ -264,7 +259,7 @@ void libvlc_set_app_id( libvlc_instance_t *p_instance, const char *id,
  *
  * \return a string containing the libvlc version
  */
-LIBVLC_API const char * libvlc_get_version(void);
+LIBVLC_API const char *libvlc_get_version(void);
 
 /**
  * Retrieve libvlc compiler version.
@@ -273,7 +268,7 @@ LIBVLC_API const char * libvlc_get_version(void);
  *
  * \return a string containing the libvlc compiler version
  */
-LIBVLC_API const char * libvlc_get_compiler(void);
+LIBVLC_API const char *libvlc_get_compiler(void);
 
 /**
  * Retrieve libvlc changeset.
@@ -282,7 +277,7 @@ LIBVLC_API const char * libvlc_get_compiler(void);
  *
  * \return a string containing the libvlc changeset
  */
-LIBVLC_API const char * libvlc_get_changeset(void);
+LIBVLC_API const char *libvlc_get_changeset(void);
 
 /**
  * Frees an heap allocation returned by a LibVLC function.
@@ -291,7 +286,7 @@ LIBVLC_API const char * libvlc_get_changeset(void);
  *
  * \param ptr the pointer
  */
-LIBVLC_API void libvlc_free( void *ptr );
+LIBVLC_API void libvlc_free(void *ptr);
 
 /** \defgroup libvlc_event LibVLC asynchronous events
  * LibVLC emits asynchronous events.
@@ -321,7 +316,7 @@ typedef int libvlc_event_type_t;
  * Callback function notification
  * \param p_event the event triggering the callback
  */
-typedef void ( *libvlc_callback_t )( const struct libvlc_event_t *p_event, void *p_data );
+typedef void (*libvlc_callback_t)(const struct libvlc_event_t *p_event, void *p_data);
 
 /**
  * Register for an event notification.
@@ -334,10 +329,8 @@ typedef void ( *libvlc_callback_t )( const struct libvlc_event_t *p_event, void 
  * \param user_data user provided data to carry with the event
  * \return 0 on success, ENOMEM on error
  */
-LIBVLC_API int libvlc_event_attach( libvlc_event_manager_t *p_event_manager,
-                                        libvlc_event_type_t i_event_type,
-                                        libvlc_callback_t f_callback,
-                                        void *user_data );
+LIBVLC_API int libvlc_event_attach(libvlc_event_manager_t *p_event_manager, libvlc_event_type_t i_event_type,
+								   libvlc_callback_t f_callback, void *user_data);
 
 /**
  * Unregister an event notification.
@@ -347,17 +340,15 @@ LIBVLC_API int libvlc_event_attach( libvlc_event_manager_t *p_event_manager,
  * \param f_callback the function to call when i_event_type occurs
  * \param p_user_data user provided data to carry with the event
  */
-LIBVLC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
-                                         libvlc_event_type_t i_event_type,
-                                         libvlc_callback_t f_callback,
-                                         void *p_user_data );
+LIBVLC_API void libvlc_event_detach(libvlc_event_manager_t *p_event_manager, libvlc_event_type_t i_event_type,
+									libvlc_callback_t f_callback, void *p_user_data);
 
 /**
  * Get an event's type name.
  *
  * \param event_type the desired event
  */
-LIBVLC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type );
+LIBVLC_API const char *libvlc_event_type_name(libvlc_event_type_t event_type);
 
 /** @} */
 
@@ -371,12 +362,11 @@ LIBVLC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type )
  * Logging messages level.
  * \note Future LibVLC versions may define new levels.
  */
-enum libvlc_log_level
-{
-    LIBVLC_DEBUG=0,   /**< Debug message */
-    LIBVLC_NOTICE=2,  /**< Important informational message */
-    LIBVLC_WARNING=3, /**< Warning (potential error) message */
-    LIBVLC_ERROR=4    /**< Error message */
+enum libvlc_log_level {
+	LIBVLC_DEBUG = 0,   /**< Debug message */
+	LIBVLC_NOTICE = 2,  /**< Important informational message */
+	LIBVLC_WARNING = 3, /**< Warning (potential error) message */
+	LIBVLC_ERROR = 4    /**< Error message */
 };
 
 typedef struct vlc_log_t libvlc_log_t;
@@ -401,8 +391,7 @@ typedef struct vlc_log_t libvlc_log_t;
  *
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
-                       const char **module, const char **file, unsigned *line);
+LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx, const char **module, const char **file, unsigned *line);
 
 /**
  * Gets log message info.
@@ -429,8 +418,7 @@ LIBVLC_API void libvlc_log_get_context(const libvlc_log_t *ctx,
  *
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx,
-                        const char **name, const char **header, uintptr_t *id);
+LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx, const char **name, const char **header, uintptr_t *id);
 
 /**
  * Callback prototype for LibVLC log message handler.
@@ -444,8 +432,7 @@ LIBVLC_API void libvlc_log_get_object(const libvlc_log_t *ctx,
  * \warning The message context pointer, the format string parameters and the
  *          variable arguments are only valid until the callback returns.
  */
-typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
-                              const char *fmt, va_list args);
+typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx, const char *fmt, va_list args);
 
 /**
  * Unsets the logging callback.
@@ -460,7 +447,7 @@ typedef void (*libvlc_log_cb)(void *data, int level, const libvlc_log_t *ctx,
  * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_unset( libvlc_instance_t *p_instance );
+LIBVLC_API void libvlc_log_unset(libvlc_instance_t *p_instance);
 
 /**
  * Sets the logging callback for a LibVLC instance.
@@ -479,9 +466,7 @@ LIBVLC_API void libvlc_log_unset( libvlc_instance_t *p_instance );
  * \param p_instance libvlc instance
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_set( libvlc_instance_t *p_instance,
-                                libvlc_log_cb cb, void *data );
-
+LIBVLC_API void libvlc_log_set(libvlc_instance_t *p_instance, libvlc_log_cb cb, void *data);
 
 /**
  * Sets up logging to a file.
@@ -490,20 +475,19 @@ LIBVLC_API void libvlc_log_set( libvlc_instance_t *p_instance,
  *         (the FILE pointer must remain valid until libvlc_log_unset())
  * \version LibVLC 2.1.0 or later
  */
-LIBVLC_API void libvlc_log_set_file( libvlc_instance_t *p_instance, FILE *stream );
+LIBVLC_API void libvlc_log_set_file(libvlc_instance_t *p_instance, FILE *stream);
 
 /** @} */
 
 /**
  * Description of a module.
  */
-typedef struct libvlc_module_description_t
-{
-    char *psz_name;
-    char *psz_shortname;
-    char *psz_longname;
-    char *psz_help;
-    struct libvlc_module_description_t *p_next;
+typedef struct libvlc_module_description_t {
+	char *psz_name;
+	char *psz_shortname;
+	char *psz_longname;
+	char *psz_help;
+	struct libvlc_module_description_t *p_next;
 } libvlc_module_description_t;
 
 /**
@@ -512,7 +496,7 @@ typedef struct libvlc_module_description_t
  * \param p_list the list to be released
  */
 LIBVLC_API
-void libvlc_module_description_list_release( libvlc_module_description_t *p_list );
+void libvlc_module_description_list_release(libvlc_module_description_t *p_list);
 
 /**
  * Returns a list of audio filters that are available.
@@ -526,7 +510,7 @@ void libvlc_module_description_list_release( libvlc_module_description_t *p_list
  * \see libvlc_module_description_list_release
  */
 LIBVLC_API
-libvlc_module_description_t *libvlc_audio_filter_list_get( libvlc_instance_t *p_instance );
+libvlc_module_description_t *libvlc_audio_filter_list_get(libvlc_instance_t *p_instance);
 
 /**
  * Returns a list of video filters that are available.
@@ -540,7 +524,7 @@ libvlc_module_description_t *libvlc_audio_filter_list_get( libvlc_instance_t *p_
  * \see libvlc_module_description_list_release
  */
 LIBVLC_API
-libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_instance );
+libvlc_module_description_t *libvlc_video_filter_list_get(libvlc_instance_t *p_instance);
 
 /** @} */
 
@@ -568,13 +552,13 @@ int64_t libvlc_clock(void);
  */
 static inline int64_t libvlc_delay(int64_t pts)
 {
-    return pts - libvlc_clock();
+	return pts - libvlc_clock();
 }
 
 /** @} */
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif /** @} */

@@ -186,13 +186,12 @@ void download_cover(const song& song, bool reset)
     QFile current(path);
     current.remove();
 
-    if (found_cover && QFile::rename(tmp, utf8_to_qt(config::cover_path))) {
-        last_cover = song.cover();
-    } else {
-        berr("Couldn't rename temporary cover file");
-    }
-
-    if (!found_cover && last_cover != "n/a") {
+    if (found_cover) {
+        if (QFile::rename(tmp, utf8_to_qt(config::cover_path)))
+            last_cover = song.cover();
+        else
+            berr("Couldn't rename temporary cover file");
+    } else if (last_cover != "n/a") {
         last_cover = "n/a";
         set_placeholder(true);
     }
@@ -271,20 +270,35 @@ bool window_pos_valid(QRect rect)
 
 void set_placeholder(bool on)
 {
+    static int8_t last_state = -1;
+
+    if (on == last_state)
+        return;
+    last_state = on;
+
     if (on) {
         auto path = utf8_to_qt(config::cover_path);
         QFile current(path);
-        if (!current.rename((current.fileName() + ".off")))
-            berr("Couldn't move existing cover to temp file");
+        QString cover_off(path + ".off");
+        QFile cover_file(path + "");
+
+        if (cover_file.exists() && !cover_file.remove())
+            berr("Couldn't remove '%s'", qt_to_utf8(cover_off));
+
+        if (current.exists() && !current.rename(cover_off))
+            berr("Couldn't move '%s' to '%s' file", config::cover_path, qt_to_utf8(cover_off));
         if (!QFile::copy(utf8_to_qt(config::cover_placeholder), path))
-            berr("Couldn't move placeholder cover");
+            berr("Couldn't copy '%s' to '%s'", config::cover_placeholder, qt_to_utf8(path));
     } else {
         auto path = utf8_to_qt(config::cover_path);
         QFile current(path);
-        if (!current.remove())
-            berr("Couldn't remove placeholder");
-        if (!QFile::rename((QString(path) + ".off"), path))
-            berr("Couldn't move placeholder cover");
+        QString cover_off(path + ".off");
+        QFile cover_file(cover_off);
+
+        if (current.exists() && !current.remove())
+            berr("Couldn't remove '%s'", qt_to_utf8(path));
+        if (cover_file.exists() && !QFile::rename(cover_off, path))
+            berr("Couldn't move '%s' to '%s'", qt_to_utf8(cover_off), config::cover_path);
     }
 }
 

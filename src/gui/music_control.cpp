@@ -16,7 +16,7 @@ music_Control::music_Control(QWidget* parent)
     , ui(new Ui::music_Control)
 {
     ui->setupUi(this);
-
+    setVisible(false); /* Invisible by default to prevent it from showing until Geometry is loaded */
     const char* geo = CGET_STR(CFG_DOCK_GEOMETRY);
     if (!geo) {
         QByteArray arr = QByteArray::fromBase64(geo);
@@ -24,12 +24,8 @@ music_Control::music_Control(QWidget* parent)
 
         QRect wg = normalGeometry();
         if (!util::window_pos_valid(wg)) {
-            QRect r = reinterpret_cast<QApplication*>(
-                obs_frontend_get_main_window())
-                          ->desktop()
-                          ->geometry();
-            setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
-                size(), r));
+            QRect r = reinterpret_cast<QApplication*>(obs_frontend_get_main_window())->desktop()->geometry();
+            setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), r));
         }
     }
 
@@ -54,9 +50,7 @@ music_Control::music_Control(QWidget* parent)
     m_song_text->setVisible(CGET_BOOL(CFG_DOCK_INFO_VISIBLE));
 }
 
-void music_Control::closeEvent(QCloseEvent* event)
-{
-}
+void music_Control::closeEvent(QCloseEvent* event) {}
 
 void music_Control::save_settings()
 {
@@ -138,9 +132,7 @@ void music_Control::on_source_changed()
         flags = src->get_capabilities();
     thread::thread_mutex.unlock();
 
-    bool next = flags & CAP_NEXT_SONG,
-         prev = flags & CAP_NEXT_SONG,
-         play = flags & CAP_PLAY_PAUSE,
+    bool next = flags & CAP_NEXT_SONG, prev = flags & CAP_NEXT_SONG, play = flags & CAP_PLAY_PAUSE,
          stop = flags & CAP_STOP_SONG;
 
     ui->btn_next->setVisible(next);

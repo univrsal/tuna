@@ -38,7 +38,7 @@
 #define PLAYER_NEXT_URL (PLAYER_URL "/next")
 #define PLAYER_PREVIOUS_URL (PLAYER_URL "/previous")
 #define PLAYER_VOLUME_URL (PLAYER_URL "/volume")
-
+#define CURL_DEBUG 0L
 #define REDIRECT_URI "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
 
 spotify_source::spotify_source()
@@ -343,7 +343,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, response_header);
 #ifdef DEBUG
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, CURL_DEBUG);
 #endif
     return curl;
 }
@@ -508,7 +508,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
         bdebug("Response header: %s", response_header.c_str());
 
 #ifdef DEBUG
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, CURL_DEBUG);
 #endif
     CURLcode res = curl_easy_perform(curl);
 

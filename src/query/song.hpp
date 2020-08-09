@@ -21,12 +21,10 @@
 #include <QString>
 #include <stdint.h>
 
-enum date_precision {
-    prec_day,
+enum date_precision { prec_day,
     prec_month,
     prec_year,
-    prec_unknown
-};
+    prec_unknown };
 
 class song {
     uint16_t m_data;

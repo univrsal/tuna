@@ -1,23 +1,58 @@
 cmake_minimum_required(VERSION 3.5)
-project(tuna)
+project(tuna VERSION 1.4.3)
+
+add_subdirectory(deps)
+
+set(PLUGIN_AUTHOR "univrsal")
+set(PLUGIN_GIT tuna)
+set(LINUX_MAINTAINER_EMAIL "uni@vrsal.cf")
+set(MACOS_BUNDLEID "cf.vrsal.tuna")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_PREFIX_PATH "${QTDIR}")
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 
-set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(./cmake/ObsPluginHelpers.cmake)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
+if (MSVC OR APPLE)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+endif()
+
+find_package(LibObs REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Libcurl REQUIRED)
+find_package(LibVLC REQUIRED)
+
+option(LOCAL_INSTALLATION "Whether to install for the current user (default: OFF)" OFF)
+option(GLOBAL_INSTALLATION "Whether to install for all users (default: OFF)" OFF)
+
 include_directories(${LIBCURL_INCLUDE_DIRS})
+include_directories(${TAGLIB_INCLUDE_DIRS})
+
+if (OBS_FRONTEND_INCLUDE)
+    include_directories(${OBS_FRONTEND_INCLUDE})
+endif()
+
 add_definitions(${LIBCURL_DEFINITIONS})
 
-if (NOT Qt5Widgets_FOUND)
-    message(FATAL_ERROR "Failed to find Qt5")
-endif ()
+configure_file(
+    package/installer-macOS.pkgproj.in
+    ../package/installer-macOS.pkgproj
+)
+configure_file(
+    package/installer-Windows.iss.in
+    ../package/installer-Windows.iss
+)
+configure_file(
+    package/README.txt.in
+    ../package/README.txt
+)
 
 # Read Spotify credentials from creds.txt
 # In this format {client_id}:{client_secre}
@@ -34,64 +69,51 @@ set(tuna_ui
 qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
 qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
 
-find_package(LibVLC QUIET)
-
-
 if (UNIX AND NOT APPLE)
     add_definitions(-DLINUX=1)
-    find_package(Taglib)
     set(tuna_platform_sources "./src/util/window/window_helper_nix.cpp")
-    set(tuna_platform_deps
-            mpdclient
-            tag)
-    set(tuna_platform_includes
-            ${TAGLIB_INCLUDES})
+    set(LIBOBS_LIBRARIES "libobs")
+    set(OBS_FRONTEND_LIB "obs-frontend-api")
 endif()
 
 if (APPLE)
     add_definitions(-DMACOS=1)
     set(tuna_platform_sources "./src/util/window/window_helper_mac.mm")
-        find_library(COCOA Cocoa)
-        find_Library(MPDCLIENT mpdclient)
-        find_library(TAG tag)
-        find_path(MPDCLIENT_INCLUDES mpd/client.h)
-        find_path(TAG_INCLUDES taglib/tag.h)
+    find_library(COCOA Cocoa)
 
     include_directories(${COCOA})
-        include_directories(${TAG_INCLUDES})
-        include_directories(${MPDCLIENT_INCLUDES})
     set_source_files_properties("./src/util/window/window_helper_mac.mm"
         PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 
-        set(tuna_platform_deps
-                ${COCOA}
-                ${MPDCLIENT}
-                ${TAG})
+    set(tuna_platform_deps
+        ${COCOA})
+    set(FRONTEND_LIB "${OBS_FRONTEND_LIB}")
+else()
+    set(FRONTEND_LIB "obs-frontend-api")
+    set(OBS_LIB "libobs")
 endif()
 
 if (UNIX)
     add_definitions(-DUNIX=1)
-
-    set(tuna_platform_sources ${tuna_platform_sources}
-        "./src/util/cover_tag_handler.cpp"
-        "./src/util/cover_tag_handler.hpp")
 endif ()
 
 if (MSVC)
-   set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
-   set(tuna_platform_deps
-            w32-pthreads)
+    set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
+    set(tuna_platform_deps
+        ${W32_PTHREADS_LIB})
 endif ()
 
-if (NOT LIBVLC_INCLUDES_FOUND AND ENABLE_VLC)
-    message(STATUS "[tuna] LibVLC includes not found but set as enabled")
+if (NOT LibVLC_FOUND AND ENABLE_VLC)
+    message(STATUS "LibVLC includes not found but set as enabled")
     add_definitions(-DDISABLE_TUNA_VLC=1)
-elseif (NOT LIBVLC_INCLUDES_FOUND)
-    message(STATUS "[tuna] LibVLC includes not found, VLC source support disabled")
-    message(STATUS "[tuna] If you want VLC support, clone the VLC repo and point VLC_INCLUDE_DIR to <repo>/include/vlc ")
+    set(DISABLEVLC TRUE)
+elseif (NOT LibVLC_FOUND)
+    message(STATUS "LibVLC includes not found, VLC source support disabled")
+    message(STATUS "If you want VLC support, clone the VLC repo and point VLC_INCLUDE_DIR to <repo>/include/vlc ")
+    set(DISABLEVLC TRUE)
     add_definitions(-DDISABLE_TUNA_VLC=1)
 else()
-    message(STATUS "[tuna] LibVLC headers found, VLC source support enabled")
+    message(STATUS "LibVLC headers found, VLC source support enabled")
 endif()
 
 if (DISABLE_VLC)
@@ -99,6 +121,7 @@ if (DISABLE_VLC)
     add_definitions(-DDISABLE_TUNA_VLC=1)
 else()
     include_directories(${LIBVLC_INCLUDE_DIRS})
+    message("Using VLC headers: ${LIBVLC_INCLUDE_DIRS}")
     add_definitions(${LIBVLC_DEFINITIONS})
     set(tuna_vlc_source
         ./src/query/vlc_obs_source.cpp
@@ -134,14 +157,17 @@ set(tuna_sources
     ./src/util/format.hpp
     ./src/source/progress.cpp
     ./src/source/progress.hpp
-    ${tuna_vlc_source}
+    ./src/util/cover_tag_handler.cpp
+    ./src/util/cover_tag_handler.hpp
     ./src/query/vlc_obs_source.hpp
     ./src/util/tuna_thread.cpp
     ./src/util/tuna_thread.hpp
     ./src/util/utility.cpp
     ./src/util/utility.hpp
     ./src/util/window/window_helper.hpp
-    ${tuna_ui_headers})
+    ${tuna_ui_headers}
+    ${tuna_vlc_source}
+    )
 
 add_library(tuna MODULE
     ${tuna_sources}
@@ -150,21 +176,82 @@ add_library(tuna MODULE
     ${tuna_qrc_sources})
 
 include_directories(
-        SYSTEM "${CMAKE_SOURCE_DIR}/libobs"
-        "../../UI/obs-frontend-api"
-        ${tuna_platform_includes}
-        ${Qt5Core_INCLUDES}
-        ${Qt5Widgets_INCLUDES})
+    "${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
+    ${LIBOBS_INCLUDE_DIR}
+    ${Qt5Core_INCLUDES}
+    ${Qt5Widgets_INCLUDES}
+)
 
 target_link_libraries(tuna
-    libobs
-    jansson
+    ${LIBOBS_LIBRARIES}
+    tag
+    mpdclient
     Qt5::Widgets
     Qt5::Core
-    obs-frontend-api
+    ${OBS_FRONTEND_LIB}
     ${LIBCURL_LIBRARIES}
     ${tuna_platform_deps})
 
-set_property(TARGET tuna PROPERTY CXX_STANDARD 14)
+# --- Windows-specific build settings and tasks ---
+if(WIN32)
+    if(NOT DEFINED OBS_FRONTEND_LIB)
+        set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
+        message(FATAL_ERROR "Could not find OBS Frontend API\'s library !")
+    endif()
 
-install_obs_plugin_with_data(tuna data)
+    # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL when building with VS2019)
+    if (MSVC)
+        add_definitions(/MP /d2FH4-)
+    endif()
+
+    include_directories(
+        "${LIBOBS_INCLUDE_DIR}"
+    )
+
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        "${OBS_FRONTEND_LIB}"
+    )
+    install_external_plugin_with_data(${CMAKE_PROJECT_NAME} "data")
+endif()
+
+if(UNIX AND NOT APPLE)
+    include(GNUInstallDirs)
+
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES PREFIX "")
+    target_link_libraries(${CMAKE_PROJECT_NAME} obs-frontend-api)
+
+    if (LOCAL_INSTALLATION)
+        # Installs into home directory
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/bin/${OBS_ARCH_NAME}")
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+            DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/")
+    elseif(GLOBAL_INSTALLATION)
+        # For *.deb installer
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
+
+        install(FILES ${locale_files}
+            DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}/locale")
+    else()
+        # For *.zip binary
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "${CMAKE_PROJECT_NAME}/bin/${OBS_ARCH_NAME}")
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+            DESTINATION "${CMAKE_PROJECT_NAME}")
+
+        install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/package/README.txt"
+            DESTINATION "${CMAKE_PROJECT_NAME}")
+    endif()
+elseif(APPLE)
+    if(NOT DEFINED OBS_FRONTEND_LIB)
+        set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
+        message(FATAL_ERROR "Could not find OBS Frontend API\'s library !")
+    endif()
+
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+        "${OBS_FRONTEND_LIB}"
+    )
+endif()

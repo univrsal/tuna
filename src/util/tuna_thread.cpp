@@ -50,12 +50,7 @@ bool start()
     thread_flag = true;
 
 #ifdef _WIN32
-    thread_handle = CreateThread(nullptr,
-        0,
-        static_cast<LPTHREAD_START_ROUTINE>(thread_method),
-        nullptr,
-        0,
-        nullptr);
+    thread_handle = CreateThread(nullptr, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_method), nullptr, 0, nullptr);
     result = thread_handle;
 #else
     result = pthread_create(&thread_handle, nullptr, thread_method, nullptr) == 0;
@@ -75,8 +70,7 @@ void stop()
 }
 
 #ifdef _WIN32
-DWORD WINAPI
-thread_method(LPVOID arg)
+DWORD WINAPI thread_method(LPVOID arg)
 #else
 void* thread_method(void* arg)
 #endif

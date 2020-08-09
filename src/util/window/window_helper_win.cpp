@@ -11,8 +11,7 @@
 
 using namespace std;
 
-static bool
-GetWindowTitle(HWND window, string& title)
+static bool GetWindowTitle(HWND window, string& title)
 {
     size_t len = (size_t)GetWindowTextLengthW(window);
     wstring wtitle;
@@ -27,8 +26,7 @@ GetWindowTitle(HWND window, string& title)
     return true;
 }
 
-static bool
-WindowValid(HWND window)
+static bool WindowValid(HWND window)
 {
     LONG_PTR styles, ex_styles;
     RECT rect;

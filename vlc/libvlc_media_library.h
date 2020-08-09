@@ -26,9 +26,9 @@
 #ifndef VLC_LIBVLC_MEDIA_LIBRARY_H
 #define VLC_LIBVLC_MEDIA_LIBRARY_H 1
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 /** \defgroup libvlc_media_library LibVLC media library
  * \ingroup libvlc
@@ -45,8 +45,7 @@ typedef struct libvlc_media_library_t libvlc_media_library_t;
  * \param p_instance the libvlc instance
  * \return a new object or NULL on error
  */
-LIBVLC_API libvlc_media_library_t *
-    libvlc_media_library_new( libvlc_instance_t * p_instance );
+LIBVLC_API libvlc_media_library_t *libvlc_media_library_new(libvlc_instance_t *p_instance);
 
 /**
  * Release media library object. This functions decrements the
@@ -55,8 +54,7 @@ LIBVLC_API libvlc_media_library_t *
  *
  * \param p_mlib media library object
  */
-LIBVLC_API void
-    libvlc_media_library_release( libvlc_media_library_t * p_mlib );
+LIBVLC_API void libvlc_media_library_release(libvlc_media_library_t *p_mlib);
 
 /**
  * Retain a reference to a media library object. This function will
@@ -65,8 +63,7 @@ LIBVLC_API void
  *
  * \param p_mlib media library object
  */
-LIBVLC_API void
-    libvlc_media_library_retain( libvlc_media_library_t * p_mlib );
+LIBVLC_API void libvlc_media_library_retain(libvlc_media_library_t *p_mlib);
 
 /**
  * Load media library.
@@ -74,8 +71,7 @@ LIBVLC_API void
  * \param p_mlib media library object
  * \return 0 on success, -1 on error
  */
-LIBVLC_API int
-    libvlc_media_library_load( libvlc_media_library_t * p_mlib );
+LIBVLC_API int libvlc_media_library_load(libvlc_media_library_t *p_mlib);
 
 /**
  * Get media library subitems.
@@ -83,14 +79,12 @@ LIBVLC_API int
  * \param p_mlib media library object
  * \return media list subitems
  */
-LIBVLC_API libvlc_media_list_t *
-    libvlc_media_library_media_list( libvlc_media_library_t * p_mlib );
-
+LIBVLC_API libvlc_media_list_t *libvlc_media_library_media_list(libvlc_media_library_t *p_mlib);
 
 /** @} */
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif /* VLC_LIBVLC_MEDIA_LIBRARY_H */

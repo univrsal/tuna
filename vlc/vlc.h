@@ -33,9 +33,9 @@
  * This file defines libvlc new external API
  */
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-# endif
+#endif
 
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_renderer_discoverer.h>
@@ -50,8 +50,8 @@ extern "C" {
 #include <vlc/libvlc_vlm.h>
 #include <vlc/deprecated.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif /* _VLC_VLC_H */
