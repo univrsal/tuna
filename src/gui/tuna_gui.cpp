@@ -101,6 +101,8 @@ void tuna_gui::toggleShowHide()
         music_sources::set_gui_values();
 
         /* setup config values */
+        ui->txt_client_id->setText(utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_ID)));
+        ui->txt_secret->setText(utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_SECRET)));
         ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
         ui->txt_song_lyrics->setText(utf8_to_qt(config::lyrics_path));
         ui->sb_refresh_rate->setValue(config::refresh_rate);
@@ -145,15 +147,14 @@ void tuna_gui::on_btn_sp_show_auth_released()
 
 void tuna_gui::on_btn_open_login_clicked()
 {
-    static QString base_url = "https://univrsal.github.io/auth/login?state=";
+
+    static QString base_url = "https://univrsal.github.io/auth/login?client_id=";
+    auto client_id = ui->txt_client_id->text();
+    if (client_id.isEmpty())
+        client_id = "847d7cf0c5dc4ff185161d1f000a9d0e";
+    QString url = base_url + client_id;
     QMessageBox::information(this, "Info", T_SPOTIFY_WARNING);
-    /* Each login uses a random number before login which is matched
-     * against the number returned after login, to make sure the login
-     * process finished correctly */
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(1, 32000);
-    QDesktopServices::openUrl(QUrl(base_url + QString::number(dist(rng))));
+    QDesktopServices::openUrl(QUrl(url));
 }
 
 void tuna_gui::on_txt_auth_code_textChanged(const QString& arg1) const
@@ -219,6 +220,11 @@ void tuna_gui::add_music_source(const QString& display, const QString& id)
 
 void tuna_gui::on_btn_request_token_clicked()
 {
+    /* Make sure that the custom data is in the config, otherwise the user
+     * has to click apply before */
+    CSET_STR(CFG_SPOTIFY_CLIENT_ID, qt_to_utf8(ui->txt_client_id->text()));
+    CSET_STR(CFG_SPOTIFY_CLIENT_SECRET, qt_to_utf8(ui->txt_secret->text()));
+
     QString log;
     auto result = false;
     try {
@@ -262,8 +268,10 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
+    CSET_STR(CFG_SPOTIFY_CLIENT_ID, qt_to_utf8(ui->txt_client_id->text()));
+    CSET_STR(CFG_SPOTIFY_CLIENT_SECRET, qt_to_utf8(ui->txt_secret->text()));
+
     /* Source settings */
-#if HAVE_MPD
     CSET_STR(CFG_MPD_IP, qt_to_utf8(ui->txt_ip->text()));
     CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
     CSET_BOOL(CFG_MPD_LOCAL, ui->rb_local->isChecked());
@@ -271,7 +279,6 @@ void tuna_gui::on_tuna_gui_accepted()
     if (!path.endsWith("/"))
         path.append("/");
     CSET_STR(CFG_MPD_BASE_FOLDER, qt_to_utf8(path));
-#endif
 
     CSET_STR(CFG_WINDOW_TITLE, qt_to_utf8(ui->txt_title->text()));
     CSET_STR(CFG_WINDOW_PAUSE, qt_to_utf8(ui->txt_paused->text()));
@@ -481,4 +488,24 @@ void tuna_gui::on_rb_remote_clicked(bool checked)
 void tuna_gui::on_rb_local_clicked(bool checked)
 {
     set_mpd_local(checked);
+}
+
+void tuna_gui::on_btn_id_show_pressed()
+{
+    ui->txt_client_id->setEchoMode(QLineEdit::Normal);
+}
+
+void tuna_gui::on_btn_id_show_released()
+{
+    ui->txt_client_id->setEchoMode(QLineEdit::Password);
+}
+
+void tuna_gui::on_btn_show_secret_pressed()
+{
+    ui->txt_secret->setEchoMode(QLineEdit::Normal);
+}
+
+void tuna_gui::on_btn_show_secret_released()
+{
+    ui->txt_secret->setEchoMode(QLineEdit::Password);
 }

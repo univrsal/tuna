@@ -127,9 +127,7 @@ void mpd_source::refresh()
     }
 
 /* Thanks ubuntu for using ancient packages */
-#ifndef MPD_TAG_LABEL
 #define MPD_TAG_LABEL (mpd_tag_type)21
-#endif
     if (m_mpd_song) {
         const char* title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
         const char* artists = mpd_song_get_tag(m_mpd_song, MPD_TAG_ARTIST, 0);

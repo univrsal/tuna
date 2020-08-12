@@ -56,6 +56,7 @@ void init()
     CDEF_STR(CFG_COVER_PATH, qt_to_utf8(path_cover_art));
     CDEF_STR(CFG_LYRICS_PATH, qt_to_utf8(path_lyrics));
     CDEF_STR(CFG_SELECTED_SOURCE, S_SOURCE_SPOTIFY);
+    CDEF_STR(CFG_SPOTIFY_CLIENT_ID, "847d7cf0c5dc4ff185161d1f000a9d0e");
 
     CDEF_BOOL(CFG_RUNNING, false);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, true);

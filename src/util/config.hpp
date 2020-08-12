@@ -57,6 +57,8 @@
 #define CFG_SPOTIFY_REFRESH_TOKEN 		"spotify.refresh_token"
 #define CFG_SPOTIFY_AUTH_CODE 			"spotify.auth_code"
 #define CFG_SPOTIFY_TOKEN_TERMINATION 	"spotify.token_termination"
+#define CFG_SPOTIFY_CLIENT_ID           "spotify.client_id"
+#define CFG_SPOTIFY_CLIENT_SECRET       "spotify.client_secret"
 
 #define CFG_MPD_IP 						"mpd.ip"
 #define CFG_MPD_PORT 					"mpd.port"

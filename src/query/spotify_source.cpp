@@ -44,15 +44,26 @@
 spotify_source::spotify_source()
     : music_source(S_SOURCE_SPOTIFY, T_SOURCE_SPOTIFY)
 {
-    /* builds credentials for spotify api */
-    QString str = SPOTIFY_CREDENTIALS;
-    m_creds = str.toUtf8().toBase64();
+    build_credentials();
     m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
 }
 
 bool spotify_source::enabled() const
 {
     return true;
+}
+
+void spotify_source::build_credentials()
+{
+    auto client_id = utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_ID));
+    auto client_secret = utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_SECRET));
+
+    if (!client_id.isEmpty() && !client_secret.isEmpty()) {
+        m_creds = (client_id + ":" + client_secret).toUtf8().toBase64();
+    } else {
+        QString str = SPOTIFY_CREDENTIALS;
+        m_creds = str.toUtf8().toBase64();
+    }
 }
 
 void spotify_source::load()
@@ -80,6 +91,7 @@ void spotify_source::load()
             save();
         }
     }
+    build_credentials();
 }
 
 void spotify_source::set_gui_values()
@@ -182,7 +194,7 @@ void spotify_source::refresh()
 
                 if (m_current.playing()) {
                     util::download_cover(m_current);
-                } else {
+                } else if (m_last_state){
                     util::reset_cover();
                     util::download_cover(m_current, true);
                 }
@@ -192,6 +204,7 @@ void spotify_source::refresh()
             QString str(response.toJson());
             berr("Couldn't fetch song data from spotify json: %s", str.toStdString().c_str());
         }
+        m_last_state = m_current.playing();
     } else if (http_code == HTTP_NO_CONTENT) {
         /* No session running */
         m_current.clear();
@@ -393,6 +406,7 @@ void request_token(const std::string& request, const std::string& credentials, Q
 /* Gets a new token using the refresh token */
 bool spotify_source::do_refresh_token(QString& log)
 {
+    build_credentials();
     static std::string request;
     bool result = true;
     QJsonDocument response;
@@ -445,6 +459,7 @@ bool spotify_source::do_refresh_token(QString& log)
 /* Gets the first token from the access code */
 bool spotify_source::new_token(QString& log)
 {
+    build_credentials();
     static std::string request;
     bool result = true;
     QJsonDocument response;

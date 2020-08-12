@@ -8,5 +8,7 @@
         <file>images/icons/play.svg</file>
         <file>images/icons/volup.svg</file>
         <file>images/icons/voldown.svg</file>
+        <file>images/icons/visible.svg</file>
+        <file>images/icons/obs.png</file>
     </qresource>
 </RCC>

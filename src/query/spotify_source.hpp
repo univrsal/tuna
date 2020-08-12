@@ -24,6 +24,7 @@
 
 class spotify_source : public music_source {
     bool m_logged_in = false;
+    bool m_last_state = false;
     QString m_token = "";
     QString m_creds = "";
     QString m_auth_code = "";
@@ -35,7 +36,7 @@ class spotify_source : public music_source {
     uint64_t m_timeout_length = 0, /* Rate limit timeout length */
         m_timout_start = 0; /* Timeout start */
     void parse_track_json(const QJsonValue& track);
-
+    void build_credentials();
 public:
     spotify_source();
 
