@@ -34,6 +34,7 @@ option(GLOBAL_INSTALLATION "Whether to install for all users (default: OFF)" OFF
 
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${TAGLIB_INCLUDE_DIRS})
+include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 
 if (OBS_FRONTEND_INCLUDE)
     include_directories(${OBS_FRONTEND_INCLUDE})
@@ -231,14 +232,14 @@ if(UNIX AND NOT APPLE)
         # For *.deb installer
         install(TARGETS ${CMAKE_PROJECT_NAME}
             LIBRARY DESTINATION "/usr/lib/obs-plugins") # hardcoded, since ubuntu uses the wrong path by default
-        
+
         file(GLOB locale_files data/locale/*.ini)
         file(GLOB other_files data/*.*)
-        
+
         install(FILES ${locale_files}
             DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}/locale")
         install(FILES ${other_files}
-		    DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}")
+            DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}")
     else()
         # For *.zip binary
         install(TARGETS ${CMAKE_PROJECT_NAME}
