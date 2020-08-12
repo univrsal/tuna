@@ -235,12 +235,12 @@ vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC)
 {
 }
-vlc_obs_source::~vlc_obs_source() {}
+vlc_obs_source::~vlc_obs_source() { }
 
-void vlc_obs_source::load() {}
-void vlc_obs_source::save() {}
-void vlc_obs_source::refresh() {}
-void vlc_obs_source::set_gui_values() {}
+void vlc_obs_source::load() { }
+void vlc_obs_source::save() { }
+void vlc_obs_source::refresh() { }
+void vlc_obs_source::set_gui_values() { }
 bool vlc_obs_source::execute_capability(capability c)
 {
     return true;

@@ -28,7 +28,7 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     update(settings);
 }
 
-progress_source::~progress_source() {}
+progress_source::~progress_source() { }
 
 void progress_source::tick(float seconds)
 {
@@ -49,7 +49,6 @@ void progress_source::tick(float seconds)
         } else if (m_synced_progress > 0) {
             m_adjusted_progress += seconds;
         }
-
 
         float duration = tmp.get_int_value('l');
         if (duration > 0)

@@ -50,7 +50,7 @@ music_Control::music_Control(QWidget* parent)
     m_song_text->setVisible(CGET_BOOL(CFG_DOCK_INFO_VISIBLE));
 }
 
-void music_Control::closeEvent(QCloseEvent* event) {}
+void music_Control::closeEvent(QCloseEvent* event) { }
 
 void music_Control::save_settings()
 {
