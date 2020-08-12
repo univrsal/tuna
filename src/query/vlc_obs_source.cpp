@@ -22,6 +22,7 @@
 #include "../util/config.hpp"
 #include "../util/utility.hpp"
 #include "../util/vlc_internal.h"
+#include <QUrl>
 
 vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC)
@@ -142,10 +143,10 @@ void vlc_obs_source::refresh()
             const char* cover = libvlc_media_get_meta_(media, libvlc_meta_ArtworkURL);
             const char* label = libvlc_media_get_meta_(media, libvlc_meta_Publisher);
 
+            if (cover)
+                m_current.set_cover_link(QUrl::fromPercentEncoding(cover));
             if (title)
                 m_current.set_title(title);
-            if (cover)
-                m_current.set_cover_link(cover);
             if (artists)
                 m_current.append_artist(artists);
             if (year)
