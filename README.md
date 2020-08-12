@@ -1,5 +1,7 @@
 ![header](/preview.png "tuna running on obs linux")
 
+![nightly](https://github.com/univrsal/tuna/workflows/nightly/badge.svg)
+
 # tuna
 Get song info from right within obs.
 Currently supports
