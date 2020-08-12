@@ -230,10 +230,10 @@ if(UNIX AND NOT APPLE)
     elseif(GLOBAL_INSTALLATION)
         # For *.deb installer
         install(TARGETS ${CMAKE_PROJECT_NAME}
-            LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/obs-plugins")
+            LIBRARY DESTINATION "/usr/lib/obs-plugins")
 
-        install(FILES ${locale_files}
-            DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}/locale")
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+            DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/obs/obs-plugins/${CMAKE_PROJECT_NAME}")
     else()
         # For *.zip binary
         install(TARGETS ${CMAKE_PROJECT_NAME}
