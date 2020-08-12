@@ -16,8 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#ifdef HAVE_MPD
-
 #include "mpd_source.hpp"
 #include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
@@ -237,5 +235,3 @@ bool mpd_source::valid_format(const QString& str)
     UNUSED_PARAMETER(str);
     return true;
 }
-
-#endif

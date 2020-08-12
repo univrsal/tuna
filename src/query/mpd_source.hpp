@@ -20,7 +20,6 @@
 #include "../util/constants.hpp"
 #include "music_source.hpp"
 
-#ifdef HAVE_MPD
 #include <mpd/client.h>
 
 class mpd_source : public music_source {
@@ -51,29 +50,3 @@ private:
 
     void disconnect();
 };
-#else
-
-class mpd_source : public music_source {
-public:
-    mpd_source()
-        : music_source(S_SOURCE_MPD, T_SOURCE_MPD) {};
-    ~mpd_source() = default;
-    void load() override {}
-    void save() override {}
-    void refresh() override {}
-    void set_gui_values() override {}
-
-    bool execute_capability(capability c) override
-    {
-        UNUSED_PARAMETER(c);
-        return false;
-    }
-
-    bool valid_format(const QString& str) override
-    {
-        UNUSED_PARAMETER(str);
-        return false;
-    }
-    bool enabled() const override { return false; }
-};
-#endif
