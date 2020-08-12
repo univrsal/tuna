@@ -101,7 +101,8 @@ endif ()
 if (MSVC)
     set(tuna_platform_sources "./src/util/window/window_helper_win.cpp")
     set(tuna_platform_deps
-        ${W32_PTHREADS_LIB})
+        ${W32_PTHREADS_LIB}
+        wsock32)
 endif ()
 
 if (NOT LibVLC_FOUND AND ENABLE_VLC)
