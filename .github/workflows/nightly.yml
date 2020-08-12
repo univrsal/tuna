@@ -2,6 +2,9 @@ name: nightly
 on:
   pull_request:
   push:
+    paths-ignore:
+      - '**.md'
+      - '**.ini'
     branches:
     - master
     tags:
