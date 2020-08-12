@@ -141,7 +141,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.project-name }}.${{ env.GIT_TAG }}.macos'
+          name: '${{ env.project-name }}.${{ env.GIT_TAG }}.installer.macos'
           path: ./package/*.pkg 
   build-linux:
     name: 'Linux 64bit'
@@ -235,7 +235,7 @@ jobs:
     - name: Publish Linux installer
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ env.project-name }}.${{ env.GIT_TAG }}.linux.x64
+        name: ${{ env.project-name }}.${{ env.GIT_TAG }}.installer.linux.x64
         path: ${{github.workspace}}/package/*.deb
   windows:
     name: 'Windows 32/64bit'
@@ -402,5 +402,5 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: '${{ env.project-name }}.${{ env.GIT_TAG }}.windows'
+          name: '${{ env.project-name }}.${{ env.GIT_TAG }}.installer.windows'
           path: ${{ github.workspace }}/${{ env.project-git }}/*.exe
