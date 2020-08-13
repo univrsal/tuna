@@ -194,7 +194,7 @@ void spotify_source::refresh()
 
                 if (m_current.playing()) {
                     util::download_cover(m_current);
-                } else if (m_last_state){
+                } else if (m_last_state) {
                     util::reset_cover();
                     util::download_cover(m_current, true);
                 }

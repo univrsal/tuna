@@ -61,6 +61,7 @@ public:
     const QString& year() const { return m_year; }
     const QString& month() const { return m_month; }
     const QString& day() const { return m_day; }
+    const QString& title() const { return m_title; }
     const QString& label() const { return m_label; }
     const QString& get_string_value(char specififer) const;
     const QList<QString>& artists() const { return m_artists; }

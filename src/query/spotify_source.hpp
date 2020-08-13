@@ -37,6 +37,7 @@ class spotify_source : public music_source {
         m_timout_start = 0; /* Timeout start */
     void parse_track_json(const QJsonValue& track);
     void build_credentials();
+
 public:
     spotify_source();
 

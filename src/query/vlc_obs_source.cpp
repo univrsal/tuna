@@ -23,6 +23,7 @@
 #include "../util/utility.hpp"
 #include "../util/vlc_internal.h"
 #include <QUrl>
+#include <exception>
 
 vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC)
@@ -120,7 +121,7 @@ void vlc_obs_source::refresh()
     if (!reload())
         return;
     auto* vlc = get_vlc();
-    /* we keep a refernce here to make sure that this source won't be freed
+    /* we keep a reference here to make sure that this source won't be freed
      * while we still need it */
     obs_source_t* src = obs_weak_source_get_source(m_weak_src);
     if (!src)
@@ -138,10 +139,16 @@ void vlc_obs_source::refresh()
             const char* artists = libvlc_media_get_meta_(media, libvlc_meta_Artist);
             const char* year = libvlc_media_get_meta_(media, libvlc_meta_Date);
             const char* album = libvlc_media_get_meta_(media, libvlc_meta_Album);
-            const char* num = libvlc_media_get_meta_(media, libvlc_meta_TrackID);
+            const char* num = libvlc_media_get_meta_(media, libvlc_meta_TrackNumber);
             const char* disc = libvlc_media_get_meta_(media, libvlc_meta_DiscNumber);
             const char* cover = libvlc_media_get_meta_(media, libvlc_meta_ArtworkURL);
             const char* label = libvlc_media_get_meta_(media, libvlc_meta_Publisher);
+
+            if (m_current.title() != utf8_to_qt(title)) {
+                /* Reset log flags */
+                m_logged_disc_number = false;
+                m_logged_track_number = false;
+            }
 
             if (cover)
                 m_current.set_cover_link(QUrl::fromPercentEncoding(cover));
@@ -153,12 +160,46 @@ void vlc_obs_source::refresh()
                 m_current.set_year(year);
             if (album)
                 m_current.set_album(album);
-            if (num)
-                m_current.set_track_number(std::stoi(num));
-            if (disc)
-                m_current.set_disc_number(std::stoi(disc));
             if (label)
                 m_current.set_label(label);
+
+            try {
+                if (num)
+                    m_current.set_track_number(std::stoi(num));
+            } catch (std::invalid_argument& e) {
+                if (!m_logged_track_number) {
+                    m_logged_track_number = true;
+                    berr("Caught invalid_argument while converting track number, '%s'"
+                         "couldn't be converted to a number",
+                        num);
+                }
+            } catch (std::out_of_range& e) {
+                if (!m_logged_track_number) {
+                    m_logged_track_number = true;
+                    berr("Caught out_of_range while converting track number, '%s'"
+                         "couldn't be converted to a number",
+                        num);
+                }
+            }
+
+            try {
+                if (disc)
+                    m_current.set_track_number(std::stoi(disc));
+            } catch (std::invalid_argument& e) {
+                if (!m_logged_disc_number) {
+                    m_logged_disc_number = true;
+                    berr("Caught invalid_argument while converting disc number, '%s'"
+                         "couldn't be converted to a number",
+                        disc);
+                }
+            } catch (std::out_of_range& e) {
+                if (!m_logged_disc_number) {
+                    m_logged_disc_number = true;
+                    berr("Caught out_of_range while converting disc number, '%s'"
+                         "couldn't be converted to a number",
+                        disc);
+                }
+            }
 
             util::download_cover(m_current);
         } else {
