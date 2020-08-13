@@ -61,7 +61,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     ui->settings_tabs->setCurrentIndex(0);
-    ui->settings_tabs->removeTab(2);
 
     /* Notify user, if vlc source is disabled */
     ui->lbl_vlc_disabled->setStyleSheet("QLabel { color: red;"
