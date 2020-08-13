@@ -27,8 +27,6 @@ class vlc_obs_source : public music_source {
     obs_weak_source_t* m_weak_src = nullptr;
     struct vlc_source* get_vlc();
     /* Only log conversion issues once per file */
-    bool m_logged_track_number = false;
-    bool m_logged_disc_number = false;
     bool reload();
 
     int perform_int_conversion(const char* val, const char* type, bool& ok);

@@ -144,12 +144,6 @@ void vlc_obs_source::refresh()
             const char* cover = libvlc_media_get_meta_(media, libvlc_meta_ArtworkURL);
             const char* label = libvlc_media_get_meta_(media, libvlc_meta_Publisher);
 
-            if (m_current.title() != utf8_to_qt(title)) {
-                /* Reset log flags */
-                m_logged_disc_number = false;
-                m_logged_track_number = false;
-            }
-
             if (cover)
                 m_current.set_cover_link(QUrl::fromPercentEncoding(cover));
             if (title)
@@ -162,44 +156,10 @@ void vlc_obs_source::refresh()
                 m_current.set_album(album);
             if (label)
                 m_current.set_label(label);
-
-            try {
-                if (num)
-                    m_current.set_track_number(std::stoi(num));
-            } catch (std::invalid_argument& e) {
-                if (!m_logged_track_number) {
-                    m_logged_track_number = true;
-                    berr("Caught invalid_argument while converting track number, '%s'"
-                         "couldn't be converted to a number",
-                        num);
-                }
-            } catch (std::out_of_range& e) {
-                if (!m_logged_track_number) {
-                    m_logged_track_number = true;
-                    berr("Caught out_of_range while converting track number, '%s'"
-                         "couldn't be converted to a number",
-                        num);
-                }
-            }
-
-            try {
-                if (disc)
-                    m_current.set_track_number(std::stoi(disc));
-            } catch (std::invalid_argument& e) {
-                if (!m_logged_disc_number) {
-                    m_logged_disc_number = true;
-                    berr("Caught invalid_argument while converting disc number, '%s'"
-                         "couldn't be converted to a number",
-                        disc);
-                }
-            } catch (std::out_of_range& e) {
-                if (!m_logged_disc_number) {
-                    m_logged_disc_number = true;
-                    berr("Caught out_of_range while converting disc number, '%s'"
-                         "couldn't be converted to a number",
-                        disc);
-                }
-            }
+            if (num)
+                m_current.set_track_number(utf8_to_qt(num).toUInt());
+            if (disc)
+                m_current.set_track_number(utf8_to_qt(disc).toUInt());
 
             util::download_cover(m_current);
         } else {
