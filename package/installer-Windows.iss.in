@@ -38,8 +38,8 @@ var
   GPLText: AnsiString;
   Page: TOutputMsgMemoWizardPage;
 begin
-  ExtractTemporaryFile('LICENSE');
-  LoadStringFromFile(ExpandConstant('{tmp}\LICENSE'), GPLText);
+  ExtractTemporaryFile('COPYING.txt');
+  LoadStringFromFile(ExpandConstant('{tmp}\COPYING.txt'), GPLText);
   Page := CreateOutputMsgMemoPage(wpWelcome,
     'License Information', 'Please review the license terms before installing {#MyAppName}',
     'Press Page Down to see the rest of the agreement. Once you are aware of your rights, click Next to continue.',
