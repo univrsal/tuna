@@ -340,10 +340,8 @@ jobs:
           msbuild /m /p:Configuration=RelWithDebInfo .\build64\UI\obs-frontend-api\obs-frontend-api.vcxproj
       - name: 'Create creds.txt'
         shell: powershell
-        env: 
-          token: ${{ secrets.SPOTIFY_TOKEN }}
         run: |
-          "$env:token" | Out-File -NoNewline -FilePath ${{ github.workspace }}/${{ env.project-git }}/creds.txt
+          "${{ secrets.SPOTIFY_TOKEN }}" | Out-File -NoNewline -FilePath ${{ github.workspace }}/${{ env.project-git }}/creds.txt
       - name: 'Configure ${{ env.project-git }}  64-bit'
         working-directory: ${{ github.workspace }}\${{ env.project-git }}
         run: |
