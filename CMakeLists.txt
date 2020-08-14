@@ -62,7 +62,7 @@ file(READ "creds.txt" CREDS)
 string(REGEX REPLACE "\n$" "" CREDS "${CREDS}")
 string(REGEX REPLACE "\r\n$" "" CREDS "${CREDS}")
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
-
+message(STATUS "TOKEN: '${CREDS}'")
 set(tuna_ui
         src/gui/tuna_gui.ui
         src/gui/output_edit_dialog.ui
