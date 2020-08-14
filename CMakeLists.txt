@@ -60,6 +60,7 @@ configure_file(
 # Make sure that there's no empty new line
 file(READ "creds.txt" CREDS)
 string(REGEX REPLACE "\n$" "" CREDS "${CREDS}")
+string(REGEX REPLACE "\r\n$" "" CREDS "${CREDS}")
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 
 set(tuna_ui
