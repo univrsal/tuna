@@ -53,28 +53,14 @@ public:
     void get_selected_output(QString& format, QString& path, bool& log_mode);
 
 signals:
-    void login_state_changed(bool sate, QString& log);
-    void vlc_source_selected(const QString& id);
-    void window_source_changed(const QString& title, const QString& replace, const QString& with,
-        const QString& pause_if, bool regex, uint16_t cut_begin, uint16_t cut_end);
-
     void source_registered(const QString& display, const QString& id, source_widget* w);
 
 private slots:
-
-    /* Music source interactions */
-    void select_vlc_source(const QString& id);
-    void apply_login_state(bool state, const QString& log) const;
-    void update_window(const QString& title, const QString& replace, const QString& with, const QString& pause_if,
-        bool regex, uint16_t cut_begin, uint16_t cut_end) const;
-
     void add_music_source(const QString& display, const QString& id, source_widget* w);
 
     /* Element interactions */
     void choose_file(QString& path, const char* title, const char* file_types);
     void on_apply_pressed();
-    void on_btn_sp_show_auth_pressed();
-    void on_btn_sp_show_auth_released();
     void on_btn_open_login_clicked();
     void on_txt_auth_code_textChanged(const QString& arg1) const;
     void on_btn_request_token_clicked();
@@ -83,20 +69,12 @@ private slots:
     void on_btn_start_clicked();
     void set_state();
     void on_btn_stop_clicked();
-    void on_btn_sp_show_token_pressed();
-    void on_btn_sp_show_token_released();
-    void on_btn_sp_show_refresh_token_pressed();
-    void on_btn_sp_show_refresh_token_released();
     void on_btn_browse_song_cover_clicked();
     void on_btn_browse_song_lyrics_clicked();
     void on_btn_add_output_clicked();
     void on_btn_remove_output_clicked();
     void on_btn_edit_output_clicked();
     void on_pb_refresh_vlc_clicked();
-    void on_btn_id_show_pressed();
-    void on_btn_id_show_released();
-    void on_btn_show_secret_pressed();
-    void on_btn_show_secret_released();
 
 private:
     Ui::tuna_gui* ui;

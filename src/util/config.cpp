@@ -79,7 +79,7 @@ void load()
         init();
     bool run = CGET_BOOL(CFG_RUNNING);
 
-    load_outputs(outputs);
+    load_outputs();
     cover_path = CGET_STR(CFG_COVER_PATH);
     lyrics_path = CGET_STR(CFG_LYRICS_PATH);
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
@@ -101,7 +101,7 @@ void load()
 void save()
 {
     music_sources::save();
-    save_outputs(outputs);
+    save_outputs();
 }
 
 void close()
@@ -163,7 +163,7 @@ void load_outputs(QList<output>& table_content)
     }
 }
 
-void save_outputs(const QList<output>& outputs)
+void save_outputs()
 {
     QJsonArray output_array;
     QDir home = QDir::homePath();
@@ -208,4 +208,4 @@ void save_outputs(const QList<output>& outputs)
     }
 }
 
-} // namespace config
+}

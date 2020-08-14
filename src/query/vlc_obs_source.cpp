@@ -19,14 +19,14 @@
 #include "vlc_obs_source.hpp"
 #ifndef DISABLE_TUNA_VLC
 #include "../gui/tuna_gui.hpp"
+#include "../gui/widgets/vlc.hpp"
 #include "../util/config.hpp"
 #include "../util/utility.hpp"
 #include "../util/vlc_internal.h"
 #include <QUrl>
-#include <exception>
 
 vlc_obs_source::vlc_obs_source()
-    : music_source(S_SOURCE_VLC, T_SOURCE_VLC)
+    : music_source(S_SOURCE_VLC, T_SOURCE_VLC, new vlc)
 {
     m_capabilities = CAP_TITLE | CAP_LABEL | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 
@@ -217,13 +217,6 @@ bool vlc_obs_source::execute_capability(capability c)
 
     obs_source_release(src);
     return vlc;
-}
-
-void vlc_obs_source::set_gui_values()
-{
-    m_target_source_name = CGET_STR(CFG_VLC_ID);
-    if (m_target_source_name)
-        emit tuna_dialog->vlc_source_selected(utf8_to_qt(m_target_source_name));
 }
 
 bool vlc_obs_source::valid_format(const QString& str)

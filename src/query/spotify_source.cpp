@@ -19,6 +19,7 @@
 #include "spotify_source.hpp"
 #include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
+#include "../gui/widgets/spotify.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/creds.hpp"
@@ -42,7 +43,7 @@
 #define REDIRECT_URI "https%3A%2F%2Funivrsal.github.io%2Fauth%2Ftoken"
 
 spotify_source::spotify_source()
-    : music_source(S_SOURCE_SPOTIFY, T_SOURCE_SPOTIFY)
+    : music_source(S_SOURCE_SPOTIFY, T_SOURCE_SPOTIFY, new spotify)
 {
     build_credentials();
     m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
@@ -94,13 +95,6 @@ void spotify_source::load()
     build_credentials();
 }
 
-void spotify_source::set_gui_values()
-{
-    const auto logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
-    QString tmp;
-    emit tuna_dialog->login_state_changed(logged_in, tmp);
-}
-
 void spotify_source::save()
 {
     CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, m_logged_in);
@@ -145,8 +139,7 @@ void spotify_source::refresh()
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
         QString log;
-        const auto result = do_refresh_token(log);
-        emit tuna_dialog->login_state_changed(result, log);
+        CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, do_refresh_token(log));
         save();
     }
 

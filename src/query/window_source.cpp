@@ -18,6 +18,7 @@
 
 #include "window_source.hpp"
 #include "../gui/tuna_gui.hpp"
+#include "../gui/widgets/window_title.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/utility.hpp"
@@ -25,7 +26,7 @@
 #include <QRegularExpression>
 
 window_source::window_source()
-    : music_source(S_SOURCE_WINDOW_TITLE, T_SOURCE_WINDOW_TITLE)
+    : music_source(S_SOURCE_WINDOW_TITLE, T_SOURCE_WINDOW_TITLE, new window_title)
 {
     m_capabilities = CAP_TITLE;
 }
@@ -120,9 +121,4 @@ bool window_source::valid_format(const QString& str)
     static QRegularExpression reg("/%[m|M]|%[a|A]|%[r|R]|%[y|Y]|%[d|D]|%[n|N]"
                                   "%[p|P]%[l|L]/gm");
     return !reg.match(str).hasMatch();
-}
-
-void window_source::set_gui_values()
-{
-    emit tuna_dialog->window_source_changed(m_title, m_search, m_replace, m_pause, m_regex, m_cut_begin, m_cut_end);
 }

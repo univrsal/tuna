@@ -70,7 +70,10 @@ set(tuna_ui
         src/gui/output_edit_dialog.ui
         src/gui/music_control.ui
         src/gui/widgets/lastfm.ui
-        src/gui/widgets/mpd.ui)
+        src/gui/widgets/mpd.ui
+        src/gui/widgets/window_title.ui
+        src/gui/widgets/spotify.ui
+        src/gui/widgets/vlc.ui)
 
 qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
 qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
@@ -176,6 +179,12 @@ set(tuna_sources
     ./src/gui/widgets/lastfm.hpp
     ./src/gui/widgets/mpd.cpp
     ./src/gui/widgets/mpd.hpp
+    ./src/gui/widgets/window_title.cpp
+    ./src/gui/widgets/window_title.hpp
+    ./src/gui/widgets/spotify.cpp
+    ./src/gui/widgets/spotify.hpp
+    ./src/gui/widgets/vlc.cpp
+    ./src/gui/widgets/vlc.hpp
     ${tuna_ui_headers}
     ${tuna_vlc_source}
     )

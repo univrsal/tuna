@@ -111,7 +111,6 @@ std::shared_ptr<T> get(const char* id)
             return std::dynamic_pointer_cast<T>(src);
         }
     }
-
-    throw std::invalid_argument("Couldn't get music source for provided id");
+    return nullptr;
 }
 }

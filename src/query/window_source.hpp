@@ -33,7 +33,6 @@ public:
     void save() override;
     void refresh() override;
     bool execute_capability(capability c) override;
-    void set_gui_values() override;
     bool valid_format(const QString& str) override;
     bool enabled() const override;
 };

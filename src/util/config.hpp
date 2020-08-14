@@ -111,7 +111,7 @@ void save();
 
 void close();
 
-void load_outputs(QList<output>& table_content);
+void load_outputs();
 
-void save_outputs(const QList<output>& table_content);
+void save_outputs();
 } // namespace config
