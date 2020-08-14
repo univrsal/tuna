@@ -338,12 +338,6 @@ jobs:
         run: |
           msbuild /m /p:Configuration=RelWithDebInfo .\build64\libobs\libobs.vcxproj
           msbuild /m /p:Configuration=RelWithDebInfo .\build64\UI\obs-frontend-api\obs-frontend-api.vcxproj
-      - name: 'Create creds.txt'
-        shell: python
-        run: |
-          f = open("${{ github.workspace }}\${{ env.project-git }}\creds.txt", "w")
-          f.write("${{ secrets.SPOTIFY_TOKEN }}")
-          f.close()
       - name: 'Configure ${{ env.project-git }}  64-bit'
         working-directory: ${{ github.workspace }}\${{ env.project-git }}
         run: |
@@ -356,6 +350,7 @@ jobs:
             -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" `
             -DVLC_INCLUDE_DIR=${{ github.workspace }}\${{ env.project-git }}\vlc `
             -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build64\libobs\RelWithDebInfo\obs.lib" `
+            -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" `
             -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build64\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" `
             -DW32_PTHREADS_LIB="${{ github.workspace }}\obs-studio\build64\deps\w32-pthreads\RelWithDebInfo\w32-pthreads.lib" ..
       - name: 'Configure ${{ env.project-git }} 32-bit'
@@ -368,6 +363,7 @@ jobs:
           -DDepsPath="${{ github.workspace }}\cmbuild\deps\win32" `
           -DLibObs_DIR="${{ github.workspace }}\obs-studio\build32\libobs" `
           -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" `
+          -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" `
           -DVLC_INCLUDE_DIR=${{ github.workspace }}\${{ env.project-git }}\vlc\ `
           -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build32\libobs\RelWithDebInfo\obs.lib" `
           -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build32\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" `
