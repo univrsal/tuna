@@ -343,8 +343,7 @@ jobs:
         env: 
           token: ${{ secrets.SPOTIFY_TOKEN }}
         run: |
-          "$env:token" | Out-File -NoNewline -FilePath ${{ github.workspace }}/${{ env.project-git }}/creds.txt `
-          (gc ${{ github.workspace }}/${{ env.project-git }}/creds.txt).Trim() | ? {$_.Length -gt 0} | out-file -NoNewline -FilePath ${{ github.workspace }}/${{ env.project-git }}/creds.txt
+          "$env:token" | Out-File -NoNewline -FilePath ${{ github.workspace }}/${{ env.project-git }}/creds.txt; (gc ${{ github.workspace }}/${{ env.project-git }}/creds.txt).Trim() | ? {$_.Length -gt 0} | out-file -NoNewline -FilePath ${{ github.workspace }}/${{ env.project-git }}/creds.txt
       - name: 'Configure ${{ env.project-git }}  64-bit'
         working-directory: ${{ github.workspace }}\${{ env.project-git }}
         run: |
