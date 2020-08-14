@@ -64,7 +64,6 @@ if (NOT CREDS)
     string(REGEX REPLACE "\r\n$" "" CREDS "${CREDS}")
 endif()
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
-message(STATUS "TOKEN: '${CREDS}'")
 
 set(tuna_ui
         src/gui/tuna_gui.ui
