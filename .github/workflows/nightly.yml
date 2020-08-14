@@ -1,6 +1,9 @@
 name: nightly
 on:
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.ini'
   push:
     paths-ignore:
       - '**.md'
