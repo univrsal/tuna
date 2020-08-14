@@ -71,7 +71,6 @@ void tuna_gui::toggleShowHide()
     setVisible(!isVisible());
     if (isVisible()) {
         /* Load config values for sources on dialog show */
-        load_vlc_sources();
         music_sources::set_gui_values();
 
         /* load basic values */

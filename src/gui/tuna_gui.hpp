@@ -39,7 +39,6 @@ public:
 class tuna_gui : public QDialog {
     Q_OBJECT
 
-    void load_vlc_sources();
     QList<source_widget*> m_source_widgets;
 
 public:

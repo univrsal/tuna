@@ -121,9 +121,9 @@ void close()
     thread::thread_mutex.unlock();
 }
 
-void load_outputs(QList<output>& table_content)
+void load_outputs()
 {
-    table_content.clear();
+    outputs.clear();
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
     QFile file(path);
@@ -148,7 +148,7 @@ void load_outputs(QList<output>& table_content)
                 tmp.last_output = obj[JSON_LAST_OUTPUT].isString();
             else
                 tmp.last_output = "";
-            table_content.push_back(tmp);
+            outputs.push_back(tmp);
         }
         binfo("Loaded %i outputs", array.size());
     } else {
@@ -159,7 +159,7 @@ void load_outputs(QList<output>& table_content)
         tmp.format = T_SONG_FORMAT_DEFAULT;
         tmp.path = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
         tmp.log_mode = false;
-        table_content.push_back(tmp);
+        outputs.push_back(tmp);
     }
 }
 
