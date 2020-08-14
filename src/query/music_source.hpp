@@ -105,7 +105,6 @@ template <class T>
 std::shared_ptr<T> get(const char* id)
 {
     for (const auto src : instances) {
-        bdebug("Searching %s for %s", src->id(), id);
         if (strcmp(src->id(), id) == 0) {
             return std::dynamic_pointer_cast<T>(src);
         }
