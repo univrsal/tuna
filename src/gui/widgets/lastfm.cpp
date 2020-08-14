@@ -16,9 +16,9 @@
 #include "lastfm.hpp"
 #include "ui_lastfm.h"
 
-lastfm::lastfm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::lastfm)
+lastfm::lastfm(QWidget* parent)
+    : source_widget(parent)
+    , ui(new Ui::lastfm)
 {
     ui->setupUi(this);
 }
@@ -26,4 +26,12 @@ lastfm::lastfm(QWidget *parent) :
 lastfm::~lastfm()
 {
     delete ui;
+}
+
+void lastfm::load_settings()
+{
+}
+
+void lastfm::save_settings()
+{
 }

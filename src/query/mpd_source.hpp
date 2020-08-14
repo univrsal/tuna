@@ -40,7 +40,6 @@ public:
     void load() override;
     void save() override;
     void refresh() override;
-    void set_gui_values() override;
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;
     bool enabled() const override;

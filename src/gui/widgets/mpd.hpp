@@ -15,21 +15,27 @@
  */
 #pragma once
 
+#include "../tuna_gui.hpp"
 #include <QWidget>
 
 namespace Ui {
 class mpd;
 }
 
-class mpd : public QWidget
-{
+class mpd : public source_widget {
     Q_OBJECT
 
 public:
-    explicit mpd(QWidget *parent = nullptr);
+    explicit mpd(QWidget* parent = nullptr);
     ~mpd();
 
-private:
-    Ui::mpd *ui;
-};
+    void load_settings() override;
+    void save_settings() override;
+private slots:
+    void on_rb_remote_toggled(bool checked);
 
+    void on_btn_browse_base_folder_clicked();
+
+private:
+    Ui::mpd* ui;
+};

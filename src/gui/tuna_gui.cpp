@@ -35,7 +35,6 @@
 #include <QPixmap>
 #include <QString>
 #include <QTimer>
-#include <exception>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <random>
@@ -56,7 +55,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     connect(this, &tuna_gui::vlc_source_selected, this, &tuna_gui::select_vlc_source);
     connect(this, &tuna_gui::window_source_changed, this, &tuna_gui::update_window);
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
-    connect(this, &tuna_gui::mpd_source_changed, this, &tuna_gui::update_mpd);
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
@@ -191,15 +189,6 @@ void tuna_gui::apply_login_state(bool state, const QString& log) const
     }
 }
 
-void tuna_gui::update_mpd(const QString& ip, uint16_t port, bool local, const QString& base_folder) const
-{
-    ui->txt_ip->setText(ip);
-    ui->sb_port->setValue(port);
-    ui->btn_browse_base_folder->setEnabled(local);
-    ui->txt_base_folder->setText(base_folder);
-    set_mpd_local(local);
-}
-
 void tuna_gui::update_window(const QString& title, const QString& replace, const QString& with, const QString& pause_if,
     bool regex, uint16_t cut_begin, uint16_t cut_end) const
 {
@@ -212,9 +201,11 @@ void tuna_gui::update_window(const QString& title, const QString& replace, const
     ui->sb_end->setValue(cut_end);
 }
 
-void tuna_gui::add_music_source(const QString& display, const QString& id)
+void tuna_gui::add_music_source(const QString& display, const QString& id, source_widget* w)
 {
     ui->cb_source->addItem(display, id);
+    ui->settings_tabs->addTab(w, display);
+    m_source_widgets.append(w);
 }
 
 void tuna_gui::on_btn_request_token_clicked()
@@ -271,13 +262,6 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_STR(CFG_SPOTIFY_CLIENT_SECRET, qt_to_utf8(ui->txt_secret->text()));
 
     /* Source settings */
-    CSET_STR(CFG_MPD_IP, qt_to_utf8(ui->txt_ip->text()));
-    CSET_UINT(CFG_MPD_PORT, ui->sb_port->value());
-    CSET_BOOL(CFG_MPD_LOCAL, ui->rb_local->isChecked());
-    auto path = ui->txt_base_folder->text();
-    if (!path.endsWith("/"))
-        path.append("/");
-    CSET_STR(CFG_MPD_BASE_FOLDER, qt_to_utf8(path));
 
     CSET_STR(CFG_WINDOW_TITLE, qt_to_utf8(ui->txt_title->text()));
     CSET_STR(CFG_WINDOW_PAUSE, qt_to_utf8(ui->txt_paused->text()));
@@ -296,6 +280,11 @@ void tuna_gui::on_tuna_gui_accepted()
         tmp.path = ui->tbl_outputs->item(row, 1)->text();
         tmp.log_mode = ui->tbl_outputs->item(row, 2)->text() == "Yes";
         config::outputs.push_back(tmp);
+    }
+
+    for (auto& w : m_source_widgets) {
+        if (w)
+            w->save_settings();
     }
 
     config::save_outputs(config::outputs);
@@ -349,12 +338,6 @@ void tuna_gui::on_btn_sp_show_refresh_token_pressed()
 void tuna_gui::on_btn_sp_show_refresh_token_released()
 {
     ui->txt_refresh_token->setEchoMode(QLineEdit::Password);
-}
-
-void tuna_gui::on_checkBox_stateChanged(int arg1)
-{
-    ui->txt_ip->setEnabled(arg1 > 0);
-    ui->sb_port->setEnabled(arg1 > 0);
 }
 
 void tuna_gui::on_btn_browse_song_cover_clicked()
@@ -455,15 +438,6 @@ void tuna_gui::on_pb_refresh_vlc_clicked()
     load_vlc_sources();
 }
 
-void tuna_gui::set_mpd_local(bool local) const
-{
-    ui->rb_local->setChecked(local);
-    ui->rb_remote->setChecked(!local);
-    ui->txt_ip->setEnabled(!local);
-    ui->sb_port->setEnabled(!local);
-    ui->txt_base_folder->setEnabled(local);
-}
-
 void tuna_gui::select_vlc_source(const QString& id)
 {
     const auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchExactly);
@@ -472,21 +446,6 @@ void tuna_gui::select_vlc_source(const QString& id)
         ui->cb_vlc_source_name->setCurrentIndex(idx);
     else
         ui->cb_vlc_source_name->setCurrentIndex(0);
-}
-
-void tuna_gui::on_btn_browse_base_folder_clicked()
-{
-    ui->txt_base_folder->setText(QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER));
-}
-
-void tuna_gui::on_rb_remote_clicked(bool checked)
-{
-    set_mpd_local(!checked);
-}
-
-void tuna_gui::on_rb_local_clicked(bool checked)
-{
-    set_mpd_local(checked);
 }
 
 void tuna_gui::on_btn_id_show_pressed()

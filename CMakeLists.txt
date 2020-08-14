@@ -68,7 +68,9 @@ add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 set(tuna_ui
         src/gui/tuna_gui.ui
         src/gui/output_edit_dialog.ui
-        src/gui/music_control.ui)
+        src/gui/music_control.ui
+        src/gui/widgets/lastfm.ui
+        src/gui/widgets/mpd.ui)
 
 qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
 qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
@@ -170,6 +172,10 @@ set(tuna_sources
     ./src/util/utility.cpp
     ./src/util/utility.hpp
     ./src/util/window/window_helper.hpp
+    ./src/gui/widgets/lastfm.cpp
+    ./src/gui/widgets/lastfm.hpp
+    ./src/gui/widgets/mpd.cpp
+    ./src/gui/widgets/mpd.hpp
     ${tuna_ui_headers}
     ${tuna_vlc_source}
     )

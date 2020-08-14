@@ -24,6 +24,7 @@
 #include <memory>
 #include <stdint.h>
 
+#include "../gui/tuna_gui.hpp"
 #include "src/util/utility.hpp"
 
 /* clang-format off */
@@ -62,9 +63,10 @@ class music_source : public QObject {
 protected:
     uint32_t m_capabilities = 0x0;
     song m_current = {};
+    source_widget* m_settings_tab = nullptr;
 
 public:
-    music_source(const char* id, const char* name);
+    music_source(const char* id, const char* name, source_widget* w = nullptr);
 
     virtual ~music_source() { }
 
@@ -87,7 +89,7 @@ public:
     virtual void refresh() = 0;
     /* Execute and return true if successful */
     virtual bool execute_capability(capability c) = 0;
-    virtual void set_gui_values() = 0;
+    virtual void set_gui_values();
     virtual bool valid_format(const QString& str) = 0;
 };
 

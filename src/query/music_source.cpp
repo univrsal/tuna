@@ -25,6 +25,7 @@
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "window_source.hpp"
+#include <obs-frontend-api.h>
 
 namespace music_sources {
 static int selected_index = -1;
@@ -32,10 +33,12 @@ QList<std::shared_ptr<music_source>> instances;
 
 void init()
 {
+    obs_frontend_push_ui_translation(obs_module_get_string);
     instances.append(std::make_shared<spotify_source>());
     instances.append(std::make_shared<mpd_source>());
     instances.append(std::make_shared<vlc_obs_source>());
     instances.append(std::make_shared<window_source>());
+    obs_frontend_pop_ui_translation();
 }
 
 void load()
@@ -100,10 +103,17 @@ void deinit()
 }
 }
 
-music_source::music_source(const char* id, const char* name)
+music_source::music_source(const char* id, const char* name, source_widget* w)
     : m_id(id)
     , m_name(name)
+    , m_settings_tab(w)
 {
     binfo("Registered %s (id: %s)", name, id);
-    emit tuna_dialog->source_registered(name, id);
+    emit tuna_dialog->source_registered(name, id, w);
+}
+
+void music_source::set_gui_values()
+{
+    if (m_settings_tab)
+        m_settings_tab->load_settings();
 }

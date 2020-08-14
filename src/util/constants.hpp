@@ -27,6 +27,7 @@
 #define S_SOURCE_MPD			"mpd"
 #define S_SOURCE_VLC			"vlc"
 #define S_SOURCE_WINDOW_TITLE	"window"
+#define S_SOURCE_LAST_FM        "lastfm"
 
 #define S_PROGRESS_FG			"fg"
 #define S_PROGRESS_BG			"bg"
@@ -46,6 +47,7 @@
 #define T_STATUS_STOPPED 		T_("tuna.gui.tab.basics.status.stopped")
 #define T_PREVIEW 				T_("tuna.gui.tab.basics.preview")
 #define T_SOURCE_MPD 			T_("tuna.gui.tab.mpd")
+#define T_SOURCE_LASTFM         T_("tuna.gui.tab.lastfm")
 #define T_SOURCE_SPOTIFY		T_("tuna.gui.tab.spotify")
 #define T_SOURCE_VLC			T_("tuna.gui.tab.vlc")
 #define T_SOURCE_WINDOW_TITLE	T_("tuna.gui.tab.window_title")

@@ -19,6 +19,7 @@
 #include "mpd_source.hpp"
 #include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
+#include "../gui/widgets/mpd.hpp"
 #include "../util/config.hpp"
 #include "../util/cover_tag_handler.hpp"
 #include "../util/utility.hpp"
@@ -26,7 +27,7 @@
 #include <taglib/fileref.h>
 
 mpd_source::mpd_source()
-    : music_source(S_SOURCE_MPD, T_SOURCE_MPD)
+    : music_source(S_SOURCE_MPD, T_SOURCE_MPD, new mpd)
 {
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_STOP_SONG | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
@@ -136,6 +137,7 @@ void mpd_source::refresh()
         const char* num = mpd_song_get_tag(m_mpd_song, MPD_TAG_TRACK, 0);
         const char* disc = mpd_song_get_tag(m_mpd_song, MPD_TAG_DISC, 0);
         const char* label = mpd_song_get_tag(m_mpd_song, MPD_TAG_LABEL, 0);
+#undef MPD_TAG_LABEL
 
         if (title)
             m_current.set_title(title);
@@ -146,9 +148,9 @@ void mpd_source::refresh()
         if (album)
             m_current.set_album(album);
         if (num)
-            m_current.set_track_number(std::stoi(num));
+            m_current.set_track_number(QString(num).toUInt());
         if (disc)
-            m_current.set_disc_number(std::atoi(disc));
+            m_current.set_disc_number(QString(disc).toUInt());
         if (label)
             m_current.set_label(label);
 
@@ -220,11 +222,6 @@ bool mpd_source::execute_capability(capability c)
     }
 
     return result;
-}
-
-void mpd_source::set_gui_values()
-{
-    emit tuna_dialog->mpd_source_changed(m_address, m_port, m_local, m_base_folder);
 }
 
 bool mpd_source::valid_format(const QString& str)

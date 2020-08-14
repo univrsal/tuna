@@ -15,21 +15,23 @@
  */
 #pragma once
 
+#include "../tuna_gui.hpp"
 #include <QWidget>
 
 namespace Ui {
 class lastfm;
 }
 
-class lastfm : public QWidget
-{
+class lastfm : public source_widget {
     Q_OBJECT
 
 public:
-    explicit lastfm(QWidget *parent = nullptr);
+    explicit lastfm(QWidget* parent = nullptr);
     ~lastfm();
 
-private:
-    Ui::lastfm *ui;
-};
+    void load_settings() override;
+    void save_settings() override;
 
+private:
+    Ui::lastfm* ui;
+};

@@ -19,15 +19,28 @@
 #pragma once
 
 #include <QDialog>
+#include <map>
+#include <tuple>
 
 namespace Ui {
 class tuna_gui;
 }
 
+class source_widget : public QWidget {
+public:
+    explicit source_widget(QWidget* parent = nullptr)
+        : QWidget(parent)
+    {
+    }
+    virtual void save_settings() = 0;
+    virtual void load_settings() = 0;
+};
+
 class tuna_gui : public QDialog {
     Q_OBJECT
 
     void load_vlc_sources();
+    QList<source_widget*> m_source_widgets;
 
 public:
     explicit tuna_gui(QWidget* parent = nullptr);
@@ -35,7 +48,6 @@ public:
     ~tuna_gui();
 
     void toggleShowHide();
-
     void add_output(const QString& format, const QString& path, bool log_mode);
     void edit_output(const QString& format, const QString& path, bool log_mode);
     void get_selected_output(QString& format, QString& path, bool& log_mode);
@@ -43,24 +55,20 @@ public:
 signals:
     void login_state_changed(bool sate, QString& log);
     void vlc_source_selected(const QString& id);
-    void mpd_source_changed(const QString& ip, uint16_t port, bool local, const QString& base_folder);
     void window_source_changed(const QString& title, const QString& replace, const QString& with,
         const QString& pause_if, bool regex, uint16_t cut_begin, uint16_t cut_end);
 
-    void source_registered(const QString& display, const QString& id);
+    void source_registered(const QString& display, const QString& id, source_widget* w);
 
-private:
-    void set_mpd_local(bool local) const;
 private slots:
 
     /* Music source interactions */
     void select_vlc_source(const QString& id);
     void apply_login_state(bool state, const QString& log) const;
-    void update_mpd(const QString& ip, uint16_t port, bool local, const QString& base_folder) const;
     void update_window(const QString& title, const QString& replace, const QString& with, const QString& pause_if,
         bool regex, uint16_t cut_begin, uint16_t cut_end) const;
 
-    void add_music_source(const QString& display, const QString& id);
+    void add_music_source(const QString& display, const QString& id, source_widget* w);
 
     /* Element interactions */
     void choose_file(QString& path, const char* title, const char* file_types);
@@ -79,16 +87,12 @@ private slots:
     void on_btn_sp_show_token_released();
     void on_btn_sp_show_refresh_token_pressed();
     void on_btn_sp_show_refresh_token_released();
-    void on_checkBox_stateChanged(int arg1);
     void on_btn_browse_song_cover_clicked();
     void on_btn_browse_song_lyrics_clicked();
     void on_btn_add_output_clicked();
     void on_btn_remove_output_clicked();
     void on_btn_edit_output_clicked();
     void on_pb_refresh_vlc_clicked();
-    void on_btn_browse_base_folder_clicked();
-    void on_rb_remote_clicked(bool checked);
-    void on_rb_local_clicked(bool checked);
     void on_btn_id_show_pressed();
     void on_btn_id_show_released();
     void on_btn_show_secret_pressed();
