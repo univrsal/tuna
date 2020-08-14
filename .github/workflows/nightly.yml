@@ -339,11 +339,11 @@ jobs:
           msbuild /m /p:Configuration=RelWithDebInfo .\build64\libobs\libobs.vcxproj
           msbuild /m /p:Configuration=RelWithDebInfo .\build64\UI\obs-frontend-api\obs-frontend-api.vcxproj
       - name: 'Create creds.txt'
-        shell: bash
-        env:
-          token: ${{ secrets.SPOTIFY_TOKEN }}
+        shell: python
         run: |
-          echo "$token" > ${{github.workspace}}/${{ env.project-git }}/creds.txt
+          f = open("{{ github.workspace }}\${{ env.project-git }}\creds.txt", "w")
+          f.write("${{ secrets.SPOTIFY_TOKEN }}")
+          f.close()
       - name: 'Configure ${{ env.project-git }}  64-bit'
         working-directory: ${{ github.workspace }}\${{ env.project-git }}
         run: |
