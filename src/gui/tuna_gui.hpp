@@ -60,10 +60,6 @@ private slots:
     /* Element interactions */
     void choose_file(QString& path, const char* title, const char* file_types);
     void on_apply_pressed();
-    void on_btn_open_login_clicked();
-    void on_txt_auth_code_textChanged(const QString& arg1) const;
-    void on_btn_request_token_clicked();
-    void on_btn_performrefresh_clicked();
     void on_tuna_gui_accepted();
     void on_btn_start_clicked();
     void set_state();
@@ -73,7 +69,6 @@ private slots:
     void on_btn_add_output_clicked();
     void on_btn_remove_output_clicked();
     void on_btn_edit_output_clicked();
-    void on_pb_refresh_vlc_clicked();
 
 private:
     Ui::tuna_gui* ui;
