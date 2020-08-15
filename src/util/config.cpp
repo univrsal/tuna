@@ -98,31 +98,20 @@ void load()
     music_sources::select(selected_source);
 }
 
-void save()
-{
-    music_sources::save();
-    save_outputs();
-}
-
 void close()
 {
     thread::thread_mutex.lock();
-    save();
+    save_outputs();
     util::reset_cover();
+    thread::thread_mutex.unlock();
     thread::stop();
-    thread::thread_mutex.unlock();
-
-    /* Wait for thread to exit to delete resources */
-    while (thread::thread_running)
-        os_sleep_ms(5);
     bfree((void*)cover_placeholder);
-    thread::thread_mutex.lock();
     music_sources::deinit();
-    thread::thread_mutex.unlock();
 }
 
 void load_outputs()
 {
+    thread::thread_mutex.lock();
     outputs.clear();
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
@@ -161,6 +150,7 @@ void load_outputs()
         tmp.log_mode = false;
         outputs.push_back(tmp);
     }
+    thread::thread_mutex.unlock();
 }
 
 void save_outputs()

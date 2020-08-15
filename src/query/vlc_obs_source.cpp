@@ -83,13 +83,6 @@ void vlc_obs_source::load()
     }
 }
 
-void vlc_obs_source::save()
-{
-    if (!util::vlc_loaded)
-        return;
-    CSET_STR(CFG_VLC_ID, m_target_source_name);
-}
-
 struct vlc_source* vlc_obs_source::get_vlc()
 {
     struct vlc_source* data = nullptr;

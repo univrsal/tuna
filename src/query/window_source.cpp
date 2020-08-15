@@ -55,17 +55,6 @@ void window_source::load()
     m_cut_end = CGET_UINT(CFG_WINDOW_CUT_END);
 }
 
-void window_source::save()
-{
-    CSET_STR(CFG_WINDOW_TITLE, qt_to_utf8(m_title));
-    CSET_STR(CFG_WINDOW_SEARCH, qt_to_utf8(m_search));
-    CSET_STR(CFG_WINDOW_REPLACE, qt_to_utf8(m_replace));
-    CSET_STR(CFG_WINDOW_PAUSE, qt_to_utf8(m_pause));
-    CSET_BOOL(CFG_WINDOW_REGEX, m_regex);
-    CSET_UINT(CFG_WINDOW_CUT_BEGIN, m_cut_begin);
-    CSET_UINT(CFG_WINDOW_CUT_END, m_cut_begin);
-}
-
 void window_source::refresh()
 {
     if (m_title.isEmpty())
@@ -119,6 +108,6 @@ bool window_source::execute_capability(capability c)
 bool window_source::valid_format(const QString& str)
 {
     static QRegularExpression reg("/%[m|M]|%[a|A]|%[r|R]|%[y|Y]|%[d|D]|%[n|N]"
-                                  "%[p|P]%[l|L]/gm");
+                                  "|%[p|P]|%[l|L]|%[b|B]/gm");
     return !reg.match(str).hasMatch();
 }

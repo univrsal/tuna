@@ -96,16 +96,15 @@ jobs:
             -DDISABLE_PLUGINS=true \
             -DENABLE_SCRIPTING=0 \
             -DDepsPath=/tmp/obsdeps \
+            -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" \
+            -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" \
             -DCMAKE_PREFIX_PATH=/usr/local/opt/qt/lib/cmake \
           && make -j4
       - name: Configure and build plugin
         shell: bash
-        env: 
-          token: ${{ secrets.SPOTIFY_TOKEN }}
         run: |
           cd ${{ github.workspace }}
           echo "=> Building plugin for macOS."
-          echo "$token" > creds.txt
           mkdir -p build && cd build
           cmake .. \
             -DQTDIR=/usr/local/opt/qt \
@@ -196,12 +195,11 @@ jobs:
         sudo ldconfig
     - name: Build plugin
       shell: bash
-      env:
-        token: ${{ secrets.SPOTIFY_TOKEN }}
       run: |
-        echo "$token" > ${{github.workspace}}/creds.txt
         cmake -S ${{github.workspace}} -B ${{github.workspace}}/build/ \-G "Unix Makefiles" \
-          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist -DVLC_INCLUDE_DIR=${{github.workspace}}/vlc/ -DOBS_FRONTEND_INCLUDE=/usr/include/obs
+          -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dist -DVLC_INCLUDE_DIR=${{github.workspace}}/vlc/ -DOBS_FRONTEND_INCLUDE=/usr/include/obs \
+          -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" \
+          -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}"
         cmake --build ${{github.workspace}}/build/ --parallel 4 --target install
     - name: Compile deb installer
       shell: bash
@@ -209,6 +207,8 @@ jobs:
           cmake ${{github.workspace}} -B ${{github.workspace}}/build \
             -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_VERBOSE_MAKEFILE=true \
             -DOBS_FRONTEND_INCLUDE=/usr/include/obs -DGLOBAL_INSTALLATION=ON \
+            -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" \
+            -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" \
             -DVLC_INCLUDE_DIR=${{github.workspace}}/vlc/
           sudo cmake --build ${{github.workspace}}/build \
             --parallel 4 \
@@ -354,6 +354,7 @@ jobs:
             -DVLC_INCLUDE_DIR=${{ github.workspace }}\${{ env.project-git }}\vlc `
             -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build64\libobs\RelWithDebInfo\obs.lib" `
             -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" `
+            -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" `
             -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build64\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" `
             -DW32_PTHREADS_LIB="${{ github.workspace }}\obs-studio\build64\deps\w32-pthreads\RelWithDebInfo\w32-pthreads.lib" ..
       - name: 'Configure ${{ env.project-git }} 32-bit'
@@ -367,6 +368,7 @@ jobs:
           -DLibObs_DIR="${{ github.workspace }}\obs-studio\build32\libobs" `
           -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" `
           -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" `
+          -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" `
           -DVLC_INCLUDE_DIR=${{ github.workspace }}\${{ env.project-git }}\vlc\ `
           -DLIBOBS_LIB="${{ github.workspace }}\obs-studio\build32\libobs\RelWithDebInfo\obs.lib" `
           -DOBS_FRONTEND_LIB="${{ github.workspace }}\obs-studio\build32\UI\obs-frontend-api\RelWithDebInfo\obs-frontend-api.lib" `

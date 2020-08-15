@@ -56,14 +56,20 @@ configure_file(
 )
 
 if (NOT CREDS)
-    # Read Spotify credentials from creds.txt
-    # In this format {client_id}:{client_secre}
-    # Make sure that there's no empty new line
-    file(READ "creds.txt" CREDS)
-    string(REGEX REPLACE "\n$" "" CREDS "${CREDS}")
-    string(REGEX REPLACE "\r\n$" "" CREDS "${CREDS}")
+    set(CREDS "MISSING")
+    message(WARNING "Missing Spotify API info")
 endif()
+
+if (NOT LASTFM_CREDS)
+    set(LASTFM_CREDS "MISSING")
+    message(WARNING "Missing Last.fm API info")
+endif()
+
+mark_as_advanced(LASTFM_CREDS)
+mark_as_advanced(CREDS)
+
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
+add_definitions(-DLASTFM_CREDENTIALS=\"${LASTFM_CREDS}\")
 
 set(tuna_ui
         src/gui/tuna_gui.ui
@@ -161,6 +167,8 @@ set(tuna_sources
     ./src/query/mpd_source.hpp
     ./src/query/window_source.cpp
     ./src/query/window_source.hpp
+    ./src/query/lastfm_source.cpp
+    ./src/query/lastfm_source.hpp
     ./src/query/song.cpp
     ./src/query/song.hpp
     ./src/util/format.cpp

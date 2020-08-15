@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.con/univrsal/tuna
- * Copyright 2020 univrsal <universailp@web.de>.
+ * Copyright 2020 univrsal <uni@vrsal.cf>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
  *************************************************************************/
 
 #pragma once
-
+#include "../util/constants.hpp"
 #include "music_source.hpp"
 
-class window_source : public music_source {
-    QString m_title = "";
-    QString m_search = "", m_replace = "", m_pause = "";
-    uint16_t m_cut_begin = 0, m_cut_end;
-    bool m_regex = false;
+class lastfm_source : public music_source {
+    QString m_username, m_api_key;
+    bool m_custom_api_key = false;
+    uint64_t m_next_refresh = 0;
+    void parse_song(const QJsonObject& s);
 
 public:
-    window_source();
+    lastfm_source();
 
     void load() override;
     void refresh() override;

@@ -23,7 +23,7 @@ class spotify;
 
 class spotify : public source_widget {
     Q_OBJECT
-    void apply_login_state(bool state, const QString& log) const;
+    void apply_login_state(bool state, const QString& log);
 
 public:
     explicit spotify(QWidget* parent = nullptr);

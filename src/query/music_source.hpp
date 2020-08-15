@@ -84,7 +84,7 @@ public:
     virtual bool enabled() const = 0;
     /* Save/load config values */
     virtual void load() = 0;
-    virtual void save() = 0;
+    virtual void save();
     /* Perform information query */
     virtual void refresh() = 0;
     /* Execute and return true if successful */

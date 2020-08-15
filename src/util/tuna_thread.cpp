@@ -21,63 +21,47 @@
 #include "../query/music_source.hpp"
 #include "config.hpp"
 #include "utility.hpp"
+#include <algorithm>
 #include <obs-module.h>
 #include <util/platform.h>
 
-#ifdef LINUX
-
-#include <pthread.h>
-
-#endif
 namespace thread {
 volatile bool thread_flag = false;
-volatile bool thread_running = false;
 song copy;
 std::mutex thread_mutex;
 std::mutex copy_mutex;
-
-#ifdef _WIN32
-static HANDLE thread_handle;
-#else
-static pthread_t thread_handle;
-#endif
+std::thread thread_handle;
 
 bool start()
 {
-    bool result = true;
     if (thread_flag)
-        return result;
+        return true;
     thread_flag = true;
-
-#ifdef _WIN32
-    thread_handle = CreateThread(nullptr, 0, static_cast<LPTHREAD_START_ROUTINE>(thread_method), nullptr, 0, nullptr);
-    result = thread_handle;
-#else
-    result = pthread_create(&thread_handle, nullptr, thread_method, nullptr) == 0;
-#endif
+    thread_handle = std::thread(thread_method);
+    bool result = thread_handle.native_handle();
     thread_flag = result;
-    thread_running = result;
     return result;
 }
 
 void stop()
 {
-    thread_flag = false;
+    if (!thread_flag)
+        return;
+    thread_mutex.lock();
     /* Set status to noting before stopping */
     auto src = music_sources::selected_source();
     src->reset_info();
     util::handle_outputs(src->song_info());
+    thread_flag = false;
+    thread_mutex.unlock();
+    util::set_placeholder(true);
+    thread_handle.join();
 }
 
-#ifdef _WIN32
-DWORD WINAPI thread_method(LPVOID arg)
-#else
-void* thread_method(void* arg)
-#endif
+void thread_method()
 {
-    UNUSED_PARAMETER(arg);
     while (thread_flag) {
-        const auto time = util::epoch();
+        const uint64_t time = os_gettime_ns() / 1000000;
         thread_mutex.lock();
         auto ref = music_sources::selected_source();
         if (ref) {
@@ -97,15 +81,9 @@ void* thread_method(void* arg)
         thread_mutex.unlock();
 
         /* Calculate how long refresh took and only wait the remaining time */
-        const auto delta = util::epoch() - time;
-        const auto wait = config::refresh_rate - delta;
+        uint64_t delta = std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate);
+        uint64_t wait = config::refresh_rate - delta;
         os_sleep_ms(wait);
     }
-    thread_running = false;
-#ifdef _WIN32
-    return 0;
-#else
-    pthread_exit(nullptr);
-#endif
 }
-} // namespace thread
+}

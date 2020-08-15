@@ -60,42 +60,42 @@ void spotify::on_btn_id_show_released()
 
 void spotify::on_btn_show_secret_pressed()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Normal);
+    ui->txt_secret->setEchoMode(QLineEdit::Normal);
 }
 
 void spotify::on_btn_show_secret_released()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Password);
+    ui->txt_secret->setEchoMode(QLineEdit::Password);
 }
 
 void spotify::on_btn_sp_show_auth_pressed()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Normal);
+    ui->txt_auth_code->setEchoMode(QLineEdit::Normal);
 }
 
 void spotify::on_btn_sp_show_auth_released()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Password);
+    ui->txt_auth_code->setEchoMode(QLineEdit::Password);
 }
 
 void spotify::on_btn_sp_show_token_pressed()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Normal);
+    ui->txt_token->setEchoMode(QLineEdit::Normal);
 }
 
 void spotify::on_btn_sp_show_token_released()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Password);
+    ui->txt_token->setEchoMode(QLineEdit::Password);
 }
 
 void spotify::on_btn_sp_show_refresh_token_pressed()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Normal);
+    ui->txt_refresh_token->setEchoMode(QLineEdit::Normal);
 }
 
 void spotify::on_btn_sp_show_refresh_token_released()
 {
-    ui->txt_client_id->setEchoMode(QLineEdit::Password);
+    ui->txt_refresh_token->setEchoMode(QLineEdit::Password);
 }
 
 void spotify::on_btn_open_login_clicked()
@@ -134,7 +134,7 @@ void spotify::on_btn_request_token_clicked()
     apply_login_state(result, log);
 }
 
-void spotify::apply_login_state(bool state, const QString& log) const
+void spotify::apply_login_state(bool state, const QString& log)
 {
     if (state) {
         auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
@@ -147,7 +147,7 @@ void spotify::apply_login_state(bool state, const QString& log) const
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDIN);
         ui->lbl_spotify_info->setStyleSheet("QLabel { color: green; "
                                             "font-weight: bold;}");
-        config::save();
+        save_settings();
     } else {
         ui->lbl_spotify_info->setText(T_SPOTIFY_LOGGEDOUT);
         ui->lbl_spotify_info->setStyleSheet("QLabel {}");

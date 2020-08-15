@@ -65,6 +65,9 @@
 #define CFG_MPD_LOCAL 					"mpd.local"
 #define CFG_MPD_BASE_FOLDER				"mpd.base.folder"
 
+#define CFG_LASTFM_USERNAME             "lastfm.username"
+#define CFG_LASTFM_API_KEY              "lastfm.apikey"
+
 #define CFG_VLC_ID 						"vlc.id"
 #define CFG_FORCE_VLC_DECISION			"vlc.force.enable"
 #define CFG_ERROR_MESSAGE_SHOWN			"vlc.error.message.shown"
@@ -106,8 +109,6 @@ extern bool download_cover;
 void init();
 
 void load();
-
-void save();
 
 void close();
 

@@ -43,7 +43,6 @@ public:
 
     bool enabled() const override;
     void load() override;
-    void save() override;
     void refresh() override;
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;

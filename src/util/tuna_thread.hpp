@@ -18,31 +18,21 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
+#include "src/query/song.hpp"
 #include <QString>
 #include <mutex>
-
-#include "src/query/song.hpp"
+#include <thread>
 
 namespace thread {
 extern volatile bool thread_flag;
-extern volatile bool thread_running;
 extern std::mutex thread_mutex;
 extern std::mutex copy_mutex;
+extern std::thread thread_handle;
 extern song copy;
 
 bool start();
 
 void stop();
 
-#ifdef _WIN32
-DWORD WINAPI thread_method(LPVOID arg);
-#else
-
-void* thread_method(void*);
-
-#endif
+void thread_method();
 } // namespace thread

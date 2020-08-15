@@ -96,14 +96,6 @@ void mpd_source::load()
     m_local = CGET_BOOL(CFG_MPD_LOCAL);
 }
 
-void mpd_source::save()
-{
-    CSET_STR(CFG_MPD_IP, qt_to_utf8(m_address));
-    CSET_STR(CFG_MPD_BASE_FOLDER, qt_to_utf8(m_base_folder));
-    CSET_UINT(CFG_MPD_PORT, m_port);
-    CSET_BOOL(CFG_MPD_LOCAL, m_local);
-}
-
 void mpd_source::refresh()
 {
     if (!m_connected)

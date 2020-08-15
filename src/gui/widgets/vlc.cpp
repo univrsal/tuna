@@ -40,6 +40,7 @@ vlc::~vlc()
 
 void vlc::load_settings()
 {
+    load_vlc_sources();
     select_vlc_source(utf8_to_qt(CGET_STR(CFG_VLC_ID)));
 }
 

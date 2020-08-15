@@ -36,7 +36,6 @@ public:
     ~vlc_obs_source();
 
     void load() override;
-    void save() override;
     void refresh() override;
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;

@@ -124,6 +124,7 @@ void tuna_gui::on_tuna_gui_accepted()
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* save outputs */
+    thread::thread_mutex.lock();
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
         config::output tmp;
@@ -139,7 +140,6 @@ void tuna_gui::on_tuna_gui_accepted()
             w->save_settings();
     }
 
-    thread::thread_mutex.lock();
     config::refresh_rate = ui->sb_refresh_rate->value();
     thread::thread_mutex.unlock();
     config::load();

@@ -6,6 +6,7 @@
 #include "ui_music_control.h"
 #include <QDesktopWidget>
 #include <QMenu>
+#include <QSizePolicy>
 #include <QStyle>
 #include <obs-frontend-api.h>
 
@@ -44,6 +45,8 @@ music_Control::music_Control(QWidget* parent)
     QTimer::singleShot(3000, this, SLOT(on_thread_changed()));
 
     m_song_text = new scroll_text(this);
+    m_song_text->setMinimumWidth(200);
+    m_song_text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     ui->control_layout->addWidget(m_song_text, Qt::AlignBottom);
 
     ui->volume_widget->setVisible(CGET_BOOL(CFG_DOCK_VOLUME_VISIBLE));
@@ -160,7 +163,7 @@ void music_Control::on_source_changed()
 void music_Control::on_thread_changed()
 {
     thread::thread_mutex.lock();
-    auto state = thread::thread_running;
+    auto state = thread::thread_flag;
     thread::thread_mutex.unlock();
     setEnabled(state);
 }

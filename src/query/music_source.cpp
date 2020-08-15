@@ -21,6 +21,7 @@
 #include "../util/cover_tag_handler.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
+#include "lastfm_source.hpp"
 #include "mpd_source.hpp"
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
@@ -38,6 +39,7 @@ void init()
     instances.append(std::make_shared<mpd_source>());
     instances.append(std::make_shared<vlc_obs_source>());
     instances.append(std::make_shared<window_source>());
+    instances.append(std::make_shared<lastfm_source>());
     obs_frontend_pop_ui_translation();
 }
 
@@ -110,6 +112,12 @@ music_source::music_source(const char* id, const char* name, source_widget* w)
 {
     binfo("Registered %s (id: %s)", name, id);
     emit tuna_dialog->source_registered(name, id, w);
+}
+
+void music_source::save()
+{
+    if (m_settings_tab)
+        m_settings_tab->save_settings();
 }
 
 void music_source::set_gui_values()

@@ -95,15 +95,6 @@ void spotify_source::load()
     build_credentials();
 }
 
-void spotify_source::save()
-{
-    CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, m_logged_in);
-    CSET_STR(CFG_SPOTIFY_TOKEN, qt_to_utf8(m_token));
-    CSET_STR(CFG_SPOTIFY_AUTH_CODE, qt_to_utf8(m_auth_code));
-    CSET_STR(CFG_SPOTIFY_REFRESH_TOKEN, qt_to_utf8(m_refresh_token));
-    CSET_INT(CFG_SPOTIFY_TOKEN_TERMINATION, m_token_termination);
-}
-
 bool spotify_source::valid_format(const QString& str)
 {
     /* Supports all specifiers */
@@ -139,7 +130,6 @@ void spotify_source::refresh()
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
         QString log;
-        CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, do_refresh_token(log));
         save();
     }
 
@@ -310,18 +300,6 @@ bool spotify_source::execute_capability(capability c)
 
 /* === CURL/Spotify API handling === */
 
-size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
-{
-    size_t new_length = size * nmemb;
-    try {
-        str->append(ptr, new_length);
-    } catch (std::bad_alloc& e) {
-        berr("Error reading curl response: %s", e.what());
-        return 0;
-    }
-    return new_length;
-}
-
 size_t header_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
 {
     size_t new_length = size * nmemb;
@@ -344,7 +322,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(request.c_str()));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, response_header);
@@ -506,7 +484,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
     } else {
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);

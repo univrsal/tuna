@@ -59,4 +59,6 @@ int64_t epoch();
 
 bool window_pos_valid(QRect rect);
 
+size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str);
+
 } // namespace util

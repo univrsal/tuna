@@ -14,6 +14,9 @@
  *
  */
 #include "lastfm.hpp"
+#include "../../util/config.hpp"
+#include "../../util/constants.hpp"
+#include "../../util/utility.hpp"
 #include "ui_lastfm.h"
 
 lastfm::lastfm(QWidget* parent)
@@ -30,8 +33,12 @@ lastfm::~lastfm()
 
 void lastfm::load_settings()
 {
+    ui->txt_username->setText(utf8_to_qt(CGET_STR(CFG_LASTFM_USERNAME)));
+    ui->txt_apikey->setText(utf8_to_qt(CGET_STR(CFG_LASTFM_API_KEY)));
 }
 
 void lastfm::save_settings()
 {
+    CSET_STR(CFG_LASTFM_USERNAME, qt_to_utf8(ui->txt_username->text()));
+    CSET_STR(CFG_LASTFM_API_KEY, qt_to_utf8(ui->txt_apikey->text()));
 }

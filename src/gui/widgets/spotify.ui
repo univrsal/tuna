@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>611</width>
-    <height>487</height>
+    <width>473</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,9 +41,15 @@
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>320</width>
+         <width>150</width>
          <height>0</height>
         </size>
        </property>
@@ -92,9 +98,15 @@
      </item>
      <item>
       <widget class="QLineEdit" name="txt_secret">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
-         <width>320</width>
+         <width>150</width>
          <height>0</height>
         </size>
        </property>
@@ -192,14 +204,14 @@
       <item>
        <widget class="QLineEdit" name="txt_auth_code">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>320</width>
+          <width>150</width>
           <height>0</height>
          </size>
         </property>
@@ -287,14 +299,14 @@
          <bool>true</bool>
         </property>
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>320</width>
+          <width>150</width>
           <height>0</height>
          </size>
         </property>
@@ -379,14 +391,14 @@
       <item>
        <widget class="QLineEdit" name="txt_refresh_token">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>320</width>
+          <width>150</width>
           <height>0</height>
          </size>
         </property>

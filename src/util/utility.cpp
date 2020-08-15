@@ -302,4 +302,16 @@ void set_placeholder(bool on)
     }
 }
 
+size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
+{
+    size_t new_length = size * nmemb;
+    try {
+        str->append(ptr, new_length);
+    } catch (std::bad_alloc& e) {
+        berr("Error reading curl response: %s", e.what());
+        return 0;
+    }
+    return new_length;
+}
+
 } // namespace util
