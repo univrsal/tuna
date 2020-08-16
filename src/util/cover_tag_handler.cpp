@@ -130,6 +130,17 @@ bool extract_mp4(TagLib::MP4::File* file)
     return false;
 }
 
+bool extract_opus(TagLib::Ogg::Opus::File *file)
+{
+    auto *tag = file->tag();
+    auto pictures = tag->pictureList();
+    if (!pictures.isEmpty()) {
+        /* I'll just assume that the last image is the one with the biggest size */
+        return write_bytes_to_file(pictures[pictures.size() - 1]->data());
+    }
+    return false;
+}
+
 bool get_embedded(const TagLib::FileRef& fr)
 {
     bool found = false;
@@ -154,6 +165,9 @@ bool get_embedded(const TagLib::FileRef& fr)
     } else if (TagLib::MPC::File* file = dynamic_cast<TagLib::MPC::File*>(fr.file())) {
         if (file->APETag())
             found = extract_ape(file->APETag());
+    } else if (TagLib::Ogg::Opus::File* file = dynamic_cast<TagLib::Ogg::Opus::File*>(fr.file())) {
+        if (file->tag())
+            found = extract_opus(file);
     }
 
     return found;
