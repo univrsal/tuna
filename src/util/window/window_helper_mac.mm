@@ -59,7 +59,7 @@ void GetWindowList(vector<string> &windows)
 	}
 }
 
-void GetWindowAndExeList(vector<tuple<string, string>>& list);
+void GetWindowAndExeList(vector<tuple<string, string>>& list)
 {
 	@autoreleasepool {
 		for (NSDictionary *d in enumerate_windows()) {
