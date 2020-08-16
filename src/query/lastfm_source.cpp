@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QRegularExpression>
 #include <QString>
+#include <QUrl>
 #include <curl/curl.h>
 
 long lastfm_request(QJsonDocument& response_json, const QString& url);
@@ -53,9 +54,9 @@ void lastfm_source::refresh()
     QJsonDocument response;
     auto code = lastfm_request(response, track_request);
     if (code == HTTP_OK) {
-        auto recent_tracks = response["recenttracks"];
+        auto recent_tracks = response.object()["recenttracks"].toObject();
 
-        if (recent_tracks.isObject() && recent_tracks["track"].isArray()) {
+        if (recent_tracks["track"].isArray()) {
             auto track_arr = recent_tracks["track"].toArray();
             if (track_arr.size() > 0) {
                 auto song = track_arr[0].toObject();
@@ -79,7 +80,8 @@ void lastfm_source::refresh()
 void lastfm_source::parse_song(const QJsonObject& s)
 {
     if (s["@attr"].isObject()) {
-        m_current.set_playing(s["@attr"]["nowplaying"].toString() == "true");
+        auto attr_obj = s["@attr"].toObject();
+        m_current.set_playing(attr_obj["nowplaying"].toString() == "true");
 
         if (m_current.playing()) {
             auto covers = s["image"];
@@ -95,27 +97,28 @@ void lastfm_source::parse_song(const QJsonObject& s)
     }
 
     if (s["artist"].isObject())
-        m_current.append_artist(s["artist"]["#text"].toString());
+        m_current.append_artist(s["artist"].toObject()["#text"].toString());
 
     if (s["album"].isObject())
-        m_current.set_album(s["album"]["#text"].toString());
+        m_current.set_album(s["album"].toObject()["#text"].toString());
 
     if (s["name"].isString())
         m_current.set_title(s["name"].toString());
 
     if (!m_current.artists().empty() && !m_current.title().isEmpty()) {
         /* Try and get song duration */
-
+        QString artist = QUrl::toPercentEncoding(m_current.artists()[0]);
+        QString track = QUrl::toPercentEncoding(m_current.title());
         QString track_request = "https://ws.audioscrobbler.com/2.0/?method="
-                                "track.getInfo&api_key="
-            + m_api_key + "&artist=" + QUrl::toPercentEncoding(m_current.artists()[0]) + "&track=" + QUrl::toPercentEncoding(m_current.title()) + "&format=json";
+                                "track.getInfo&api_key=" + m_api_key +
+                                "&artist=" + artist + "&track=" +  + "&format=json";
 
         QJsonDocument response;
         auto code = lastfm_request(response, track_request);
         if (code == HTTP_OK) {
-            auto track = response["track"];
+            auto track = response.object()["track"];
             if (track.isObject()) {
-                auto duration = track["duration"];
+                auto duration = track.toObject()["duration"];
                 if (duration.isString()) {
                     bool ok = false;
                     int i = duration.toString().toInt(&ok);
