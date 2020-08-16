@@ -140,15 +140,6 @@ void load_outputs()
             outputs.push_back(tmp);
         }
         binfo("Loaded %i outputs", array.size());
-    } else {
-        /* Nothing to load, add default */
-        binfo("No config exists, creating default");
-        QDir home = QDir::homePath();
-        output tmp;
-        tmp.format = T_SONG_FORMAT_DEFAULT;
-        tmp.path = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
-        tmp.log_mode = false;
-        outputs.push_back(tmp);
     }
     thread::thread_mutex.unlock();
 }

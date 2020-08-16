@@ -72,9 +72,7 @@ void select(const char* id)
     song s;
     util::download_cover(s, true);
     util::set_placeholder(true);
-#ifdef UNIX
     cover::find_embedded_cover("", true);
-#endif
     thread::thread_mutex.unlock();
 }
 
@@ -84,10 +82,23 @@ void set_gui_values()
         src->set_gui_values();
 }
 
+std::shared_ptr<music_source> selected_source_unsafe()
+{
+    if (selected_index >= 0) {
+        auto ref = std::shared_ptr<music_source>(instances[selected_index]);
+        return ref;
+    }
+    return nullptr;
+}
+
 std::shared_ptr<music_source> selected_source()
 {
-    if (selected_index >= 0)
-        return std::shared_ptr<music_source>(instances[selected_index]);
+    if (selected_index >= 0) {
+        thread::thread_mutex.lock();
+        auto ref = std::shared_ptr<music_source>(instances[selected_index]);
+        thread::thread_mutex.unlock();
+        return ref;
+    }
     return nullptr;
 }
 

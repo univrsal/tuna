@@ -47,9 +47,9 @@ void stop()
 {
     if (!thread_flag)
         return;
-    thread_mutex.lock();
     /* Set status to noting before stopping */
     auto src = music_sources::selected_source();
+    thread_mutex.lock();
     src->reset_info();
     util::handle_outputs(src->song_info());
     thread_flag = false;
@@ -62,9 +62,9 @@ void thread_method()
 {
     while (thread_flag) {
         const uint64_t time = os_gettime_ns() / 1000000;
-        thread_mutex.lock();
         auto ref = music_sources::selected_source();
         if (ref) {
+            thread_mutex.lock();
             ref->refresh();
             auto s = ref->song_info();
 
@@ -77,8 +77,8 @@ void thread_method()
             copy_mutex.unlock();
             /* Process song data */
             util::handle_outputs(s);
+            thread_mutex.unlock();
         }
-        thread_mutex.unlock();
 
         /* Calculate how long refresh took and only wait the remaining time */
         uint64_t delta = std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate);

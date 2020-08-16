@@ -88,9 +88,8 @@ void lastfm_source::parse_song(const QJsonObject& s)
             if (covers.isArray() && covers.toArray().size() > 0) {
                 auto cover_array = covers.toArray();
                 auto cover = cover_array[cover_array.size() - 1];
-                if (cover.isObject()) {
+                if (cover.isObject())
                     m_current.set_cover_link(cover.toObject()["#text"].toString());
-                }
             }
         }
         util::download_cover(m_current);
@@ -110,8 +109,8 @@ void lastfm_source::parse_song(const QJsonObject& s)
         QString artist = QUrl::toPercentEncoding(m_current.artists()[0]);
         QString track = QUrl::toPercentEncoding(m_current.title());
         QString track_request = "https://ws.audioscrobbler.com/2.0/?method="
-                                "track.getInfo&api_key=" + m_api_key +
-                                "&artist=" + artist + "&track=" +  + "&format=json";
+                                "track.getInfo&api_key="
+            + m_api_key + "&artist=" + artist + "&track=" + +"&format=json";
 
         QJsonDocument response;
         auto code = lastfm_request(response, track_request);

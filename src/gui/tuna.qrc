@@ -10,5 +10,6 @@
         <file>images/icons/voldown.svg</file>
         <file>images/icons/visible.svg</file>
         <file>images/icons/obs.png</file>
+        <file>images/icons/help_light.svg</file>
     </qresource>
 </RCC>

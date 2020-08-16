@@ -130,9 +130,9 @@ bool extract_mp4(TagLib::MP4::File* file)
     return false;
 }
 
-bool extract_opus(TagLib::Ogg::Opus::File *file)
+bool extract_opus(TagLib::Ogg::Opus::File* file)
 {
-    auto *tag = file->tag();
+    auto* tag = file->tag();
     auto pictures = tag->pictureList();
     if (!pictures.isEmpty()) {
         /* I'll just assume that the last image is the one with the biggest size */

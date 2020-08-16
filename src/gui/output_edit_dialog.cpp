@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #include "output_edit_dialog.hpp"
+#include "../query/music_source.hpp"
 #include "../util/constants.hpp"
 #include "tuna_gui.hpp"
 #include "ui_output_edit_dialog.h"
@@ -24,9 +25,22 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QValidator>
 #ifdef _WIN32
 #include <QTextStream>
 #endif
+
+class format_validator : public QValidator {
+public:
+    QValidator::State validate(QString& str, int&) const override
+    {
+        auto src = music_sources::selected_source();
+        if (src) {
+            return src->valid_format(str) ? QValidator::State::Acceptable : QValidator::State::Invalid;
+        }
+        return QValidator::State::Acceptable;
+    }
+};
 
 output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     : QDialog(parent)
@@ -34,7 +48,6 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     , m_mode(m)
 {
     ui->setupUi(this);
-    ui->txt_format->setText(T_SONG_FORMAT_DEFAULT);
     m_tuna = dynamic_cast<tuna_gui*>(parent);
 
     if (m == edit_mode::modify) {
@@ -78,6 +91,10 @@ void output_edit_dialog::on_buttonBox_accepted()
         QMessageBox::warning(this, T_OUTPUT_ERROR_TITLE, T_OUTPUT_ERROR);
         return; /* Nothing to do */
     }
+
+    auto src = music_sources::selected_source();
+    if (src && !src->valid_format(ui->txt_format->text()))
+        QMessageBox::warning(this, T_OUTPUT_ERROR_TITLE, T_OUTPUT_ERROR_FORMAT);
 
     if (m_mode == edit_mode::create) {
         m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text(), ui->cb_logmode->isChecked());

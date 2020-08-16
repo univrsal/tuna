@@ -101,6 +101,7 @@ extern void save();
 extern void set_gui_values();
 extern void deinit();
 extern void select(const char* id);
+extern std::shared_ptr<music_source> selected_source_unsafe();
 extern std::shared_ptr<music_source> selected_source();
 
 template <class T>

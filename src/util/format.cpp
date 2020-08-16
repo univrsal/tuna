@@ -20,6 +20,7 @@
 #include "../query/music_source.hpp"
 #include "../query/song.hpp"
 #include "../util/config.hpp"
+#include "../util/tuna_thread.hpp"
 #include <memory>
 
 namespace format {
@@ -100,7 +101,7 @@ void init()
 void execute(QString& q)
 {
     auto splits = q.split("%");
-    auto src_ref = music_sources::selected_source();
+    auto src_ref = music_sources::selected_source_unsafe();
     bool first = !q.startsWith("%");
     for (auto& split : splits) {
         if (first) {
@@ -112,10 +113,10 @@ void execute(QString& q)
             continue;
 
         auto sp = get_matching_specifier(split[0].toLower().toLatin1());
-        if (sp)
+        if (sp) {
             sp->do_format(split, src_ref->song_info());
+        }
     }
-    src_ref.reset();
     q = splits.join("");
 }
 

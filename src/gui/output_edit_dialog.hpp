@@ -20,18 +20,18 @@
 
 #include <QDialog>
 
+class format_validator;
+
 namespace Ui {
 class output_edit_dialog;
 }
 
 class tuna_gui;
-
 enum class edit_mode { create,
     modify };
 
 class output_edit_dialog : public QDialog {
     Q_OBJECT
-
 public:
     output_edit_dialog(edit_mode m, QWidget* parent = nullptr);
     ~output_edit_dialog();

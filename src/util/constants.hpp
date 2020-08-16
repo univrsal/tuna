@@ -60,10 +60,10 @@
 
 #define T_SONG_PATH 			T_("tuna.gui.tab.basics.song.info")
 #define T_SONG_FORMAT 			T_("tuna.gui.tab.basics.song.format")
-#define T_SONG_FORMAT_DEFAULT 	T_("tuna.config.song.format")
 
 #define T_OUTPUT_ERROR_TITLE 	T_("tuna.gui.output.edit.dialog.error.title")
 #define T_OUTPUT_ERROR 			T_("tuna.gui.output.edit.dialog.error")
+#define T_OUTPUT_ERROR_FORMAT   T_("tuna.gui.output.edit.dialog.format.error")
 
 #define T_VLC_NONE 				T_("tuna.gui.vlc.none")
 #define T_VLC_VERSION_ISSUE		T_("tuna.gui.vlc.issue.message")

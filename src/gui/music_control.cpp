@@ -77,23 +77,17 @@ music_Control::~music_Control()
 
 void music_Control::on_btn_prev_clicked()
 {
-    thread::thread_mutex.lock();
     music_sources::selected_source()->execute_capability(CAP_PREV_SONG);
-    thread::thread_mutex.unlock();
 }
 
 void music_Control::on_btn_play_pause_clicked()
 {
-    thread::thread_mutex.lock();
     music_sources::selected_source()->execute_capability(CAP_PLAY_PAUSE);
-    thread::thread_mutex.unlock();
 }
 
 void music_Control::on_btn_next_clicked()
 {
-    thread::thread_mutex.lock();
     music_sources::selected_source()->execute_capability(CAP_NEXT_SONG);
-    thread::thread_mutex.unlock();
 }
 
 void music_Control::refresh_play_state()
@@ -128,12 +122,10 @@ void music_Control::refresh_play_state()
 
 void music_Control::on_source_changed()
 {
-    thread::thread_mutex.lock();
     auto src = music_sources::selected_source();
     uint32_t flags = 0;
     if (src)
         flags = src->get_capabilities();
-    thread::thread_mutex.unlock();
 
     bool next = flags & CAP_NEXT_SONG, prev = flags & CAP_NEXT_SONG, play = flags & CAP_PLAY_PAUSE,
          stop = flags & CAP_STOP_SONG;
@@ -170,9 +162,7 @@ void music_Control::on_thread_changed()
 
 void music_Control::on_btn_stop_clicked()
 {
-    thread::thread_mutex.lock();
     music_sources::selected_source()->execute_capability(CAP_STOP_SONG);
-    thread::thread_mutex.unlock();
 }
 
 void music_Control::showcontextmenu(const QPoint& pos)
@@ -199,9 +189,7 @@ void music_Control::toggle_title()
 
 void music_Control::toggle_volume()
 {
-    thread::thread_mutex.lock();
     auto flags = music_sources::selected_source()->get_capabilities();
-    thread::thread_mutex.unlock();
     if (flags & CAP_VOLUME_UP || flags & CAP_VOLUME_DOWN)
         ui->volume_widget->setVisible(!ui->volume_widget->isVisible());
     save_settings();
@@ -209,14 +197,10 @@ void music_Control::toggle_volume()
 
 void music_Control::on_btn_voldown_clicked()
 {
-    thread::thread_mutex.lock();
     music_sources::selected_source()->execute_capability(CAP_VOLUME_DOWN);
-    thread::thread_mutex.unlock();
 }
 
 void music_Control::on_btn_volup_clicked()
 {
-    thread::thread_mutex.lock();
     music_sources::selected_source()->execute_capability(CAP_VOLUME_UP);
-    thread::thread_mutex.unlock();
 }
