@@ -26,6 +26,27 @@ static bool GetWindowTitle(HWND window, string& title)
     return true;
 }
 
+static bool GetWindowExe(HWND window, string& exe)
+{
+    bool result = false;
+    DWORD proc_id = 0;
+    HANDLE h = NULL;
+    GetWindowThreadProcessId(handle, &proc_id);
+    h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, proc_id);
+    if (h) {
+        PDWORD len = 1024;
+        wchar_t buf[1024];
+        result = QueryFullProcessImageNameW(h, NULL, buf, &len);
+        if (result) {
+            len = os_wcs_to_utf8(buf, 0, nullptr, 0);
+            exe.resize(len);
+            os_wcs_to_utf8(buf, 0, &exe[0], len + 1);
+        }
+        CloseHandle(h);
+    }
+    return result;
+}
+
 static bool WindowValid(HWND window)
 {
     LONG_PTR styles, ex_styles;
@@ -62,15 +83,18 @@ void GetWindowList(vector<string>& windows)
     }
 }
 
-void GetCurrentWindowTitle(string& title)
+void GetWindowAndProcessList(vector<tuple<string, string>>& list)
 {
-    HWND window = GetForegroundWindow();
-    DWORD id;
+    HWND window = GetWindow(GetDesktopWindow(), GW_CHILD);
 
-    GetWindowThreadProcessId(window, &id);
-    if (id == GetCurrentProcessId()) {
-        title = "";
-        return;
-    }
-    GetWindowTitle(window, title);
+    while (window) {
+        string title, exe;
+        if (WindowValid(window) && GetWindowTitle(window, title) &&
+            GetWindowExe(window, exe))
+        {
+            windows.emplace_back(tuple<string, string>(exe, title));    
+        }
+        window = GetNextWindow(window, GW_HWNDNEXT);
+    }  
 }
+

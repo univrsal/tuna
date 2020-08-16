@@ -9,6 +9,7 @@
 #import <CoreGraphics/CGWindow.h>
 #import <Cocoa/Cocoa.h>
 #include <util/platform.h>
+#include <tuple>
 #include "window_helper.hpp"
 
 #define WINDOW_NAME ((NSString *)kCGWindowName)
@@ -51,11 +52,18 @@ static inline const char *make_name(NSString *owner, NSString *name)
 
 void GetWindowList(vector<string> &windows)
 {
-	windows.resize(0);
-
 	@autoreleasepool {
 		for (NSDictionary *d in enumerate_windows()) {
 			windows.emplace_back(make_name(d[OWNER_NAME], d[WINDOW_NAME]));
+		}
+	}
+}
+
+void GetWindowAndExeList(vector<tuple<string, string>>& list);
+{
+	@autoreleasepool {
+		for (NSDictionary *d in enumerate_windows()) {
+			list.emplace_back(d[OWNER_NAME].UTF8String, d[WINDOW_NAME].UTF8String);
 		}
 	}
 }

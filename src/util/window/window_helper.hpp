@@ -9,5 +9,8 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
-void GetWindowList(std::vector<std::string>& windows);
+using namespace std;
+void GetWindowList(vector<string>& windows);
+void GetWindowAndExeList(vector<tuple<string, string>>& list);

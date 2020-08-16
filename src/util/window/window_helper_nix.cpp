@@ -6,10 +6,13 @@
 #include <string>
 #include <util/platform.h>
 #include <vector>
+#include <tuple>
+#include <unistd.h>
 
 /*
     https://github.com/obsproject/obs-studio/blob/master/plugins/linux-capture/xcompcap-helper.cpp
 */
+using namespace std;
 namespace x11util {
 static Display* xdisplay = 0;
 
@@ -58,9 +61,9 @@ bool ewmhIsSupported()
     return ewmh_window != 0;
 }
 
-std::list<Window> getTopLevelWindows()
+list<Window> getTopLevelWindows()
 {
-    std::list<Window> res;
+    list<Window> res;
 
     if (!ewmhIsSupported()) {
         blog(LOG_WARNING, "Unable to query window list "
@@ -88,8 +91,9 @@ std::list<Window> getTopLevelWindows()
             continue;
         }
 
-        for (unsigned long i = 0; i < num; ++i)
+        for (unsigned long i = 0; i < num; ++i) {
             res.push_back(data[i]);
+        }
 
         XFree(data);
     }
@@ -97,13 +101,13 @@ std::list<Window> getTopLevelWindows()
     return res;
 }
 
-std::string getWindowAtom(Window win, const char* atom)
+string getWindowAtom(Window win, const char* atom)
 {
     Atom netWmName = XInternAtom(disp(), atom, false);
     int n;
     char** list = 0;
     XTextProperty tp;
-    std::string res = "unknown";
+    string res = "unknown";
 
     XGetTextProperty(disp(), win, &tp, netWmName);
 
@@ -134,22 +138,58 @@ std::string getWindowAtom(Window win, const char* atom)
     return res;
 }
 
-inline std::string getWindowName(Window win)
+inline string getWindowName(Window win)
 {
     return getWindowAtom(win, "_NET_WM_NAME");
 }
 
-inline std::string getWindowClass(Window win)
+inline string getWindowClass(Window win)
 {
     return getWindowAtom(win, "WM_CLASS");
 }
 
+inline string getWindowExe(Window win)
+{
+    Atom windowPID = XInternAtom(disp(), "_NET_WM_PID", true);
+    Atom actualType;
+    int format;
+    unsigned long num, bytes;
+    unsigned char *propPID = nullptr;
+    if (windowPID != None) {
+        if (XGetWindowProperty(disp(), win, windowPID, 0, 1, False, XA_CARDINAL,
+                           &actualType, &format, &num, &bytes, &propPID) == Success)
+        {
+            if (propPID != nullptr) {
+                auto pid_str = "/proc/" + to_string(*propPID) + "/exe";
+                XFree(propPID);
+                char exe[1024];
+                if (readlink(pid_str.c_str(), exe, 1024) > 0) {
+                    return exe;
+                }
+            }
+        }
+    }
+    return "";
+}
+
 } // namespace x11util
 
-void GetWindowList(std::vector<std::string>& windows)
+void GetWindowList(vector<string>& windows)
 {
-    std::list<Window> top_level = x11util::getTopLevelWindows();
+    list<Window> top_level = x11util::getTopLevelWindows();
     for (const auto& window : top_level) {
         windows.emplace_back(x11util::getWindowName(window));
+    }
+}
+
+void GetWindowAndExeList(vector<tuple<string, string>>& list)
+{
+    auto top_level = x11util::getTopLevelWindows();
+    for (const auto &window : top_level) {
+        auto exe = x11util::getWindowExe(window);
+        if (!exe.empty()) {
+            list.emplace_back(tuple<string, string>(exe,
+                                                    x11util::getWindowName(window)));
+        }
     }
 }
