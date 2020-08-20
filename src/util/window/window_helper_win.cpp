@@ -31,13 +31,13 @@ static bool GetWindowExe(HWND window, string& exe)
     bool result = false;
     DWORD proc_id = 0;
     HANDLE h = NULL;
-    GetWindowThreadProcessId(h, &proc_id);
+    GetWindowThreadProcessId(window, &proc_id);
     h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, proc_id);
     if (h) {
-        PDWORD l = 1024;
+        DWORD l = 1024;
         size_t len = 1024;
         wchar_t buf[1024];
-        result = QueryFullProcessImageNameW(h, NULL, buf, l);
+        result = QueryFullProcessImageNameW(h, NULL, buf, &l);
         if (result) {
             len = os_wcs_to_utf8(buf, 0, nullptr, 0);
             exe.resize(len);
