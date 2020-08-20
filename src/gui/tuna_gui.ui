@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>607</height>
+    <height>628</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,7 +26,7 @@
    <string>tuna.gui.title</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="tuna.qrc">
     <normaloff>:/images/icons/obs.png</normaloff>:/images/icons/obs.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -277,6 +277,9 @@
             <attribute name="verticalHeaderVisible">
              <bool>false</bool>
             </attribute>
+            <attribute name="verticalHeaderStretchLastSection">
+             <bool>false</bool>
+            </attribute>
             <column>
              <property name="text">
               <string>tuna.gui.tab.basics.song.logmode</string>
@@ -453,7 +456,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../../../../obs-studio/UI/forms/obs.qrc">:/res/images/help_light.svg</pixmap>
+             <pixmap>:/res/images/help_light.svg</pixmap>
             </property>
            </widget>
           </item>
@@ -721,7 +724,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap>:/images/tuna.png</pixmap>
+             <pixmap resource="tuna.qrc">:/images/tuna.png</pixmap>
             </property>
            </widget>
           </item>
@@ -792,7 +795,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="tuna.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

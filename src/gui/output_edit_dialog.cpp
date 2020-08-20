@@ -50,6 +50,9 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     ui->setupUi(this);
     m_tuna = dynamic_cast<tuna_gui*>(parent);
 
+    ui->tableWidget->setColumnWidth(0, 40);
+    ui->tableWidget->setColumnWidth(1, 180);
+    ui->tableWidget->setColumnWidth(2, 40);
     if (m == edit_mode::modify) {
         QString format, path;
         bool log_mode = false;

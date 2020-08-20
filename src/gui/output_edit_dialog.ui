@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
-    <height>260</height>
+    <width>467</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -77,6 +77,237 @@
       </widget>
      </item>
      <item>
+      <widget class="QTableWidget" name="tableWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+       <property name="verticalScrollMode">
+        <enum>QAbstractItemView::ScrollPerPixel</enum>
+       </property>
+       <property name="horizontalScrollMode">
+        <enum>QAbstractItemView::ScrollPerPixel</enum>
+       </property>
+       <property name="showGrid">
+        <bool>false</bool>
+       </property>
+       <property name="cornerButtonEnabled">
+        <bool>false</bool>
+       </property>
+       <attribute name="horizontalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderHighlightSections">
+        <bool>true</bool>
+       </attribute>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>New Row</string>
+        </property>
+       </row>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string/>
+        </property>
+       </column>
+       <item row="0" column="0">
+        <property name="text">
+         <string>%t</string>
+        </property>
+       </item>
+       <item row="0" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.title</string>
+        </property>
+       </item>
+       <item row="0" column="2">
+        <property name="text">
+         <string>%e</string>
+        </property>
+       </item>
+       <item row="0" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.linebreak</string>
+        </property>
+       </item>
+       <item row="1" column="0">
+        <property name="text">
+         <string>%m</string>
+        </property>
+       </item>
+       <item row="1" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.artist</string>
+        </property>
+       </item>
+       <item row="1" column="2">
+        <property name="text">
+         <string>%d</string>
+        </property>
+       </item>
+       <item row="1" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.disc.number</string>
+        </property>
+       </item>
+       <item row="2" column="0">
+        <property name="text">
+         <string>%n</string>
+        </property>
+       </item>
+       <item row="2" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.number</string>
+        </property>
+       </item>
+       <item row="2" column="2">
+        <property name="text">
+         <string>%a</string>
+        </property>
+       </item>
+       <item row="2" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.album</string>
+        </property>
+       </item>
+       <item row="3" column="0">
+        <property name="text">
+         <string>%r</string>
+        </property>
+       </item>
+       <item row="3" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.date.full</string>
+        </property>
+       </item>
+       <item row="3" column="2">
+        <property name="text">
+         <string>%p</string>
+        </property>
+       </item>
+       <item row="3" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.time.progress</string>
+        </property>
+       </item>
+       <item row="4" column="0">
+        <property name="text">
+         <string>%y</string>
+        </property>
+       </item>
+       <item row="4" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.date.year</string>
+        </property>
+       </item>
+       <item row="4" column="2">
+        <property name="text">
+         <string>%l</string>
+        </property>
+       </item>
+       <item row="4" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.time.length</string>
+        </property>
+       </item>
+       <item row="5" column="0">
+        <property name="text">
+         <string>%b</string>
+        </property>
+       </item>
+       <item row="5" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.label</string>
+        </property>
+       </item>
+       <item row="5" column="2">
+        <property name="text">
+         <string>%s</string>
+        </property>
+       </item>
+       <item row="5" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.space</string>
+        </property>
+       </item>
+       <item row="6" column="0">
+        <property name="text">
+         <string>%o</string>
+        </property>
+       </item>
+       <item row="6" column="1">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.time.left</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="txt_format"/>
      </item>
      <item>
@@ -85,19 +316,6 @@
         <string>tuna.gui.output.edit.dialog.logmode</string>
        </property>
       </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">
