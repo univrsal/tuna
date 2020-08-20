@@ -122,9 +122,9 @@ void vlc_obs_source::refresh()
 
     if (vlc) {
         m_current.clear();
-        m_current.set_progress(libvlc_media_player_get_time_(vlc->media_player));
-        m_current.set_duration(libvlc_media_player_get_length_(vlc->media_player));
-        m_current.set_playing(libvlc_media_player_get_state_(vlc->media_player) == libvlc_Playing);
+        m_current.set_progress(obs_source_media_get_time(src));
+        m_current.set_duration(obs_source_media_get_duration(src));
+        m_current.set_playing(obs_source_media_get_state(src) == OBS_MEDIA_STATE_PLAYING);
 
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
         if (m_current.playing() && media) {
