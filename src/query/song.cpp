@@ -182,6 +182,10 @@ int32_t song::get_int_value(char specifier) const
         return m_progress_ms;
     case 'l':
         return m_duration_ms;
+    case 'o':
+        if (m_data & CAP_TIME_LEFT)
+            return m_duration_ms - m_progress_ms;
+        /* Fallthrough */
     default:
         return 0;
     }

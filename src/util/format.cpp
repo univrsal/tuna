@@ -84,18 +84,19 @@ QString time_format(int32_t ms)
 void init()
 {
     /* Register format specifiers with their data */
-    specifiers.emplace_back(std::make_unique<specifier_string>('t', CAP_TITLE));
-    specifiers.emplace_back(std::make_unique<specifier_string>('a', CAP_ALBUM));
-    specifiers.emplace_back(std::make_unique<specifier_string>('y', CAP_RELEASE));
-    specifiers.emplace_back(std::make_unique<specifier_string>('b', CAP_LABEL));
-    specifiers.emplace_back(std::make_unique<specifier_string_list>('m', CAP_ARTIST));
-    specifiers.emplace_back(std::make_unique<specifier_date>('r', CAP_RELEASE));
-    specifiers.emplace_back(std::make_unique<specifier_int>('d', CAP_DISC_NUMBER));
-    specifiers.emplace_back(std::make_unique<specifier_int>('n', CAP_TRACK_NUMBER));
-    specifiers.emplace_back(std::make_unique<specifier_time>('p', CAP_PROGRESS));
-    specifiers.emplace_back(std::make_unique<specifier_time>('l', CAP_DURATION));
-    specifiers.emplace_back(std::make_unique<specifier_static>('e', "\n"));
-    specifiers.emplace_back(std::make_unique<specifier_static>('s', " "));
+    specifiers.emplace_back(new specifier_string('t', CAP_TITLE));
+    specifiers.emplace_back(new specifier_string('a', CAP_ALBUM));
+    specifiers.emplace_back(new specifier_string('y', CAP_RELEASE));
+    specifiers.emplace_back(new specifier_string('b', CAP_LABEL));
+    specifiers.emplace_back(new specifier_string_list('m', CAP_ARTIST));
+    specifiers.emplace_back(new specifier_date('r', CAP_RELEASE));
+    specifiers.emplace_back(new specifier_int('d', CAP_DISC_NUMBER));
+    specifiers.emplace_back(new specifier_int('n', CAP_TRACK_NUMBER));
+    specifiers.emplace_back(new specifier_time('p', CAP_PROGRESS));
+    specifiers.emplace_back(new specifier_time('l', CAP_DURATION));
+    specifiers.emplace_back(new specifier_time('o', CAP_TIME_LEFT));
+    specifiers.emplace_back(new specifier_static('e', "\n"));
+    specifiers.emplace_back(new specifier_static('s', " "));
 }
 
 void execute(QString& q)

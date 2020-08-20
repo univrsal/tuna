@@ -30,28 +30,30 @@
 /* clang-format off */
 
 enum capability {
-    CAP_TITLE = 1 << 0,         /* Song title               */
-    CAP_ARTIST = 1 << 1,        /* Song artitst             */
-    CAP_ALBUM = 1 << 2,         /* Album name               */
-    CAP_RELEASE = 1 << 3,       /* Release date             */
-    CAP_COVER = 1 << 4,         /* Cover image link         */
-    CAP_LYRICS = 1 << 5,        /* Lyrics text link         */
-    CAP_DURATION = 1 << 6,      /* Get song length in ms    */
-    CAP_EXPLICIT = 1 << 7,      /* don't say swears         */
-    CAP_DISC_NUMBER = 1 << 8,   /* Disc number              */
-    CAP_TRACK_NUMBER = 1 << 9,  /* Track number on disk     */
-    CAP_PROGRESS = 1 << 10,     /* Get play progress in ms  */
-    CAP_STATUS = 1 << 11,       /* Get song playing satus   */
-    CAP_LABEL = 1 << 12,        /* Song production label    */
+    CAP_TITLE = 1 << 0,             /* Song title               */
+    CAP_ARTIST = 1 << 1,            /* Song artitst             */
+    CAP_ALBUM = 1 << 2,             /* Album name               */
+    CAP_RELEASE = 1 << 3,           /* Release date             */
+    CAP_COVER = 1 << 4,             /* Cover image link         */
+    CAP_LYRICS = 1 << 5,            /* Lyrics text link         */
+    CAP_DURATION = 1 << 6,          /* Get song length in ms    */
+    CAP_EXPLICIT = 1 << 7,          /* don't say swears         */
+    CAP_DISC_NUMBER = 1 << 8,       /* Disc number              */
+    CAP_TRACK_NUMBER = 1 << 9,      /* Track number on disk     */
+    CAP_PROGRESS = 1 << 10,         /* Get play progress in ms  */
+    CAP_STATUS = 1 << 11,           /* Get song playing satus   */
+    CAP_LABEL = 1 << 12,            /* Song production label    */
+    CAP_TIME_LEFT = CAP_PROGRESS |  /* Duration - Progress      */
+                    CAP_DURATION,
 
     /* Control stuff */
-    CAP_NEXT_SONG = 1 << 16,    /* Skip to next song        */
-    CAP_PREV_SONG = 1 << 17,    /* Go to previous song      */
-    CAP_PLAY_PAUSE = 1 << 18,   /* Toggle play/pause        */
-    CAP_STOP_SONG = 1 << 19,    /* Stop playback            */
-    CAP_VOLUME_UP = 1 << 20,    /* Increase volume          */
-    CAP_VOLUME_DOWN = 1 << 21,  /* Decrease volume          */
-    CAP_VOLUME_MUTE = 1 << 22,  /* Toggle mute              */
+    CAP_NEXT_SONG = 1 << 16,        /* Skip to next song        */
+    CAP_PREV_SONG = 1 << 17,        /* Go to previous song      */
+    CAP_PLAY_PAUSE = 1 << 18,       /* Toggle play/pause        */
+    CAP_STOP_SONG = 1 << 19,        /* Stop playback            */
+    CAP_VOLUME_UP = 1 << 20,        /* Increase volume          */
+    CAP_VOLUME_DOWN = 1 << 21,      /* Decrease volume          */
+    CAP_VOLUME_MUTE = 1 << 22,      /* Toggle mute              */
 };
 
 /* clang-format on */
