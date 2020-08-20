@@ -31,12 +31,13 @@ static bool GetWindowExe(HWND window, string& exe)
     bool result = false;
     DWORD proc_id = 0;
     HANDLE h = NULL;
-    GetWindowThreadProcessId(handle, &proc_id);
+    GetWindowThreadProcessId(h, &proc_id);
     h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, proc_id);
     if (h) {
-        PDWORD len = 1024;
+        PDWORD l = 1024;
+        size_t len = 1024;
         wchar_t buf[1024];
-        result = QueryFullProcessImageNameW(h, NULL, buf, &len);
+        result = QueryFullProcessImageNameW(h, NULL, buf, l);
         if (result) {
             len = os_wcs_to_utf8(buf, 0, nullptr, 0);
             exe.resize(len);
@@ -92,7 +93,7 @@ void GetWindowAndProcessList(vector<tuple<string, string>>& list)
         if (WindowValid(window) && GetWindowTitle(window, title) &&
             GetWindowExe(window, exe))
         {
-            windows.emplace_back(tuple<string, string>(exe, title));    
+            list.emplace_back(tuple<string, string>(exe, title));    
         }
         window = GetNextWindow(window, GW_HWNDNEXT);
     }  
