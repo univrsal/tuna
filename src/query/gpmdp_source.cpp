@@ -21,6 +21,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
 
 gpmdp_source::gpmdp_source()
     : music_source(S_SOURCE_GPMDP, T_SOURCE_GPMDP)
@@ -47,8 +48,8 @@ void gpmdp_source::refresh()
         if (!doc.isObject())
             return;
         auto obj = doc.object();
-        auto song = doc["song"].toObject();
-        auto time = doc["time"].toObject();
+        auto song = obj["song"].toObject();
+        auto time = obj["time"].toObject();
 
         m_current.set_playing(obj["playing"].toBool());
         m_current.set_title(song["title"].toString());
