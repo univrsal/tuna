@@ -169,6 +169,8 @@ set(tuna_sources
     ./src/query/window_source.hpp
     ./src/query/lastfm_source.cpp
     ./src/query/lastfm_source.hpp
+    ./src/query/gpmdp_source.cpp
+    ./src/query/gpmdp_source.hpp
     ./src/query/song.cpp
     ./src/query/song.hpp
     ./src/util/format.cpp

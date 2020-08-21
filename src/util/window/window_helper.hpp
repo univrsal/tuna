@@ -8,8 +8,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <tuple>
+#include <vector>
 
 using namespace std;
 void GetWindowList(vector<string>& windows);

@@ -90,12 +90,9 @@ void GetWindowAndProcessList(vector<tuple<string, string>>& list)
 
     while (window) {
         string title, exe;
-        if (WindowValid(window) && GetWindowTitle(window, title) &&
-            GetWindowExe(window, exe))
-        {
-            list.emplace_back(tuple<string, string>(exe, title));    
+        if (WindowValid(window) && GetWindowTitle(window, title) && GetWindowExe(window, exe)) {
+            list.emplace_back(tuple<string, string>(exe, title));
         }
         window = GetNextWindow(window, GW_HWNDNEXT);
-    }  
+    }
 }
-
