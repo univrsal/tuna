@@ -80,6 +80,8 @@
 #define CFG_WINDOW_CUT_BEGIN 			"window.cut.begin"
 #define CFG_WINDOW_CUT_END 				"window.cut.end"
 #define CFG_WINDOW_REGEX 				"window.regex"
+#define CFG_WINDOW_USE_PROCRESS         "window.use.process"
+#define CFG_WINDOW_PROCESS_NAME         "window.process.name"
 
 #define CFG_DOCK_GEOMETRY				"dock_geometry"
 #define CFG_DOCK_VISIBLE				"dock_visible"

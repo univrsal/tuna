@@ -19,13 +19,19 @@
 #pragma once
 
 #include "music_source.hpp"
+#include <string>
+#include <vector>
+#include <utility>
 
 class window_source : public music_source {
     QString m_title = "";
+    QString m_process_name = "";
     QString m_search = "", m_replace = "", m_pause = "";
     uint16_t m_cut_begin = 0, m_cut_end;
-    bool m_regex = false;
+    bool m_regex = false, m_use_process_name;
 
+    QString get_title(const std::vector<std::string> &windows);
+    QString get_title(const std::vector<std::pair<std::string, std::string>> &processes);
 public:
     window_source();
 

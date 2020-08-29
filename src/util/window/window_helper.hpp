@@ -8,9 +8,9 @@
 #pragma once
 
 #include <string>
-#include <tuple>
+#include <utility>
 #include <vector>
 
 using namespace std;
 void GetWindowList(vector<string>& windows);
-void GetWindowAndExeList(vector<tuple<string, string>>& list);
+void GetWindowAndExeList(vector<pair<string, string>>& list);

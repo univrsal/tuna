@@ -4,10 +4,11 @@
 #include <list>
 #include <obs-module.h>
 #include <string>
-#include <tuple>
 #include <unistd.h>
+#include <utility>
 #include <util/platform.h>
 #include <vector>
+#include "window_helper.hpp"
 
 /*
     https://github.com/obsproject/obs-studio/blob/master/plugins/linux-capture/xcompcap-helper.cpp
@@ -158,11 +159,14 @@ inline string getWindowExe(Window win)
     if (windowPID != None) {
         if (XGetWindowProperty(disp(), win, windowPID, 0, 1, False, XA_CARDINAL,
                 &actualType, &format, &num, &bytes, &propPID)
-            == Success) {
+            == Success)
+        {
             if (propPID != nullptr) {
-                auto pid_str = "/proc/" + to_string(*propPID) + "/exe";
+                int pidInt = *((int*)propPID);
+                auto pid_str = "/proc/" + to_string(pidInt) + "/exe";
                 XFree(propPID);
                 char exe[1024];
+                memset(exe, 0, 1024);
                 if (readlink(pid_str.c_str(), exe, 1024) > 0) {
                     return exe;
                 }
@@ -182,13 +186,13 @@ void GetWindowList(vector<string>& windows)
     }
 }
 
-void GetWindowAndExeList(vector<tuple<string, string>>& list)
+void GetWindowAndExeList(vector<pair<string, string>>& list)
 {
     auto top_level = x11util::getTopLevelWindows();
     for (const auto& window : top_level) {
         auto exe = x11util::getWindowExe(window);
         if (!exe.empty()) {
-            list.emplace_back(tuple<string, string>(exe,
+            list.emplace_back(pair<string, string>(exe,
                 x11util::getWindowName(window)));
         }
     }

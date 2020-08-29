@@ -45,6 +45,8 @@ void window_source::load()
     CDEF_STR(CFG_WINDOW_PAUSE, "");
     CDEF_UINT(CFG_WINDOW_CUT_BEGIN, 0);
     CDEF_UINT(CFG_WINDOW_CUT_END, 0);
+    CDEF_STR(CFG_WINDOW_PROCESS_NAME, "");
+    CDEF_BOOL(CFG_WINDOW_USE_PROCRESS, false);
 
     m_title = utf8_to_qt(CGET_STR(CFG_WINDOW_TITLE));
     m_regex = CGET_BOOL(CFG_WINDOW_REGEX);
@@ -53,20 +55,16 @@ void window_source::load()
     m_pause = utf8_to_qt(CGET_STR(CFG_WINDOW_PAUSE));
     m_cut_begin = CGET_UINT(CFG_WINDOW_CUT_BEGIN);
     m_cut_end = CGET_UINT(CFG_WINDOW_CUT_END);
+    m_use_process_name = CGET_BOOL(CFG_WINDOW_USE_PROCRESS);
+    m_process_name = utf8_to_qt(CGET_STR(CFG_WINDOW_PROCESS_NAME));
 }
 
-void window_source::refresh()
+QString window_source::get_title(const vector<string> &windows)
 {
-    if (m_title.isEmpty())
-        return;
-
-    std::vector<std::string> window_titles;
-    GetWindowList(window_titles);
-
     QRegularExpression regex(m_title);
     QString result = "";
 
-    for (const auto& title : window_titles) {
+    for (const auto& title : windows) {
         bool matches = false;
         if (m_regex) {
             matches = regex.match(title.c_str()).hasMatch();
@@ -82,6 +80,36 @@ void window_source::refresh()
             result = title.c_str();
             break;
         }
+    }
+    return result;
+}
+
+QString window_source::get_title(const vector<pair<string, string> > &processes)
+{
+    QString result = "";
+    for (const auto &p : processes) {
+        if (utf8_to_qt(p.first.c_str()) == m_process_name) {
+            result = utf8_to_qt(p.second.c_str());
+            break;
+        }
+    }
+    return result;
+}
+
+void window_source::refresh()
+{
+    if (m_title.isEmpty())
+        return;
+    QString result;
+
+    if (m_use_process_name) {
+        vector<pair<string, string>> processes;
+        GetWindowAndExeList(processes);
+        result = get_title(processes);
+    } else {
+        vector<string> windows;
+        GetWindowList(windows);
+        result = get_title(windows);
     }
 
     begin_refresh();

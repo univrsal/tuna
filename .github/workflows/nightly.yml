@@ -50,7 +50,7 @@ jobs:
           path: obs-studio
       - name: 'Fetch prune'
         if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
-        run: git fetch --prune --unshallow
+        run: git fetch --prune
       - name: 'Get OBS-Studio git info'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio

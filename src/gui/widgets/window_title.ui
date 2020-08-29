@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>633</width>
-    <height>389</height>
+    <width>532</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,24 +15,88 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_15">
+    <widget class="QRadioButton" name="rb_process_name">
      <property name="text">
-      <string>tuna.gui.tab.windowtitle.title</string>
+      <string>tuna.gui.tab.windowtitle.use.process</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="txt_title"/>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>tuna.gui.tab.windowtitle.processname</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cb_procress_list">
+       <property name="editable">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_17">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_refresh">
+       <property name="text">
+        <string>tuna.gui.vlc.refresh</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QRadioButton" name="rb_window_title">
      <property name="text">
-      <string>tuna.gui.tab.windowtitle.pause</string>
+      <string>tuna.gui.tab.windowtitle.use.title</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="txt_paused"/>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_15">
+       <property name="text">
+        <string>tuna.gui.tab.windowtitle.title</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txt_title"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_17">
+       <property name="text">
+        <string>tuna.gui.tab.windowtitle.pause</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txt_paused"/>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QCheckBox" name="cb_regex">
