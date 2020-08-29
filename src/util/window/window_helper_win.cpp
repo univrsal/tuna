@@ -84,7 +84,7 @@ void GetWindowList(vector<string>& windows)
     }
 }
 
-void GetWindowAndProcessList(vector<pair<string, string>>& list)
+void GetWindowAndExeList(vector<pair<string, string>>& list)
 {
     HWND window = GetWindow(GetDesktopWindow(), GW_CHILD);
 
