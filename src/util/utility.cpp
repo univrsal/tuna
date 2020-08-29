@@ -163,38 +163,22 @@ void download_lyrics(const song& song)
     }
 }
 
-void download_cover(const song& song, bool reset)
+bool download_cover(const song& song)
 {
-    static QString last_cover = "";
-
-    if (reset) {
-        last_cover = "";
-        return;
-    }
-
-    if (!config::download_cover || song.cover() == last_cover)
-        return;
-
-    auto found_cover = false;
+    bool result = false;
     auto path = utf8_to_qt(config::cover_path);
     auto tmp = path + ".tmp";
-
-    if (song.cover() != "n/a")
-        found_cover = curl_download(qt_to_utf8(song.cover()), qt_to_utf8(tmp));
+    result = curl_download(qt_to_utf8(song.cover()), qt_to_utf8(tmp));
 
     /* Replace cover only after download is done */
     QFile current(path);
     current.remove();
 
-    if (found_cover) {
-        if (QFile::rename(tmp, utf8_to_qt(config::cover_path)))
-            last_cover = song.cover();
-        else
-            berr("Couldn't rename temporary cover file");
-    } else if (last_cover != "n/a") {
-        last_cover = "n/a";
-        set_placeholder(true);
+    if (result && !QFile::rename(tmp, utf8_to_qt(config::cover_path))) {
+        berr("Couldn't rename temporary cover file");
+        result = false;
     }
+    return result;
 }
 
 void reset_cover()
@@ -241,14 +225,14 @@ void handle_outputs(const song& s)
         tmp_text = o.format;
         format::execute(tmp_text);
 
-        if (tmp_text.isEmpty() || !s.playing()) {
+        if (tmp_text.isEmpty() || s.state() >= state_paused) {
             tmp_text = config::placeholder;
             /* OBS seems to cut leading and trailing spaces
              * when loading the config file so this workaround
              * allows users to still use them */
             tmp_text.replace("%s", " ");
         }
-        if (!s.playing() && o.log_mode)
+        if (s.state() >= state_paused && o.log_mode)
             continue; /* No song playing text doesn't make sense in the log */
         write_song(o, tmp_text);
     }
@@ -266,40 +250,6 @@ bool window_pos_valid(QRect rect)
             return true;
     }
     return false;
-}
-
-void set_placeholder(bool on)
-{
-    static int8_t last_state = -1;
-
-    if (on == last_state)
-        return;
-    last_state = on;
-
-    if (on) {
-        auto path = utf8_to_qt(config::cover_path);
-        QFile current(path);
-        QString cover_off(path + ".off");
-        QFile cover_file(path + "");
-
-        if (cover_file.exists() && !cover_file.remove())
-            berr("Couldn't remove '%s'", qt_to_utf8(cover_off));
-
-        if (current.exists() && !current.rename(cover_off))
-            berr("Couldn't move '%s' to '%s' file", config::cover_path, qt_to_utf8(cover_off));
-        if (!QFile::copy(utf8_to_qt(config::cover_placeholder), path))
-            berr("Couldn't copy '%s' to '%s'", config::cover_placeholder, qt_to_utf8(path));
-    } else {
-        auto path = utf8_to_qt(config::cover_path);
-        QFile current(path);
-        QString cover_off(path + ".off");
-        QFile cover_file(cover_off);
-
-        if (current.exists() && !current.remove())
-            berr("Couldn't remove '%s'", qt_to_utf8(path));
-        if (cover_file.exists() && !QFile::rename(cover_off, path))
-            berr("Couldn't move '%s' to '%s'", qt_to_utf8(cover_off), config::cover_path);
-    }
 }
 
 size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)

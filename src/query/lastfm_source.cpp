@@ -48,6 +48,8 @@ void lastfm_source::refresh()
      */
     if (!m_custom_api_key && os_gettime_ns() < m_next_refresh)
         return;
+
+    begin_refresh();
     m_current.clear();
     QString track_request = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user="
         + m_username + "&api_key=" + m_api_key + "&limit=1&format=json";
@@ -81,9 +83,9 @@ void lastfm_source::parse_song(const QJsonObject& s)
 {
     if (s["@attr"].isObject()) {
         auto attr_obj = s["@attr"].toObject();
-        m_current.set_playing(attr_obj["nowplaying"].toString() == "true");
+        m_current.set_state(attr_obj["nowplaying"].toString() == "true" ? state_playing : state_stopped);
 
-        if (m_current.playing()) {
+        if (m_current.state()) {
             auto covers = s["image"];
             if (covers.isArray() && covers.toArray().size() > 0) {
                 auto cover_array = covers.toArray();

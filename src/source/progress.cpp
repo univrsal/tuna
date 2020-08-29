@@ -17,7 +17,6 @@
  *************************************************************************/
 
 #include "progress.hpp"
-#include "../query/music_source.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 
@@ -36,8 +35,8 @@ void progress_source::tick(float seconds)
     thread::copy_mutex.lock();
     tmp = thread::copy;
     thread::copy_mutex.unlock();
-    m_active = tmp.playing();
-    if (m_active) {
+    m_state = tmp.state();
+    if (m_state == state_playing) {
         seconds *= 1000; /* s -> ms */
         if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
             if (tmp.get_int_value('p') != m_synced_progress) {
@@ -53,7 +52,7 @@ void progress_source::tick(float seconds)
         float duration = tmp.get_int_value('l');
         if (duration > 0)
             m_progress = m_adjusted_progress / duration;
-    } else {
+    } else if (m_state == state_paused) {
         float step = 0.0005f * m_cx;
         if (m_bounce_up)
             m_bounce_progress = fmin(m_bounce_progress + seconds * step, 1.f);
@@ -68,7 +67,7 @@ void progress_source::tick(float seconds)
 void progress_source::render(gs_effect_t* effect)
 {
     UNUSED_PARAMETER(effect);
-    if (m_hide_paused && !m_active)
+    if (m_hide_paused && m_state >= state_paused)
         return;
 
     gs_effect_t* solid = obs_get_base_effect(OBS_EFFECT_SOLID);
@@ -91,7 +90,7 @@ void progress_source::render(gs_effect_t* effect)
 
     gs_effect_set_vec4(color, &fg);
 
-    if (m_active) {
+    if (m_state == state_playing) {
         uint32_t progress = static_cast<uint32_t>(m_cx * m_progress);
         if (progress > 0) {
             gs_technique_begin(tech);
@@ -100,7 +99,7 @@ void progress_source::render(gs_effect_t* effect)
             gs_technique_end_pass(tech);
             gs_technique_end(tech);
         }
-    } else {
+    } else if (m_state == state_paused) {
         uint32_t w = static_cast<uint32_t>(m_cx * .25);
         uint32_t x = static_cast<uint32_t>(m_bounce_progress * (m_cx - w));
         if (w > 0) {

@@ -32,15 +32,16 @@
 
 namespace config {
 
+QList<output> outputs;
 config_t* instance = nullptr;
 uint16_t refresh_rate = 1000;
 const char* placeholder = nullptr;
 const char* cover_path = nullptr;
 const char* lyrics_path = nullptr;
 const char* selected_source = nullptr;
-QList<output> outputs;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;
+bool placeholder_when_paused = true;
 
 void init()
 {
@@ -58,6 +59,7 @@ void init()
     CDEF_STR(CFG_SELECTED_SOURCE, S_SOURCE_SPOTIFY);
     CDEF_STR(CFG_SPOTIFY_CLIENT_ID, "847d7cf0c5dc4ff185161d1f000a9d0e");
 
+    CDEF_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, true);
     CDEF_BOOL(CFG_RUNNING, false);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, true);
     CDEF_BOOL(CFG_FORCE_VLC_DECISION, false);
@@ -86,6 +88,7 @@ void load()
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
     selected_source = CGET_STR(CFG_SELECTED_SOURCE);
+    placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
 
     /* Sources */
     thread::thread_mutex.lock();

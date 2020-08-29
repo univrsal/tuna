@@ -142,13 +142,10 @@ void tuna_gui::on_tuna_gui_accepted()
     }
 
     config::refresh_rate = ui->sb_refresh_rate->value();
+    if (music_control)
+        music_control->thread_changed(thread::thread_flag);
     thread::thread_mutex.unlock();
     config::load();
-
-    if (music_control) {
-        emit music_control->source_changed();
-        emit music_control->thread_changed();
-    }
 }
 
 void tuna_gui::on_apply_pressed()

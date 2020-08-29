@@ -95,10 +95,9 @@ void spotify_source::load()
     build_credentials();
 }
 
-bool spotify_source::valid_format(const QString& str)
+bool spotify_source::valid_format(const QString &)
 {
     /* Supports all specifiers */
-    UNUSED_PARAMETER(str);
     return true;
 }
 
@@ -126,6 +125,8 @@ void spotify_source::refresh()
 {
     if (!m_logged_in)
         return;
+
+    begin_refresh();
 
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
@@ -162,9 +163,7 @@ void spotify_source::refresh()
 
         /* If an ad is playing we assume playback is paused */
         if (play_type.isString() && play_type.toString() == "ad") {
-            m_current.set_playing(false);
-            util::reset_cover();
-            util::download_cover(m_current, true);
+            m_current.set_state(state_paused);
             return;
         }
 
@@ -173,26 +172,17 @@ void spotify_source::refresh()
                 berr("Spotify session is private! Can't read track");
             } else {
                 parse_track_json(obj["item"]);
-                m_current.set_playing(playing.toBool());
-
-                if (m_current.playing()) {
-                    util::download_cover(m_current);
-                } else if (m_last_state) {
-                    util::reset_cover();
-                    util::download_cover(m_current, true);
-                }
+                m_current.set_state(playing.toBool() ? state_playing : state_stopped);
             }
             m_current.set_progress(progress.toInt());
         } else {
             QString str(response.toJson());
             berr("Couldn't fetch song data from spotify json: %s", str.toStdString().c_str());
         }
-        m_last_state = m_current.playing();
+        m_last_state = m_current.state();
     } else if (http_code == HTTP_NO_CONTENT) {
         /* No session running */
         m_current.clear();
-        util::reset_cover();
-        util::download_cover(m_current, true);
     } else {
         /* Don't reset cover or info here since
          * we're just waiting for the API to give a proper
@@ -264,7 +254,7 @@ bool spotify_source::execute_capability(capability c)
 
     switch (c) {
     case CAP_PLAY_PAUSE:
-        if (m_current.playing()) {
+        if (m_current.state()) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
             http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, true);

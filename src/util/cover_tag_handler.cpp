@@ -173,24 +173,13 @@ bool get_embedded(const TagLib::FileRef& fr)
     return found;
 }
 
-bool find_embedded_cover(const QString& path, bool reset)
+bool find_embedded_cover(const QString& path)
 {
-    static QString last_file = "";
     bool result = false;
 
-    if (reset) {
-        last_file = "";
-        return false;
-    }
-
-    if (last_file == path) {
-        result = true;
-    } else {
-        TagLib::FileRef fr(qt_to_utf8(path), false);
-        if (!fr.isNull())
-            result = get_embedded(fr);
-        last_file = path;
-    }
+    TagLib::FileRef fr(qt_to_utf8(path), false);
+    if (!fr.isNull())
+        result = get_embedded(fr);
     return result;
 }
 
@@ -211,9 +200,9 @@ bool find_local(const QString& filename, const QString& folder, QString& out)
     return false;
 }
 
-bool find_local_cover(const QString& path, QString& cover_out)
+bool find_local_cover(const QString& folder, QString& cover_out)
 {
-    return find_local("cover", path, cover_out) || find_local("folder", path, cover_out);
+    return find_local("cover", folder, cover_out) || find_local("folder", folder, cover_out);
 }
 
 void get_file_folder(QString& path)

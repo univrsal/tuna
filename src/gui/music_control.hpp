@@ -3,6 +3,9 @@
 #include "scrolltext.hpp"
 #include <QDockWidget>
 #include <QTimer>
+#include <memory>
+
+class music_source;
 
 namespace Ui {
 class music_Control;
@@ -17,30 +20,20 @@ public:
 
     void save_settings();
 
-    virtual void closeEvent(QCloseEvent* event);
-signals:
-    void source_changed();
-    void thread_changed();
+    void refresh_source(std::shared_ptr<music_source> src);
+    void thread_changed(bool state);
 
-private Q_SLOTS:
-    void on_source_changed();
-    void on_thread_changed();
+private slots:
     void refresh_play_state();
     void showcontextmenu(const QPoint& pos);
     void toggle_title();
     void toggle_volume();
-private slots:
 
     void on_btn_prev_clicked();
-
     void on_btn_play_pause_clicked();
-
     void on_btn_next_clicked();
-
     void on_btn_stop_clicked();
-
     void on_btn_voldown_clicked();
-
     void on_btn_volup_clicked();
 
 private:

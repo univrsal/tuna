@@ -108,6 +108,24 @@ struct vlc_source* vlc_obs_source::get_vlc()
     return data;
 }
 
+static play_state from_obs_state(obs_media_state s)
+{
+    switch (s) {
+    case OBS_MEDIA_STATE_PLAYING:
+        return state_playing;
+    case OBS_MEDIA_STATE_BUFFERING:
+    case OBS_MEDIA_STATE_OPENING:
+    case OBS_MEDIA_STATE_PAUSED:
+        return state_paused;
+    case OBS_MEDIA_STATE_STOPPED:
+        return state_paused;
+    default:
+    case OBS_MEDIA_STATE_NONE:
+    case OBS_MEDIA_STATE_ERROR:
+        return state_unknown;
+    }
+}
+
 void vlc_obs_source::refresh()
 {
 
@@ -120,14 +138,16 @@ void vlc_obs_source::refresh()
     if (!src)
         return;
 
+    begin_refresh();
+    m_current.clear();
+
     if (vlc) {
-        m_current.clear();
         m_current.set_progress(obs_source_media_get_time(src));
         m_current.set_duration(obs_source_media_get_duration(src));
-        m_current.set_playing(obs_source_media_get_state(src) == OBS_MEDIA_STATE_PLAYING);
+        m_current.set_state(from_obs_state(obs_source_media_get_state(src)));
 
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
-        if (m_current.playing() && media) {
+        if (m_current.state() && media) {
             const char* title = libvlc_media_get_meta_(media, libvlc_meta_Title);
             const char* artists = libvlc_media_get_meta_(media, libvlc_meta_Artist);
             const char* year = libvlc_media_get_meta_(media, libvlc_meta_Date);
@@ -153,16 +173,7 @@ void vlc_obs_source::refresh()
                 m_current.set_track_number(utf8_to_qt(num).toUInt());
             if (disc)
                 m_current.set_track_number(utf8_to_qt(disc).toUInt());
-
-            util::download_cover(m_current);
-        } else {
-            m_current.clear();
-            util::download_cover(m_current, true);
-            util::reset_cover();
         }
-    } else {
-        m_current.clear();
-        util::reset_cover();
     }
 
     obs_source_release(src);

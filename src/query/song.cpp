@@ -36,24 +36,29 @@ void song::clear()
     m_track_number = 0;
     m_duration_ms = 0;
     m_progress_ms = 0;
-    m_is_playing = false;
+    m_is_playing = state_unknown;
     m_is_explicit = false;
     m_release_precision = prec_unknown;
     m_day = "";
     m_month = "";
     m_year = "";
+    m_full_release = "";
 }
 
 void song::update_release_precision()
 {
     if (!m_day.isEmpty() && !m_month.isEmpty() && !m_year.isEmpty()) {
         m_release_precision = prec_day;
+        m_full_release = m_year + "." + m_month + "." + m_day;
     } else if (!m_month.isEmpty() && !m_year.isEmpty()) {
         m_release_precision = prec_month;
+        m_full_release = m_year + "." + m_month;
     } else if (!m_year.isEmpty()) {
         m_release_precision = prec_year;
+        m_full_release = m_year;
     } else {
         m_release_precision = prec_unknown;
+        m_full_release = "";
     }
 }
 
@@ -112,7 +117,7 @@ void song::set_explicit(bool e)
     m_is_explicit = e;
 }
 
-void song::set_playing(bool p)
+void song::set_state(play_state p)
 {
     m_data |= CAP_STATUS;
     m_is_playing = p;
@@ -162,6 +167,8 @@ const QString& song::get_string_value(char specifier) const
         return m_title;
     case 'a':
         return m_album;
+    case 'r':
+        return m_full_release;
     case 'y':
         return m_year;
     case 'b':
@@ -189,4 +196,17 @@ int32_t song::get_int_value(char specifier) const
     default:
         return 0;
     }
+}
+
+bool song::operator==(const song& other) const
+{
+    /* basically compare all data that shouldn't change in between
+     * updates, unless the song changes
+     */
+    return state() == other.state() && data() == other.data() && cover() == other.cover() && label() == other.label() && get_int_value('d') == other.get_int_value('d') && get_int_value('a') == other.get_int_value('a') && get_int_value('l') == other.get_int_value('l') && get_string_value('t') == other.get_string_value('t') && get_string_value('a') == other.get_string_value('a') && get_string_value('y') == other.get_string_value('y') && get_string_value('b') == other.get_string_value('b') && get_string_value('r') == other.get_string_value('r');
+}
+
+bool song::operator!=(const song& other) const
+{
+    return !((*this) == other);
 }

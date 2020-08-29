@@ -18,6 +18,8 @@
 
 #include "music_source.hpp"
 #include "../gui/tuna_gui.hpp"
+#include "../gui/music_control.hpp"
+#include "../util/config.hpp"
 #include "../util/cover_tag_handler.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
@@ -61,7 +63,14 @@ void select(const char* id)
 {
     if (!id)
         return;
+
+    auto selected = selected_source();
+    if (selected && strcmp(selected->id(), id) == 0)
+        return;
+
     thread::thread_mutex.lock();
+    if (selected)
+        selected->reset_info();
     int i = 0;
     for (auto src : instances) {
         if (strcmp(src->id(), id) == 0) {
@@ -70,11 +79,9 @@ void select(const char* id)
         }
         i++;
     }
-    /* ensure cover will be refreshed after changing source */
-    song s;
-    util::download_cover(s, true);
-    util::set_placeholder(true);
-    cover::find_embedded_cover("", true);
+
+    /* Ensure that cover is set to place holder on switch */
+    util::reset_cover();
     thread::thread_mutex.unlock();
 }
 
@@ -137,4 +144,17 @@ void music_source::set_gui_values()
 {
     if (m_settings_tab)
         m_settings_tab->load_settings();
+}
+
+void music_source::handle_cover()
+{
+    if (m_current == m_prev)
+        return;
+
+    if (m_current.state() == state_playing) {
+        if (!util::download_cover(m_current))
+            util::reset_cover();
+    } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
+        util::reset_cover();
+    }
 }

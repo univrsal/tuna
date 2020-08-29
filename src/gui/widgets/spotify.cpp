@@ -46,6 +46,13 @@ void spotify::save_settings()
 {
     CSET_STR(CFG_SPOTIFY_CLIENT_ID, qt_to_utf8(ui->txt_client_id->text()));
     CSET_STR(CFG_SPOTIFY_CLIENT_SECRET, qt_to_utf8(ui->txt_secret->text()));
+    auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
+    if (spotify) {
+        CSET_STR(CFG_SPOTIFY_AUTH_CODE, qt_to_utf8(spotify->auth_code()));
+        CSET_STR(CFG_SPOTIFY_TOKEN, qt_to_utf8(spotify->token()));
+        CSET_STR(CFG_SPOTIFY_REFRESH_TOKEN, qt_to_utf8(spotify->refresh_token()));
+        CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, spotify->is_logged_in());
+    }
 }
 
 void spotify::on_btn_id_show_pressed()

@@ -18,6 +18,7 @@
 
 #include "tuna_thread.hpp"
 #include "../gui/tuna_gui.hpp"
+#include "../gui/music_control.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
 #include "utility.hpp"
@@ -54,7 +55,6 @@ void stop()
     util::handle_outputs(src->song_info());
     thread_flag = false;
     thread_mutex.unlock();
-    util::set_placeholder(true);
     thread_handle.join();
 }
 
@@ -75,8 +75,13 @@ void thread_method()
             copy_mutex.lock();
             copy = s;
             copy_mutex.unlock();
+
             /* Process song data */
             util::handle_outputs(s);
+            if (config::download_cover)
+                ref->handle_cover();
+
+            if (music_control)
             thread_mutex.unlock();
         }
 
@@ -85,5 +90,6 @@ void thread_method()
         uint64_t wait = config::refresh_rate - delta;
         os_sleep_ms(wait);
     }
+    util::reset_cover();
 }
 }

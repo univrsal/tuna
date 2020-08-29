@@ -21,18 +21,28 @@
 #include <QString>
 #include <stdint.h>
 
-enum date_precision { prec_day,
+enum date_precision {
+    prec_day,
     prec_month,
     prec_year,
-    prec_unknown };
+    prec_unknown
+};
+
+enum play_state {
+    state_playing,
+    state_paused,
+    state_stopped,
+    state_unknown
+};
 
 class song {
     uint16_t m_data;
     QString m_title, m_album, m_cover, m_lyrics, m_label;
     QList<QString> m_artists;
-    QString m_year, m_month, m_day;
+    QString m_year, m_month, m_day, m_full_release;
     int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
-    bool m_is_explicit, m_is_playing;
+    bool m_is_explicit;
+    play_state m_is_playing;
     date_precision m_release_precision;
 
 public:
@@ -45,7 +55,7 @@ public:
     void set_progress(int ms);
     void set_album(const QString& album);
     void set_explicit(bool e);
-    void set_playing(bool p);
+    void set_state(play_state p);
     void set_disc_number(int i);
     void set_track_number(int i);
     void set_year(const QString& y);
@@ -54,7 +64,7 @@ public:
     void set_label(const QString& l);
     void clear();
 
-    bool playing() const { return m_is_playing; }
+    play_state state() const { return m_is_playing; }
     uint16_t data() const { return m_data; }
     const QString& cover() const { return m_cover; }
     const QString& lyrics() const { return m_lyrics; }
@@ -67,4 +77,7 @@ public:
     const QList<QString>& artists() const { return m_artists; }
     int32_t get_int_value(char specifier) const;
     date_precision release_precision() const { return m_release_precision; }
+
+    bool operator==(const song& other) const;
+    bool operator!=(const song& other) const;
 };

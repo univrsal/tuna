@@ -34,6 +34,7 @@
 #define berr(format, ...) write_log(LOG_ERROR, format, ##__VA_ARGS__)
 
 #define SECOND_TO_NS 1000000000
+
 class song;
 
 namespace util {
@@ -45,15 +46,13 @@ void unload_vlc();
 
 bool curl_download(const char* url, const char* path);
 
-void download_cover(const song& song, bool reset = false);
+bool download_cover(const song& song);
 
 void reset_cover();
 
 void download_lyrics(const song& song);
 
 void handle_outputs(const song& song);
-
-void set_placeholder(bool on);
 
 int64_t epoch();
 

@@ -58,6 +58,12 @@ void mpd_source::disconnect()
     m_connected = false;
 }
 
+void mpd_source::reset_info()
+{
+    music_source::reset_info();
+    disconnect();
+}
+
 void mpd_source::connect()
 {
     bdebug("Opening MPD connection to %s:%hu", qt_to_utf8(m_address), m_port);
@@ -96,27 +102,39 @@ void mpd_source::load()
     m_local = CGET_BOOL(CFG_MPD_LOCAL);
 }
 
+static inline play_state from_mpd_state(mpd_state s)
+{
+    switch (s) {
+    case MPD_STATE_PLAY:
+        return state_playing;
+    case MPD_STATE_PAUSE:
+        return state_paused;
+    case MPD_STATE_STOP:
+        return state_stopped;
+    default:
+    case MPD_STATE_UNKNOWN:
+        return state_unknown;
+    }
+}
+
 void mpd_source::refresh()
 {
     if (!m_connected)
         connect();
-    if (!m_connected) {
-        util::set_placeholder(true);
-        return;
-    }
 
-    bool old_state = m_current.playing();
+    begin_refresh();
     m_current.clear();
+
+    if (!m_connected)
+        return;
 
     m_status = mpd_run_status(m_connection);
     m_mpd_song = mpd_run_current_song(m_connection);
 
     if (m_status) {
-        bool new_state = mpd_status_get_state(m_status) == MPD_STATE_PLAY;
+        auto new_state = mpd_status_get_state(m_status);
         m_current.set_progress(mpd_status_get_elapsed_ms(m_status));
-        if (new_state != old_state)
-            util::set_placeholder(!new_state);
-        m_current.set_playing(new_state);
+        m_current.set_state(from_mpd_state(new_state));
     }
 
 /* Thanks ubuntu for using ancient packages */
@@ -148,35 +166,45 @@ void mpd_source::refresh()
 
         m_current.set_duration(mpd_song_get_duration_ms(m_mpd_song));
 
+        /* Absolute path to current song file */
         QString file_path = mpd_song_get_uri(m_mpd_song);
-        QString tmp;
         file_path.prepend(m_base_folder);
-
-        if (m_current.playing()) {
-            if (!cover::find_embedded_cover(file_path)) {
-                cover::get_file_folder(file_path);
-
-                if (!file_path.startsWith("http")) /* this is not a url */
-                    file_path.prepend("file://");
-                cover::find_local_cover(file_path, tmp);
-                m_current.set_cover_link(tmp);
-                util::download_cover(m_current);
-            }
-        } else {
-            util::download_cover(m_current);
-        }
-    } else {
-        cover::find_embedded_cover("", true);
-        util::download_cover(m_current);
+        m_current.set_cover_link(file_path);
     }
 
     if (m_mpd_song)
         mpd_song_free(m_mpd_song);
     m_mpd_song = nullptr;
-
     if (m_status)
         mpd_status_free(m_status);
     m_status = nullptr;
+}
+
+void mpd_source::handle_cover()
+{
+    if (m_current == m_prev)
+        return;
+
+    if (m_current.state() == state_playing) {
+        bool result = false;
+        QString file_path = m_current.cover(), tmp;
+        if (cover::find_embedded_cover(file_path)) {
+            result = true;
+        } else {
+            cover::get_file_folder(file_path);
+            file_path.prepend("file://");
+
+            /* try to find a cover image in the same folder*/
+            if (cover::find_local_cover(file_path, tmp)) {
+                m_current.set_cover_link(tmp);
+                result = util::download_cover(m_current);
+            }
+        }
+        if (!result)
+            util::reset_cover();
+    } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
+        util::reset_cover();
+    }
 }
 
 bool mpd_source::execute_capability(capability c)
@@ -216,9 +244,8 @@ bool mpd_source::execute_capability(capability c)
     return result;
 }
 
-bool mpd_source::valid_format(const QString& str)
+bool mpd_source::valid_format(const QString&)
 {
     /* Supports all specifiers */
-    UNUSED_PARAMETER(str);
     return true;
 }

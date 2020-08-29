@@ -64,8 +64,10 @@ class music_source : public QObject {
 
 protected:
     uint32_t m_capabilities = 0x0;
-    song m_current = {};
+    song m_current = {}, m_prev = {};
     source_widget* m_settings_tab = nullptr;
+
+    void begin_refresh() { m_prev = m_current; }
 
 public:
     music_source(const char* id, const char* name, source_widget* w = nullptr);
@@ -78,7 +80,11 @@ public:
     bool has_capability(capability c) const { return m_capabilities & ((uint16_t)c); }
 
     const song& song_info() const { return m_current; }
-    void reset_info() { m_current.clear(); }
+    virtual void reset_info()
+    {
+        m_current.clear();
+        m_prev.clear();
+    }
     const char* name() const { return m_name; }
     const char* id() const { return m_id; }
 
@@ -93,6 +99,7 @@ public:
     virtual bool execute_capability(capability c) = 0;
     virtual void set_gui_values();
     virtual bool valid_format(const QString& str) = 0;
+    virtual void handle_cover();
 };
 
 namespace music_sources {

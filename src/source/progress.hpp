@@ -17,8 +17,8 @@
  *************************************************************************/
 
 #pragma once
+#include "../query/music_source.hpp"
 #include <obs-module.h>
-
 namespace obs_sources {
 
 class progress_source {
@@ -33,7 +33,7 @@ class progress_source {
     /* Song progress adjusted with frame time */
     float m_adjusted_progress = 0.f;
     bool m_bounce_up = true;
-    bool m_active = false;
+    play_state m_state = state_unknown;
     bool m_use_bg = true;
     bool m_hide_paused = false;
 

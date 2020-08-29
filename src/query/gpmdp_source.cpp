@@ -51,7 +51,7 @@ void gpmdp_source::refresh()
         auto song = obj["song"].toObject();
         auto time = obj["time"].toObject();
 
-        m_current.set_playing(obj["playing"].toBool());
+        m_current.set_state(obj["playing"].toBool() ? state_playing : state_stopped);
         m_current.set_title(song["title"].toString());
         m_current.append_artist(song["artist"].toString());
         m_current.set_album(song["album"].toString());
@@ -63,6 +63,8 @@ void gpmdp_source::refresh()
         util::download_cover(m_current);
         file.close();
     }
+
+    begin_refresh();
 }
 
 bool gpmdp_source::valid_format(const QString& str)

@@ -45,6 +45,7 @@
 #define CFG_RUNNING 					"running"
 #define CFG_SONG_PATH 					"song_path"
 #define CFG_COVER_PATH 					"cover_path"
+#define CFG_PLACEHOLDER_WHEN_PAUSED     "placeholder_when_paused"
 #define CFG_LYRICS_PATH 				"lyrics_path"
 #define CFG_SELECTED_SOURCE 			"music.source"
 #define CFG_REFRESH_RATE 				"refresh_rate"
@@ -105,6 +106,7 @@ extern const char* lyrics_path;
 extern QList<output> outputs;
 extern const char* cover_placeholder;
 extern bool download_cover;
+extern bool placeholder_when_paused;
 
 void init();
 

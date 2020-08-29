@@ -35,14 +35,9 @@ music_Control::music_Control(QWidget* parent)
     connect(m_timer, SIGNAL(timeout()), SLOT(refresh_play_state()));
 
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showcontextmenu(const QPoint&)));
-    connect(this, &music_Control::source_changed, this, &music_Control::on_source_changed);
-    connect(this, &music_Control::thread_changed, this, &music_Control::on_thread_changed);
 
     /* This is dependent on tuna thread speed so lowering this wouldn't make a difference */
     m_timer->start(500);
-    /* Wait for config to load and then check update dock according to selected source */
-    QTimer::singleShot(3000, this, SLOT(on_source_changed()));
-    QTimer::singleShot(3000, this, SLOT(on_thread_changed()));
 
     m_song_text = new scroll_text(this);
     m_song_text->setMinimumWidth(200);
@@ -52,8 +47,6 @@ music_Control::music_Control(QWidget* parent)
     ui->volume_widget->setVisible(CGET_BOOL(CFG_DOCK_VOLUME_VISIBLE));
     m_song_text->setVisible(CGET_BOOL(CFG_DOCK_INFO_VISIBLE));
 }
-
-void music_Control::closeEvent(QCloseEvent* event) { }
 
 void music_Control::save_settings()
 {
@@ -97,13 +90,13 @@ void music_Control::refresh_play_state()
     thread::copy_mutex.lock();
     copy = thread::copy;
     thread::copy_mutex.unlock();
-    QString icon = copy.playing() ? "://images/icons/pause.svg" : "://images/icons/play.svg";
+    QString icon = copy.state() == state_playing ? "://images/icons/pause.svg" : "://images/icons/play.svg";
     ui->btn_play_pause->setIcon(QIcon(icon));
 
     /* refresh song info */
     if (copy.get_string_value('t') != last_title) {
         QString info = utf8_to_qt(T_DOCK_SONG_INFO);
-        if (copy.playing()) {
+        if (copy.state() <= state_paused) {
             last_title = copy.get_string_value('t');
             QString artists, title = copy.get_string_value('t');
 
@@ -118,11 +111,11 @@ void music_Control::refresh_play_state()
         info.replace("%s", " ");
         m_song_text->set_text(info);
     }
+    refresh_source(music_sources::selected_source());
 }
 
-void music_Control::on_source_changed()
+void music_Control::refresh_source(std::shared_ptr<music_source> src)
 {
-    auto src = music_sources::selected_source();
     uint32_t flags = 0;
     if (src)
         flags = src->get_capabilities();
@@ -152,11 +145,8 @@ void music_Control::on_source_changed()
     save_settings();
 }
 
-void music_Control::on_thread_changed()
+void music_Control::thread_changed(bool state)
 {
-    thread::thread_mutex.lock();
-    auto state = thread::thread_flag;
-    thread::thread_mutex.unlock();
     setEnabled(state);
 }
 
