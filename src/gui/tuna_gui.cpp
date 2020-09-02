@@ -39,7 +39,8 @@ tuna_gui::tuna_gui(QWidget* parent)
     , ui(new Ui::tuna_gui)
 {
     ui->setupUi(this);
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(on_apply_pressed()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,
+            this, &tuna_gui::on_apply_pressed);
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -142,8 +143,6 @@ void tuna_gui::on_tuna_gui_accepted()
     }
 
     config::refresh_rate = ui->sb_refresh_rate->value();
-    if (music_control)
-        music_control->thread_changed(thread::thread_flag);
     thread::thread_mutex.unlock();
     config::load();
 }

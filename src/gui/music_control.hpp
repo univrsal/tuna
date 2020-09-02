@@ -18,10 +18,6 @@ public:
     explicit music_Control(QWidget* parent = nullptr);
     ~music_Control();
 
-    void save_settings();
-
-    void refresh_source(std::shared_ptr<music_source> src);
-    void thread_changed(bool state);
 
 private slots:
     void refresh_play_state();
@@ -37,6 +33,9 @@ private slots:
     void on_btn_volup_clicked();
 
 private:
+    void save_settings();
+    void refresh_source();
+    bool last_thread_state = false;
     Ui::music_Control* ui;
     QTimer* m_timer = nullptr;
     scroll_text* m_song_text = nullptr;

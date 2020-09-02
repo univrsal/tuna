@@ -30,18 +30,6 @@
 #include <QTextStream>
 #endif
 
-class format_validator : public QValidator {
-public:
-    QValidator::State validate(QString& str, int&) const override
-    {
-        auto src = music_sources::selected_source();
-        if (src) {
-            return src->valid_format(str) ? QValidator::State::Acceptable : QValidator::State::Invalid;
-        }
-        return QValidator::State::Acceptable;
-    }
-};
-
 output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     : QDialog(parent)
     , ui(new Ui::output_edit_dialog)
@@ -49,6 +37,7 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
 {
     ui->setupUi(this);
     m_tuna = dynamic_cast<tuna_gui*>(parent);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     ui->tableWidget->setColumnWidth(0, 40);
     ui->tableWidget->setColumnWidth(1, 180);
@@ -96,8 +85,14 @@ void output_edit_dialog::on_buttonBox_accepted()
     }
 
     auto src = music_sources::selected_source();
-    if (src && !src->valid_format(ui->txt_format->text()))
-        QMessageBox::warning(this, T_OUTPUT_ERROR_TITLE, T_OUTPUT_ERROR_FORMAT);
+    if (src && !src->valid_format(ui->txt_format->text())) {
+        if (QMessageBox::question(this, T_ERROR_TITLE, T_OUTPUT_ERROR_FORMAT) ==
+            QMessageBox::StandardButton::No)
+        {
+            /* User wants to remove unsupported format options */
+            return;
+        }
+    }
 
     if (m_mode == edit_mode::create) {
         m_tuna->add_output(ui->txt_format->text(), ui->txt_path->text(), ui->cb_logmode->isChecked());

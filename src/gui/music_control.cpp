@@ -37,7 +37,7 @@ music_Control::music_Control(QWidget* parent)
     connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showcontextmenu(const QPoint&)));
 
     /* This is dependent on tuna thread speed so lowering this wouldn't make a difference */
-    m_timer->start(500);
+    m_timer->start(700);
 
     m_song_text = new scroll_text(this);
     m_song_text->setMinimumWidth(200);
@@ -87,6 +87,7 @@ void music_Control::refresh_play_state()
 {
     static QString last_title = "";
     song copy;
+
     thread::copy_mutex.lock();
     copy = thread::copy;
     thread::copy_mutex.unlock();
@@ -111,14 +112,19 @@ void music_Control::refresh_play_state()
         info.replace("%s", " ");
         m_song_text->set_text(info);
     }
-    refresh_source(music_sources::selected_source());
+    thread::thread_mutex.lock();
+    refresh_source();
+    last_thread_state = thread::thread_flag;
+    setEnabled(thread::thread_flag);
+    thread::thread_mutex.unlock();
+    save_settings();
 }
 
-void music_Control::refresh_source(std::shared_ptr<music_source> src)
+void music_Control::refresh_source()
 {
     uint32_t flags = 0;
-    if (src)
-        flags = src->get_capabilities();
+    if (music_sources::selected_source_unsafe())
+        flags = music_sources::selected_source_unsafe()->get_capabilities();
 
     bool next = flags & CAP_NEXT_SONG, prev = flags & CAP_NEXT_SONG, play = flags & CAP_PLAY_PAUSE,
          stop = flags & CAP_STOP_SONG;
@@ -142,12 +148,6 @@ void music_Control::refresh_source(std::shared_ptr<music_source> src)
     } else {
         ui->volume_widget->setVisible(false);
     }
-    save_settings();
-}
-
-void music_Control::thread_changed(bool state)
-{
-    setEnabled(state);
 }
 
 void music_Control::on_btn_stop_clicked()
