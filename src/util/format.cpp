@@ -21,7 +21,6 @@
 #include "../query/song.hpp"
 #include "../util/config.hpp"
 #include "../util/tuna_thread.hpp"
-#include <memory>
 
 namespace format {
 
@@ -193,5 +192,11 @@ bool specifier_date::do_format(QString& slice, const song& s) const
     }
     return replace(slice, s, data);
 }
+
+const std::vector<std::unique_ptr<specifier>>& get_specifiers()
+{
+    return specifiers;
+}
+
 
 }

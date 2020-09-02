@@ -29,6 +29,5 @@ public:
     void load() override {};
     void refresh() override;
     bool execute_capability(capability) override { return false; };
-    bool valid_format(const QString& str) override;
     bool enabled() const override { return true; };
 };

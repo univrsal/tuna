@@ -38,6 +38,5 @@ public:
     void load() override;
     void refresh() override;
     bool execute_capability(capability c) override;
-    bool valid_format(const QString& str) override;
     bool enabled() const override;
 };

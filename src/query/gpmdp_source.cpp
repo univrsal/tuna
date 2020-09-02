@@ -21,7 +21,6 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QRegularExpression>
 
 gpmdp_source::gpmdp_source()
     : music_source(S_SOURCE_GPMDP, T_SOURCE_GPMDP)
@@ -65,10 +64,4 @@ void gpmdp_source::refresh()
     }
 
     begin_refresh();
-}
-
-bool gpmdp_source::valid_format(const QString& str)
-{
-    static QRegularExpression reg("/%[r|R]|%[b|B]|%[y|Y]|%[d|D]|%[n|N]/gm");
-    return !reg.match(str).hasMatch();
 }

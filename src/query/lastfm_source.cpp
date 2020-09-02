@@ -6,7 +6,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QRegularExpression>
 #include <QString>
 #include <QUrl>
 #include <curl/curl.h>
@@ -134,12 +133,6 @@ void lastfm_source::parse_song(const QJsonObject& s)
 bool lastfm_source::execute_capability(capability)
 {
     return true;
-}
-
-bool lastfm_source::valid_format(const QString& str)
-{
-    static QRegularExpression reg("/%[p|P]|%[r|R]|%[b|B]|%[y|Y]|%[d|D]|%[n|N]/gm");
-    return !reg.match(str).hasMatch();
 }
 
 bool lastfm_source::enabled() const

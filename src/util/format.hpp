@@ -19,9 +19,9 @@
 #pragma once
 #include <QString>
 #include <vector>
+#include <memory>
 
 class song;
-class specifier;
 
 namespace format {
 
@@ -46,6 +46,7 @@ public:
     bool replace(QString& slice, const song& s, const QString& data = "") const;
 
     char get_id() const { return m_id; }
+    int tag_capability() { return m_tag_id; }
 };
 
 class specifier_time : public specifier {
@@ -112,5 +113,7 @@ public:
 
     bool do_format(QString& slice, const song& s) const override;
 };
+
+extern const std::vector<std::unique_ptr<specifier>>& get_specifiers();
 
 }

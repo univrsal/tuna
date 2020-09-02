@@ -147,7 +147,7 @@ void vlc_obs_source::refresh()
         m_current.set_state(from_obs_state(obs_source_media_get_state(src)));
 
         auto* media = libvlc_media_player_get_media_(vlc->media_player);
-        if (m_current.state() && media) {
+        if (m_current.state() <= state_paused && media) {
             const char* title = libvlc_media_get_meta_(media, libvlc_meta_Title);
             const char* artists = libvlc_media_get_meta_(media, libvlc_meta_Artist);
             const char* year = libvlc_media_get_meta_(media, libvlc_meta_Date);

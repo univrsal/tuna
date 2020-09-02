@@ -98,7 +98,7 @@ public:
     /* Execute and return true if successful */
     virtual bool execute_capability(capability c) = 0;
     virtual void set_gui_values();
-    virtual bool valid_format(const QString& str) = 0;
+    virtual bool valid_format(const QString& str);
     virtual void handle_cover();
 };
 
