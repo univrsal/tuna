@@ -39,6 +39,9 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     m_tuna = dynamic_cast<tuna_gui*>(parent);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
+    ui->lbl_format_error->setVisible(false);
+    ui->lbl_format_error->setStyleSheet("QLabel { color: red;"
+                                        "font-weight: bold; }");
     ui->tableWidget->setColumnWidth(0, 40);
     ui->tableWidget->setColumnWidth(1, 180);
     ui->tableWidget->setColumnWidth(2, 40);
@@ -74,24 +77,13 @@ static inline bool is_valid_file(const QString& file)
     return result;
 }
 
-void output_edit_dialog::on_buttonBox_accepted()
+void output_edit_dialog::buttonBox_accepted()
 {
     bool empty = ui->txt_format->text().isEmpty();
     bool valid = is_valid_file(ui->txt_path->text());
 
     if (empty || !valid) {
         QMessageBox::warning(this, T_OUTPUT_ERROR_TITLE, T_OUTPUT_ERROR);
-        return; /* Nothing to do */
-    }
-
-    auto src = music_sources::selected_source();
-    if (src && !src->valid_format(ui->txt_format->text())) {
-        if (QMessageBox::question(this, T_ERROR_TITLE, T_OUTPUT_ERROR_FORMAT) ==
-            QMessageBox::StandardButton::No)
-        {
-            /* User wants to remove unsupported format options */
-            return;
-        }
     }
 
     if (m_mode == edit_mode::create) {
@@ -101,9 +93,16 @@ void output_edit_dialog::on_buttonBox_accepted()
     }
 }
 
-void output_edit_dialog::on_pushButton_clicked()
+void output_edit_dialog::browse_file_clicked()
 {
     QString path = QFileDialog::getSaveFileName(this, tr(T_SELECT_SONG_FILE), QDir::home().path(),
         tr(FILTER("Text file", "*.txt")));
     ui->txt_path->setText(path);
+}
+
+void output_edit_dialog::on_txt_format_textChanged(const QString& arg1)
+{
+    auto src = music_sources::selected_source();
+    if (src)
+        ui->lbl_format_error->setVisible(!src->valid_format(arg1));
 }

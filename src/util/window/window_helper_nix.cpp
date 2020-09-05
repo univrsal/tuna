@@ -1,3 +1,4 @@
+#include "window_helper.hpp"
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -5,10 +6,9 @@
 #include <obs-module.h>
 #include <string>
 #include <unistd.h>
-#include <utility>
 #include <util/platform.h>
+#include <utility>
 #include <vector>
-#include "window_helper.hpp"
 
 /*
     https://github.com/obsproject/obs-studio/blob/master/plugins/linux-capture/xcompcap-helper.cpp
@@ -159,8 +159,7 @@ inline string getWindowExe(Window win)
     if (windowPID != None) {
         if (XGetWindowProperty(disp(), win, windowPID, 0, 1, False, XA_CARDINAL,
                 &actualType, &format, &num, &bytes, &propPID)
-            == Success)
-        {
+            == Success) {
             if (propPID != nullptr) {
                 int pidInt = *((int*)propPID);
                 auto pid_str = "/proc/" + to_string(pidInt) + "/exe";

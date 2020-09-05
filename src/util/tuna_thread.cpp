@@ -17,8 +17,8 @@
  *************************************************************************/
 
 #include "tuna_thread.hpp"
-#include "../gui/tuna_gui.hpp"
 #include "../gui/music_control.hpp"
+#include "../gui/tuna_gui.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
 #include "utility.hpp"
@@ -81,8 +81,8 @@ void thread_method()
             if (config::download_cover)
                 ref->handle_cover();
 
-            if (music_control)
-            thread_mutex.unlock();
+            if (music_dock)
+                thread_mutex.unlock();
         }
 
         /* Calculate how long refresh took and only wait the remaining time */

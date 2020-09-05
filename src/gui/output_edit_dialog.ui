@@ -308,6 +308,19 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="lbl_format_error">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>tuna.gui.output.edit.dialog.format.error</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="txt_format"/>
      </item>
      <item>
@@ -342,8 +355,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>258</x>
+     <y>482</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -358,8 +371,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>326</x>
+     <y>482</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

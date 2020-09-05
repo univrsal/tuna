@@ -109,7 +109,7 @@ void scroll_text::paintEvent(QPaintEvent*)
         //pb.end();
         p.drawImage(0, 0, m_buffer);
     } else {
-        p.drawStaticText(QPointF(m_left_margin, (height() - m_whole_text_size.height()) / 2), m_static_text);
+        p.drawStaticText(QPointF((width() - m_whole_text_size.width()) / 2, (height() - m_whole_text_size.height()) / 2), m_static_text);
     }
 }
 

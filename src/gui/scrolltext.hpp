@@ -33,7 +33,6 @@ class scroll_text : public QWidget {
 public:
     explicit scroll_text(QWidget* parent = nullptr);
 
-public slots:
     QString text() const;
     void set_text(QString text);
 

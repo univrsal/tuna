@@ -28,6 +28,7 @@ class window_title;
 class window_title : public source_widget {
     Q_OBJECT
     std::vector<std::pair<std::string, std::string>> m_items;
+
 public:
     explicit window_title(QWidget* parent = nullptr);
     ~window_title();

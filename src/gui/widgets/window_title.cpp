@@ -17,8 +17,8 @@
 #include "../../util/config.hpp"
 #include "../../util/constants.hpp"
 #include "../../util/utility.hpp"
-#include "ui_window_title.h"
 #include "../../util/window/window_helper.hpp"
+#include "ui_window_title.h"
 
 window_title::window_title(QWidget* parent)
     : source_widget(parent)
@@ -40,7 +40,7 @@ void window_title::refresh_process_list()
     m_items.clear();
     GetWindowAndExeList(m_items);
     int count = 0;
-    for (const auto &p : m_items) {
+    for (const auto& p : m_items) {
         QString t = utf8_to_qt(("[" + p.first + "] " + p.second).c_str());
         ui->cb_procress_list->addItem(t, count++);
     }

@@ -111,7 +111,7 @@ void lastfm_source::parse_song(const QJsonObject& s)
         QString track = QUrl::toPercentEncoding(m_current.title());
         QString track_request = "https://ws.audioscrobbler.com/2.0/?method="
                                 "track.getInfo&api_key="
-            + m_api_key + "&artist=" + artist + "&track=" + +"&format=json";
+            + m_api_key + "&artist=" + artist + "&track=" + track + "&format=json";
 
         QJsonDocument response;
         auto code = lastfm_request(response, track_request);

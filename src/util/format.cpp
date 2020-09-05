@@ -24,7 +24,7 @@
 
 namespace format {
 
-static std::vector<std::unique_ptr<specifier>> specifiers;
+std::vector<std::unique_ptr<specifier>> specifiers;
 
 const specifier* get_matching_specifier(char c)
 {
@@ -197,6 +197,5 @@ const std::vector<std::unique_ptr<specifier>>& get_specifiers()
 {
     return specifiers;
 }
-
 
 }

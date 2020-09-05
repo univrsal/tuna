@@ -8,16 +8,15 @@
 class music_source;
 
 namespace Ui {
-class music_Control;
+class music_control;
 }
 
-class music_Control : public QDockWidget {
+class music_control : public QDockWidget {
     Q_OBJECT
 
 public:
-    explicit music_Control(QWidget* parent = nullptr);
-    ~music_Control();
-
+    explicit music_control(QWidget* parent = nullptr);
+    ~music_control();
 
 private slots:
     void refresh_play_state();
@@ -36,9 +35,9 @@ private:
     void save_settings();
     void refresh_source();
     bool last_thread_state = false;
-    Ui::music_Control* ui;
+    Ui::music_control* ui;
     QTimer* m_timer = nullptr;
     scroll_text* m_song_text = nullptr;
 };
 
-extern music_Control* music_control;
+extern music_control* music_dock;

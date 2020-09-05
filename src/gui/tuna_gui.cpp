@@ -40,8 +40,21 @@ tuna_gui::tuna_gui(QWidget* parent)
 {
     ui->setupUi(this);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,
-            this, &tuna_gui::on_apply_pressed);
+        this, &tuna_gui::apply_pressed);
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
+
+    /* Other signals */
+#define ADD_SIGNAL(btn) connect(ui->btn, SIGNAL(clicked()), this, SLOT(btn##_clicked()))
+
+    ADD_SIGNAL(btn_browse_song_cover);
+    ADD_SIGNAL(btn_add_output);
+    ADD_SIGNAL(btn_remove_output);
+    ADD_SIGNAL(btn_edit_output);
+    ADD_SIGNAL(btn_start);
+    ADD_SIGNAL(btn_stop);
+    ADD_SIGNAL(btn_browse_song_lyrics);
+
+#undef ADD_SIGNAL
 
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     ui->tbl_outputs->setColumnWidth(0, 100);
@@ -86,7 +99,7 @@ void tuna_gui::toggleShowHide()
 
         const auto s = CGET_STR(CFG_SELECTED_SOURCE);
         auto i = 0;
-        for (const auto& src : music_sources::instances) {
+        for (const auto& src : qAsConst(music_sources::instances)) {
             if (strcmp(src->id(), s) == 0)
                 break;
             i++;
@@ -99,7 +112,7 @@ void tuna_gui::toggleShowHide()
             ui->tbl_outputs->removeRow(row);
         row = 0; /* Load rows */
         ui->tbl_outputs->setRowCount(config::outputs.size());
-        for (const auto& entry : config::outputs) {
+        for (const auto& entry : qAsConst(config::outputs)) {
             ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(entry.log_mode ? "Yes" : "No"));
             ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(entry.format));
             ui->tbl_outputs->setItem(row, 2, new QTableWidgetItem(entry.path));
@@ -115,7 +128,7 @@ void tuna_gui::add_music_source(const QString& display, const QString& id, sourc
     m_source_widgets.append(w);
 }
 
-void tuna_gui::on_tuna_gui_accepted()
+void tuna_gui::tuna_gui_accepted()
 {
     QString tmp = ui->cb_source->currentData().toByteArray();
     CSET_STR(CFG_SELECTED_SOURCE, tmp.toStdString().c_str());
@@ -147,12 +160,12 @@ void tuna_gui::on_tuna_gui_accepted()
     config::load();
 }
 
-void tuna_gui::on_apply_pressed()
+void tuna_gui::apply_pressed()
 {
-    on_tuna_gui_accepted();
+    tuna_gui_accepted();
 }
 
-void tuna_gui::on_btn_start_clicked()
+void tuna_gui::btn_start_clicked()
 {
     if (!thread::start())
         QMessageBox::warning(this, "Error", "Thread couldn't be started!");
@@ -160,14 +173,14 @@ void tuna_gui::on_btn_start_clicked()
     set_state();
 }
 
-void tuna_gui::on_btn_stop_clicked()
+void tuna_gui::btn_stop_clicked()
 {
     thread::stop();
     CSET_BOOL(CFG_RUNNING, thread::thread_flag);
     set_state();
 }
 
-void tuna_gui::on_btn_browse_song_cover_clicked()
+void tuna_gui::btn_browse_song_cover_clicked()
 {
     QString path;
     choose_file(path, T_SELECT_COVER_FILE, FILTER("Image file", "*.png"));
@@ -175,7 +188,7 @@ void tuna_gui::on_btn_browse_song_cover_clicked()
         ui->txt_song_cover->setText(path);
 }
 
-void tuna_gui::on_btn_browse_song_lyrics_clicked()
+void tuna_gui::btn_browse_song_lyrics_clicked()
 {
     QString path;
     choose_file(path, T_SELECT_LYRICS_FILE, FILTER("Text file", "*.txt"));
@@ -202,7 +215,7 @@ void tuna_gui::edit_output(const QString& format, const QString& path, bool log_
     }
 }
 
-void tuna_gui::on_btn_add_output_clicked()
+void tuna_gui::btn_add_output_clicked()
 {
     obs_frontend_push_ui_translation(obs_module_get_string);
     auto* dialog = new output_edit_dialog(edit_mode::create, this);
@@ -210,7 +223,7 @@ void tuna_gui::on_btn_add_output_clicked()
     dialog->exec();
 }
 
-void tuna_gui::on_btn_remove_output_clicked()
+void tuna_gui::btn_remove_output_clicked()
 {
     auto* select = ui->tbl_outputs->selectionModel();
     if (select->hasSelection()) {
@@ -231,7 +244,7 @@ void tuna_gui::get_selected_output(QString& format, QString& path, bool& log_mod
     }
 }
 
-void tuna_gui::on_btn_edit_output_clicked()
+void tuna_gui::btn_edit_output_clicked()
 {
     auto selection = ui->tbl_outputs->selectedItems();
     if (!selection.empty() && selection.size() > 1) {

@@ -59,7 +59,7 @@ void window_source::load()
     m_process_name = utf8_to_qt(CGET_STR(CFG_WINDOW_PROCESS_NAME));
 }
 
-QString window_source::get_title(const vector<string> &windows)
+QString window_source::get_title(const vector<string>& windows)
 {
     QRegularExpression regex(m_title);
     QString result = "";
@@ -84,10 +84,10 @@ QString window_source::get_title(const vector<string> &windows)
     return result;
 }
 
-QString window_source::get_title(const vector<pair<string, string> > &processes)
+QString window_source::get_title(const vector<pair<string, string>>& processes)
 {
     QString result = "";
-    for (const auto &p : processes) {
+    for (const auto& p : processes) {
         if (utf8_to_qt(p.first.c_str()) == m_process_name) {
             result = utf8_to_qt(p.second.c_str());
             break;

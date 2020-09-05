@@ -27,6 +27,7 @@ class tuna_gui;
 }
 
 class source_widget : public QWidget {
+    Q_OBJECT
 public:
     explicit source_widget(QWidget* parent = nullptr)
         : QWidget(parent)
@@ -54,23 +55,24 @@ public:
 signals:
     void source_registered(const QString& display, const QString& id, source_widget* w);
 
-private slots:
+public slots:
     void add_music_source(const QString& display, const QString& id, source_widget* w);
 
+private slots:
     /* Element interactions */
-    void choose_file(QString& path, const char* title, const char* file_types);
-    void on_apply_pressed();
-    void on_tuna_gui_accepted();
-    void on_btn_start_clicked();
+    void apply_pressed();
+    void tuna_gui_accepted();
+    void btn_start_clicked();
     void set_state();
-    void on_btn_stop_clicked();
-    void on_btn_browse_song_cover_clicked();
-    void on_btn_browse_song_lyrics_clicked();
-    void on_btn_add_output_clicked();
-    void on_btn_remove_output_clicked();
-    void on_btn_edit_output_clicked();
+    void btn_stop_clicked();
+    void btn_browse_song_cover_clicked();
+    void btn_browse_song_lyrics_clicked();
+    void btn_add_output_clicked();
+    void btn_remove_output_clicked();
+    void btn_edit_output_clicked();
 
 private:
+    void choose_file(QString& path, const char* title, const char* file_types);
     Ui::tuna_gui* ui;
 };
 

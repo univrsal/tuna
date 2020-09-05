@@ -20,8 +20,8 @@
 
 #include "music_source.hpp"
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 class window_source : public music_source {
     QString m_title = "";
@@ -30,8 +30,9 @@ class window_source : public music_source {
     uint16_t m_cut_begin = 0, m_cut_end;
     bool m_regex = false, m_use_process_name;
 
-    QString get_title(const std::vector<std::string> &windows);
-    QString get_title(const std::vector<std::pair<std::string, std::string>> &processes);
+    QString get_title(const std::vector<std::string>& windows);
+    QString get_title(const std::vector<std::pair<std::string, std::string>>& processes);
+
 public:
     window_source();
 

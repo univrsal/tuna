@@ -52,16 +52,15 @@ void register_gui()
     /* Register dock */
 #ifndef __APPLE__
     obs_frontend_push_ui_translation(obs_module_get_string);
-    auto* tmp = new music_Control(main_window);
-    music_control = reinterpret_cast<music_Control*>(obs_frontend_add_dock(tmp));
+    auto* tmp = new music_control(main_window);
+    music_dock = reinterpret_cast<music_control*>(obs_frontend_add_dock(tmp));
     obs_frontend_pop_ui_translation();
 #endif
 }
 
 bool obs_module_load()
 {
-    binfo("Loading v%s", BUILD_TIME);
-
+    binfo("Loading v%s build time %s", TUNA_VERSION, BUILD_TIME);
     config::init();
     util::load_vlc();
     register_gui();

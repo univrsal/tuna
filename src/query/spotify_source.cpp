@@ -95,7 +95,7 @@ void spotify_source::load()
     build_credentials();
 }
 
-bool spotify_source::valid_format(const QString &)
+bool spotify_source::valid_format(const QString&)
 {
     /* Supports all specifiers */
     return true;
@@ -130,7 +130,6 @@ void spotify_source::refresh()
 
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
-        QString log;
         save();
     }
 
@@ -210,7 +209,7 @@ void spotify_source::parse_track_json(const QJsonValue& track)
     m_current.clear();
 
     /* Get All artists */
-    for (const auto artist : artists)
+    for (const auto& artist : qAsConst(artists))
         m_current.append_artist(artist.toObject()["name"].toString());
 
     /* Cover link */

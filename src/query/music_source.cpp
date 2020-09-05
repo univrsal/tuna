@@ -17,21 +17,21 @@
  *************************************************************************/
 
 #include "music_source.hpp"
-#include "../gui/tuna_gui.hpp"
 #include "../gui/music_control.hpp"
+#include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
 #include "../util/cover_tag_handler.hpp"
+#include "../util/format.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
-#include "../util/format.hpp"
 #include "gpmdp_source.hpp"
 #include "lastfm_source.hpp"
 #include "mpd_source.hpp"
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "window_source.hpp"
-#include <obs-frontend-api.h>
 #include <QRegularExpression>
+#include <obs-frontend-api.h>
 
 namespace music_sources {
 static int selected_index = -1;
@@ -74,7 +74,7 @@ void select(const char* id)
     if (selected)
         selected->reset_info();
     int i = 0;
-    for (auto src : instances) {
+    for (const auto& src : qAsConst(instances)) {
         if (strcmp(src->id(), id) == 0) {
             selected_index = i;
             break;
@@ -89,7 +89,7 @@ void select(const char* id)
 
 void set_gui_values()
 {
-    for (const auto& src : instances)
+    for (const auto& src : qAsConst(instances))
         src->set_gui_values();
 }
 
@@ -156,12 +156,12 @@ void music_source::handle_cover()
     if (m_current.state() == state_playing) {
         if (!util::download_cover(m_current))
             util::reset_cover();
-    } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
+    } else if (m_current.state() != state_paused || config::placeholder_when_paused || !(m_current.data() & CAP_COVER)) {
         util::reset_cover();
     }
 }
 
-bool music_source::valid_format(const QString &str)
+bool music_source::valid_format(const QString& str)
 {
     QString regexStr = "%[";
     QRegularExpression regex;

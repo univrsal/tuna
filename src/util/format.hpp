@@ -18,8 +18,8 @@
 
 #pragma once
 #include <QString>
-#include <vector>
 #include <memory>
+#include <vector>
 
 class song;
 

@@ -10,11 +10,11 @@
 #include <QStyle>
 #include <obs-frontend-api.h>
 
-music_Control* music_control = nullptr;
+class music_control* music_dock = nullptr;
 
-music_Control::music_Control(QWidget* parent)
+music_control::music_control(QWidget* parent)
     : QDockWidget(parent)
-    , ui(new Ui::music_Control)
+    , ui(new Ui::music_control)
 {
     ui->setupUi(this);
     setVisible(false); /* Invisible by default to prevent it from showing until Geometry is loaded */
@@ -42,13 +42,13 @@ music_Control::music_Control(QWidget* parent)
     m_song_text = new scroll_text(this);
     m_song_text->setMinimumWidth(200);
     m_song_text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    ui->control_layout->addWidget(m_song_text, Qt::AlignBottom);
+    ui->control_layout->insertWidget(ui->control_layout->count() - 2, m_song_text, 0, Qt::AlignBottom);
 
     ui->volume_widget->setVisible(CGET_BOOL(CFG_DOCK_VOLUME_VISIBLE));
     m_song_text->setVisible(CGET_BOOL(CFG_DOCK_INFO_VISIBLE));
 }
 
-void music_Control::save_settings()
+void music_control::save_settings()
 {
     if (config::instance) {
         CSET_BOOL(CFG_DOCK_VOLUME_VISIBLE, ui->volume_widget->isVisible());
@@ -56,7 +56,7 @@ void music_Control::save_settings()
     }
 }
 
-music_Control::~music_Control()
+music_control::~music_control()
 {
     CSET_BOOL(CFG_DOCK_VISIBLE, isVisible());
     if (isVisible()) {
@@ -68,22 +68,22 @@ music_Control::~music_Control()
     delete m_song_text;
 }
 
-void music_Control::on_btn_prev_clicked()
+void music_control::on_btn_prev_clicked()
 {
     music_sources::selected_source()->execute_capability(CAP_PREV_SONG);
 }
 
-void music_Control::on_btn_play_pause_clicked()
+void music_control::on_btn_play_pause_clicked()
 {
     music_sources::selected_source()->execute_capability(CAP_PLAY_PAUSE);
 }
 
-void music_Control::on_btn_next_clicked()
+void music_control::on_btn_next_clicked()
 {
     music_sources::selected_source()->execute_capability(CAP_NEXT_SONG);
 }
 
-void music_Control::refresh_play_state()
+void music_control::refresh_play_state()
 {
     static QString last_title = "";
     song copy;
@@ -120,7 +120,7 @@ void music_Control::refresh_play_state()
     save_settings();
 }
 
-void music_Control::refresh_source()
+void music_control::refresh_source()
 {
     uint32_t flags = 0;
     if (music_sources::selected_source_unsafe())
@@ -150,12 +150,12 @@ void music_Control::refresh_source()
     }
 }
 
-void music_Control::on_btn_stop_clicked()
+void music_control::on_btn_stop_clicked()
 {
     music_sources::selected_source()->execute_capability(CAP_STOP_SONG);
 }
 
-void music_Control::showcontextmenu(const QPoint& pos)
+void music_control::showcontextmenu(const QPoint& pos)
 {
     QMenu contextMenu(T_DOCK_MENU_TITLE, this);
 
@@ -171,13 +171,13 @@ void music_Control::showcontextmenu(const QPoint& pos)
     contextMenu.exec(mapToGlobal(pos));
 }
 
-void music_Control::toggle_title()
+void music_control::toggle_title()
 {
     m_song_text->setVisible(!m_song_text->isVisible());
     save_settings();
 }
 
-void music_Control::toggle_volume()
+void music_control::toggle_volume()
 {
     auto flags = music_sources::selected_source()->get_capabilities();
     if (flags & CAP_VOLUME_UP || flags & CAP_VOLUME_DOWN)
@@ -185,12 +185,12 @@ void music_Control::toggle_volume()
     save_settings();
 }
 
-void music_Control::on_btn_voldown_clicked()
+void music_control::on_btn_voldown_clicked()
 {
     music_sources::selected_source()->execute_capability(CAP_VOLUME_DOWN);
 }
 
-void music_Control::on_btn_volup_clicked()
+void music_control::on_btn_volup_clicked()
 {
     music_sources::selected_source()->execute_capability(CAP_VOLUME_UP);
 }

@@ -16,6 +16,7 @@ set(CMAKE_AUTOUIC ON)
 
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
+add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
 
 include(./cmake/ObsPluginHelpers.cmake)
 
@@ -256,7 +257,7 @@ if(UNIX AND NOT APPLE)
             LIBRARY DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/bin/${OBS_ARCH_NAME}")
 
         install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
-            DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/")
+            DESTINATION "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}")
     elseif(GLOBAL_INSTALLATION)
         # For *.deb installer
         install(TARGETS ${CMAKE_PROJECT_NAME}

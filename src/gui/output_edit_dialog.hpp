@@ -37,9 +37,10 @@ public:
     ~output_edit_dialog();
 
 private slots:
-    void on_buttonBox_accepted();
+    void buttonBox_accepted();
+    void browse_file_clicked();
 
-    void on_pushButton_clicked();
+    void on_txt_format_textChanged(const QString& arg1);
 
 private:
     Ui::output_edit_dialog* ui;
