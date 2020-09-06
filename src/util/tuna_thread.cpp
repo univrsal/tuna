@@ -26,7 +26,7 @@
 #include <obs-module.h>
 #include <util/platform.h>
 
-namespace thread {
+namespace tuna_thread {
 volatile bool thread_flag = false;
 song copy;
 std::mutex thread_mutex;

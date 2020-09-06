@@ -23,7 +23,7 @@
 #include <mutex>
 #include <thread>
 
-namespace thread {
+namespace tuna_thread {
 extern volatile bool thread_flag;
 extern std::mutex thread_mutex;
 extern std::mutex copy_mutex;

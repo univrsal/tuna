@@ -37,7 +37,7 @@ bool load_libvlc()
 {
     return false;
 }
-void unload_libvlc() { }
+void unload_libvlc() {}
 #else
 #include "vlc_internal.h"
 #endif

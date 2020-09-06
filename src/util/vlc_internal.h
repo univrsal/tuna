@@ -131,7 +131,7 @@ bool load_vlc_funcs()
 {
     return false;
 }
-void unload_libvlc() { }
+void unload_libvlc() {}
 #endif /* DISABLE VLC*/
 
 #ifdef __cplusplus

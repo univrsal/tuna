@@ -20,6 +20,7 @@ lastfm_source::lastfm_source()
 
 void lastfm_source::load()
 {
+    music_source::load();
     m_username = utf8_to_qt(CGET_STR(CFG_LASTFM_USERNAME));
     m_api_key = utf8_to_qt(CGET_STR(CFG_LASTFM_API_KEY));
     if (m_api_key.isEmpty()) {

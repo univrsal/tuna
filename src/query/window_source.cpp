@@ -38,6 +38,7 @@ bool window_source::enabled() const
 
 void window_source::load()
 {
+    music_source::load();
     CDEF_STR(CFG_WINDOW_TITLE, "");
     CDEF_BOOL(CFG_WINDOW_REGEX, false);
     CDEF_STR(CFG_WINDOW_SEARCH, "");

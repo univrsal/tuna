@@ -88,9 +88,9 @@ void music_control::refresh_play_state()
     static QString last_title = "";
     song copy;
 
-    thread::copy_mutex.lock();
-    copy = thread::copy;
-    thread::copy_mutex.unlock();
+    tuna_thread::copy_mutex.lock();
+    copy = tuna_thread::copy;
+    tuna_thread::copy_mutex.unlock();
     QString icon = copy.state() == state_playing ? "://images/icons/pause.svg" : "://images/icons/play.svg";
     ui->btn_play_pause->setIcon(QIcon(icon));
 
@@ -112,11 +112,10 @@ void music_control::refresh_play_state()
         info.replace("%s", " ");
         m_song_text->set_text(info);
     }
-    thread::thread_mutex.lock();
+
     refresh_source();
-    last_thread_state = thread::thread_flag;
-    setEnabled(thread::thread_flag);
-    thread::thread_mutex.unlock();
+    last_thread_state = tuna_thread::thread_flag;
+    setEnabled(tuna_thread::thread_flag);
     save_settings();
 }
 

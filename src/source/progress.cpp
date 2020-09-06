@@ -27,14 +27,14 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     update(settings);
 }
 
-progress_source::~progress_source() { }
+progress_source::~progress_source() {}
 
 void progress_source::tick(float seconds)
 {
     song tmp;
-    thread::copy_mutex.lock();
-    tmp = thread::copy;
-    thread::copy_mutex.unlock();
+    tuna_thread::copy_mutex.lock();
+    tmp = tuna_thread::copy;
+    tuna_thread::copy_mutex.unlock();
     m_state = tmp.state();
     if (m_state == state_playing) {
         seconds *= 1000; /* s -> ms */
