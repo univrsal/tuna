@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
- * github.con/univrsal/tuna
- * Copyright 2020 univrsal <universailp@web.de>.
+ * github.com/univrsal/tuna
+ * Copyright 2020 univrsal <uni@vrsal.cf>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

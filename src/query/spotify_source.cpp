@@ -1,6 +1,6 @@
 /*************************************************************************
  * This file is part of tuna
- * github.con/univrsal/tuna
+ * github.com/univrsal/tuna
  * Copyright 2020 univrsal <universailp@web.de>.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -130,6 +130,9 @@ void spotify_source::refresh()
 
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
+        QString log;
+        const auto result = do_refresh_token(log);
+        emit((spotify*)m_settings_tab)->login_state_changed(result, log);
         save();
     }
 

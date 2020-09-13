@@ -1,18 +1,21 @@
-/* spotify.hpp created on 2020.8.14
+/*************************************************************************
+ * This file is part of tuna
+ * github.com/univrsal/tuna
+ * Copyright 2020 univrsal <uni@vrsal.cf>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
- * (at your option) any later version.
+ * the Free Software Foundation, version 2 of the License.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * github.com/univrsal/
- *
- */
+ *************************************************************************/
+
 #pragma once
 
 #include "../tuna_gui.hpp"
@@ -31,6 +34,8 @@ public:
 
     void save_settings() override;
     void load_settings() override;
+signals:
+    void login_state_changed(bool sate, QString& log);
 private slots:
     void on_btn_id_show_pressed();
     void on_btn_id_show_released();
