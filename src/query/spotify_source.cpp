@@ -74,12 +74,16 @@ void spotify_source::load()
     CDEF_STR(CFG_SPOTIFY_AUTH_CODE, "");
     CDEF_STR(CFG_SPOTIFY_REFRESH_TOKEN, "");
     CDEF_INT(CFG_SPOTIFY_TOKEN_TERMINATION, 0);
+    CDEF_STR(CFG_SPOTIFY_CLIENT_ID, "");
+    CDEF_STR(CFG_SPOTIFY_CLIENT_SECRET, "");
 
     m_logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
     m_token = utf8_to_qt(CGET_STR(CFG_SPOTIFY_TOKEN));
     m_refresh_token = utf8_to_qt(CGET_STR(CFG_SPOTIFY_REFRESH_TOKEN));
     m_auth_code = utf8_to_qt(CGET_STR(CFG_SPOTIFY_AUTH_CODE));
     m_token_termination = CGET_INT(CFG_SPOTIFY_TOKEN_TERMINATION);
+    build_credentials();
+    music_source::load();
 
     /* Token handling */
     if (m_logged_in) {
@@ -90,9 +94,9 @@ void spotify_source::load()
             if (result)
                 binfo("Successfully renewed Spotify token");
             save();
+            music_source::load(); // Reload token stuff etc.
         }
     }
-    build_credentials();
 }
 
 bool spotify_source::valid_format(const QString&)

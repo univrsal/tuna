@@ -72,7 +72,7 @@ protected:
 public:
     music_source(const char* id, const char* name, source_widget* w = nullptr);
 
-    virtual ~music_source() { }
+    virtual ~music_source() {}
 
     /* util */
     uint32_t get_capabilities() const { return m_capabilities; }
@@ -91,7 +91,7 @@ public:
     /* Abstract stuff */
     virtual bool enabled() const = 0;
     /* Save/load config values */
-    virtual void load() = 0;
+    virtual void load();
     virtual void save();
     /* Perform information query */
     virtual void refresh() = 0;

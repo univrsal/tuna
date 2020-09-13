@@ -18,11 +18,9 @@ string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
 
-include(./cmake/ObsPluginHelpers.cmake)
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
 if (MSVC OR APPLE)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/obs")
 endif()
 
 find_package(LibObs REQUIRED)
@@ -138,7 +136,7 @@ if (DISABLE_VLC)
     add_definitions(-DDISABLE_TUNA_VLC=1)
 else()
     include_directories(${LIBVLC_INCLUDE_DIRS})
-    message("Using VLC headers: ${LIBVLC_INCLUDE_DIRS}")
+    message(STATUS "Using VLC headers: ${LIBVLC_INCLUDE_DIRS}")
     add_definitions(${LIBVLC_DEFINITIONS})
     set(tuna_vlc_source
         ./src/query/vlc_obs_source.cpp
@@ -242,7 +240,38 @@ if(WIN32)
     target_link_libraries(${CMAKE_PROJECT_NAME}
         "${OBS_FRONTEND_LIB}"
     )
-    install_external_plugin_with_data(${CMAKE_PROJECT_NAME} "data")
+
+	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(ARCH_NAME "64bit")
+		set(OBS_BUILDDIR_ARCH "build64")
+	else()
+		set(ARCH_NAME "32bit")
+		set(OBS_BUILDDIR_ARCH "build32")
+	endif()
+
+    get_filename_component(LibOBS_DIR ${LIBOBS_LIB} DIRECTORY)
+
+	add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+		# Copy to obs-studio dev environment for immediate testing
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E copy
+				"$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
+				"${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E copy
+				"$<TARGET_PDB_FILE:${CMAKE_PROJECT_NAME}>"
+				"${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E make_directory
+				"${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
+
+		COMMAND if $<CONFIG:Debug>==1 (
+			"${CMAKE_COMMAND}" -E copy_directory
+				"${PROJECT_SOURCE_DIR}/data"
+				"${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
+	)
 endif()
 
 if(UNIX AND NOT APPLE)

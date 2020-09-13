@@ -70,7 +70,7 @@ void tuna_gui::choose_file(QString& path, const char* title, const char* file_ty
 
 void tuna_gui::set_state()
 {
-    if (thread::thread_flag)
+    if (tuna_thread::thread_flag)
         ui->lbl_status->setText(T_STATUS_RUNNING);
     else
         ui->lbl_status->setText(T_STATUS_STOPPED);
@@ -139,7 +139,7 @@ void tuna_gui::tuna_gui_accepted()
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 
     /* save outputs */
-    thread::thread_mutex.lock();
+    tuna_thread::thread_mutex.lock();
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
         config::output tmp;
@@ -156,7 +156,7 @@ void tuna_gui::tuna_gui_accepted()
     }
 
     config::refresh_rate = ui->sb_refresh_rate->value();
-    thread::thread_mutex.unlock();
+    tuna_thread::thread_mutex.unlock();
     config::load();
 }
 
@@ -167,16 +167,16 @@ void tuna_gui::apply_pressed()
 
 void tuna_gui::btn_start_clicked()
 {
-    if (!thread::start())
+    if (!tuna_thread::start())
         QMessageBox::warning(this, "Error", "Thread couldn't be started!");
-    CSET_BOOL(CFG_RUNNING, thread::thread_flag);
+    CSET_BOOL(CFG_RUNNING, tuna_thread::thread_flag);
     set_state();
 }
 
 void tuna_gui::btn_stop_clicked()
 {
-    thread::stop();
-    CSET_BOOL(CFG_RUNNING, thread::thread_flag);
+    tuna_thread::stop();
+    CSET_BOOL(CFG_RUNNING, tuna_thread::thread_flag);
     set_state();
 }
 

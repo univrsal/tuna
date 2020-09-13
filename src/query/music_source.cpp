@@ -70,7 +70,7 @@ void select(const char* id)
     if (selected && strcmp(selected->id(), id) == 0)
         return;
 
-    thread::thread_mutex.lock();
+    tuna_thread::thread_mutex.lock();
     if (selected)
         selected->reset_info();
     int i = 0;
@@ -84,7 +84,7 @@ void select(const char* id)
 
     /* Ensure that cover is set to place holder on switch */
     util::reset_cover();
-    thread::thread_mutex.unlock();
+    tuna_thread::thread_mutex.unlock();
 }
 
 void set_gui_values()
@@ -105,9 +105,9 @@ std::shared_ptr<music_source> selected_source_unsafe()
 std::shared_ptr<music_source> selected_source()
 {
     if (selected_index >= 0) {
-        thread::thread_mutex.lock();
+        tuna_thread::thread_mutex.lock();
         auto ref = std::shared_ptr<music_source>(instances[selected_index]);
-        thread::thread_mutex.unlock();
+        tuna_thread::thread_mutex.unlock();
         return ref;
     }
     return nullptr;
@@ -134,6 +134,12 @@ music_source::music_source(const char* id, const char* name, source_widget* w)
 {
     binfo("Registered %s (id: %s)", name, id);
     emit tuna_dialog->source_registered(name, id, w);
+}
+
+void music_source::load()
+{
+    if (m_settings_tab)
+        m_settings_tab->load_settings();
 }
 
 void music_source::save()

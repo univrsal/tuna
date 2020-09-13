@@ -91,11 +91,11 @@ void load()
     placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
 
     /* Sources */
-    thread::thread_mutex.lock();
+    tuna_thread::thread_mutex.lock();
     music_sources::load();
-    thread::thread_mutex.unlock();
+    tuna_thread::thread_mutex.unlock();
 
-    if (run && !thread::start())
+    if (run && !tuna_thread::start())
         berr("Couldn't start thread");
 
     music_sources::select(selected_source);
@@ -103,18 +103,18 @@ void load()
 
 void close()
 {
-    thread::thread_mutex.lock();
+    tuna_thread::thread_mutex.lock();
     save_outputs();
     util::reset_cover();
-    thread::thread_mutex.unlock();
-    thread::stop();
+    tuna_thread::thread_mutex.unlock();
+    tuna_thread::stop();
     bfree((void*)cover_placeholder);
     music_sources::deinit();
 }
 
 void load_outputs()
 {
-    thread::thread_mutex.lock();
+    tuna_thread::thread_mutex.lock();
     outputs.clear();
     QDir home = QDir::homePath();
     QString path = QDir::toNativeSeparators(home.absoluteFilePath(OUTPUT_FILE));
@@ -144,7 +144,7 @@ void load_outputs()
         }
         binfo("Loaded %i outputs", array.size());
     }
-    thread::thread_mutex.unlock();
+    tuna_thread::thread_mutex.unlock();
 }
 
 void save_outputs()

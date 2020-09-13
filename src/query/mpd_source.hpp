@@ -47,6 +47,6 @@ public:
 
 private:
     void connect();
-
     void disconnect();
+    uint64_t m_last_error_log = 0;
 };

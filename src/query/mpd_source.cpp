@@ -69,20 +69,25 @@ void mpd_source::connect()
     bdebug("Opening MPD connection to %s:%hu", qt_to_utf8(m_address), m_port);
     disconnect();
     if (m_local)
-        m_connection = mpd_connection_new(nullptr, 0, 0);
+        m_connection = mpd_connection_new(nullptr, 0, 400); // 0 ms timeout on windows blocks this thread, which is bad
     else
         m_connection = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
 
     if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
-        if (m_local) {
-            berr("local mpd connection on port %i failed with error %s", 6600,
-                mpd_connection_get_error_message(m_connection));
-        } else {
-            berr("mpd connection to %s:%hu failed with error %s", qt_to_utf8(m_address), m_port,
-                mpd_connection_get_error_message(m_connection));
+        if (util::epoch() - m_last_error_log > 5) {
+            if (m_local) {
+                berr("local mpd connection on default port (usually %i) failed with error '%s'", 6600,
+                    mpd_connection_get_error_message(m_connection));
+            } else {
+                berr("mpd connection to %s:%hu failed with error '%s'", qt_to_utf8(m_address), m_port,
+                    mpd_connection_get_error_message(m_connection));
+            }
+            m_last_error_log = util::epoch();
         }
+
         mpd_connection_free(m_connection);
         m_connection = nullptr;
+        m_connected = false;
     } else {
         m_connected = true;
         mpd_connection_set_keepalive(m_connection, true);
@@ -96,6 +101,7 @@ bool mpd_source::enabled() const
 
 void mpd_source::load()
 {
+    music_source::load();
     CDEF_INT(CFG_MPD_PORT, 0);
     CDEF_STR(CFG_MPD_IP, "localhost");
     CDEF_BOOL(CFG_MPD_LOCAL, true);
@@ -128,10 +134,17 @@ void mpd_source::refresh()
         connect();
 
     begin_refresh();
+#ifdef _WIN32
+    song copy = m_current; /* Windows seems to randomly not return any info, so we keep a copy in case that happens */
+#endif
     m_current.clear();
 
-    if (!m_connected)
+    if (!m_connected) {
+#ifdef _WIN32
+        m_current = copy;
+#endif
         return;
+    }
 
     m_status = mpd_run_status(m_connection);
     m_mpd_song = mpd_run_current_song(m_connection);
@@ -175,6 +188,13 @@ void mpd_source::refresh()
         QString file_path = mpd_song_get_uri(m_mpd_song);
         file_path.prepend(m_base_folder);
         m_current.set_cover_link(file_path);
+    }
+
+    if (!m_mpd_song || !m_status) {
+#ifdef _WIN32
+        m_current = copy;
+#endif
+        disconnect();
     }
 
     if (m_mpd_song)
