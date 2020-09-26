@@ -42,19 +42,7 @@
         <widget class="QLineEdit" name="txt_path"/>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>15</width>
-           <height>0</height>
-          </size>
-         </property>
+        <widget class="QPushButton" name="browse">
          <property name="text">
           <string>...</string>
          </property>
@@ -350,22 +338,6 @@
  <connections>
   <connection>
    <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>output_edit_dialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>258</x>
-     <y>482</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
    <signal>rejected()</signal>
    <receiver>output_edit_dialog</receiver>
    <slot>reject()</slot>
@@ -376,6 +348,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>output_edit_dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>482</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
      <y>274</y>
     </hint>
    </hints>
