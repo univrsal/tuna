@@ -172,23 +172,21 @@ void save_outputs()
         output_array.append(output);
     }
 
-    if (output_array.empty()) {
-        binfo("No ouputs to save");
-    } else {
-        QJsonDocument doc(output_array);
-        QFile save_file(path);
-        if (save_file.open(QIODevice::WriteOnly)) {
-            auto data = doc.toJson();
-            auto wrote = save_file.write(data);
-            if (data.length() != wrote) {
-                berr("Couldn't write outputs to %s only"
-                     "wrote %lli bytes out of %i",
-                    qt_to_utf8(path), wrote, data.length());
-            }
-            save_file.close();
+    QJsonDocument doc(output_array);
+    QFile save_file(path);
+    if (save_file.open(QIODevice::WriteOnly)) {
+        auto data = doc.toJson();
+        auto wrote = save_file.write(data);
+        if (data.length() != wrote) {
+            berr("Couldn't write outputs to %s only"
+                 "wrote %lli bytes out of %i",
+                qt_to_utf8(path), wrote, data.length());
         } else {
-            berr("Couldn't write outputs to %s", qt_to_utf8(path));
+            binfo("Saved %i outputs", output_array.count());
         }
+        save_file.close();
+    } else {
+        berr("Couldn't write outputs to %s", qt_to_utf8(path));
     }
 }
 
