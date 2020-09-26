@@ -39,8 +39,10 @@ tuna_gui::tuna_gui(QWidget* parent)
     , ui(new Ui::tuna_gui)
 {
     ui->setupUi(this);
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,
-        this, &tuna_gui::apply_pressed);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()),
+        this, SLOT(apply_pressed()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()),
+        this, SLOT(tuna_gui_accepted()));
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
 
     /* Other signals */
