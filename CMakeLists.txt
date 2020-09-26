@@ -18,6 +18,7 @@ string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ObsPluginHelpers.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
 if (MSVC OR APPLE)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/obs")
@@ -241,37 +242,37 @@ if(WIN32)
         "${OBS_FRONTEND_LIB}"
     )
 
-	if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-		set(ARCH_NAME "64bit")
-		set(OBS_BUILDDIR_ARCH "build64")
-	else()
-		set(ARCH_NAME "32bit")
-		set(OBS_BUILDDIR_ARCH "build32")
-	endif()
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(ARCH_NAME "64bit")
+        set(OBS_BUILDDIR_ARCH "build64")
+    else()
+        set(ARCH_NAME "32bit")
+        set(OBS_BUILDDIR_ARCH "build32")
+    endif()
 
     get_filename_component(LibOBS_DIR ${LIBOBS_LIB} DIRECTORY)
 
-	add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-		# Copy to obs-studio dev environment for immediate testing
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy
-				"$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
-				"${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        # Copy to obs-studio dev environment for immediate testing
+        COMMAND if $<CONFIG:Debug>==1 (
+            "${CMAKE_COMMAND}" -E copy
+                "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
+                "${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
 
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy
-				"$<TARGET_PDB_FILE:${CMAKE_PROJECT_NAME}>"
-				"${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
+        COMMAND if $<CONFIG:Debug>==1 (
+            "${CMAKE_COMMAND}" -E copy
+                "$<TARGET_PDB_FILE:${CMAKE_PROJECT_NAME}>"
+                "${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/${ARCH_NAME}")
 
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E make_directory
-				"${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
+        COMMAND if $<CONFIG:Debug>==1 (
+            "${CMAKE_COMMAND}" -E make_directory
+                "${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
 
-		COMMAND if $<CONFIG:Debug>==1 (
-			"${CMAKE_COMMAND}" -E copy_directory
-				"${PROJECT_SOURCE_DIR}/data"
-				"${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
-	)
+        COMMAND if $<CONFIG:Debug>==1 (
+            "${CMAKE_COMMAND}" -E copy_directory
+                "${PROJECT_SOURCE_DIR}/data"
+                "${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
+    )
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -279,6 +280,9 @@ if(UNIX AND NOT APPLE)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES PREFIX "")
     target_link_libraries(${CMAKE_PROJECT_NAME} obs-frontend-api)
+    if (NOT OBS_ARCH_NAME)
+        message(FATAL_ERROR "Can't install plugin without knowing architecture")
+    endif()
 
     if (LOCAL_INSTALLATION)
         # Installs into home directory
