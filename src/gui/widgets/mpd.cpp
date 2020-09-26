@@ -65,5 +65,7 @@ void mpd::on_rb_remote_toggled(bool remote)
 
 void mpd::on_btn_browse_base_folder_clicked()
 {
-    ui->txt_base_folder->setText(QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER));
+    auto result = QFileDialog::getExistingDirectory(this, T_SELECT_MPD_FOLDER);
+    if (!result.isEmpty())
+        ui->txt_base_folder->setText(result);
 }
