@@ -73,8 +73,8 @@ bool obs_module_load()
 
 void obs_module_unload()
 {
+    config::close();
     tuna_thread::thread_mutex.lock();
     util::unload_vlc();
     tuna_thread::thread_mutex.unlock();
-    config::close();
 }
