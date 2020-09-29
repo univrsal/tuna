@@ -18,7 +18,7 @@ jobs:
     runs-on: [macos-latest]
     env:
       QT_VERSION: 5.14.1
-      OSX_DEPS_VERSION: '2020-07-06'
+      MACOS_DEPS_VERSION: '2020-08-30'
       project-git: tuna
       project-name: tuna
     steps:
@@ -41,6 +41,35 @@ jobs:
         with:
           path: obs-studio
           key: obs-deps-macos
+      - name: 'Restore pre-built dependencies from cache'
+        id: deps-cache
+        uses: actions/cache@v1
+        env:
+          CACHE_NAME: 'deps-cache'
+        with:
+          path: /tmp/obsdeps
+          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}
+      - name: 'Restore pre-built Qt dependency from cache'
+        id: deps-qt-cache
+        uses: actions/cache@v1
+        env:
+          CACHE_NAME: 'deps-qt-cache'
+        with:
+          path: /tmp/obsdeps
+          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}
+      - name: 'Install prerequisite: Pre-built dependencies'
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz
+          tar -xf ./macos-deps-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
+      - name: 'Install prerequisite: Pre-built dependency Qt'
+        if: steps.deps-qt-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz
+          tar -xf ./macos-qt-${{ env.QT_VERSION }}-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
+          xattr -r -d com.apple.quarantine /tmp/obsdeps
       - name: Checkout OBS
         if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
@@ -58,30 +87,6 @@ jobs:
           echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
           echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
           echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
-      - name: 'Install prerequisites (Homebrew)'
-        shell: bash
-        run: |
-          brew update >/dev/null
-          BREW_PACKAGES=$(brew list)
-          BREW_DEPENDENCIES="jack speexdsp cmake freetype fdk-aac ccache swig mbedtls"
-
-          for DEPENDENCY in ${BREW_DEPENDENCIES}; do
-              if echo "${BREW_PACKAGES}" | grep -q "^${DEPENDENCY}\$"; then
-                  echo "=> Upgrading OBS-Studio dependency '${DEPENDENCY}'.."
-                  brew upgrade ${DEPENDENCY} 2>/dev/null
-              else
-                  echo "=> Installing OBS-Studio dependency '${DEPENDENCY}'.."
-                  brew install ${DEPENDENCY} 2>/dev/null
-              fi
-          done
-          brew install https://gist.githubusercontent.com/DDRBoxman/9c7a2b08933166f4b61ed9a44b242609/raw/ef4de6c587c6bd7f50210eccd5bd51ff08e6de13/qt.rb
-          brew pin qt
-      - name: 'Install build dependencies'
-        if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.OSX_DEPS_VERSION }}/macos-deps-${{ env.OSX_DEPS_VERSION }}.tar.gz
-          tar -xf ./macos-deps-${{ env.OSX_DEPS_VERSION }}.tar.gz -C "/tmp"
       - name: Configure and build OBS
         if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
         shell: bash
@@ -90,16 +95,10 @@ jobs:
           git checkout ${{ env.OBS_GIT_TAG }}
           mkdir build && cd build
           echo "=> Building obs-studio.."
-          cmake .. \
-            -DBUILD_CAPTIONS=true \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 \
-            -DDISABLE_PLUGINS=true \
-            -DENABLE_SCRIPTING=0 \
-            -DDepsPath=/tmp/obsdeps \
-            -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" \
-            -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" \
-            -DCMAKE_PREFIX_PATH=/usr/local/opt/qt/lib/cmake \
-          && make -j4
+
+          cmake .. -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DQTDIR="/tmp/obsdeps" -DDepsPath="/tmp/obsdeps" \
+            -DBUILD_CAPTIONS=OFF -DDISABLE_PLUGINS=true -DENABLE_SCRIPTING=0
+          make -j4
       - name: Configure and build plugin
         shell: bash
         run: |
@@ -113,6 +112,8 @@ jobs:
             -DOBS_FRONTEND_LIB:STRING="${{ github.workspace }}/obs-studio/build/UI/obs-frontend-api/libobs-frontend-api.dylib" \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DVLC_INCLUDE_DIR=../vlc/ \
+            -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" \
+            -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" \
             -DCMAKE_INSTALL_PREFIX=/usr \
           && make -j4
       - name: 'Install prerequisite: Packages app'
