@@ -115,24 +115,24 @@ void vlc_obs_source::refresh()
     begin_refresh();
     m_current.clear();
 
-    proc_handler_t *ph = obs_source_get_proc_handler(src);
+    proc_handler_t* ph = obs_source_get_proc_handler(src);
 
     if (!ph)
         return;
 
-    auto *calldata = calldata_create();
+    auto* calldata = calldata_create();
     bool failure = false;
 
-#define GET_VLC_META(tid)                                               \
-    const char* tid = nullptr;                                          \
-    do {                                                                \
-        calldata_set_string(calldata, "tag_id", #tid);                  \
-        failure |= !proc_handler_call(ph,                               \
-            "void get_metadata(in string tag_id out string tag_data)",  \
-            calldata);                                                  \
-        if (failure || !calldata_get_string(calldata, "tag_data", &tid))\
-           berr("Failed to retrieve %s tag", #tid);                     \
-    } while(false)
+#define GET_VLC_META(tid)                                                \
+    const char* tid = nullptr;                                           \
+    do {                                                                 \
+        calldata_set_string(calldata, "tag_id", #tid);                   \
+        failure |= !proc_handler_call(ph,                                \
+            "void get_metadata(in string tag_id out string tag_data)",   \
+            calldata);                                                   \
+        if (failure || !calldata_get_string(calldata, "tag_data", &tid)) \
+            berr("Failed to retrieve %s tag", #tid);                     \
+    } while (false)
 
     if (!proc_handler_call(ph, "", calldata)) {
         calldata_destroy(calldata);

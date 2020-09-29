@@ -35,7 +35,7 @@ OBS_DECLARE_MODULE()
 
 OBS_MODULE_USE_DEFAULT_LOCALE(S_PLUGIN_ID, "en-US")
 
-MODULE_EXPORT const char *obs_module_description(void)
+MODULE_EXPORT const char* obs_module_description(void)
 {
     return "Song information plugin";
 }

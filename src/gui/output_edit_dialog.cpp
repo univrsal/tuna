@@ -42,7 +42,7 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     connect(ui->browse, SIGNAL(clicked()), this, SLOT(browse_clicked()));
     connect(ui->txt_format, SIGNAL(textChanged(const QString&)), this, SLOT(format_changed(const QString&)));
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this,
-            SLOT(accept_clicked()));
+        SLOT(accept_clicked()));
 
     ui->lbl_format_error->setVisible(false);
     ui->lbl_format_error->setStyleSheet("QLabel { color: red;"
