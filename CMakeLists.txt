@@ -27,7 +27,6 @@ endif()
 find_package(LibObs REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Libcurl REQUIRED)
-find_package(LibVLC REQUIRED)
 
 option(LOCAL_INSTALLATION "Whether to install for the current user (default: OFF)" OFF)
 option(GLOBAL_INSTALLATION "Whether to install for all users (default: OFF)" OFF)
@@ -119,32 +118,6 @@ if (MSVC)
         wsock32)
 endif ()
 
-if (NOT LibVLC_FOUND AND ENABLE_VLC)
-    message(STATUS "LibVLC includes not found but set as enabled")
-    add_definitions(-DDISABLE_TUNA_VLC=1)
-    set(DISABLEVLC TRUE)
-elseif (NOT LibVLC_FOUND)
-    message(STATUS "LibVLC includes not found, VLC source support disabled")
-    message(STATUS "If you want VLC support, clone the VLC repo and point VLC_INCLUDE_DIR to <repo>/include/vlc ")
-    set(DISABLEVLC TRUE)
-    add_definitions(-DDISABLE_TUNA_VLC=1)
-else()
-    message(STATUS "LibVLC headers found, VLC source support enabled")
-endif()
-
-if (DISABLE_VLC)
-    message(STATUS "VLC integration disabled")
-    add_definitions(-DDISABLE_TUNA_VLC=1)
-else()
-    include_directories(${LIBVLC_INCLUDE_DIRS})
-    message(STATUS "Using VLC headers: ${LIBVLC_INCLUDE_DIRS}")
-    add_definitions(${LIBVLC_DEFINITIONS})
-    set(tuna_vlc_source
-        ./src/query/vlc_obs_source.cpp
-        ./src/util/vlc_internal.h
-        ./src/util/vlc_internal.c)
-endif()
-
 set(tuna_sources
     ./src/tuna_plugin.cpp
     ./src/util/constants.hpp
@@ -179,6 +152,7 @@ set(tuna_sources
     ./src/source/progress.hpp
     ./src/util/cover_tag_handler.cpp
     ./src/util/cover_tag_handler.hpp
+    ./src/query/vlc_obs_source.cpp
     ./src/query/vlc_obs_source.hpp
     ./src/util/tuna_thread.cpp
     ./src/util/tuna_thread.hpp
@@ -196,7 +170,6 @@ set(tuna_sources
     ./src/gui/widgets/vlc.cpp
     ./src/gui/widgets/vlc.hpp
     ${tuna_ui_headers}
-    ${tuna_vlc_source}
     )
 
 add_library(tuna MODULE

@@ -35,6 +35,11 @@ OBS_DECLARE_MODULE()
 
 OBS_MODULE_USE_DEFAULT_LOCALE(S_PLUGIN_ID, "en-US")
 
+MODULE_EXPORT const char *obs_module_description(void)
+{
+    return "Song information plugin";
+}
+
 void register_gui()
 {
     /* UI registration from
@@ -62,7 +67,6 @@ bool obs_module_load()
 {
     binfo("Loading v%s build time %s", TUNA_VERSION, BUILD_TIME);
     config::init();
-    util::load_vlc();
     register_gui();
     format::init();
     music_sources::init();
@@ -71,10 +75,12 @@ bool obs_module_load()
     return true;
 }
 
+void obs_module_post_load()
+{
+    util::have_vlc_source = obs_get_module("vlc-video") != nullptr;
+}
+
 void obs_module_unload()
 {
     config::close();
-    tuna_thread::thread_mutex.lock();
-    util::unload_vlc();
-    tuna_thread::thread_mutex.unlock();
 }

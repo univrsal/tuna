@@ -24,23 +24,6 @@
 #include <QGuiApplication>
 #include <QScreen>
 
-#if DISABLE_TUNA_VLC
-bool load_libvlc_module()
-{
-    return false;
-}
-bool load_vlc_funcs()
-{
-    return false;
-}
-bool load_libvlc()
-{
-    return false;
-}
-void unload_libvlc() { }
-#else
-#include "vlc_internal.h"
-#endif
 #include <QFile>
 #include <QMessageBox>
 #include <QTextStream>
@@ -52,58 +35,7 @@ void unload_libvlc() { }
 
 namespace util {
 
-bool vlc_loaded = false;
-
-void load_vlc()
-{
-#ifndef DISABLE_TUNA_VLC
-    auto ver = obs_get_version();
-    bool result = true;
-
-    if (obs_get_version() != LIBOBS_API_VER) {
-        int major = ver >> 24 & 0xFF;
-        int minor = ver >> 16 & 0xFF;
-        int patch = ver & 0xFF;
-        bwarn("libobs version %d.%d.%d is "
-              "invalid. Tuna expects %d.%d.%d for"
-              " VLC sources to work",
-            major, minor, patch, LIBOBS_API_MAJOR_VER, LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER);
-
-        result = CGET_BOOL(CFG_FORCE_VLC_DECISION);
-
-        /* If this is the first startup with the new version
-         * ask user */
-        if (!CGET_BOOL(CFG_ERROR_MESSAGE_SHOWN)) {
-            result = QMessageBox::question(nullptr, T_ERROR_TITLE, T_VLC_VERSION_ISSUE) == QMessageBox::StandardButton::Yes;
-        }
-
-        if (result)
-            bwarn("User force enabled VLC support");
-        CSET_BOOL(CFG_ERROR_MESSAGE_SHOWN, true);
-        CSET_BOOL(CFG_FORCE_VLC_DECISION, result);
-    } else {
-        /* reset warning config */
-        CSET_BOOL(CFG_ERROR_MESSAGE_SHOWN, false);
-        CSET_BOOL(CFG_FORCE_VLC_DECISION, false);
-    }
-
-    if (result) {
-        if (load_libvlc_module() && load_vlc_funcs() && load_libvlc()) {
-            binfo("Loaded libVLC. VLC source support enabled");
-            vlc_loaded = true;
-        } else {
-            bwarn("Couldn't load libVLC,"
-                  " VLC source support disabled");
-        }
-    }
-#endif
-}
-
-void unload_vlc()
-{
-    unload_libvlc();
-    vlc_loaded = false;
-}
+bool have_vlc_source = false;
 
 size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
 {

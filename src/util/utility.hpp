@@ -38,11 +38,8 @@
 class song;
 
 namespace util {
-extern bool vlc_loaded;
 
-void load_vlc();
-
-void unload_vlc();
+extern bool have_vlc_source;
 
 bool curl_download(const char* url, const char* path);
 

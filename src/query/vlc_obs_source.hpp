@@ -25,12 +25,9 @@
 class vlc_obs_source : public music_source {
     const char* m_target_source_name = nullptr;
     obs_weak_source_t* m_weak_src = nullptr;
-    struct vlc_source* get_vlc();
     /* Only log conversion issues once per file */
     bool reload();
-
     int perform_int_conversion(const char* val, const char* type, bool& ok);
-
 public:
     vlc_obs_source();
     ~vlc_obs_source();
