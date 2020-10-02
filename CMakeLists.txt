@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(tuna VERSION 1.5.0)
+project(tuna VERSION 1.5.1)
 
 add_subdirectory(deps)
 
