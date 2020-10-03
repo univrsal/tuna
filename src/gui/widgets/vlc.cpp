@@ -28,12 +28,8 @@ vlc::vlc(QWidget* parent)
 {
     ui->setupUi(this);
 
-    /* Notify user, if vlc source is disabled */
     ui->lbl_vlc_disabled->setStyleSheet("QLabel { color: red;"
                                         "font-weight: bold; }");
-    ui->lbl_vlc_disabled->setVisible(!util::have_vlc_source);
-    ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
-    ui->cb_vlc_source_name->setEnabled(util::have_vlc_source);
 }
 
 vlc::~vlc()
@@ -45,6 +41,10 @@ void vlc::load_settings()
 {
     load_vlc_sources();
     select_vlc_source(utf8_to_qt(CGET_STR(CFG_VLC_ID)));
+    /* Notify user, if vlc source is disabled */
+    ui->lbl_vlc_disabled->setVisible(!util::have_vlc_source);
+    ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
+    ui->cb_vlc_source_name->setEnabled(util::have_vlc_source);
 }
 
 void vlc::save_settings()

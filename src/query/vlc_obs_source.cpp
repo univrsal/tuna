@@ -121,55 +121,48 @@ void vlc_obs_source::refresh()
         return;
 
     auto* calldata = calldata_create();
-    bool failure = false;
 
-#define GET_VLC_META(tid)                                                \
-    const char* tid = nullptr;                                           \
-    do {                                                                 \
-        calldata_set_string(calldata, "tag_id", #tid);                   \
-        failure |= !proc_handler_call(ph,                                \
-            "void get_metadata(in string tag_id out string tag_data)",   \
-            calldata);                                                   \
-        if (failure || !calldata_get_string(calldata, "tag_data", &tid)) \
-            berr("Failed to retrieve %s tag", #tid);                     \
-    } while (false)
-
-    if (!proc_handler_call(ph, "", calldata)) {
-        calldata_destroy(calldata);
-        return;
-    }
+    auto get_meta = [](const char* tag_id, calldata_t* cd, proc_handler_t* ph)
+    {
+        const char* result = nullptr;
+        calldata_set_string(cd, "tag_id", tag_id);
+        bool failure = !proc_handler_call(ph, "get_metadata",
+            cd);
+        if (failure || !calldata_get_string(cd, "tag_data", &result))
+            berr("Failed to retrieve %s tag", tag_id);
+        return utf8_to_qt(result);
+    };
 
     m_current.set_progress(obs_source_media_get_time(src));
     m_current.set_duration(obs_source_media_get_duration(src));
     m_current.set_state(from_obs_state(obs_source_media_get_state(src)));
 
     if (m_current.state() <= state_paused) {
-        GET_VLC_META(artist);
-        GET_VLC_META(genre);
-        GET_VLC_META(album);
-        GET_VLC_META(track_number);
-        GET_VLC_META(title);
-        GET_VLC_META(date);
-        GET_VLC_META(disc_number);
-        GET_VLC_META(artwork_url);
-        GET_VLC_META(publisher);
+        auto artwork_url = get_meta("artwork_url", calldata, ph);
+        auto title = get_meta("title", calldata, ph);
+        auto artist = get_meta("artist", calldata, ph);
+        auto date = get_meta("date", calldata, ph);
+        auto album = get_meta("album", calldata, ph);
+        auto publisher = get_meta("publisher", calldata, ph);
+        auto track_number = get_meta("track_number", calldata, ph);
+        auto disc_number = get_meta("disc_number", calldata, ph);
 
-        if (artwork_url)
-            m_current.set_cover_link(QUrl::fromPercentEncoding(artwork_url));
-        if (title)
+        if (artwork_url != "")
+            m_current.set_cover_link(QUrl::fromPercentEncoding(qt_to_utf8(artwork_url)));
+        if (title != "")
             m_current.set_title(title);
-        if (artist)
+        if (artist != "")
             m_current.append_artist(artist);
-        if (date)
+        if (date != "")
             m_current.set_year(date);
-        if (album)
+        if (album != "")
             m_current.set_album(album);
-        if (publisher)
+        if (publisher != "")
             m_current.set_label(publisher);
-        if (track_number)
-            m_current.set_track_number(utf8_to_qt(track_number).toUInt());
-        if (disc_number)
-            m_current.set_track_number(utf8_to_qt(disc_number).toUInt());
+        if (track_number != "")
+            m_current.set_track_number(track_number.toUInt());
+        if (disc_number != "")
+            m_current.set_track_number(disc_number.toUInt());
     }
 
     calldata_destroy(calldata);
