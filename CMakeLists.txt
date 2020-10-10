@@ -246,9 +246,8 @@ if(WIN32)
                 "${PROJECT_SOURCE_DIR}/data"
                 "${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
     )
-endif()
 
-if(UNIX AND NOT APPLE)
+elseif(UNIX AND NOT APPLE)
     include(GNUInstallDirs)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES PREFIX "")
@@ -296,4 +295,13 @@ elseif(APPLE)
     target_link_libraries(${CMAKE_PROJECT_NAME}
         "${OBS_FRONTEND_LIB}"
     )
+
+    if (LOCAL_INSTALLATION)
+        # Installs into home directory
+        install(TARGETS ${CMAKE_PROJECT_NAME}
+            LIBRARY DESTINATION "$ENV{HOME}/Library/Application Support/obs-studio/plugins/${CMAKE_PROJECT_NAME}/bin/")
+
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data
+            DESTINATION "$ENV{HOME}/Library/Application Support/obs-studio/plugins/${CMAKE_PROJECT_NAME}")
+    endif()
 endif()

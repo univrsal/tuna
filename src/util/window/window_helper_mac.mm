@@ -49,6 +49,19 @@ static inline const char *make_name(NSString *owner, NSString *name)
 	return str.UTF8String;
 }
 
+static inline pair<string, string> create_pair(NSString *owner, NSString *name, bool& ok)
+{
+       ok = false;
+    if (!owner.length || !name.length)
+        return pair<string, string>("n/a", "n/a");
+    string o = string([owner UTF8String], [owner lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    string n = string([name UTF8String], [name lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+
+    if (!o.empty() && !n.empty())
+        ok = true;
+    return pair<string, string>(o, n);
+}
+
 void GetWindowList(vector<string> &windows)
 {
 	@autoreleasepool {
@@ -61,8 +74,11 @@ void GetWindowList(vector<string> &windows)
 void GetWindowAndExeList(vector<pair<string, string>>& list)
 {
 	@autoreleasepool {
-		for (NSDictionary *d in enumerate_windows()) {
-			list.emplace_back(pair<string, string>(((NSString *)d[OWNER_NAME]).UTF8String, ((NSString *)d[WINDOW_NAME]).UTF8String));
+        for (NSDictionary *d in enumerate_windows()) {
+            bool ok = false;
+            auto pair = create_pair(d[OWNER_NAME], d[WINDOW_NAME], ok);
+            if (ok)
+                list.emplace_back(pair);
 		}
 	}
 }
