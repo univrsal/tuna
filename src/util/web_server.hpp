@@ -17,24 +17,15 @@
  *************************************************************************/
 
 #pragma once
-#include "../util/constants.hpp"
-#include "music_source.hpp"
-#include <QString>
-#include <obs-module.h>
+#include <mutex>
+#include <thread>
 
-class vlc_obs_source : public music_source {
-    const char* m_target_source_name = nullptr;
-    obs_weak_source_t* m_weak_src = nullptr;
-    /* Only log conversion issues once per file */
-    bool reload();
+/* This thread runs a server that hosts music information in a JSON file */
+namespace web_thread {
+extern std::mutex thread_mutex;
+extern std::thread thread_handle;
 
-public:
-    vlc_obs_source();
-    ~vlc_obs_source();
-
-    void load() override;
-    void refresh() override;
-    bool execute_capability(capability c) override;
-    bool valid_format(const QString& str) override;
-    bool enabled() const override;
-};
+bool start();
+void stop();
+void thread_method();
+}

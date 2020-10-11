@@ -18,9 +18,10 @@
 
 #include "config.hpp"
 #include "../query/music_source.hpp"
-#include "../util/tuna_thread.hpp"
 #include "constants.hpp"
+#include "tuna_thread.hpp"
 #include "utility.hpp"
+#include "web_server.hpp"
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -65,11 +66,13 @@ void init()
     CDEF_BOOL(CFG_FORCE_VLC_DECISION, false);
     CDEF_BOOL(CFG_ERROR_MESSAGE_SHOWN, false);
     CDEF_UINT(CFG_REFRESH_RATE, refresh_rate);
+    CDEF_STR(CFG_SERVER_PORT, "1608");
     CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
 
     CDEF_BOOL(CFG_DOCK_VISIBLE, false);
     CDEF_BOOL(CFG_DOCK_INFO_VISIBLE, true);
     CDEF_BOOL(CFG_DOCK_VOLUME_VISIBLE, true);
+    CDEF_BOOL(CFG_SERVER_ENABLED, false);
 
     if (!cover_placeholder)
         cover_placeholder = obs_module_file("placeholder.png");
@@ -96,7 +99,10 @@ void load()
     tuna_thread::thread_mutex.unlock();
 
     if (run && !tuna_thread::start())
-        berr("Couldn't start thread");
+        berr("Couldn't start query thread");
+
+    if (CGET_BOOL(CFG_SERVER_ENABLED) && !web_thread::start())
+        berr("Couldn't start web server thread");
 
     music_sources::select(selected_source);
 }
@@ -110,10 +116,12 @@ void close()
     tuna_thread::stop();
     bfree((void*)cover_placeholder);
     music_sources::deinit();
+    web_thread::stop();
 }
 
 void load_outputs()
 {
+
     tuna_thread::thread_mutex.lock();
     outputs.clear();
     QDir home = QDir::homePath();

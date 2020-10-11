@@ -17,7 +17,12 @@
  *************************************************************************/
 
 #include "song.hpp"
+#include "../util/format.hpp"
 #include "music_source.hpp"
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 
 song::song()
 {
@@ -183,16 +188,14 @@ int32_t song::get_int_value(char specifier) const
     switch (specifier) {
     case 'd':
         return m_disc_number;
-    case 'a':
+    case 'n':
         return m_track_number;
     case 'p':
         return m_progress_ms;
     case 'l':
         return m_duration_ms;
     case 'o':
-        if (m_data & CAP_TIME_LEFT)
-            return m_duration_ms - m_progress_ms;
-        /* Fallthrough */
+        return m_duration_ms - m_progress_ms;
     default:
         return 0;
     }
@@ -209,4 +212,72 @@ bool song::operator==(const song& other) const
 bool song::operator!=(const song& other) const
 {
     return !((*this) == other);
+}
+
+void song::to_json(QJsonObject& obj)
+{
+    obj = QJsonObject();
+
+    for (const auto& f : format::get_specifiers()) {
+        if (m_data & f->tag_capability()) {
+            auto key = music_sources::capability_to_string(capability(f->tag_capability()));
+            switch (f->get_id()) {
+            case 'd':
+            case 'n':
+            case 'p':
+            case 'l':
+            case 'o':
+                obj[key] = get_int_value(f->get_id());
+                break;
+            case 't':
+            case 'a':
+            case 'r':
+            case 'y':
+            case 'b':
+                obj[key] = get_string_value(f->get_id());
+                break;
+            }
+        }
+    }
+
+    /* Special cases: Cover link, Artists as list, release as year, month, day */
+    if (m_data & CAP_COVER)
+        obj["cover_url"] = m_cover;
+
+    if (m_data & CAP_LYRICS)
+        obj["lyrics_url"] = m_lyrics;
+
+    if (m_data & CAP_ARTIST) {
+        QJsonArray list;
+        for (const auto& artist : m_artists) {
+            list.append(artist);
+        }
+        obj["artists"] = list;
+    }
+
+    if (m_data & CAP_RELEASE) {
+        QJsonObject release;
+        QString precision = "unknown";
+        switch (m_release_precision) {
+        case prec_day:
+            release["day"] = m_day;
+            precision = "day";
+            /* Fallthrough */
+        case prec_month:
+            release["month"] = m_month;
+            if (m_release_precision == prec_month)
+                precision = "month";
+            /* Fallthrough */
+        default:
+        case prec_unknown:
+        case prec_year:
+            release["year"] = m_year;
+            if (m_release_precision == prec_year)
+                precision = "year";
+            else if (m_release_precision == prec_unknown)
+                precision = "unkown";
+        }
+        release["date_precision"] = precision;
+        obj["release_date"] = release;
+    }
 }

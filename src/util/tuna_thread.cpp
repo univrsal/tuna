@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <obs-module.h>
 #include <util/platform.h>
+#include <util/threading.h>
 
 namespace tuna_thread {
 volatile bool thread_flag = false;
@@ -60,6 +61,8 @@ void stop()
 
 void thread_method()
 {
+    os_set_thread_name("tuna-query");
+
     while (thread_flag) {
         const uint64_t time = os_gettime_ns() / 1000000;
         auto ref = music_sources::selected_source();

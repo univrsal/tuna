@@ -80,4 +80,6 @@ public:
 
     bool operator==(const song& other) const;
     bool operator!=(const song& other) const;
+
+    void to_json(QJsonObject& obj);
 };

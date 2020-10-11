@@ -27,9 +27,6 @@ vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC, new vlc)
 {
     m_capabilities = CAP_TITLE | CAP_LABEL | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
-
-    if (!util::have_vlc_source)
-        binfo("VLC source not available, VLC support disabled");
 }
 
 vlc_obs_source::~vlc_obs_source()
@@ -122,8 +119,7 @@ void vlc_obs_source::refresh()
 
     auto* calldata = calldata_create();
 
-    auto get_meta = [](const char* tag_id, calldata_t* cd, proc_handler_t* ph)
-    {
+    auto get_meta = [](const char* tag_id, calldata_t* cd, proc_handler_t* ph) {
         const char* result = nullptr;
         calldata_set_string(cd, "tag_id", tag_id);
         bool failure = !proc_handler_call(ph, "get_metadata",

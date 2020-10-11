@@ -72,7 +72,7 @@ protected:
 public:
     music_source(const char* id, const char* name, source_widget* w = nullptr);
 
-    virtual ~music_source() { }
+    virtual ~music_source() {}
 
     /* util */
     uint32_t get_capabilities() const { return m_capabilities; }
@@ -112,6 +112,7 @@ extern void deinit();
 extern void select(const char* id);
 extern std::shared_ptr<music_source> selected_source_unsafe();
 extern std::shared_ptr<music_source> selected_source();
+extern QString capability_to_string(capability c);
 
 template <class T>
 std::shared_ptr<T> get(const char* id)

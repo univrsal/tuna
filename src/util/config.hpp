@@ -42,6 +42,9 @@
 
 #define CFG_REGION 						"tuna"
 
+#define CFG_SERVER_PORT                 "server_port"
+#define CFG_SERVER_ENABLED              "server_enabled"
+
 #define CFG_RUNNING 					"running"
 #define CFG_SONG_PATH 					"song_path"
 #define CFG_COVER_PATH 					"cover_path"

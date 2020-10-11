@@ -34,6 +34,7 @@ option(GLOBAL_INSTALLATION "Whether to install for all users (default: OFF)" OFF
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${TAGLIB_INCLUDE_DIRS})
 include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+include_directories(${MONGOOSE_INCLUDE_DIRS})
 
 if (OBS_FRONTEND_INCLUDE)
     include_directories(${OBS_FRONTEND_INCLUDE})
@@ -158,6 +159,8 @@ set(tuna_sources
     ./src/util/tuna_thread.hpp
     ./src/util/utility.cpp
     ./src/util/utility.hpp
+    ./src/util/web_server.cpp
+    ./src/util/web_server.hpp
     ./src/util/window/window_helper.hpp
     ./src/gui/widgets/lastfm.cpp
     ./src/gui/widgets/lastfm.hpp
@@ -169,8 +172,9 @@ set(tuna_sources
     ./src/gui/widgets/spotify.hpp
     ./src/gui/widgets/vlc.cpp
     ./src/gui/widgets/vlc.hpp
+    ${MONGOOSE_INCLUDE_SRC}
     ${tuna_ui_headers}
-    )
+)
 
 add_library(tuna MODULE
     ${tuna_sources}

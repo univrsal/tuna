@@ -97,6 +97,8 @@ void tuna_gui::toggleShowHide()
         ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
         ui->cb_dl_cover->setChecked(config::download_cover);
         ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
+        ui->cb_host_server->setChecked(CGET_BOOL(CFG_SERVER_ENABLED));
+        ui->sb_web_port->setValue(utf8_to_qt(CGET_STR(CFG_SERVER_PORT)).toInt());
         set_state();
 
         const auto s = CGET_STR(CFG_SELECTED_SOURCE);
@@ -139,6 +141,8 @@ void tuna_gui::tuna_gui_accepted()
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
+    CSET_BOOL(CFG_SERVER_ENABLED, ui->cb_host_server->isChecked());
+    CSET_STR(CFG_SERVER_PORT, qt_to_utf8(QString::number(ui->sb_web_port->value())));
 
     /* save outputs */
     tuna_thread::thread_mutex.lock();
