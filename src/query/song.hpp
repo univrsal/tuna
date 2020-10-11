@@ -21,6 +21,8 @@
 #include <QString>
 #include <stdint.h>
 
+class QJsonObject;
+
 enum date_precision {
     prec_day,
     prec_month,
