@@ -39,7 +39,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -257,7 +257,7 @@
              <bool>false</bool>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="horizontalHeaderMinimumSectionSize">
              <number>37</number>
@@ -783,7 +783,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;tuna&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;https://github.com/univrsal/tuna&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;github.com/univrsal/tuna&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Display information about currently playing music directly within obs.&lt;/p&gt;&lt;p&gt;Depends on Qt, libobs, taglib, libmpdclient and curl.&lt;/p&gt;&lt;p&gt;Tuna is licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;GPL v2.0&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Translators:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/COOLIGUAY&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;COOLIGUAY&lt;/span&gt;&lt;/a&gt; (Spanish)&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/dEN5-tech&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;dEN5-tech&lt;/span&gt;&lt;/a&gt; (Russian)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;tuna&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;https://github.com/univrsal/tuna&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;github.com/univrsal/tuna&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Display information about currently playing music directly within obs.&lt;/p&gt;&lt;p&gt;Depends on Qt, libobs, taglib, libmpdclient, mongoose and curl.&lt;/p&gt;&lt;p&gt;Tuna is licensed under the &lt;a href=&quot;https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;GPL v2.0&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Translators:&lt;/p&gt;&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/COOLIGUAY&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;COOLIGUAY&lt;/span&gt;&lt;/a&gt; (Spanish)&lt;/li&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/dEN5-tech&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;dEN5-tech&lt;/span&gt;&lt;/a&gt; (Russian)&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="openExternalLinks">
           <bool>true</bool>

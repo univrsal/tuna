@@ -43,21 +43,21 @@ extern bool have_vlc_source;
 
 extern bool curl_download(const char* url, const char* path);
 
-extern bool download_cover(const song &song);
+extern bool download_cover(const song& song);
 
 extern void reset_cover();
 
-extern void download_lyrics(const song &song);
+extern void download_lyrics(const song& song);
 
-extern void handle_outputs(const song &song);
+extern void handle_outputs(const song& song);
 
 extern int64_t epoch();
 
 extern bool window_pos_valid(QRect rect);
 
-extern size_t write_callback(char *ptr, size_t size, size_t nmemb, std::string *str);
+extern size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str);
 
 /* Redirected from util/threading.h because it clashes with mongoose */
-extern void set_thread_name(const char *name);
+extern void set_thread_name(const char* name);
 
 } // namespace util

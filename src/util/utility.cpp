@@ -197,9 +197,9 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
     return new_length;
 }
 
-void set_thread_name(const char *name)
+void set_thread_name(const char* name)
 {
-	os_set_thread_name(name);
+    os_set_thread_name(name);
 }
 
 } // namespace util

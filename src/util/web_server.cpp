@@ -69,6 +69,7 @@ static void event_handler(struct mg_connection* nc, int ev, void* p)
             "Cache-Control: no-store\r\n"
             "Content-Language: en-US\r\n"
             "Server: tuna/%s\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
             "\r\n"
             "%s",
             len, TUNA_VERSION, str.c_str());
