@@ -1,6 +1,5 @@
 # Functions for generating external plugins
 
-set(EXTERNAL_PLUGIN_OUTPUT_DIR "${LibObs_DIR}/../rundir")
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(OBS_ARCH_NAME "64bit")
     set(OBS_BUILDDIR_ARCH "build64")
@@ -37,14 +36,14 @@ endfunction()
 # Installs data
 # 'target' is the destination target project being installed to
 # 'data_loc' specifies the directory of the data
-function(install_external_plugin_data target data_loc)
-	install_external_plugin_data_internal(${target} ${data_loc})
+function(install_external_plugin_data target data_loc LIBOBS_LIB)
+	install_external_plugin_data_internal(${target} ${data_loc} ${LIBOBS_LIB})
 endfunction()
 
 # Installs an additional binary to a target
 # 'target' is the destination target project being installed to
 # 'additional_target' specifies the additional binary
-function(install_external_plugin_additional target additional_target)
+function(install_external_plugin_additional target additional_target LIBOBS_LIB)
 	if(APPLE)
 		set(_bit_suffix "")
 	elseif(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -52,7 +51,11 @@ function(install_external_plugin_additional target additional_target)
 	else()
 		set(_bit_suffix "32bit/")
 	endif()
+	
+	get_filename_component(LibObs_DIR ${LIBOBS_LIB} DIRECTORY)
 
+	set(EXTERNAL_PLUGIN_OUTPUT_DIR "${LibObs_DIR}/../rundir")
+	
 	set_target_properties(${additional_target} PROPERTIES
 		PREFIX "")
 
@@ -64,23 +67,23 @@ function(install_external_plugin_additional target additional_target)
 	add_custom_command(TARGET ${additional_target} POST_BUILD
 		COMMAND "${CMAKE_COMMAND}" -E copy
 			"$<TARGET_FILE:${additional_target}>"
-			"${EXTERNAL_PLUGIN_OUTPUT_DIR}/$<CONFIGURATION>/${target}/${_bit_suffix}$<TARGET_FILE_NAME:${additional_target}>"
+			"${EXTERNAL_PLUGIN_OUTPUT_DIR}/$<CONFIG>/${target}/${_bit_suffix}$<TARGET_FILE_NAME:${additional_target}>"
 		VERBATIM)
     	add_custom_command(TARGET ${additional_target} POST_BUILD
     		COMMAND ${CMAKE_COMMAND} -E copy_if_different
         		$<TARGET_PDB_FILE:${additional_target}>
-		        "${EXTERNAL_PLUGIN_OUTPUT_DIR}/$<CONFIGURATION>/${target}/${_bit_suffix}")
+		        "${EXTERNAL_PLUGIN_OUTPUT_DIR}/$<CONFIG>/${target}/${_bit_suffix}")
 endfunction()
 
 # Installs the binary of the target
 # 'target' is the target project being installed
-function(install_external_plugin target)
-	install_external_plugin_additional(obs-plugins ${target})
+function(install_external_plugin target LIBOBS_LIB)
+	install_external_plugin_additional(obs-plugins ${target} ${LIBOBS_LIB})
 endfunction()
 
 # Installs the binary and data of the target
 # 'target' is the destination target project being installed to
-function(install_external_plugin_with_data target data_loc)
-	install_external_plugin(${target})
-	install_external_plugin_data(${target} ${data_loc})
+function(install_external_plugin_with_data target data_loc LIBOBS_LIB)
+	install_external_plugin_data(${target} ${data_loc} ${LIBOBS_LIB})
+	install_external_plugin(${target} ${LIBOBS_LIB})
 endfunction()
