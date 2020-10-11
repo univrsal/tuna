@@ -172,9 +172,10 @@ set(tuna_sources
     ./src/gui/widgets/spotify.hpp
     ./src/gui/widgets/vlc.cpp
     ./src/gui/widgets/vlc.hpp
-    ${MONGOOSE_INCLUDE_SRC}
+    "${MONGOOSE_SRC}"
     ${tuna_ui_headers}
 )
+message(STATUS ${MONGOOSE_SRC})
 
 add_library(tuna MODULE
     ${tuna_sources}
