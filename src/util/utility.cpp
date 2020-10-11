@@ -32,6 +32,7 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
+#include <util/threading.h>
 
 namespace util {
 
@@ -194,6 +195,11 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
         return 0;
     }
     return new_length;
+}
+
+void set_thread_name(const char *name)
+{
+	os_set_thread_name(name);
 }
 
 } // namespace util

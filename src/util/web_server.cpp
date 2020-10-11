@@ -26,7 +26,6 @@
 #include <QJsonValue>
 #include <mongoose.h>
 #include <util/platform.h>
-#include <util/threading.h>
 
 namespace web_thread {
 
@@ -118,7 +117,7 @@ void stop()
 
 void thread_method()
 {
-    os_set_thread_name("tuna-webserver");
+    util::set_thread_name("tuna-webserver");
 
     for (;;) {
         mg_mgr_poll(&mgr, 500);
