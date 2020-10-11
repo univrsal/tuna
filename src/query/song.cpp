@@ -240,7 +240,23 @@ void song::to_json(QJsonObject& obj)
         }
     }
 
-    /* Special cases: Cover link, Artists as list, release as year, month, day */
+    /* Special cases: Status, Cover link, Artists as list, release as year, month, day */
+    QString status = "unknown";
+    switch (m_is_playing) {
+    case state_playing:
+        status = "playing";
+        break;
+    case state_paused:
+        status = "paused";
+        break;
+    case state_stopped:
+        status = "stopped";
+        break;
+    default:
+    case state_unknown:;
+    }
+    obj["status"] = status;
+
     if (m_data & CAP_COVER)
         obj["cover_url"] = m_cover;
 

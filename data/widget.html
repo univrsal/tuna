@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        body { margin: 0px; overflow: hidden;}
+
+        .info {
+            overflow: hidden;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .widget {
+            padding: 8px;
+            background-color: rgb(44, 44, 44);
+            border-radius: 4px;
+            border-color: rgb(22, 22, 22);
+            height: 120px;
+            box-shadow: 0px 0px 5px black;
+            margin: 8px;
+            position: relative;
+            z-index: -2;
+        }
+
+        #cover {
+            height: 100%;
+        }
+
+        .image-box {
+            box-shadow: 0 0 4px 4px rgba(0, 0, 0, .5) inset;
+            border-radius: 4px;
+            border-width: 1px;
+            height: 100%;
+            float: left;
+        }
+        
+        .image-box img {
+            position: relative;
+            z-index: -1;
+            border-radius: 4px;
+        }
+
+        #title {
+            font-size: x-large;
+            font-weight: bold;
+        }
+
+        p {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            margin: 0px;
+            padding-bottom: 2px;
+        }
+        
+        #artist {
+            font-size: large;
+        }
+        #progressbar, #progress {
+            background-color: gray;
+            height: 6px;
+            width: 100%;
+            margin-top: 5px;
+            border-radius: 2px;
+        }
+
+        #progressbar {
+            position: relative;
+            margin-bottom: 4px;
+        }
+
+        #progress {
+            background-color: rgb(223, 253, 179);
+            width: 50%;
+            position: absolute;
+            top: -80%;
+        }
+
+        #timeline {
+            display: grid;
+            grid-template-columns: 1fr 20fr 1fr;
+            align-items: center;
+            place-items: center;
+        }
+
+        #length {
+            margin-right: 5px;
+            font-size: medium;
+        }
+
+        #time-passed {
+            margin-left: 5px;
+            font-size: medium;
+        }
+    </style>
+
+    <body>
+        <div class="widget">
+            <div class="image-box">
+                <img src="placeholder.png" id="cover">
+            </div>
+            <div class="info">
+                <p id="title">Title</p>
+                <p id="artist">Artist</p>
+                <div id="timeline">
+                    <div>
+                        <p id="length">0:00</p>
+                    </div>
+                    <div id="progressbar">
+                        <div id="progress"></div>
+                    </div>
+                    <div>
+                        <p id="time-passed">0:00</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    
+    <script>
+        var last_cover = '';
+
+        function format_ms(s) {
+            var ms = s % 1000;
+            s = (s - ms) / 1000;
+            var secs = s % 60;
+            s = (s - secs) / 60;
+            var mins = s % 60;
+            var hrs = (s - mins) / 60;
+
+            if (secs < 10)
+                secs = '0' + secs;
+            
+            if (hrs > 0) {
+                if (mins < 10)
+                    mins = '0' + mins;
+                return hrs + ':' + mins + ':' + secs;
+            }
+            return mins + ':' + secs;
+        }
+
+        function fetch_data() {
+            fetch('http://localhost:1608/')
+            .then(response => response.json())
+            .then(data => {
+                // data now contains the json object with song metadata
+                document.getElementById('title').innerText = data['title'];
+                if (data['cover_url'] !== last_cover) {
+                    document.getElementById('cover').src = data['cover_url'];
+                    last_cover = data['cover_url'];
+                }
+                
+                // artist list
+                var artists = '';
+                var array = data['artists'];
+                for (var i = 0; i < array.length; i++) {
+                    artists += array[i];
+                    if (i < array.length - 1)
+                        artists += ', ';
+                }
+
+                if (artists === data['album']) // Some singles have the artist as the album, which looks strange with the other subtitle
+                    document.getElementById('artist').innerText = 'by ' + artists;
+                else
+                    document.getElementById('artist').innerText = 'by ' + artists + ' from ' + data['album']
+                
+                var length = data['duration'];
+                var progress = data['progress'];
+                document.getElementById('progress').style.width = (progress / length) * 100 + '%';
+
+                // Timestamps
+                document.getElementById('length').innerText = format_ms(length);
+                document.getElementById('time-passed').innerText = format_ms(progress);
+                last_query = new Date().getTime();
+                last_json = data;
+            })
+            .catch(function() {
+                // Do nothing
+            });
+        }
+        
+        setInterval(fetch_data, 500);
+    </script>
+</html>
