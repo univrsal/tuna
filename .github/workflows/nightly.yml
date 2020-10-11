@@ -32,9 +32,9 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           git fetch --prune --unshallow
-          echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
-          echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
-          echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
+          echo "GIT_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: Cache OBS build
         id: cache-obs-build-macos
         uses: actions/cache@v1
@@ -84,9 +84,9 @@ jobs:
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
-          echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
-          echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
-          echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
+          echo "OBS_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          echo "OBS_GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "OBS_GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: Configure and build OBS
         if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
         shell: bash
@@ -104,6 +104,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           echo "=> Building plugin for macOS."
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           mkdir -p build && cd build
           cmake .. \
             -DQTDIR=/tmp/obsdeps \
@@ -137,7 +138,6 @@ jobs:
           ./build/lib${{ env.project-name }}.so
           otool -L ./build/lib${{ env.project-name }}.so
           packagesbuild ./package/installer-macOS.pkgproj
-          echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
           mv ./package/build/*.pkg ./package/${{ env.project-name }}.${{ env.GIT_TAG }}.macos.pkg
       - name: Publish
         if: success()
@@ -164,9 +164,9 @@ jobs:
       working-directory: ${{ github.workspace }}
       run: |
         git fetch --prune --unshallow
-        echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
-        echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
-        echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
+        echo "GIT_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+        echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
     - name: Cache Dependencies
       id: cache-linux-deps
       uses: actions/cache@v1
@@ -270,9 +270,9 @@ jobs:
         working-directory: ${{ github.workspace }}/obs-studio
         run: |
           git fetch --prune --unshallow
-          echo ::set-env name=OBS_GIT_BRANCH::$(git rev-parse --abbrev-ref HEAD)
-          echo ::set-env name=OBS_GIT_HASH::$(git rev-parse --short HEAD)
-          echo ::set-env name=OBS_GIT_TAG::$(git describe --tags --abbrev=0)
+          echo "OBS_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          echo "OBS_GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "OBS_GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: 'Checkout last OBS-Studio release (${{ env.OBS_GIT_TAG }})'
         shell: bash
         working-directory: ${{ github.workspace }}/obs-studio
@@ -284,9 +284,9 @@ jobs:
         working-directory: ${{ github.workspace }}/${{ env.project-git }}
         run: |
           git fetch --prune --unshallow
-          echo ::set-env name=GIT_BRANCH::${{ github.event.pull_request.head.ref }}
-          echo ::set-env name=GIT_HASH::$(git rev-parse --short HEAD)
-          echo ::set-env name=GIT_TAG::$(git describe --tags --abbrev=0)
+          echo "GIT_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: 'Install prerequisite: QT'
         run: |
           curl -kLO https://cdn-fastly.obsproject.com/downloads/Qt_${{ env.QT_VERSION }}.7z -f --retry 5 -C -
