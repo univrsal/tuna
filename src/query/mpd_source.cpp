@@ -1,4 +1,4 @@
-/*************************************************************************
+﻿/*************************************************************************
  * This file is part of tuna
  * github.com/univrsal/tuna
  * Copyright 2020 univrsal <uni@vrsal.cf>.
@@ -187,7 +187,24 @@ void mpd_source::refresh()
         /* Absolute path to current song file */
         QString file_path = mpd_song_get_uri(m_mpd_song);
         file_path.prepend(m_base_folder);
-        m_current.set_cover_link(file_path);
+        m_song_file_path = file_path;
+
+        /* The song url link is now used by the browser widget which requires
+         * a proper url to embed it into the browser source, the acutal
+         * retrieval of the cover is done via m_song_file_path which checks
+         * the song file for cover tags as well as the folder the file is in
+         */
+        QString path = utf8_to_qt(config::cover_path);
+
+        // Convert C:\test\file.txt to \C\test\file.txt
+        if (path[1] == ':') {
+            path[1] = path[0];
+            path[0] = '/';
+        }
+
+        path.replace('\\', '/'); // url has to use unix separators
+        path = "file://" + path;
+        m_current.set_cover_link(path);
     }
 
     if (!m_mpd_song || !m_status) {
@@ -212,7 +229,7 @@ void mpd_source::handle_cover()
 
     if (m_current.state() == state_playing) {
         bool result = false;
-        QString file_path = m_current.cover(), tmp;
+        QString file_path = m_song_file_path, tmp;
         if (cover::find_embedded_cover(file_path)) {
             result = true;
         } else {

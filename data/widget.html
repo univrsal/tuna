@@ -117,6 +117,8 @@
     
     <script>
         var last_cover = '';
+        var last_artist = '';
+        var last_title = '';
 
         function format_ms(s) {
             var ms = s % 1000;
@@ -142,11 +144,7 @@
             .then(response => response.json())
             .then(data => {
                 // data now contains the json object with song metadata
-                document.getElementById('title').innerText = data['title'];
-                if (data['cover_url'] !== last_cover) {
-                    document.getElementById('cover').src = data['cover_url'];
-                    last_cover = data['cover_url'];
-                }
+
                 
                 // artist list
                 var artists = '';
@@ -155,6 +153,16 @@
                     artists += array[i];
                     if (i < array.length - 1)
                         artists += ', ';
+                }
+
+                document.getElementById('title').innerText = data['title'];
+                if (data['cover_url'] !== last_cover || // Refresh only if meta data suggests that the cover changed
+                    (data['title'] !== last_title &&    // When using MPD the path is always the cover path configured in tuna
+                    artists !== last_artist))           // which means it won't change so we check against other data
+                {
+                    // Random number at the end is to prevent caching
+                    document.getElementById('cover').src = data['cover_url'] + '?' + Math.random();
+                    last_cover = data['cover_url'];
                 }
 
                 if (artists === data['album']) // Some singles have the artist as the album, which looks strange with the other subtitle
@@ -169,8 +177,9 @@
                 // Timestamps
                 document.getElementById('length').innerText = format_ms(length);
                 document.getElementById('time-passed').innerText = format_ms(progress);
-                last_query = new Date().getTime();
-                last_json = data;
+                
+                last_artist = artists;
+                last_title = data['title'];
             })
             .catch(function() {
                 // Do nothing

@@ -29,6 +29,7 @@ class mpd_source : public music_source {
     bool m_stopped = false;
     QString m_address;
     QString m_base_folder;
+    QString m_song_file_path;
     bool m_connected;
     uint16_t m_port;
     bool m_local;
