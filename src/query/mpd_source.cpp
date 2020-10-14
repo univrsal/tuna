@@ -196,12 +196,8 @@ void mpd_source::refresh()
          */
         QString path = utf8_to_qt(config::cover_path);
 
-        // Convert C:\test\file.txt to \C\test\file.txt
-        if (path[1] == ':') {
-            path[1] = path[0];
-            path[0] = '/';
-        }
-
+        // Convert to proper file:// url
+        path = '/' + path;
         path.replace('\\', '/'); // url has to use unix separators
         path = "file://" + path;
         m_current.set_cover_link(path);
