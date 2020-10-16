@@ -214,7 +214,7 @@ bool song::operator!=(const song& other) const
     return !((*this) == other);
 }
 
-void song::to_json(QJsonObject& obj)
+void song::to_json(QJsonObject& obj) const
 {
     obj = QJsonObject();
 
@@ -296,4 +296,43 @@ void song::to_json(QJsonObject& obj)
         release["date_precision"] = precision;
         obj["release_date"] = release;
     }
+}
+
+void song::from_json(const QJsonObject& obj)
+{
+    /* This is currently only used for POSTing info from the web browser
+     * so we only parse supported options */
+    clear();
+
+    auto state = obj["status"];
+    if (state.isNull())
+        set_state(state_unknown);
+    else if (state.toString() == "playing")
+        set_state(state_playing);
+    else if (state.toString() == "stopped")
+        set_state(state_stopped);
+
+    auto cover = obj["cover_url"];
+    if (cover.isString())
+        set_cover_link(cover.toString());
+
+    auto title = obj["title"];
+    if (title.isString())
+        set_title(title.toString());
+
+    auto artists = obj["artists"];
+    if (artists.isArray()) {
+        for (auto a : artists.toArray()) {
+            if (a.isString())
+                append_artist(a.toString());
+        }
+    }
+
+    auto progress = obj["progress"];
+    if (progress.isDouble())
+        set_progress(progress.toInt());
+
+    auto duration = obj["duration"];
+    if (duration.isDouble())
+        set_duration(duration.toInt());
 }

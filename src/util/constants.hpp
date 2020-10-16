@@ -29,6 +29,7 @@
 #define S_SOURCE_WINDOW_TITLE	"window"
 #define S_SOURCE_GPMDP          "gpmdp"
 #define S_SOURCE_LAST_FM        "lastfm"
+#define S_SOURCE_WEB            "web"
 
 #define S_PROGRESS_FG			"fg"
 #define S_PROGRESS_BG			"bg"
@@ -53,6 +54,8 @@
 #define T_SOURCE_VLC			T_("tuna.gui.tab.vlc")
 #define T_SOURCE_GPMDP      	T_("tuna.gui.tab.gpmdp")
 #define T_SOURCE_WINDOW_TITLE	T_("tuna.gui.tab.window_title")
+#define T_SOURCE_WEB            T_("tuna.gui.tab.web")
+
 #define T_PLACEHOLDER 			T_("tuna.config.song.placeholder")
 #define T_FORMAT 				T_("tuna.config.song.format")
 #define T_SELECT_SONG_FILE 		T_("tuna.gui.select.song.file")

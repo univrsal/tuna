@@ -17,17 +17,13 @@
  *************************************************************************/
 
 #pragma once
-#include "../query/song.hpp"
-#include <mutex>
-#include <thread>
+#include "music_source.hpp"
 
-/* This thread runs a server that hosts music information in a JSON file */
-namespace web_thread {
-extern std::mutex song_mutex;
-extern std::mutex thread_mutex;
-extern std::thread thread_handle;
-extern song current_song;
-bool start();
-void stop();
-void thread_method();
-}
+class web_source : public music_source {
+public:
+    web_source();
+
+    void refresh() override;
+    bool execute_capability(capability c) override;
+    bool enabled() const override;
+};

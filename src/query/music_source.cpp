@@ -29,6 +29,7 @@
 #include "mpd_source.hpp"
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
+#include "web_source.hpp"
 #include "window_source.hpp"
 #include <QRegularExpression>
 #include <obs-frontend-api.h>
@@ -46,6 +47,7 @@ void init()
     instances.append(std::make_shared<window_source>());
     instances.append(std::make_shared<lastfm_source>());
     instances.append(std::make_shared<gpmdp_source>());
+    instances.append(std::make_shared<web_source>());
     obs_frontend_pop_ui_translation();
 }
 

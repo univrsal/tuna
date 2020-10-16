@@ -16,18 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
-#pragma once
-#include "../query/song.hpp"
-#include <mutex>
-#include <thread>
+#include "web_source.hpp"
+#include "../util/constants.hpp"
+#include "../util/web_server.hpp"
 
-/* This thread runs a server that hosts music information in a JSON file */
-namespace web_thread {
-extern std::mutex song_mutex;
-extern std::mutex thread_mutex;
-extern std::thread thread_handle;
-extern song current_song;
-bool start();
-void stop();
-void thread_method();
+web_source::web_source()
+    : music_source(S_SOURCE_WEB, T_SOURCE_WEB)
+{
+}
+
+void web_source::refresh()
+{
+    begin_refresh();
+    m_current.clear();
+    web_thread::song_mutex.lock();
+    m_current = web_thread::current_song;
+    web_thread::song_mutex.unlock();
+}
+
+bool web_source::execute_capability(capability)
+{
+    return false;
+}
+
+bool web_source::enabled() const
+{
+    return true;
 }
