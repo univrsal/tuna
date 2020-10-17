@@ -8,6 +8,11 @@ Currently supports
 - Spotify
 - MPD
 - Any Window title
+- [last.fm](https://last.fm) scrobbling
 - OBS VLC source
+- [Google Play Music™ Desktop Player](https://github.com/MarshallOfSound/Google-Play-Music-Desktop-Player-UNOFFICIAL-)
+- Through [tampermonkey script](https://greasyfork.org/en/scripts/413575-tuna-browser-script):
+    - Soundcloud 
+    - Spotify Web Player
 
 <img src="src/gui/images/tuna.png" alt="hey tuna" width="180px">
