@@ -165,7 +165,7 @@
                     last_cover = data['cover_url'];
                 }
 
-                if (artists === data['album']) // Some singles have the artist as the album, which looks strange with the other subtitle
+                if (artists === data['album'] || data['album'] === undefined) // Some singles have the artist as the album, which looks strange with the other subtitle
                     document.getElementById('artist').innerText = 'by ' + artists;
                 else
                     document.getElementById('artist').innerText = 'by ' + artists + ' from ' + data['album']
