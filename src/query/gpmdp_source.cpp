@@ -27,7 +27,8 @@ gpmdp_source::gpmdp_source()
 {
     m_capabilities = CAP_ALBUM | CAP_TITLE | CAP_ARTIST | CAP_STATUS | CAP_DURATION | CAP_PROGRESS | CAP_COVER;
 #if _WIN32
-    m_path = qEnvironmentVariable("%APPDATA%") + "/Google Play Music Desktop Player/json_store/playback.json";
+    m_path = qgetenv("APPDATA") + "/Google Play Music Desktop Player/json_store/playback.json";
+	bdebug("PATH: %s", qt_to_utf8(m_path));
 #elif __unix__
     QDir home = QDir::homePath();
     m_path = home.absolutePath() + "/.config/Google Play Music Desktop Player/json_store/playback.json";
