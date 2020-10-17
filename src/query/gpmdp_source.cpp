@@ -28,7 +28,6 @@ gpmdp_source::gpmdp_source()
     m_capabilities = CAP_ALBUM | CAP_TITLE | CAP_ARTIST | CAP_STATUS | CAP_DURATION | CAP_PROGRESS | CAP_COVER;
 #if _WIN32
     m_path = qgetenv("APPDATA") + "/Google Play Music Desktop Player/json_store/playback.json";
-	bdebug("PATH: %s", qt_to_utf8(m_path));
 #elif __unix__
     QDir home = QDir::homePath();
     m_path = home.absolutePath() + "/.config/Google Play Music Desktop Player/json_store/playback.json";
@@ -43,6 +42,7 @@ void gpmdp_source::refresh()
     QFile file(m_path);
 
     if (file.open(QIODevice::ReadOnly)) {
+		begin_refresh();
         m_current.clear();
         auto doc = QJsonDocument::fromJson(file.readAll());
         if (!doc.isObject())
