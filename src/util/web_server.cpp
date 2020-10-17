@@ -81,15 +81,27 @@ static inline void handle_get(struct mg_connection* nc)
 static inline void handle_post(struct mg_connection* nc, struct http_message* msg)
 {
     /* Parse POST data JSON */
+	QByteArray arr = QByteArray(msg->body.p, msg->body.len);
     QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(msg->body.p, &err);
+	QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
 
-    song_mutex.lock();
-    auto data = doc.object()["data"];
-    if (data.isObject())
-        current_song.from_json(data.toObject());
-    song_mutex.unlock();
-
+    if (err.error == QJsonParseError::NoError && doc.isObject()) {
+		song_mutex.lock();
+		auto data = doc.object()["data"];
+		if (data.isObject())
+			current_song.from_json(data.toObject());
+		song_mutex.unlock();
+	} else {
+		bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
+		bwarn("JSON: %s", msg->body.p);
+		mg_printf(nc,
+				  "HTTP/1.1 400 Bad request\r\n"
+				  "Connection: close\r\n"
+				  "Server: tuna/%s\r\n"
+				  "\r\n", TUNA_VERSION);
+		return;
+    }
+ 
     /* Simple OK reponse with mirror of received data */
     mg_printf(nc,
         "HTTP/1.1 200 OK\r\n"
@@ -118,7 +130,7 @@ static inline void handle_options(struct mg_connection* nc)
         "Cache-Control: max-age=604800\r\n"
         "Access-Control-Allow-Origin: *\r\n"
         "Access-Control-Allow-Methods: POST\r\n"
-        "Access-Control-Allow-Headers: access-control-allow-headers,content-type\r\n"
+        "Access-Control-Allow-Headers: *\r\n"
         "Access-Control-Max-Age: 84600\r\n"
         "Date: %s\r\n"
         "Server: tuna/%s\r\n"
