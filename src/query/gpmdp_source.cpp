@@ -40,9 +40,8 @@ gpmdp_source::gpmdp_source()
 void gpmdp_source::refresh()
 {
     QFile file(m_path);
-
+	begin_refresh();
     if (file.open(QIODevice::ReadOnly)) {
-		begin_refresh();
         m_current.clear();
         auto doc = QJsonDocument::fromJson(file.readAll());
         if (!doc.isObject())
@@ -59,10 +58,6 @@ void gpmdp_source::refresh()
 
         m_current.set_duration(time["total"].toInt());
         m_current.set_progress(time["current"].toInt());
-
-        util::download_cover(m_current);
         file.close();
     }
-
-    begin_refresh();
 }
