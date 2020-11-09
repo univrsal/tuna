@@ -37,8 +37,10 @@ vlc_obs_source::~vlc_obs_source()
 
 bool vlc_obs_source::reload()
 {
-    load();
     auto result = !!m_weak_src;
+    if (!m_weak_src && m_target_source_name != "None")
+        load_vlc_source();
+
     if (m_weak_src) {
         auto src = obs_weak_source_get_source(m_weak_src);
         if (src) {
@@ -50,16 +52,8 @@ bool vlc_obs_source::reload()
     return result;
 }
 
-bool vlc_obs_source::enabled() const
+void vlc_obs_source::load_vlc_source()
 {
-    return util::have_vlc_source;
-}
-
-void vlc_obs_source::load()
-{
-    if (!util::have_vlc_source || m_weak_src)
-        return;
-    music_source::load();
     CDEF_STR(CFG_VLC_ID, "");
     m_target_source_name = CGET_STR(CFG_VLC_ID);
 
@@ -77,6 +71,19 @@ void vlc_obs_source::load()
         }
         obs_source_release(src);
     }
+}
+
+bool vlc_obs_source::enabled() const
+{
+    return util::have_vlc_source;
+}
+
+void vlc_obs_source::load()
+{
+    if (!util::have_vlc_source || m_weak_src)
+        return;
+    music_source::load();
+    load_vlc_source();
 }
 
 static play_state from_obs_state(obs_media_state s)
@@ -111,6 +118,12 @@ void vlc_obs_source::refresh()
 
     begin_refresh();
     m_current.clear();
+    m_current.set_state(from_obs_state(obs_source_media_get_state(src)));
+
+    /* Prevent polling when vlc is stopped, which otherwise could cause a crash
+       when closing obs */
+    if (m_current.state() == state_stopped)
+        return;
 
     proc_handler_t* ph = obs_source_get_proc_handler(src);
 
@@ -131,7 +144,6 @@ void vlc_obs_source::refresh()
 
     m_current.set_progress(obs_source_media_get_time(src));
     m_current.set_duration(obs_source_media_get_duration(src));
-    m_current.set_state(from_obs_state(obs_source_media_get_state(src)));
 
     if (m_current.state() <= state_paused) {
         auto artwork_url = get_meta("artwork_url", calldata, ph);

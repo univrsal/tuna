@@ -40,7 +40,7 @@ gpmdp_source::gpmdp_source()
 void gpmdp_source::refresh()
 {
     QFile file(m_path);
-	begin_refresh();
+    begin_refresh();
     if (file.open(QIODevice::ReadOnly)) {
         m_current.clear();
         auto doc = QJsonDocument::fromJson(file.readAll());

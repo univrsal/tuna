@@ -81,27 +81,28 @@ static inline void handle_get(struct mg_connection* nc)
 static inline void handle_post(struct mg_connection* nc, struct http_message* msg)
 {
     /* Parse POST data JSON */
-	QByteArray arr = QByteArray(msg->body.p, msg->body.len);
+    QByteArray arr = QByteArray(msg->body.p, msg->body.len);
     QJsonParseError err;
-	QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
+    QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
 
     if (err.error == QJsonParseError::NoError && doc.isObject()) {
-		song_mutex.lock();
-		auto data = doc.object()["data"];
-		if (data.isObject())
-			current_song.from_json(data.toObject());
-		song_mutex.unlock();
-	} else {
-		bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
-		bwarn("JSON: %s", msg->body.p);
-		mg_printf(nc,
-				  "HTTP/1.1 400 Bad request\r\n"
-				  "Connection: close\r\n"
-				  "Server: tuna/%s\r\n"
-				  "\r\n", TUNA_VERSION);
-		return;
+        song_mutex.lock();
+        auto data = doc.object()["data"];
+        if (data.isObject())
+            current_song.from_json(data.toObject());
+        song_mutex.unlock();
+    } else {
+        bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
+        bwarn("JSON: %s", msg->body.p);
+        mg_printf(nc,
+            "HTTP/1.1 400 Bad request\r\n"
+            "Connection: close\r\n"
+            "Server: tuna/%s\r\n"
+            "\r\n",
+            TUNA_VERSION);
+        return;
     }
- 
+
     /* Simple OK reponse with mirror of received data */
     mg_printf(nc,
         "HTTP/1.1 200 OK\r\n"

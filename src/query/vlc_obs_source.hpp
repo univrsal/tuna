@@ -28,6 +28,8 @@ class vlc_obs_source : public music_source {
     /* Only log conversion issues once per file */
     bool reload();
 
+    void load_vlc_source();
+
 public:
     vlc_obs_source();
     ~vlc_obs_source();
