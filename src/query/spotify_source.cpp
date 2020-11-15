@@ -479,6 +479,8 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     if (put) {
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     } else {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
