@@ -467,11 +467,15 @@ bool spotify_source::new_token(QString& log)
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
     QJsonDocument& response_json, bool put)
 {
-    std::string response;
-    std::string header = "Authorization: Bearer ";
     long http_code = -1;
+    std::string response;
+
+    std::string header = "Authorization: Bearer ";
     header.append(auth_token);
+
     auto* list = curl_slist_append(nullptr, header.c_str());
+    list = curl_slist_append(list, "Content-Length: 0");
+    list = curl_slist_append(list, "Content-Type: application/json");
 
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -481,7 +485,6 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
 
     if (put) {
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "");
     } else {
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
