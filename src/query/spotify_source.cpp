@@ -260,7 +260,7 @@ bool spotify_source::execute_capability(capability c)
 
     switch (c) {
     case CAP_PLAY_PAUSE:
-        if (m_current.state()) {
+        if (!m_current.state()) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
             http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, true);
