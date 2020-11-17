@@ -474,8 +474,6 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     header.append(auth_token);
 
     auto* list = curl_slist_append(nullptr, header.c_str());
-    list = curl_slist_append(list, "Content-Length: 0");
-    list = curl_slist_append(list, "Content-Type: application/json");
 
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -487,6 +485,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
 
     if (custom_request_type != nullptr) {
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, custom_request_type);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
     }
 
     if (!response_header.empty())
