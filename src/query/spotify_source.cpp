@@ -107,7 +107,7 @@ bool spotify_source::valid_format(const QString&)
 
 /* implementation further down */
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json, bool put = false);
+    QJsonDocument& response_json, const char* custom_request_type = nullptr);
 
 void extract_timeout(const std::string& header, uint64_t& timeout)
 {
@@ -260,19 +260,19 @@ bool spotify_source::execute_capability(capability c)
 
     switch (c) {
     case CAP_PLAY_PAUSE:
-        if (m_current.state()) {
+        if (m_current.state() == state_playing) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
-            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, true);
+            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, "PUT");
         } else {
-            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PLAY_URL, header, response, true);
+            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PLAY_URL, header, response, "PUT");
         }
         break;
     case CAP_PREV_SONG:
-        http_code = execute_command(qt_to_utf8(m_token), PLAYER_PREVIOUS_URL, header, response, true);
+        http_code = execute_command(qt_to_utf8(m_token), PLAYER_PREVIOUS_URL, header, response, "POST");
         break;
     case CAP_NEXT_SONG:
-        http_code = execute_command(qt_to_utf8(m_token), PLAYER_NEXT_URL, header, response, true);
+        http_code = execute_command(qt_to_utf8(m_token), PLAYER_NEXT_URL, header, response, "POST");
         break;
     case CAP_VOLUME_UP:
         /* TODO? */
@@ -465,27 +465,27 @@ bool spotify_source::new_token(QString& log)
 /* Sends commands to spotify api via url */
 
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json, bool put)
+    QJsonDocument& response_json, const char* custom_request_type)
 {
-    std::string response;
-    std::string header = "Authorization: Bearer ";
     long http_code = -1;
+    std::string response;
+
+    std::string header = "Authorization: Bearer ";
     header.append(auth_token);
+
     auto* list = curl_slist_append(nullptr, header.c_str());
 
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
-    if (put) {
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
+    curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
+
+    if (custom_request_type != nullptr) {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, custom_request_type);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    } else {
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
-        curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
     }
 
     if (!response_header.empty())
