@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *************************************************************************/
 
+#define NOMINMAX
 #include "spotify_source.hpp"
 #include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
@@ -201,8 +202,6 @@ void spotify_source::refresh()
                 m_timeout_length *= SECOND_TO_NS;
                 m_timout_start = os_gettime_ns();
             }
-        } else {
-            bwarn("Unknown error occured when querying Spotify-API: %li (response: %s)", http_code, qt_to_utf8(str));
         }
     }
 }
@@ -467,6 +466,17 @@ bool spotify_source::new_token(QString& log)
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
     QJsonDocument& response_json, const char* custom_request_type)
 {
+    static int last_call = 0;
+    static int timeout = 0;
+    static int timeout_multiplier = 1;
+    last_call = util::epoch();
+
+    if (timeout > 0) {
+        timeout -= std::max(util::epoch() - last_call, 0ll);
+        if (timeout <= 0)
+            binfo("cURL request timeout over.");
+    }
+
     long http_code = -1;
     std::string response;
 
@@ -503,8 +513,12 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
         response_json = QJsonDocument::fromJson(response.c_str(), &err);
         if (response_json.isNull() && !response.empty())
             berr("Failed to parse json response: %s, Error: %s", response.c_str(), qt_to_utf8(err.errorString()));
+        else
+            timeout_multiplier = 1; // Reset on successful requests
     } else {
-        berr("CURL failed while sending spotify command");
+        timeout = 5 * timeout_multiplier++;
+        berr("CURL failed while sending spotify command (HTTP error %i, cURL error %i: '%s'). Waiting %i seconds before trying again",
+            http_code, res, curl_easy_strerror(res), timeout);
     }
 
     curl_slist_free_all(list);
