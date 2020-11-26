@@ -109,11 +109,11 @@ void load()
 
 void close()
 {
+    tuna_thread::stop();
     tuna_thread::thread_mutex.lock();
     save_outputs();
     util::reset_cover();
     tuna_thread::thread_mutex.unlock();
-    tuna_thread::stop();
     bfree((void*)cover_placeholder);
     music_sources::deinit();
     web_thread::stop();

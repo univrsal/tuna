@@ -107,9 +107,8 @@ std::shared_ptr<music_source> selected_source_unsafe()
 std::shared_ptr<music_source> selected_source()
 {
     if (selected_index >= 0) {
-        tuna_thread::thread_mutex.lock();
+        std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
         auto ref = std::shared_ptr<music_source>(instances[selected_index]);
-        tuna_thread::thread_mutex.unlock();
         return ref;
     }
     return nullptr;

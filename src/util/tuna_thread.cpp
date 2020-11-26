@@ -36,6 +36,7 @@ std::thread thread_handle;
 
 bool start()
 {
+    std::lock_guard<std::mutex> lock(thread_mutex);
     if (thread_flag)
         return true;
     thread_flag = true;
@@ -47,44 +48,49 @@ bool start()
 
 void stop()
 {
-    if (!thread_flag)
-        return;
-    /* Set status to noting before stopping */
-    auto src = music_sources::selected_source();
-    thread_mutex.lock();
-    src->reset_info();
-    util::handle_outputs(src->song_info());
-    thread_flag = false;
-    thread_mutex.unlock();
+	if (!thread_flag)
+		return;
+    {
+        std::lock_guard<std::mutex> lock(thread_mutex);
+        /* Set status to noting before stopping */
+        auto src = music_sources::selected_source_unsafe();
+        src->reset_info();
+        util::handle_outputs(src->song_info());
+        thread_flag = false;
+    }
     thread_handle.join();
+	util::reset_cover();
 }
 
 void thread_method()
 {
     os_set_thread_name("tuna-query");
 
-    while (thread_flag) {
+    while (true) {
         const uint64_t time = os_gettime_ns() / 1000000;
-        auto ref = music_sources::selected_source();
-        if (ref) {
-            thread_mutex.lock();
-            ref->refresh();
-            auto s = ref->song_info();
+        {
+            std::lock_guard<std::mutex> lock(thread_mutex);
+            auto ref = music_sources::selected_source_unsafe();
+            if (ref) {
 
-            /* Make a copy for the progress bar source, because it can't
-             * wait for the other processes to finish, otherwise it'll block
-             * the video thread
-             */
-            copy_mutex.lock();
-            copy = s;
-            copy_mutex.unlock();
+                ref->refresh();
+                auto s = ref->song_info();
 
-            /* Process song data */
-            util::handle_outputs(s);
-            if (config::download_cover)
-                ref->handle_cover();
+                /* Make a copy for the progress bar source, because it can't
+                 * wait for the other processes to finish, otherwise it'll block
+                 * the video thread
+                 */
+                copy_mutex.lock();
+                copy = s;
+                copy_mutex.unlock();
 
-            thread_mutex.unlock();
+                /* Process song data */
+                util::handle_outputs(s);
+                if (config::download_cover)
+                    ref->handle_cover();
+                if (!thread_flag)
+                    break;
+            }
         }
 
         /* Calculate how long refresh took and only wait the remaining time */
@@ -92,6 +98,6 @@ void thread_method()
         uint64_t wait = config::refresh_rate - delta;
         os_sleep_ms(wait);
     }
-    util::reset_cover();
+	binfo("Query thread stopped.");
 }
 }
