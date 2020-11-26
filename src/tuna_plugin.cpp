@@ -78,7 +78,7 @@ bool obs_module_load()
 void obs_module_post_load()
 {
     // Just tries to create a vlc source, preferably with a name that isn't already taken
-    obs_source_t* vlc_source = obs_source_create("vlc_source", "dummy9873945", nullptr, nullptr);
+    obs_source_t* vlc_source = obs_source_create("vlc_source", "tuna_module_load_vlc_presence_test_source", nullptr, nullptr);
     util::have_vlc_source = vlc_source != nullptr;
     obs_source_release(vlc_source);
 }
