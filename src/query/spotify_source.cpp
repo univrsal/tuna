@@ -472,7 +472,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     last_call = util::epoch();
 
     if (timeout > 0) {
-        timeout -= std::max(util::epoch() - last_call, 0ll);
+        timeout -= UTIL_MAX(util::epoch() - last_call, 0);
         if (timeout <= 0)
             binfo("cURL request timeout over.");
     }

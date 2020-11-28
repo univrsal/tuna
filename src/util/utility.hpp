@@ -35,6 +35,8 @@
 
 #define SECOND_TO_NS 1000000000
 
+#define UTIL_MAX(a, b) ((a) > (b) ? (a) : (b))
+
 class song;
 
 namespace util {
