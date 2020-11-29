@@ -19,6 +19,7 @@
 #include "vlc_obs_source.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../gui/widgets/vlc.hpp"
+#include "../util/constants.hpp"
 #include "../util/config.hpp"
 #include "../util/utility.hpp"
 #include <QUrl>
@@ -31,6 +32,15 @@ vlc_obs_source::vlc_obs_source()
 
 vlc_obs_source::~vlc_obs_source()
 {
+    /* Currently VLC sources cause crashes on exit when stopped
+     * so this might mitigate the issue */
+    if (m_weak_src) {
+        obs_source_t *src = obs_weak_source_get_source(m_weak_src);
+        if (src && obs_source_media_get_state(src) == OBS_MEDIA_STATE_STOPPED) {
+            obs_source_media_restart(src);
+            obs_source_release(src);
+        }
+    }
     obs_weak_source_release(m_weak_src);
     m_weak_src = nullptr;
 }
@@ -38,7 +48,7 @@ vlc_obs_source::~vlc_obs_source()
 bool vlc_obs_source::reload()
 {
     auto result = !!m_weak_src;
-    if (!m_weak_src && m_target_source_name != "None")
+    if (!m_weak_src && m_target_source_name != std::string(T_VLC_NONE))
         load_vlc_source();
 
     if (m_weak_src) {
