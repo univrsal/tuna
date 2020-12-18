@@ -29,13 +29,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QCheckBox" name="cb_rmextensions">
-     <property name="text">
-      <string>tuna.gui.vlc.removeextensions</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="btn_refresh_vlc">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">

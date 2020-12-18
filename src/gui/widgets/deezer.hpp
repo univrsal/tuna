@@ -35,6 +35,23 @@ public:
     void load_settings() override;
     void save_settings() override;
 
+private slots:
+    void on_btn_id_show_pressed();
+
+    void on_btn_id_show_released();
+
+    void on_btn_show_secret_pressed();
+
+    void on_btn_show_secret_released();
+
+    void on_btn_sp_show_auth_pressed();
+
+    void on_btn_sp_show_auth_released();
+
+    void on_btn_sp_show_token_pressed();
+
+    void on_btn_sp_show_token_released();
+
 private:
     Ui::deezer* ui;
 };
