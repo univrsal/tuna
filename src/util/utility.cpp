@@ -202,4 +202,41 @@ void set_thread_name(const char* name)
     os_set_thread_name(name);
 }
 
+void remove_extensions(QString& str)
+{
+    if (CGET_BOOL(CFG_REMOVE_EXTENSIONS)) {
+        /* that's every single format supported by vlc, i think */
+        auto exts = {
+            ".aac", ".ac3", ".adts", ".aif", ".aifc", ".aiff", ".amr",
+            ".amv", ".aob", ".aqt", ".asf", ".ass", ".asx", ".au", ".avc",
+            ".avchd", ".avi", ".ax", ".b4s", ".bdmv", ".cda", ".cdg",
+            ".clpi", ".cue", ".dash", ".div", ".divx", ".dts", ".dv",
+            ".dvdmedia", ".f4v", ".flac", ".flh", ".flv", ".gsm", ".gvi",
+            ".gvp", ".h264", ".hdmov", ".ifo", ".iso", ".it", ".jss",
+            ".kmv", ".lrv", ".m1v", ".m2a", ".m2p", ".m2t", ".m2ts", ".m3u",
+            ".m3u8", ".m4a", ".m4b", ".m4p", ".m4v", ".mid", ".mka", ".mkv",
+            ".mlp", ".mod", ".moi", ".moov", ".mov", ".mp1", ".mp2", /* yeah, as if anybody still uses mp2 */
+            ".mp2v", ".mp3", ".mp4", ".mp4.infovid", ".mp4v", ".mpa",
+            ".mpc", ".mpe", ".mpeg", ".mpeg1", ".mpeg4", ".mpg", ".mpg2",
+            ".mpls", ".mpsub", ".mpv", ".mpv2", ".mts", ".mxf", ".nsv",
+            ".nuv", ".oga", ".ogg", ".ogm", ".ogv", ".ogx", ".oma", ".opus",
+            ".pjs", ".pss", ".ra", ".ram", ".rec", ".rm", ".rmi", ".rmvb",
+            ".rt", ".s3m", ".s3z", ".smi", ".snd", ".spx", ".srt", ".sub",
+            ".svi", ".tod", ".trp", ".ts", ".tta", ".usf", ".vlc", ".vlt",
+            ".vob", ".voc", ".vp6", ".vqf", ".vro", ".vse", ".w64", ".wav",
+            ".webm", ".wma", ".wmv", ".wv", ".xa", ".xm", ".xspf", ".xvid",
+            ".3g2", ".3ga", ".3gp", ".3gp2", ".3gpp", ".3p2", ".261",
+            ".3gp_128x96", ".axa", ".axv", ".cache-2", ".cache-3", ".eac3",
+            ".flvat", ".h260", ".mbv", ".mks", ".ml20", ".mp3a", ".mp4a",
+            ".mpeg2", ".mpg4", ".mpgv", ".thd", ".vfo", ".xavc", ".xwm", ".zab"
+        };
+
+        for (const auto& ext : exts) {
+            if (str.toLower().endsWith(ext)) {
+                str = str.left(QString(ext).length());
+                break;
+            }
+        }
+    }
+}
 } // namespace util

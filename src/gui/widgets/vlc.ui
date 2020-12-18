@@ -29,12 +29,9 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="lbl_vlc_disabled">
+    <widget class="QCheckBox" name="cb_rmextensions">
      <property name="text">
-      <string>tuna.gui.vlc.disabled</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
+      <string>tuna.gui.vlc.removeextensions</string>
      </property>
     </widget>
    </item>

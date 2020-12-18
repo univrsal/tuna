@@ -48,8 +48,8 @@ bool start()
 
 void stop()
 {
-	if (!thread_flag)
-		return;
+    if (!thread_flag)
+        return;
     {
         std::lock_guard<std::mutex> lock(thread_mutex);
         /* Set status to noting before stopping */
@@ -59,7 +59,7 @@ void stop()
         thread_flag = false;
     }
     thread_handle.join();
-	util::reset_cover();
+    util::reset_cover();
 }
 
 void thread_method()
@@ -98,6 +98,6 @@ void thread_method()
         uint64_t wait = config::refresh_rate - delta;
         os_sleep_ms(wait);
     }
-	binfo("Query thread stopped.");
+    binfo("Query thread stopped.");
 }
 }

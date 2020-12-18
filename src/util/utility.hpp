@@ -62,4 +62,6 @@ extern size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* 
 /* Redirected from util/threading.h because it clashes with mongoose */
 extern void set_thread_name(const char* name);
 
+extern void remove_extensions(QString& str);
+
 } // namespace util

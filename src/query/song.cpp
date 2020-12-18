@@ -94,6 +94,7 @@ void song::set_title(const QString& title)
     if (!title.isEmpty())
         m_data |= CAP_TITLE;
     m_title = title;
+    util::remove_extensions(m_title);
 }
 
 void song::set_duration(int ms)

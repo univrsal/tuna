@@ -79,7 +79,8 @@ set(tuna_ui
         src/gui/widgets/mpd.ui
         src/gui/widgets/window_title.ui
         src/gui/widgets/spotify.ui
-        src/gui/widgets/vlc.ui)
+        src/gui/widgets/vlc.ui
+        src/gui/widgets/deezer.ui)
 
 qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
 qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
@@ -149,6 +150,8 @@ set(tuna_sources
     ./src/query/web_source.hpp
     ./src/query/song.cpp
     ./src/query/song.hpp
+    ./src/query/deezer_source.cpp
+    ./src/query/deezer_source.hpp
     ./src/util/format.cpp
     ./src/util/format.hpp
     ./src/source/progress.cpp
@@ -174,6 +177,8 @@ set(tuna_sources
     ./src/gui/widgets/spotify.hpp
     ./src/gui/widgets/vlc.cpp
     ./src/gui/widgets/vlc.hpp
+    ./src/gui/widgets/deezer.cpp
+    ./src/gui/widgets/deezer.hpp
     "${MONGOOSE_SRC}"
     ${tuna_ui_headers}
 )

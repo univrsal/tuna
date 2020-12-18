@@ -19,8 +19,8 @@
 #include "vlc_obs_source.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../gui/widgets/vlc.hpp"
-#include "../util/constants.hpp"
 #include "../util/config.hpp"
+#include "../util/constants.hpp"
 #include "../util/utility.hpp"
 #include <QUrl>
 
@@ -35,7 +35,7 @@ vlc_obs_source::~vlc_obs_source()
     /* Currently VLC sources cause crashes on exit when stopped
      * so this might mitigate the issue */
     if (m_weak_src) {
-        obs_source_t *src = obs_weak_source_get_source(m_weak_src);
+        obs_source_t* src = obs_weak_source_get_source(m_weak_src);
         if (src && obs_source_media_get_state(src) == OBS_MEDIA_STATE_STOPPED) {
             obs_source_media_restart(src);
             obs_source_release(src);

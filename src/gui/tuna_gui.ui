@@ -38,8 +38,20 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
+     </property>
+     <property name="elideMode">
+      <enum>Qt::ElideLeft</enum>
+     </property>
+     <property name="usesScrollButtons">
+      <bool>true</bool>
+     </property>
+     <property name="documentMode">
+      <bool>true</bool>
      </property>
      <widget class="QWidget" name="tab_basic">
       <attribute name="title">
@@ -397,6 +409,13 @@
              </spacer>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox">
+            <property name="text">
+             <string>tuna.gui.tab.basics.removeextensions</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

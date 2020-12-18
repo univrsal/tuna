@@ -55,6 +55,7 @@
 #define CFG_SONG_FORMAT 				"song_format"
 #define CFG_SONG_PLACEHOLDER 			"song_placeholder"
 #define CFG_DOWNLOAD_COVER 				"download_cover"
+#define CFG_REMOVE_EXTENSIONS           "removeextensions"
 
 #define CFG_SPOTIFY_LOGGEDIN 			"spotify.login"
 #define CFG_SPOTIFY_TOKEN 				"spotify.token"
@@ -63,6 +64,12 @@
 #define CFG_SPOTIFY_TOKEN_TERMINATION 	"spotify.token_termination"
 #define CFG_SPOTIFY_CLIENT_ID           "spotify.client_id"
 #define CFG_SPOTIFY_CLIENT_SECRET       "spotify.client_secret"
+
+#define CFG_DEEZER_CLIENT_ID            "deezer.client.id"
+#define CFG_DEEZER_CLIENT_SECRET        "deezer.client.secret"
+#define CFG_DEEZER_LOGGEDIN             "deezer.login"
+#define CFG_DEEZER_TOKEN                "deezer.token"
+#define CFG_DEEZER_AUTH_CODE            "deezer.auth_code"
 
 #define CFG_MPD_IP 						"mpd.ip"
 #define CFG_MPD_PORT 					"mpd.port"
