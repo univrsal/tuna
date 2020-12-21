@@ -164,6 +164,7 @@ void handle_outputs(const song& s)
              * when loading the config file so this workaround
              * allows users to still use them */
             tmp_text.replace("%s", " ");
+            tmp_text.replace("%e", "\n");
         }
         if (s.state() >= state_paused && o.log_mode)
             continue; /* No song playing text doesn't make sense in the log */
