@@ -31,31 +31,7 @@ mpd_source::mpd_source()
 {
     m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_STOP_SONG | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
-    m_connection = nullptr;
     m_port = 0;
-    m_connected = false;
-}
-
-mpd_source::~mpd_source()
-{
-    if (m_connection)
-        mpd_connection_free(m_connection);
-    if (m_status)
-        mpd_status_free(m_status);
-    if (m_mpd_song)
-        mpd_song_free(m_mpd_song);
-    m_mpd_song = nullptr;
-    m_connection = nullptr;
-    m_status = nullptr;
-}
-
-void mpd_source::disconnect()
-{
-    if (m_connected) {
-        mpd_connection_free(m_connection);
-        m_connection = nullptr;
-    }
-    m_connected = false;
 }
 
 void mpd_source::reset_info()
@@ -64,34 +40,30 @@ void mpd_source::reset_info()
     disconnect();
 }
 
-void mpd_source::connect()
+struct mpd_connection* mpd_source::connect()
 {
-    bdebug("Opening MPD connection to %s:%hu", qt_to_utf8(m_address), m_port);
-    disconnect();
+    struct mpd_connection* result = nullptr;
     if (m_local)
-        m_connection = mpd_connection_new(nullptr, 0, 400); // 0 ms timeout on windows blocks this thread, which is bad
+        result = mpd_connection_new(nullptr, 0, 400); // 0 ms timeout on windows blocks this thread, which is bad
     else
-        m_connection = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
+        result = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
 
-    if (mpd_connection_get_error(m_connection) != MPD_ERROR_SUCCESS) {
+    if (mpd_connection_get_error(result) != MPD_ERROR_SUCCESS) {
         if (util::epoch() - m_last_error_log > 5) {
             if (m_local) {
                 berr("local mpd connection on default port (usually %i) failed with error '%s'", 6600,
-                    mpd_connection_get_error_message(m_connection));
+                    mpd_connection_get_error_message(result));
             } else {
                 berr("mpd connection to %s:%hu failed with error '%s'", qt_to_utf8(m_address), m_port,
-                    mpd_connection_get_error_message(m_connection));
+                    mpd_connection_get_error_message(result));
             }
             m_last_error_log = util::epoch();
         }
 
-        mpd_connection_free(m_connection);
-        m_connection = nullptr;
-        m_connected = false;
-    } else {
-        m_connected = true;
-        mpd_connection_set_keepalive(m_connection, true);
+        mpd_connection_free(result);
+        result = nullptr;
     }
+    return result;
 }
 
 bool mpd_source::enabled() const
@@ -130,41 +102,33 @@ static inline play_state from_mpd_state(mpd_state s)
 
 void mpd_source::refresh()
 {
-    if (!m_connected)
-        connect();
+    struct mpd_connection* connection = connect();
+    struct mpd_status* status = nullptr;
+    struct mpd_song* mpd_song = nullptr;
 
-    begin_refresh();
-#ifdef _WIN32
-    song copy = m_current; /* Windows seems to randomly not return any info, so we keep a copy in case that happens */
-#endif
-    m_current.clear();
-
-    if (!m_connected) {
-#ifdef _WIN32
-        m_current = copy;
-#endif
+    if (!connection)
         return;
-    }
+    begin_refresh();
 
-    m_status = mpd_run_status(m_connection);
-    m_mpd_song = mpd_run_current_song(m_connection);
+    status = mpd_run_status(connection);
+    mpd_song = mpd_run_current_song(connection);
 
-    if (m_status) {
-        auto new_state = mpd_status_get_state(m_status);
-        m_current.set_progress(mpd_status_get_elapsed_ms(m_status));
+    if (status) {
+        auto new_state = mpd_status_get_state(status);
+        m_current.set_progress(mpd_status_get_elapsed_ms(status));
         m_current.set_state(from_mpd_state(new_state));
     }
 
 /* Thanks ubuntu for using ancient packages */
 #define MPD_TAG_LABEL (mpd_tag_type)21
-    if (m_mpd_song) {
-        const char* title = mpd_song_get_tag(m_mpd_song, MPD_TAG_TITLE, 0);
-        const char* artists = mpd_song_get_tag(m_mpd_song, MPD_TAG_ARTIST, 0);
-        const char* year = mpd_song_get_tag(m_mpd_song, MPD_TAG_DATE, 0);
-        const char* album = mpd_song_get_tag(m_mpd_song, MPD_TAG_ALBUM, 0);
-        const char* num = mpd_song_get_tag(m_mpd_song, MPD_TAG_TRACK, 0);
-        const char* disc = mpd_song_get_tag(m_mpd_song, MPD_TAG_DISC, 0);
-        const char* label = mpd_song_get_tag(m_mpd_song, MPD_TAG_LABEL, 0);
+    if (mpd_song) {
+        const char* title = mpd_song_get_tag(mpd_song, MPD_TAG_TITLE, 0);
+        const char* artists = mpd_song_get_tag(mpd_song, MPD_TAG_ARTIST, 0);
+        const char* year = mpd_song_get_tag(mpd_song, MPD_TAG_DATE, 0);
+        const char* album = mpd_song_get_tag(mpd_song, MPD_TAG_ALBUM, 0);
+        const char* num = mpd_song_get_tag(mpd_song, MPD_TAG_TRACK, 0);
+        const char* disc = mpd_song_get_tag(mpd_song, MPD_TAG_DISC, 0);
+        const char* label = mpd_song_get_tag(mpd_song, MPD_TAG_LABEL, 0);
 #undef MPD_TAG_LABEL
 
         if (title)
@@ -182,15 +146,15 @@ void mpd_source::refresh()
         if (label)
             m_current.set_label(label);
 
-        m_current.set_duration(mpd_song_get_duration_ms(m_mpd_song));
+        m_current.set_duration(mpd_song_get_duration_ms(mpd_song));
 
         /* Absolute path to current song file */
-        QString file_path = mpd_song_get_uri(m_mpd_song);
+        QString file_path = mpd_song_get_uri(mpd_song);
         file_path.prepend(m_base_folder);
         m_song_file_path = file_path;
 
         /* The song url link is now used by the browser widget which requires
-         * a proper url to embed it into the browser source, the acutal
+         * a proper url to embed it into the browser source, the actal
          * retrieval of the cover is done via m_song_file_path which checks
          * the song file for cover tags as well as the folder the file is in
          */
@@ -203,19 +167,11 @@ void mpd_source::refresh()
         m_current.set_cover_link(path);
     }
 
-    if (!m_mpd_song || !m_status) {
-#ifdef _WIN32
-        m_current = copy;
-#endif
-        disconnect();
-    }
-
-    if (m_mpd_song)
-        mpd_song_free(m_mpd_song);
-    m_mpd_song = nullptr;
-    if (m_status)
-        mpd_status_free(m_status);
-    m_status = nullptr;
+    mpd_connection_free(connection);
+    if (mpd_song)
+        mpd_song_free(mpd_song);
+    if (status)
+        mpd_status_free(status);
 }
 
 void mpd_source::handle_cover()
@@ -230,12 +186,16 @@ void mpd_source::handle_cover()
             result = true;
         } else {
             cover::get_file_folder(file_path);
-            file_path.prepend("file://");
 
             /* try to find a cover image in the same folder*/
             if (cover::find_local_cover(file_path, tmp)) {
+                tmp = "file://" + tmp; /* cURL needs this to download the file */
+                QString old = m_current.cover();
                 m_current.set_cover_link(tmp);
                 result = util::download_cover(m_current);
+                /* reset the cover link so the comparsion m_current == m_prev works */
+                m_current.set_cover_link(old);
+                result = true;
             }
         }
         if (!result)
@@ -247,38 +207,40 @@ void mpd_source::handle_cover()
 
 bool mpd_source::execute_capability(capability c)
 {
-    if (!m_connected)
+    struct mpd_connection* connection = connect();
+    if (!connection)
         return false;
     bool result = false;
     switch (c) {
     case CAP_NEXT_SONG:
-        result = mpd_run_next(m_connection);
+        result = mpd_run_next(connection);
         break;
     case CAP_PREV_SONG:
-        result = mpd_run_previous(m_connection);
+        result = mpd_run_previous(connection);
         break;
     case CAP_VOLUME_UP:
-        result = mpd_run_change_volume(m_connection, 2);
+        result = mpd_run_change_volume(connection, 2);
         break;
     case CAP_VOLUME_DOWN:
-        result = mpd_run_change_volume(m_connection, -2);
+        result = mpd_run_change_volume(connection, -2);
         break;
     case CAP_VOLUME_MUTE:
-        result = mpd_run_set_volume(m_connection, 0);
+        result = mpd_run_set_volume(connection, 0);
         break;
     case CAP_PLAY_PAUSE:
-        result = mpd_run_toggle_pause(m_connection);
+        result = mpd_run_toggle_pause(connection);
         if (m_stopped)
-            result = mpd_run_play_pos(m_connection, 0);
+            result = mpd_run_play_pos(connection, 0);
         m_stopped = false;
         break;
     case CAP_STOP_SONG:
         m_stopped = true;
-        result = mpd_run_stop(m_connection);
+        result = mpd_run_stop(connection);
         break;
     default:;
     }
 
+    mpd_connection_free(connection);
     return result;
 }
 

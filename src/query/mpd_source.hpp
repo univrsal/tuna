@@ -23,20 +23,15 @@
 #include <mpd/client.h>
 
 class mpd_source : public music_source {
-    struct mpd_connection* m_connection = nullptr;
-    struct mpd_status* m_status = nullptr;
-    struct mpd_song* m_mpd_song = nullptr;
     bool m_stopped = false;
     QString m_address;
     QString m_base_folder;
     QString m_song_file_path;
-    bool m_connected;
     uint16_t m_port;
     bool m_local;
 
 public:
     mpd_source();
-    ~mpd_source() override;
 
     void load() override;
     void refresh() override;
@@ -47,7 +42,6 @@ public:
     void reset_info() override;
 
 private:
-    void connect();
-    void disconnect();
+    struct mpd_connection* connect();
     uint64_t m_last_error_log = 0;
 };

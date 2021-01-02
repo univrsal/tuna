@@ -26,6 +26,7 @@
 #include "config.hpp"
 #include "utility.hpp"
 #include <QDir>
+#include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
 #include <taglib/apefile.h>
@@ -183,26 +184,39 @@ bool find_embedded_cover(const QString& path)
     return result;
 }
 
-bool find_local(const QString& filename, const QString& folder, QString& out)
+bool find_local_cover(const QString& folder, QString& out)
 {
-    static QStringList exts = { "jpg", "jpeg", "png", "bmp" };
-    QString path = folder + filename + ".";
-
-    for (const auto& ext : exts) {
-        QString file = path + ext;
-        QFile tmp(file);
-
-        if (tmp.exists()) {
-            out = file;
+    static QStringList exts = { "*.jpg", "*.jpeg", "*.png", "*.bmp" };
+    QList<QString> OtherFiles;
+    QDirIterator it(folder, exts, QDir::Files, QDirIterator::NoIteratorFlags);
+    while (it.hasNext()) {
+        if (it.next().contains("cover", Qt::CaseInsensitive)) {
+            out = it.filePath();
             return true;
         }
+        OtherFiles.append(it.filePath());
     }
-    return false;
-}
 
-bool find_local_cover(const QString& folder, QString& cover_out)
-{
-    return find_local("cover", folder, cover_out) || find_local("folder", folder, cover_out);
+    /* If we couldn't find a file named cover, we resort to picking the largest
+     * image file in the folder
+     */
+    qint64 biggest_image_size = 0;
+    QString biggest_image = "";
+
+    for (const auto& file : OtherFiles) {
+        QFileInfo info(file);
+        if (info.size() > biggest_image_size) {
+            biggest_image = file;
+            biggest_image_size = info.size();
+        }
+    }
+
+    if (!biggest_image.isEmpty()) {
+        out = biggest_image;
+        return true;
+    }
+
+    return false;
 }
 
 void get_file_folder(QString& path)
