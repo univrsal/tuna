@@ -109,6 +109,7 @@ void mpd_source::refresh()
     if (!connection)
         return;
     begin_refresh();
+    m_current.clear();
 
     status = mpd_run_status(connection);
     mpd_song = mpd_run_current_song(connection);
