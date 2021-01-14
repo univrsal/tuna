@@ -14,5 +14,6 @@ Currently supports
 - Through [tampermonkey script](https://greasyfork.org/en/scripts/413575-tuna-browser-script):
     - Soundcloud 
     - Spotify Web Player
+    - Deezer
 
 <img src="src/gui/images/tuna.png" alt="hey tuna" width="180px">
