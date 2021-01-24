@@ -48,7 +48,7 @@ vlc_obs_source::~vlc_obs_source()
 bool vlc_obs_source::reload()
 {
     auto result = !!m_weak_src;
-    if (!m_weak_src && m_target_source_name != std::string(T_VLC_NONE))
+    if (!m_weak_src && m_target_source_name && m_target_source_name != std::string(T_VLC_NONE))
         load_vlc_source();
 
     if (m_weak_src) {
