@@ -1,4 +1,4 @@
-﻿/*************************************************************************
+/*************************************************************************
  * This file is part of tuna
  * github.com/univrsal/tuna
  * Copyright 2020 univrsal <uni@vrsal.cf>.
@@ -44,7 +44,7 @@ struct mpd_connection* mpd_source::connect()
 {
     struct mpd_connection* result = nullptr;
     if (m_local)
-        result = mpd_connection_new(nullptr, 0, 400); // 0 ms timeout on windows blocks this thread, which is bad
+        result = mpd_connection_new(nullptr, 0, 2000); // 0 ms timeout on windows blocks this thread, which is bad
     else
         result = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
 
