@@ -150,7 +150,7 @@ void mpd_source::refresh()
         m_current.set_duration(mpd_song_get_duration_ms(mpd_song));
 
         /* Absolute path to current song file */
-        QString file_path = mpd_song_get_uri(mpd_song);
+        QString file_path = utf8_to_qt(mpd_song_get_uri(mpd_song));
         file_path.prepend(m_base_folder);
         m_song_file_path = file_path;
 
