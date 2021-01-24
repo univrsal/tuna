@@ -177,7 +177,6 @@ set(tuna_sources
     "${MONGOOSE_SRC}"
     ${tuna_ui_headers}
 )
-message(STATUS ${MONGOOSE_SRC})
 
 add_library(tuna MODULE
     ${tuna_sources}
