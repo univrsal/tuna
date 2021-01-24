@@ -178,11 +178,11 @@ bool find_embedded_cover(const QString& path)
 {
     bool result = false;
 #ifdef _WIN32
-	// Windoze can't into utf8
-	const auto wstr = path.toStdWString();
-	const TagLib::FileRef fr(wstr.c_str(), false);
+    // Windoze can't into utf8
+    const auto wstr = path.toStdWString();
+    const TagLib::FileRef fr(wstr.c_str(), false);
 #else
-	const TagLib::FileRef fr(qt_to_utf8(path), false);
+    const TagLib::FileRef fr(qt_to_utf8(path), false);
 #endif
 
     if (!fr.isNull())

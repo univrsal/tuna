@@ -27,7 +27,7 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     update(settings);
 }
 
-progress_source::~progress_source() { }
+progress_source::~progress_source() {}
 
 void progress_source::tick(float seconds)
 {
