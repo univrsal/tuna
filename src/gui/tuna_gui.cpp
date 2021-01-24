@@ -28,8 +28,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QString>
+#include <curl/curl.h>
+#include <mongoose.h>
+#include <mpd/client.h>
 #include <obs-frontend-api.h>
 #include <string>
+#include <taglib/taglib.h>
 #include <util/platform.h>
 
 tuna_gui* tuna_dialog = nullptr;
@@ -63,6 +67,18 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->tbl_outputs->setColumnWidth(1, 180);
     /* TODO Lyrics */
     ui->frame_lyrics->setVisible(false);
+
+    auto about_text = ui->label->text();
+#define MAKE_VERSION_STRING(prefix, postfix) \
+    QString("%1.%2.%3").arg(QString::number(##prefix##_MAJOR_##postfix), QString::number(prefix##_MINOR_##postfix), QString::number(prefix##_PATCH_##postfix))
+
+    about_text = about_text.replace("%qtversion%", QT_VERSION_STR);
+    about_text = about_text.replace("%libobsversion%", MAKE_VERSION_STRING(LIBOBS_API, VER));
+    about_text = about_text.replace("%taglibversion%", MAKE_VERSION_STRING(TAGLIB, VERSION));
+    about_text = about_text.replace("%mpdversion%", MAKE_VERSION_STRING(LIBMPDCLIENT, VERSION));
+    about_text = about_text.replace("%mgversion%", MG_VERSION);
+    about_text = about_text.replace("%curlversion%", curl_version());
+    ui->label->setText(about_text);
 }
 
 void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)

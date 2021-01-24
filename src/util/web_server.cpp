@@ -25,7 +25,9 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <ctime>
+extern "C" {
 #include <mongoose.h>
+}
 #include <util/platform.h>
 
 namespace web_thread {
@@ -78,10 +80,10 @@ static inline void handle_get(struct mg_connection* nc)
 }
 
 /* POST means we're getting information */
-static inline void handle_post(struct mg_connection* nc, struct http_message* msg)
+static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
 {
     /* Parse POST data JSON */
-    QByteArray arr = QByteArray(msg->body.p, msg->body.len);
+    QByteArray arr = QByteArray(msg->body.ptr, msg->body.len);
     QJsonParseError err;
     QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
 
@@ -93,7 +95,7 @@ static inline void handle_post(struct mg_connection* nc, struct http_message* ms
         song_mutex.unlock();
     } else {
         bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
-        bwarn("JSON: %s", msg->body.p);
+        bwarn("JSON: %s", msg->body.ptr);
         mg_printf(nc,
             "HTTP/1.1 400 Bad request\r\n"
             "Connection: close\r\n"
@@ -115,7 +117,7 @@ static inline void handle_post(struct mg_connection* nc, struct http_message* ms
         "Access-Control-Allow-Origin: *\r\n"
         "\r\n"
         "%s",
-        int(msg->body.len), TUNA_VERSION, msg->body.p);
+        int(msg->body.len), TUNA_VERSION, msg->body.ptr);
 }
 
 static inline void handle_options(struct mg_connection* nc)
@@ -139,11 +141,11 @@ static inline void handle_options(struct mg_connection* nc)
         date, TUNA_VERSION);
 }
 
-static void event_handler(struct mg_connection* nc, int ev, void* d)
+static void event_handler(struct mg_connection* nc, int ev, void* d, void* priv)
 {
-    if (ev == MG_EV_HTTP_REQUEST) {
-        struct http_message* incoming = reinterpret_cast<struct http_message*>(d);
-        QString method = utf8_to_qt(incoming->method.p);
+    if (ev == MG_EV_HTTP_MSG) {
+        auto* incoming = reinterpret_cast<struct mg_http_message*>(d);
+        QString method = utf8_to_qt(incoming->method.ptr);
         if (method.startsWith("GET"))
             handle_get(nc);
         else if (method.startsWith("POST"))
@@ -161,17 +163,17 @@ bool start()
 
     bool result = true;
     auto port = CGET_STR(CFG_SERVER_PORT);
-
+    std::string url = "http://localhost:";
+    url = url.append(port);
     binfo("Starting web server on %s", port);
-    mg_mgr_init(&mgr, NULL);
-    nc = mg_bind(&mgr, port, event_handler);
+    mg_mgr_init(&mgr);
+    nc = mg_listen(&mgr, url.c_str(), event_handler, NULL);
 
     if (!nc) {
         berr("Failed to start listener");
         result = false;
     }
 
-    mg_set_protocol_http_websocket(nc);
     thread_handle = std::thread(thread_method);
     result = thread_handle.native_handle();
 
