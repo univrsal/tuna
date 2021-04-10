@@ -43,10 +43,8 @@ tuna_gui::tuna_gui(QWidget* parent)
     , ui(new Ui::tuna_gui)
 {
     ui->setupUi(this);
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()),
-        this, SLOT(apply_pressed()));
-    connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()),
-        this, SLOT(tuna_gui_accepted()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply_pressed()));
+    connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(tuna_gui_accepted()));
     connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
 
     /* Other signals */
@@ -69,15 +67,20 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->frame_lyrics->setVisible(false);
 
     auto about_text = ui->label->text();
-#define MAKE_VERSION_STRING(prefix, postfix) \
-    QString("%1.%2.%3").arg(QString::number(##prefix##_MAJOR_##postfix), QString::number(prefix##_MINOR_##postfix), QString::number(prefix##_PATCH_##postfix))
+#define MAKE_VERSION_STRING(prefix, postfix)                                                       \
+    QString("%1.%2.%3")                                                                            \
+        .arg(QString::number(prefix##_MAJOR_##postfix), QString::number(prefix##_MINOR_##postfix), \
+            QString::number(prefix##_PATCH_##postfix))
+    auto* ver = curl_version_info(CURLVERSION_NOW);
 
+    if (ver)
+        about_text = about_text.replace("%curlversion%", ver->version);
     about_text = about_text.replace("%qtversion%", QT_VERSION_STR);
     about_text = about_text.replace("%libobsversion%", MAKE_VERSION_STRING(LIBOBS_API, VER));
     about_text = about_text.replace("%taglibversion%", MAKE_VERSION_STRING(TAGLIB, VERSION));
     about_text = about_text.replace("%mpdversion%", MAKE_VERSION_STRING(LIBMPDCLIENT, VERSION));
     about_text = about_text.replace("%mgversion%", MG_VERSION);
-    about_text = about_text.replace("%curlversion%", curl_version());
+
     ui->label->setText(about_text);
 }
 

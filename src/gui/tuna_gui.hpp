@@ -35,6 +35,7 @@ public:
     }
     virtual void save_settings() = 0;
     virtual void load_settings() = 0;
+    virtual void tick() { }
 };
 
 class tuna_gui : public QDialog {
