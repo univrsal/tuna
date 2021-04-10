@@ -294,3 +294,9 @@ foreach(CurrentHeader ${HEADERS})
     get_filename_component(FILE ${CurrentHeader} NAME)
     file(COPY "${CurrentHeader}" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/taglib/taglib/")
 endforeach()
+
+include(ConfigureChecks.cmake)
+
+if (HAVE_GCC_ATOMIC)
+    target_compile_definitions(tag PUBLIC HAVE_GCC_ATOMIC)
+endif()
