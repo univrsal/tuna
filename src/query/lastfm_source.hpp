@@ -21,16 +21,16 @@
 #include "music_source.hpp"
 
 class lastfm_source : public music_source {
-    QString m_username, m_api_key;
-    bool m_custom_api_key = false;
-    uint64_t m_next_refresh = 0;
-    void parse_song(const QJsonObject& s);
+	QString m_username, m_api_key;
+	bool m_custom_api_key = false;
+	uint64_t m_next_refresh = 0;
+	void parse_song(const QJsonObject &s);
 
 public:
-    lastfm_source();
+	lastfm_source();
 
-    void load() override;
-    void refresh() override;
-    bool execute_capability(capability c) override;
-    bool enabled() const override;
+	void load() override;
+	void refresh() override;
+	bool execute_capability(capability c) override;
+	bool enabled() const override;
 };

@@ -27,22 +27,21 @@ class output_edit_dialog;
 }
 
 class tuna_gui;
-enum class edit_mode { create,
-    modify };
+enum class edit_mode { create, modify };
 
 class output_edit_dialog : public QDialog {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    output_edit_dialog(edit_mode m, QWidget* parent = nullptr);
-    ~output_edit_dialog();
+	output_edit_dialog(edit_mode m, QWidget *parent = nullptr);
+	~output_edit_dialog();
 
 private slots:
-    void browse_clicked();
-    void accept_clicked();
-    void format_changed(const QString& text);
+	void browse_clicked();
+	void accept_clicked();
+	void format_changed(const QString &text);
 
 private:
-    Ui::output_edit_dialog* ui;
-    edit_mode m_mode;
-    tuna_gui* m_tuna;
+	Ui::output_edit_dialog *ui;
+	edit_mode m_mode;
+	tuna_gui *m_tuna;
 };

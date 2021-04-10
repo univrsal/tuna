@@ -101,22 +101,22 @@
 
 namespace config {
 struct output {
-    QString format;
-    QString path;
-    QString last_output;
-    bool log_mode;
+	QString format;
+	QString path;
+	QString last_output;
+	bool log_mode;
 };
 
-extern config_t* instance;
+extern config_t *instance;
 
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
-extern const char* placeholder;
-extern const char* selected_source;
-extern const char* cover_path;
-extern const char* lyrics_path;
+extern const char *placeholder;
+extern const char *selected_source;
+extern const char *cover_path;
+extern const char *lyrics_path;
 extern QList<output> outputs;
-extern const char* cover_placeholder;
+extern const char *cover_placeholder;
 extern bool download_cover;
 extern bool placeholder_when_paused;
 

@@ -26,37 +26,37 @@
 #include <QWidget>
 
 class scroll_text : public QWidget {
-    Q_OBJECT
-    Q_PROPERTY(QString text READ text WRITE set_text)
-    Q_PROPERTY(QString separator READ separator WRITE set_separator)
+	Q_OBJECT
+	Q_PROPERTY(QString text READ text WRITE set_text)
+	Q_PROPERTY(QString separator READ separator WRITE set_separator)
 
 public:
-    explicit scroll_text(QWidget* parent = nullptr);
+	explicit scroll_text(QWidget *parent = nullptr);
 
-    QString text() const;
-    void set_text(QString text);
+	QString text() const;
+	void set_text(QString text);
 
-    QString separator() const;
-    void set_separator(QString separator);
+	QString separator() const;
+	void set_separator(QString separator);
 
 protected:
-    virtual void paintEvent(QPaintEvent*);
-    virtual void resizeEvent(QResizeEvent*);
+	virtual void paintEvent(QPaintEvent *);
+	virtual void resizeEvent(QResizeEvent *);
 
 private:
-    void update_text();
-    QString m_text;
-    QString m_separator;
-    QStaticText m_static_text;
-    int m_single_text_width;
-    QSize m_whole_text_size;
-    int m_left_margin;
-    bool m_scroll_enabled;
-    int m_scroll_pos;
-    QImage m_alpha_channel;
-    QImage m_buffer;
-    QTimer m_timer;
+	void update_text();
+	QString m_text;
+	QString m_separator;
+	QStaticText m_static_text;
+	int m_single_text_width;
+	QSize m_whole_text_size;
+	int m_left_margin;
+	bool m_scroll_enabled;
+	int m_scroll_pos;
+	QImage m_alpha_channel;
+	QImage m_buffer;
+	QTimer m_timer;
 
 private slots:
-    virtual void timer_timeout();
+	virtual void timer_timeout();
 };

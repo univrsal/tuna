@@ -12,5 +12,5 @@
 #include <vector>
 
 using namespace std;
-void GetWindowList(vector<string>& windows);
-void GetWindowAndExeList(vector<pair<string, string>>& list);
+void GetWindowList(vector<string> &windows);
+void GetWindowAndExeList(vector<pair<string, string>> &list);

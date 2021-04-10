@@ -20,26 +20,23 @@
 #include "../util/constants.hpp"
 #include "../util/web_server.hpp"
 
-web_source::web_source()
-    : music_source(S_SOURCE_WEB, T_SOURCE_WEB)
-{
-}
+web_source::web_source() : music_source(S_SOURCE_WEB, T_SOURCE_WEB) {}
 
 void web_source::refresh()
 {
-    begin_refresh();
-    m_current.clear();
-    web_thread::song_mutex.lock();
-    m_current = web_thread::current_song;
-    web_thread::song_mutex.unlock();
+	begin_refresh();
+	m_current.clear();
+	web_thread::song_mutex.lock();
+	m_current = web_thread::current_song;
+	web_thread::song_mutex.unlock();
 }
 
 bool web_source::execute_capability(capability)
 {
-    return false;
+	return false;
 }
 
 bool web_source::enabled() const
 {
-    return true;
+	return true;
 }

@@ -21,13 +21,13 @@
 #include "music_source.hpp"
 
 class gpmdp_source : public music_source {
-    QString m_path;
+	QString m_path;
 
 public:
-    gpmdp_source();
+	gpmdp_source();
 
-    void load() override {};
-    void refresh() override;
-    bool execute_capability(capability) override { return false; };
-    bool enabled() const override { return true; };
+	void load() override{};
+	void refresh() override;
+	bool execute_capability(capability) override { return false; };
+	bool enabled() const override { return true; };
 };

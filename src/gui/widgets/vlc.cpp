@@ -22,60 +22,58 @@
 #include "../../util/utility.hpp"
 #include "ui_vlc.h"
 
-vlc::vlc(QWidget* parent)
-    : source_widget(parent)
-    , ui(new Ui::vlc)
+vlc::vlc(QWidget *parent) : source_widget(parent), ui(new Ui::vlc)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 }
 
 vlc::~vlc()
 {
-    delete ui;
+	delete ui;
 }
 
 void vlc::load_settings()
 {
-    load_vlc_sources();
-    select_vlc_source(utf8_to_qt(CGET_STR(CFG_VLC_ID)));
-    ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
-    ui->cb_vlc_source_name->setEnabled(util::have_vlc_source);
+	load_vlc_sources();
+	select_vlc_source(utf8_to_qt(CGET_STR(CFG_VLC_ID)));
+	ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
+	ui->cb_vlc_source_name->setEnabled(util::have_vlc_source);
 }
 
 void vlc::save_settings()
 {
-    CSET_STR(CFG_VLC_ID, qt_to_utf8(ui->cb_vlc_source_name->currentText()));
+	CSET_STR(CFG_VLC_ID, qt_to_utf8(ui->cb_vlc_source_name->currentText()));
 }
 
-static bool add_source(void* data, obs_source_t* src)
+static bool add_source(void *data, obs_source_t *src)
 {
-    auto* id = obs_source_get_id(src);
-    if (strcmp(id, "vlc_source") == 0) {
-        auto* name = obs_source_get_name(src);
-        QComboBox* cb = reinterpret_cast<QComboBox*>(data);
-        cb->addItem(utf8_to_qt(name));
-    }
-    return true;
+	auto *id = obs_source_get_id(src);
+	if (strcmp(id, "vlc_source") == 0) {
+		auto *name = obs_source_get_name(src);
+		QComboBox *cb = reinterpret_cast<QComboBox *>(data);
+		cb->addItem(utf8_to_qt(name));
+	}
+	return true;
 }
 
 void vlc::load_vlc_sources()
 {
-    ui->cb_vlc_source_name->clear();
-    ui->cb_vlc_source_name->addItem(T_VLC_NONE);
-    obs_enum_sources(add_source, ui->cb_vlc_source_name);
+	ui->cb_vlc_source_name->clear();
+	ui->cb_vlc_source_name->addItem(T_VLC_NONE);
+	obs_enum_sources(add_source, ui->cb_vlc_source_name);
 }
 
 void vlc::on_btn_refresh_vlc_clicked()
 {
-    load_vlc_sources();
+	load_vlc_sources();
 }
 
-void vlc::select_vlc_source(const QString& id)
+void vlc::select_vlc_source(const QString &id)
 {
-    const auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchExactly);
+	const auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchExactly);
 
-    if (idx >= 0)
-        ui->cb_vlc_source_name->setCurrentIndex(idx);
-    else
-        ui->cb_vlc_source_name->setCurrentIndex(0);
+	if (idx >= 0)
+		ui->cb_vlc_source_name->setCurrentIndex(idx);
+	else
+		ui->cb_vlc_source_name->setCurrentIndex(0);
 }

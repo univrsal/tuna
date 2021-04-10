@@ -26,15 +26,15 @@ class lastfm;
 }
 
 class lastfm : public source_widget {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit lastfm(QWidget* parent = nullptr);
-    ~lastfm();
+	explicit lastfm(QWidget *parent = nullptr);
+	~lastfm();
 
-    void load_settings() override;
-    void save_settings() override;
+	void load_settings() override;
+	void save_settings() override;
 
 private:
-    Ui::lastfm* ui;
+	Ui::lastfm *ui;
 };

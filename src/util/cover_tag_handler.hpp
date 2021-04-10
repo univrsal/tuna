@@ -21,11 +21,11 @@
 
 namespace cover {
 /* Tries to get the song embbeded in the file */
-extern bool find_embedded_cover(const QString& path);
+extern bool find_embedded_cover(const QString &path);
 
 /* Tries to find the cover in the folder that the file is located in */
-extern bool find_local_cover(const QString& path, QString& cover_out);
+extern bool find_local_cover(const QString &path, QString &cover_out);
 
 /* Turns /home/usr/file.flac into /home/usr/ */
-extern void get_file_folder(QString& path);
+extern void get_file_folder(QString &path);
 }

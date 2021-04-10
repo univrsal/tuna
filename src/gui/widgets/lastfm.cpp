@@ -22,26 +22,24 @@
 #include "../../util/utility.hpp"
 #include "ui_lastfm.h"
 
-lastfm::lastfm(QWidget* parent)
-    : source_widget(parent)
-    , ui(new Ui::lastfm)
+lastfm::lastfm(QWidget *parent) : source_widget(parent), ui(new Ui::lastfm)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 }
 
 lastfm::~lastfm()
 {
-    delete ui;
+	delete ui;
 }
 
 void lastfm::load_settings()
 {
-    ui->txt_username->setText(utf8_to_qt(CGET_STR(CFG_LASTFM_USERNAME)));
-    ui->txt_apikey->setText(utf8_to_qt(CGET_STR(CFG_LASTFM_API_KEY)));
+	ui->txt_username->setText(utf8_to_qt(CGET_STR(CFG_LASTFM_USERNAME)));
+	ui->txt_apikey->setText(utf8_to_qt(CGET_STR(CFG_LASTFM_API_KEY)));
 }
 
 void lastfm::save_settings()
 {
-    CSET_STR(CFG_LASTFM_USERNAME, qt_to_utf8(ui->txt_username->text()));
-    CSET_STR(CFG_LASTFM_API_KEY, qt_to_utf8(ui->txt_apikey->text()));
+	CSET_STR(CFG_LASTFM_USERNAME, qt_to_utf8(ui->txt_username->text()));
+	CSET_STR(CFG_LASTFM_API_KEY, qt_to_utf8(ui->txt_apikey->text()));
 }

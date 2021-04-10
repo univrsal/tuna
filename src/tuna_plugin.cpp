@@ -35,55 +35,56 @@ OBS_DECLARE_MODULE()
 
 OBS_MODULE_USE_DEFAULT_LOCALE(S_PLUGIN_ID, "en-US")
 
-MODULE_EXPORT const char* obs_module_description(void)
+MODULE_EXPORT const char *obs_module_description(void)
 {
-    return "Song information plugin";
+	return "Song information plugin";
 }
 
 void register_gui()
 {
-    /* UI registration from
+	/* UI registration from
      * https://github.com/Palakis/obs-websocket/
      */
-    const auto menu_action = static_cast<QAction*>(obs_frontend_add_tools_menu_qaction(T_MENU_TUNA));
-    obs_frontend_push_ui_translation(obs_module_get_string);
-    const auto main_window = static_cast<QMainWindow*>(obs_frontend_get_main_window());
-    tuna_dialog = new tuna_gui(main_window);
-    obs_frontend_pop_ui_translation();
+	const auto menu_action = static_cast<QAction *>(obs_frontend_add_tools_menu_qaction(T_MENU_TUNA));
+	obs_frontend_push_ui_translation(obs_module_get_string);
+	const auto main_window = static_cast<QMainWindow *>(obs_frontend_get_main_window());
+	tuna_dialog = new tuna_gui(main_window);
+	obs_frontend_pop_ui_translation();
 
-    const auto menu_cb = [] { tuna_dialog->toggleShowHide(); };
-    QAction::connect(menu_action, &QAction::triggered, menu_cb);
+	const auto menu_cb = [] { tuna_dialog->toggleShowHide(); };
+	QAction::connect(menu_action, &QAction::triggered, menu_cb);
 
-    /* Register dock */
+	/* Register dock */
 #ifndef __APPLE__
-    obs_frontend_push_ui_translation(obs_module_get_string);
-    auto* tmp = new music_control(main_window);
-    music_dock = reinterpret_cast<music_control*>(obs_frontend_add_dock(tmp));
-    obs_frontend_pop_ui_translation();
+	obs_frontend_push_ui_translation(obs_module_get_string);
+	auto *tmp = new music_control(main_window);
+	music_dock = reinterpret_cast<music_control *>(obs_frontend_add_dock(tmp));
+	obs_frontend_pop_ui_translation();
 #endif
 }
 
 bool obs_module_load()
 {
-    binfo("Loading v%s build time %s", TUNA_VERSION, BUILD_TIME);
-    config::init();
-    register_gui();
-    format::init();
-    music_sources::init();
-    config::load();
-    obs_sources::register_progress();
-    return true;
+	binfo("Loading v%s build time %s", TUNA_VERSION, BUILD_TIME);
+	config::init();
+	register_gui();
+	format::init();
+	music_sources::init();
+	config::load();
+	obs_sources::register_progress();
+	return true;
 }
 
 void obs_module_post_load()
 {
-    // Just tries to create a vlc source, preferably with a name that isn't already taken
-    obs_source_t* vlc_source = obs_source_create("vlc_source", "tuna_module_load_vlc_presence_test_source", nullptr, nullptr);
-    util::have_vlc_source = vlc_source != nullptr;
-    obs_source_release(vlc_source);
+	// Just tries to create a vlc source, preferably with a name that isn't already taken
+	obs_source_t *vlc_source =
+		obs_source_create("vlc_source", "tuna_module_load_vlc_presence_test_source", nullptr, nullptr);
+	util::have_vlc_source = vlc_source != nullptr;
+	obs_source_release(vlc_source);
 }
 
 void obs_module_unload()
 {
-    config::close();
+	config::close();
 }

@@ -19,39 +19,43 @@
 #pragma once
 
 #include "../tuna_gui.hpp"
+#include <future>
 
 namespace Ui {
 class spotify;
 }
 
 class spotify : public source_widget {
-    Q_OBJECT
-    void apply_login_state(bool state, const QString& log);
+	Q_OBJECT
+	void apply_login_state(bool state, const QString &log);
+
+	std::future<std::pair<bool, QString>> m_token_request_future, m_token_refresh_future;
 
 public:
-    explicit spotify(QWidget* parent = nullptr);
-    ~spotify();
+	explicit spotify(QWidget *parent = nullptr);
+	~spotify();
 
-    void save_settings() override;
-    void load_settings() override;
+	void save_settings() override;
+	void load_settings() override;
+	void tick() override;
 signals:
-    void login_state_changed(bool sate, QString& log);
+	void login_state_changed(bool sate, QString &log);
 private slots:
-    void on_btn_id_show_pressed();
-    void on_btn_id_show_released();
-    void on_btn_show_secret_pressed();
-    void on_btn_show_secret_released();
-    void on_btn_sp_show_auth_pressed();
-    void on_btn_sp_show_auth_released();
-    void on_btn_sp_show_token_pressed();
-    void on_btn_sp_show_token_released();
-    void on_btn_sp_show_refresh_token_pressed();
-    void on_btn_sp_show_refresh_token_released();
-    void on_btn_open_login_clicked();
-    void on_txt_auth_code_textChanged(const QString& arg1);
-    void on_btn_request_token_clicked();
-    void on_btn_performrefresh_clicked();
+	void on_btn_id_show_pressed();
+	void on_btn_id_show_released();
+	void on_btn_show_secret_pressed();
+	void on_btn_show_secret_released();
+	void on_btn_sp_show_auth_pressed();
+	void on_btn_sp_show_auth_released();
+	void on_btn_sp_show_token_pressed();
+	void on_btn_sp_show_token_released();
+	void on_btn_sp_show_refresh_token_pressed();
+	void on_btn_sp_show_refresh_token_released();
+	void on_btn_open_login_clicked();
+	void on_txt_auth_code_textChanged(const QString &arg1);
+	void on_btn_request_token_clicked();
+	void on_btn_performrefresh_clicked();
 
 private:
-    Ui::spotify* ui;
+	Ui::spotify *ui;
 };

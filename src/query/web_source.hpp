@@ -21,9 +21,9 @@
 
 class web_source : public music_source {
 public:
-    web_source();
+	web_source();
 
-    void refresh() override;
-    bool execute_capability(capability c) override;
-    bool enabled() const override;
+	void refresh() override;
+	bool execute_capability(capability c) override;
+	bool enabled() const override;
 };
