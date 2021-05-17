@@ -357,7 +357,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path .\build64
           cd .\build64
           cmake -G "${{ env.CMAKE_GENERATOR }}" -A x64 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" `
-            -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2017_64" `
+            -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc${{ env.WINDOWS_DEPS_VERSION }}_64" `
             -DDepsPath="${{ github.workspace }}\cmbuild\deps\win64" `
             -DLibObs_DIR="${{ github.workspace }}\obs-studio\build64\libobs" `
             -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" `
@@ -372,7 +372,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path .\build32
           cd .\build32
           cmake -G "${{ env.CMAKE_GENERATOR }}" -A Win32 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" `
-          -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc2017" `
+          -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc${{ env.WINDOWS_DEPS_VERSION }}" `
           -DDepsPath="${{ github.workspace }}\cmbuild\deps\win32" `
           -DLibObs_DIR="${{ github.workspace }}\obs-studio\build32\libobs" `
           -DLIBOBS_INCLUDE_DIR="${{ github.workspace }}\obs-studio\libobs" `
