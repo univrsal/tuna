@@ -316,7 +316,7 @@ jobs:
             -A Win32 -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" `
             -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc${{ env.WINDOWS_DEPS_VERSION }}" `
             -DDepsPath="${{ github.workspace }}\cmbuild\deps\win32" -DBUILD_CAPTIONS=YES `
-            -DCOPIED_DEPENDENCIES=NO -DCOPY_DEPENDENCIES=YES ..
+            -DCOPIED_DEPENDENCIES=NO -DCOPY_DEPENDENCIES=YES -DBUILD_BROWSER=OFF ..
       - name: 'Build OBS-Studio 32-bit'
         if: steps.build-cache-obs-32.outputs.cache-hit != 'true'
         working-directory: ${{ github.workspace }}/obs-studio
@@ -344,7 +344,7 @@ jobs:
             -DCMAKE_SYSTEM_VERSION="${{ env.CMAKE_SYSTEM_VERSION }}" `
             -DQTDIR="${{ github.workspace }}\cmbuild\QT\${{ env.QT_VERSION }}\msvc${{ env.WINDOWS_DEPS_VERSION }}_64" `
             -DDepsPath="${{ github.workspace }}\cmbuild\deps\win64" -DBUILD_CAPTIONS=YES -DCOPIED_DEPENDENCIES=NO `
-            -DCOPY_DEPENDENCIES=YES ..
+            -DCOPY_DEPENDENCIES=YES -DBUILD_BROWSER=OFF ..
       - name: 'Build OBS-Studio 64-bit'
         if: steps.build-cache-obs-64.outputs.cache-hit != 'true'
         working-directory: ${{ github.workspace }}/obs-studio
