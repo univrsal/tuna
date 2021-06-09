@@ -6,6 +6,8 @@ labels: bug
 assignees: ''
 
 ---
+# FILL THIS FORM OUT CORRECTLY AND PROVIDE AS MUCH INFORMATION AS POSSIBLE OR YOUR ISSUE WILL BE CLOSED
+(you can remove this before submitting the issue)
 
 **Describe the bug**
 A clear and concise description of what the bug is.
