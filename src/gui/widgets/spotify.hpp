@@ -26,10 +26,16 @@ class spotify;
 }
 
 class spotify : public source_widget {
+	struct result {
+		bool success{};
+		QString value;
+	};
+
 	Q_OBJECT
 	void apply_login_state(bool state, const QString &log);
 
-	std::future<std::pair<bool, QString>> m_token_request_future, m_token_refresh_future;
+	std::promise<result> *m_token_request_promise{}, *m_token_refresh_promise{};
+	std::future<result> m_token_request_future{}, m_token_refresh_future{};
 
 public:
 	explicit spotify(QWidget *parent = nullptr);

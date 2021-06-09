@@ -80,6 +80,10 @@ tuna_gui::tuna_gui(QWidget *parent) : QDialog(parent), ui(new Ui::tuna_gui)
 	about_text = about_text.replace("%mgversion%", MG_VERSION);
 
 	ui->label->setText(about_text);
+
+	m_refresh = new QTimer(this);
+	connect(m_refresh, &QTimer::timeout, this, &tuna_gui::refresh);
+	m_refresh->start(250);
 }
 
 void tuna_gui::choose_file(QString &path, const char *title, const char *file_types)
@@ -145,8 +149,16 @@ void tuna_gui::toggleShowHide()
 void tuna_gui::add_music_source(const QString &display, const QString &id, source_widget *w)
 {
 	ui->cb_source->addItem(display, id);
-	ui->settings_tabs->insertTab(1, w, display);
-	m_source_widgets.append(w);
+	if (w) {
+		ui->settings_tabs->insertTab(1, w, display);
+		m_source_widgets.append(w);
+	}
+}
+
+void tuna_gui::refresh()
+{
+	for (auto widget : qAsConst(m_source_widgets))
+		widget->tick();
 }
 
 void tuna_gui::tuna_gui_accepted()

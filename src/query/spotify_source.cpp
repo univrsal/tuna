@@ -63,8 +63,9 @@ void spotify_source::build_credentials()
 	if (!client_id.isEmpty() && !client_secret.isEmpty()) {
 		m_creds = (client_id + ":" + client_secret).toUtf8().toBase64();
 	} else {
-		QString str = SPOTIFY_CREDENTIALS;
-		m_creds = str.toUtf8().toBase64();
+		QString str = utf8_to_qt(SPOTIFY_CREDENTIALS);
+		auto utf8 = str.toUtf8();
+		m_creds = utf8.toBase64();
 	}
 }
 

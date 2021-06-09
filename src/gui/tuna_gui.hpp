@@ -39,6 +39,7 @@ class tuna_gui : public QDialog {
 	Q_OBJECT
 
 	QList<source_widget *> m_source_widgets;
+	QTimer *m_refresh = nullptr;
 
 public:
 	explicit tuna_gui(QWidget *parent = nullptr);
@@ -50,6 +51,7 @@ public:
 	void edit_output(const QString &format, const QString &path, bool log_mode);
 	void get_selected_output(QString &format, QString &path, bool &log_mode);
 
+	void refresh();
 signals:
 	void source_registered(const QString &display, const QString &id, source_widget *w);
 
