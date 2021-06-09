@@ -166,12 +166,13 @@ bool start()
 	std::string url = "http://localhost:";
 	url = url.append(port);
 	binfo("Starting web server on %s", port);
+	mg_log_set_callback([](const void *buf, int, void *) { binfo("mongoose: %s", (char *)buf); }, nullptr);
 	mg_mgr_init(&mgr);
-	nc = mg_listen(&mgr, url.c_str(), event_handler, NULL);
+	nc = mg_http_listen(&mgr, url.c_str(), event_handler, NULL);
 
 	if (!nc) {
 		berr("Failed to start listener");
-		result = false;
+		return false;
 	}
 
 	thread_handle = std::thread(thread_method);
