@@ -34,7 +34,7 @@ class song {
 	QString m_year, m_month, m_day, m_full_release;
 	int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
 	bool m_is_explicit;
-	play_state m_is_playing;
+	play_state m_playing_state;
 	date_precision m_release_precision;
 
 public:
@@ -56,7 +56,10 @@ public:
 	void set_label(const QString &l);
 	void clear();
 
-	play_state state() const { return m_is_playing; }
+	play_state state() const { return m_playing_state; }
+	bool is_playing() const { return m_playing_state == state_playing; }
+	bool is_paused() const { return !is_playing(); }
+
 	uint16_t data() const { return m_data; }
 	const QString &cover() const { return m_cover; }
 	const QString &lyrics() const { return m_lyrics; }

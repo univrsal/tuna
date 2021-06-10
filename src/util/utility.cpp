@@ -98,6 +98,8 @@ void download_lyrics(const song &song)
 
 bool download_cover(const song &song)
 {
+	if (song.cover() == "n/a")
+		return false;
 	bool result = false;
 	auto path = utf8_to_qt(config::cover_path);
 	auto tmp = path + ".tmp";

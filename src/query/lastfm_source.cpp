@@ -102,7 +102,7 @@ void lastfm_source::parse_song(const QJsonObject &s)
 		auto attr_obj = s["@attr"].toObject();
 		m_current.set_state(attr_obj["nowplaying"].toString() == "true" ? state_playing : state_stopped);
 
-		if (m_current.state()) {
+		if (m_current.is_playing()) {
 			auto covers = s["image"];
 			if (covers.isArray() && covers.toArray().size() > 0) {
 				auto cover_array = covers.toArray();

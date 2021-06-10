@@ -41,7 +41,7 @@ void song::clear()
 	m_track_number = 0;
 	m_duration_ms = 0;
 	m_progress_ms = 0;
-	m_is_playing = state_unknown;
+	m_playing_state = state_unknown;
 	m_is_explicit = false;
 	m_release_precision = prec_unknown;
 	m_day = "";
@@ -126,7 +126,7 @@ void song::set_explicit(bool e)
 void song::set_state(play_state p)
 {
 	m_data |= CAP_STATUS;
-	m_is_playing = p;
+	m_playing_state = p;
 }
 
 void song::set_disc_number(int i)
@@ -248,7 +248,7 @@ void song::to_json(QJsonObject &obj) const
 
 	/* Special cases: Status, Cover link, Artists as list, release as year, month, day */
 	QString status = "unknown";
-	switch (m_is_playing) {
+	switch (m_playing_state) {
 	case state_playing:
 		status = "playing";
 		break;
