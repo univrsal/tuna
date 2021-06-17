@@ -119,7 +119,7 @@ bool extract_flac(TagLib::FLAC::File *file)
 bool extract_mp4(TagLib::MP4::File *file)
 {
 	TagLib::MP4::Tag *tag = file->tag();
-	const TagLib::MP4::ItemListMap &itemListMap = tag->itemListMap();
+	const TagLib::MP4::ItemMap &itemListMap = tag->itemMap();
 	if (itemListMap.contains("covr")) {
 		const TagLib::MP4::CoverArtList &coverArtList = itemListMap["covr"].toCoverArtList();
 		if (!coverArtList.isEmpty()) {
@@ -142,7 +142,7 @@ bool extract_opus(TagLib::Ogg::Opus::File *file)
 	return false;
 }
 
-bool get_embedded(const TagLib::FileRef &fr)
+bool get_embedded(TagLib::FileRef fr)
 {
 	bool found = false;
 
