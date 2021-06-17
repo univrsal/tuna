@@ -26,7 +26,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Log**
-[Add the link to your obs studio log](https://obsproject.com/forum/threads/please-post-a-log-with-your-issue-heres-how.23074/)
+[Add the link to your **entire** obs studio log](https://obsproject.com/forum/threads/please-post-a-log-with-your-issue-heres-how.23074/)
+Also add the **entire** crash report, if this issues is about a crash.
 
 **Additional context**
 Add any other context about the problem here.
