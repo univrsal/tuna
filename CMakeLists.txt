@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(tuna VERSION 1.5.4)
+project(tuna VERSION 1.5.5)
 
 add_subdirectory(deps)
 
@@ -99,9 +99,11 @@ if (APPLE)
     include_directories(${COCOA})
     set_source_files_properties("./src/util/window/window_helper_mac.mm"
         PROPERTIES COMPILE_FLAGS "-fobjc-arc")
-
+    
+    # taglib needs zlib
     set(tuna_platform_deps
-        ${COCOA})
+        ${COCOA}
+        z)
     set(FRONTEND_LIB "${OBS_FRONTEND_LIB}")
 else()
     set(FRONTEND_LIB "obs-frontend-api")
