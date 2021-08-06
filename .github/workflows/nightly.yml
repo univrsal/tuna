@@ -120,8 +120,9 @@ jobs:
         if: success()
         shell: bash
         run: |
-          curl -L -O https://gnu.cat/zqr.pkg
-          sudo installer -pkg ./zqr.pkg -target /
+          curl -L -O http://s.sudre.free.fr/Software/files/Packages.dmg
+          sudo hdiutil attach ./Packages.dmg
+          sudo installer -pkg /Volumes/Packages\ 1.2.9/Install\ Packages.pkg -target /
       - name: Package
         working-directory: ${{ github.workspace }}
         if: success()
