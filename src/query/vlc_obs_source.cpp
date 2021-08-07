@@ -32,15 +32,6 @@ vlc_obs_source::vlc_obs_source()
 
 vlc_obs_source::~vlc_obs_source()
 {
-    /* Currently VLC sources cause crashes on exit when stopped
-     * so this might mitigate the issue */
-    if (m_weak_src) {
-        obs_source_t* src = obs_weak_source_get_source(m_weak_src);
-        if (src && obs_source_media_get_state(src) == OBS_MEDIA_STATE_STOPPED) {
-            obs_source_media_restart(src);
-            obs_source_release(src);
-        }
-    }
     obs_weak_source_release(m_weak_src);
     m_weak_src = nullptr;
 }
@@ -133,13 +124,17 @@ void vlc_obs_source::refresh()
 
     /* Prevent polling when vlc is stopped, which otherwise could cause a crash
        when closing obs */
-    if (m_current.state() == state_stopped)
+    if (m_current.state() == state_stopped) {
+        obs_source_release(src);
         return;
+    }
 
     proc_handler_t* ph = obs_source_get_proc_handler(src);
 
-    if (!ph)
+    if (!ph) {
+        obs_source_release(src);
         return;
+    }
 
     auto* calldata = calldata_create();
 
