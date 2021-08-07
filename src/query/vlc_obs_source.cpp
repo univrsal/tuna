@@ -106,17 +106,18 @@ static play_state from_obs_state(obs_media_state s)
 	case OBS_MEDIA_STATE_PAUSED:
 		return state_paused;
 	case OBS_MEDIA_STATE_STOPPED:
-		return state_paused;
+	case OBS_MEDIA_STATE_ENDED:
+		return state_stopped;
 	default:
 	case OBS_MEDIA_STATE_NONE:
 	case OBS_MEDIA_STATE_ERROR:
 		return state_unknown;
+		break;
 	}
 }
 
 void vlc_obs_source::refresh()
 {
-
 	if (!reload())
 		return;
 

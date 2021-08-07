@@ -233,7 +233,7 @@ void remove_extensions(QString &str)
 
 		for (const auto &ext : exts) {
 			if (str.toLower().endsWith(ext)) {
-				str = str.left(QString(ext).length());
+				str.chop(strlen(ext));
 				break;
 			}
 		}

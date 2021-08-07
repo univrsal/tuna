@@ -120,6 +120,7 @@ void tuna_gui::toggleShowHide()
 		ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
 		ui->cb_host_server->setChecked(CGET_BOOL(CFG_SERVER_ENABLED));
 		ui->sb_web_port->setValue(utf8_to_qt(CGET_STR(CFG_SERVER_PORT)).toInt());
+		ui->cb_remove_file_extensions->setChecked(config::remove_file_extensions);
 		set_state();
 
 		const auto s = CGET_STR(CFG_SELECTED_SOURCE);
@@ -172,6 +173,7 @@ void tuna_gui::tuna_gui_accepted()
 	CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
 	CSET_BOOL(CFG_SERVER_ENABLED, ui->cb_host_server->isChecked());
 	CSET_STR(CFG_SERVER_PORT, qt_to_utf8(QString::number(ui->sb_web_port->value())));
+	CSET_BOOL(CFG_REMOVE_EXTENSIONS, ui->cb_remove_file_extensions->isChecked());
 
 	/* save outputs */
 	tuna_thread::thread_mutex.lock();

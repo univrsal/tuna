@@ -43,6 +43,7 @@ const char *selected_source = nullptr;
 const char *cover_placeholder = nullptr;
 bool download_cover = true;
 bool placeholder_when_paused = true;
+bool remove_file_extensions = true;
 
 void init()
 {
@@ -60,6 +61,7 @@ void init()
 	CDEF_STR(CFG_SELECTED_SOURCE, S_SOURCE_SPOTIFY);
 	CDEF_STR(CFG_SPOTIFY_CLIENT_ID, "847d7cf0c5dc4ff185161d1f000a9d0e");
 
+	CDEF_BOOL(CFG_REMOVE_EXTENSIONS, true);
 	CDEF_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, true);
 	CDEF_BOOL(CFG_RUNNING, false);
 	CDEF_BOOL(CFG_DOWNLOAD_COVER, true);
@@ -92,6 +94,7 @@ void load()
 	download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
 	selected_source = CGET_STR(CFG_SELECTED_SOURCE);
 	placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
+	remove_file_extensions = CGET_BOOL(CFG_REMOVE_EXTENSIONS);
 
 	/* Sources */
 	tuna_thread::thread_mutex.lock();

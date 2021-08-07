@@ -118,6 +118,7 @@ extern const char *lyrics_path;
 extern QList<output> outputs;
 extern const char *cover_placeholder;
 extern bool download_cover;
+extern bool remove_file_extensions;
 extern bool placeholder_when_paused;
 
 void init();

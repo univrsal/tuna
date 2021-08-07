@@ -42,7 +42,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideLeft</enum>
@@ -411,7 +411,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QCheckBox" name="cb_remove_file_extensions">
             <property name="text">
              <string>tuna.gui.tab.basics.removeextensions</string>
             </property>
