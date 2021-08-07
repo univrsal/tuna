@@ -36,68 +36,68 @@ std::thread thread_handle;
 
 bool start()
 {
-	std::lock_guard<std::mutex> lock(thread_mutex);
-	if (thread_flag)
-		return true;
-	thread_flag = true;
-	thread_handle = std::thread(thread_method);
-	bool result = thread_handle.native_handle();
-	thread_flag = result;
-	return result;
+    std::lock_guard<std::mutex> lock(thread_mutex);
+    if (thread_flag)
+        return true;
+    thread_flag = true;
+    thread_handle = std::thread(thread_method);
+    bool result = thread_handle.native_handle();
+    thread_flag = result;
+    return result;
 }
 
 void stop()
 {
-	if (!thread_flag)
-		return;
-	{
-		std::lock_guard<std::mutex> lock(thread_mutex);
-		/* Set status to noting before stopping */
-		auto src = music_sources::selected_source_unsafe();
-		src->reset_info();
-		util::handle_outputs(src->song_info());
-		thread_flag = false;
-	}
-	thread_handle.join();
-	util::reset_cover();
+    if (!thread_flag)
+        return;
+    {
+        std::lock_guard<std::mutex> lock(thread_mutex);
+        /* Set status to noting before stopping */
+        auto src = music_sources::selected_source_unsafe();
+        src->reset_info();
+        util::handle_outputs(src->song_info());
+        thread_flag = false;
+    }
+    thread_handle.join();
+    util::reset_cover();
 }
 
 void thread_method()
 {
-	os_set_thread_name("tuna-query");
+    os_set_thread_name("tuna-query");
 
-	while (true) {
-		const uint64_t time = os_gettime_ns() / 1000000;
-		{
-			std::lock_guard<std::mutex> lock(thread_mutex);
-			auto ref = music_sources::selected_source_unsafe();
-			if (ref) {
+    while (true) {
+        const uint64_t time = os_gettime_ns() / 1000000;
+        {
+            std::lock_guard<std::mutex> lock(thread_mutex);
+            auto ref = music_sources::selected_source_unsafe();
+            if (ref) {
 
-				ref->refresh();
-				auto s = ref->song_info();
+                ref->refresh();
+                auto s = ref->song_info();
 
-				/* Make a copy for the progress bar source, because it can't
+                /* Make a copy for the progress bar source, because it can't
                  * wait for the other processes to finish, otherwise it'll block
                  * the video thread
                  */
-				copy_mutex.lock();
-				copy = s;
-				copy_mutex.unlock();
+                copy_mutex.lock();
+                copy = s;
+                copy_mutex.unlock();
 
-				/* Process song data */
-				util::handle_outputs(s);
-				if (config::download_cover)
-					ref->handle_cover();
-				if (!thread_flag)
-					break;
-			}
-		}
+                /* Process song data */
+                util::handle_outputs(s);
+                if (config::download_cover)
+                    ref->handle_cover();
+                if (!thread_flag)
+                    break;
+            }
+        }
 
-		/* Calculate how long refresh took and only wait the remaining time */
-		uint64_t delta = std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate);
-		uint64_t wait = config::refresh_rate - delta;
-		os_sleep_ms(wait);
-	}
-	binfo("Query thread stopped.");
+        /* Calculate how long refresh took and only wait the remaining time */
+        uint64_t delta = std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate);
+        uint64_t wait = config::refresh_rate - delta;
+        os_sleep_ms(wait);
+    }
+    binfo("Query thread stopped.");
 }
 }

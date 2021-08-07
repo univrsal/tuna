@@ -27,53 +27,56 @@ class tuna_gui;
 }
 
 class source_widget : public QWidget {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit source_widget(QWidget *parent = nullptr) : QWidget(parent) {}
-	virtual void save_settings() = 0;
-	virtual void load_settings() = 0;
-	virtual void tick() {}
+    explicit source_widget(QWidget* parent = nullptr)
+        : QWidget(parent)
+    {
+    }
+    virtual void save_settings() = 0;
+    virtual void load_settings() = 0;
+    virtual void tick() { }
 };
 
 class tuna_gui : public QDialog {
-	Q_OBJECT
+    Q_OBJECT
 
-	QList<source_widget *> m_source_widgets;
-	QTimer *m_refresh = nullptr;
+    QList<source_widget*> m_source_widgets;
+    QTimer* m_refresh = nullptr;
 
 public:
-	explicit tuna_gui(QWidget *parent = nullptr);
+    explicit tuna_gui(QWidget* parent = nullptr);
 
-	~tuna_gui();
+    ~tuna_gui();
 
-	void toggleShowHide();
-	void add_output(const QString &format, const QString &path, bool log_mode);
-	void edit_output(const QString &format, const QString &path, bool log_mode);
-	void get_selected_output(QString &format, QString &path, bool &log_mode);
+    void toggleShowHide();
+    void add_output(const QString& format, const QString& path, bool log_mode);
+    void edit_output(const QString& format, const QString& path, bool log_mode);
+    void get_selected_output(QString& format, QString& path, bool& log_mode);
 
-	void refresh();
+    void refresh();
 signals:
-	void source_registered(const QString &display, const QString &id, source_widget *w);
+    void source_registered(const QString& display, const QString& id, source_widget* w);
 
 public slots:
-	void add_music_source(const QString &display, const QString &id, source_widget *w);
+    void add_music_source(const QString& display, const QString& id, source_widget* w);
 
 private slots:
-	/* Element interactions */
-	void apply_pressed();
-	void tuna_gui_accepted();
-	void btn_start_clicked();
-	void set_state();
-	void btn_stop_clicked();
-	void btn_browse_song_cover_clicked();
-	void btn_browse_song_lyrics_clicked();
-	void btn_add_output_clicked();
-	void btn_remove_output_clicked();
-	void btn_edit_output_clicked();
+    /* Element interactions */
+    void apply_pressed();
+    void tuna_gui_accepted();
+    void btn_start_clicked();
+    void set_state();
+    void btn_stop_clicked();
+    void btn_browse_song_cover_clicked();
+    void btn_browse_song_lyrics_clicked();
+    void btn_add_output_clicked();
+    void btn_remove_output_clicked();
+    void btn_edit_output_clicked();
 
 private:
-	void choose_file(QString &path, const char *title, const char *file_types);
-	Ui::tuna_gui *ui;
+    void choose_file(QString& path, const char* title, const char* file_types);
+    Ui::tuna_gui* ui;
 };
 
-extern tuna_gui *tuna_dialog;
+extern tuna_gui* tuna_dialog;

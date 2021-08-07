@@ -29,24 +29,24 @@ class window_title;
 }
 
 class window_title : public source_widget {
-	Q_OBJECT
-	std::vector<std::pair<std::string, std::string>> m_items;
+    Q_OBJECT
+    std::vector<std::pair<std::string, std::string>> m_items;
 
 public:
-	explicit window_title(QWidget *parent = nullptr);
-	~window_title();
+    explicit window_title(QWidget* parent = nullptr);
+    ~window_title();
 
-	void save_settings() override;
-	void load_settings() override;
+    void save_settings() override;
+    void load_settings() override;
 
-	void refresh_process_list();
+    void refresh_process_list();
 private slots:
 
-	void on_rb_process_name_clicked(bool checked);
-	void on_rb_window_title_clicked(bool checked);
-	void on_btn_refresh_clicked();
+    void on_rb_process_name_clicked(bool checked);
+    void on_rb_window_title_clicked(bool checked);
+    void on_btn_refresh_clicked();
 
 private:
-	Ui::window_title *ui;
-	QTimer *m_timer = nullptr;
+    Ui::window_title* ui;
+    QTimer* m_timer = nullptr;
 };

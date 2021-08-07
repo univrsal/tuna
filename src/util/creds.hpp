@@ -19,7 +19,7 @@
 #pragma once
 
 #ifndef SPOTIFY_CREDENTIALS
-#error No Spotify Credentials defined. Define SPOTIFY_CREDENTIALS with {client_id}:{secret}
+#    error No Spotify Credentials defined. Define SPOTIFY_CREDENTIALS with {client_id}:{secret}
 /* Define your spotify credentials like this;
 #define SPOTIFY_CREDENTIALS "{client_id}:{secret}"
 */

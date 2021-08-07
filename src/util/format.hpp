@@ -26,71 +26,94 @@ class song;
 namespace format {
 
 void init();
-void execute(QString &out);
+void execute(QString& out);
 
 class specifier {
 protected:
-	char m_id;
-	int m_tag_id;
+    char m_id;
+    int m_tag_id;
 
 public:
-	virtual ~specifier() = default;
-	specifier() = default;
-	specifier(char id, int tag_id) : m_id(id), m_tag_id(tag_id) {}
+    virtual ~specifier() = default;
+    specifier() = default;
+    specifier(char id, int tag_id)
+        : m_id(id)
+        , m_tag_id(tag_id)
+    {
+    }
 
-	virtual bool do_format(QString &slice, const song &s) const;
-	bool replace(QString &slice, const song &s, const QString &data = "") const;
+    virtual bool do_format(QString& slice, const song& s) const;
+    bool replace(QString& slice, const song& s, const QString& data = "") const;
 
-	char get_id() const { return m_id; }
-	int tag_capability() { return m_tag_id; }
+    char get_id() const { return m_id; }
+    int tag_capability() { return m_tag_id; }
 };
 
 class specifier_time : public specifier {
 public:
-	specifier_time(char id, int tag_id) : specifier(id, tag_id) {}
+    specifier_time(char id, int tag_id)
+        : specifier(id, tag_id)
+    {
+    }
 
-	bool do_format(QString &slice, const song &s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_int : public specifier {
 public:
-	specifier_int(char id, int tag_id) : specifier(id, tag_id) {}
+    specifier_int(char id, int tag_id)
+        : specifier(id, tag_id)
+    {
+    }
 
-	bool do_format(QString &slice, const song &s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_string : public specifier {
 public:
-	specifier_string(char id, int tag_id) : specifier(id, tag_id) {}
+    specifier_string(char id, int tag_id)
+        : specifier(id, tag_id)
+    {
+    }
 
-	bool do_format(QString &slice, const song &s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_static : public specifier {
-	QString m_static_value;
+    QString m_static_value;
 
 public:
-	specifier_static(char id, const QString &value) : specifier(id, 0), m_static_value(value) {}
+    specifier_static(char id, const QString& value)
+        : specifier(id, 0)
+        , m_static_value(value)
+    {
+    }
 
-	bool do_format(QString &slice, const song &s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_string_list : public specifier {
-	const QList<QString> *m_data;
+    const QList<QString>* m_data;
 
 public:
-	specifier_string_list(char id, int tag_id) : specifier(id, tag_id) {}
+    specifier_string_list(char id, int tag_id)
+        : specifier(id, tag_id)
+    {
+    }
 
-	bool do_format(QString &slice, const song &s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
 class specifier_date : public specifier {
 public:
-	specifier_date(char id, int tag_id) : specifier(id, tag_id) {}
+    specifier_date(char id, int tag_id)
+        : specifier(id, tag_id)
+    {
+    }
 
-	bool do_format(QString &slice, const song &s) const override;
+    bool do_format(QString& slice, const song& s) const override;
 };
 
-extern const std::vector<std::unique_ptr<specifier>> &get_specifiers();
+extern const std::vector<std::unique_ptr<specifier>>& get_specifiers();
 
 }

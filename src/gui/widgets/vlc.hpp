@@ -25,19 +25,19 @@ class vlc;
 }
 
 class vlc : public source_widget {
-	Q_OBJECT
-	void load_vlc_sources();
+    Q_OBJECT
+    void load_vlc_sources();
 
 public:
-	explicit vlc(QWidget *parent = nullptr);
-	~vlc();
+    explicit vlc(QWidget* parent = nullptr);
+    ~vlc();
 
-	void select_vlc_source(const QString &id);
-	void save_settings() override;
-	void load_settings() override;
+    void select_vlc_source(const QString& id);
+    void save_settings() override;
+    void load_settings() override;
 private slots:
-	void on_btn_refresh_vlc_clicked();
+    void on_btn_refresh_vlc_clicked();
 
 private:
-	Ui::vlc *ui;
+    Ui::vlc* ui;
 };

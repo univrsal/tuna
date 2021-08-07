@@ -23,20 +23,20 @@
 #include <obs-module.h>
 
 class vlc_obs_source : public music_source {
-	const char *m_target_source_name = nullptr;
-	obs_weak_source_t *m_weak_src = nullptr;
-	/* Only log conversion issues once per file */
-	bool reload();
+    const char* m_target_source_name = nullptr;
+    obs_weak_source_t* m_weak_src = nullptr;
+    /* Only log conversion issues once per file */
+    bool reload();
 
-	void load_vlc_source();
+    void load_vlc_source();
 
 public:
-	vlc_obs_source();
-	~vlc_obs_source();
+    vlc_obs_source();
+    ~vlc_obs_source();
 
-	void load() override;
-	void refresh() override;
-	bool execute_capability(capability c) override;
-	bool valid_format(const QString &str) override;
-	bool enabled() const override;
+    void load() override;
+    void refresh() override;
+    bool execute_capability(capability c) override;
+    bool valid_format(const QString& str) override;
+    bool enabled() const override;
 };

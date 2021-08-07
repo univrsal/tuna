@@ -22,42 +22,42 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-gpmdp_source::gpmdp_source() : music_source(S_SOURCE_GPMDP, T_SOURCE_GPMDP)
+gpmdp_source::gpmdp_source()
+    : music_source(S_SOURCE_GPMDP, T_SOURCE_GPMDP)
 {
-	m_capabilities = CAP_ALBUM | CAP_TITLE | CAP_ARTIST | CAP_STATUS | CAP_DURATION | CAP_PROGRESS | CAP_COVER;
+    m_capabilities = CAP_ALBUM | CAP_TITLE | CAP_ARTIST | CAP_STATUS | CAP_DURATION | CAP_PROGRESS | CAP_COVER;
 #if _WIN32
-	m_path = qgetenv("APPDATA") + "/Google Play Music Desktop Player/json_store/playback.json";
+    m_path = qgetenv("APPDATA") + "/Google Play Music Desktop Player/json_store/playback.json";
 #elif __unix__
-	QDir home = QDir::homePath();
-	m_path = home.absolutePath() + "/.config/Google Play Music Desktop Player/json_store/playback.json";
+    QDir home = QDir::homePath();
+    m_path = home.absolutePath() + "/.config/Google Play Music Desktop Player/json_store/playback.json";
 #elif __APPLE__
-	QDir home = QDir::homePath();
-	m_path =
-		home.absolutePath() + "/Library/Application Support/Google Play Music Desktop Player/json_store/playback.json";
+    QDir home = QDir::homePath();
+    m_path = home.absolutePath() + "/Library/Application Support/Google Play Music Desktop Player/json_store/playback.json";
 #endif
 }
 
 void gpmdp_source::refresh()
 {
-	QFile file(m_path);
-	begin_refresh();
-	if (file.open(QIODevice::ReadOnly)) {
-		m_current.clear();
-		auto doc = QJsonDocument::fromJson(file.readAll());
-		if (!doc.isObject())
-			return;
-		auto obj = doc.object();
-		auto song = obj["song"].toObject();
-		auto time = obj["time"].toObject();
+    QFile file(m_path);
+    begin_refresh();
+    if (file.open(QIODevice::ReadOnly)) {
+        m_current.clear();
+        auto doc = QJsonDocument::fromJson(file.readAll());
+        if (!doc.isObject())
+            return;
+        auto obj = doc.object();
+        auto song = obj["song"].toObject();
+        auto time = obj["time"].toObject();
 
-		m_current.set_state(obj["playing"].toBool() ? state_playing : state_stopped);
-		m_current.set_title(song["title"].toString());
-		m_current.append_artist(song["artist"].toString());
-		m_current.set_album(song["album"].toString());
-		m_current.set_cover_link(song["albumArt"].toString());
+        m_current.set_state(obj["playing"].toBool() ? state_playing : state_stopped);
+        m_current.set_title(song["title"].toString());
+        m_current.append_artist(song["artist"].toString());
+        m_current.set_album(song["album"].toString());
+        m_current.set_cover_link(song["albumArt"].toString());
 
-		m_current.set_duration(time["total"].toInt());
-		m_current.set_progress(time["current"].toInt());
-		file.close();
-	}
+        m_current.set_duration(time["total"].toInt());
+        m_current.set_progress(time["current"].toInt());
+        file.close();
+    }
 }
