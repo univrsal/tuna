@@ -46,6 +46,10 @@ bool vlc_obs_source::reload()
         auto src = obs_weak_source_get_source(m_weak_src);
         if (src) {
             result = obs_source_showing(src);
+            if (!result) {
+                m_current.clear();
+                m_current.set_state(state_stopped);
+            }
             obs_source_release(src);
         }
     }
