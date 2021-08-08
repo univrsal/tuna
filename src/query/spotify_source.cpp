@@ -101,10 +101,10 @@ void spotify_source::load()
     }
 }
 
-bool spotify_source::valid_format(const QString&)
+bool spotify_source::valid_format(const QString& format)
 {
-    /* Supports all specifiers */
-    return true;
+    // Label isn't supported
+    return !format.contains("%b");
 }
 
 /* implementation further down */
