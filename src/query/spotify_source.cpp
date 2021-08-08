@@ -394,19 +394,24 @@ bool spotify_source::do_refresh_token(QString& log)
         const auto& response_obj = response.object();
         const auto& token = response_obj["access_token"];
         const auto& expires = response_obj["expires_in"];
-
+        const auto& error = response_obj["error"];
         const auto& refresh_token = response_obj["refresh_token"];
 
         /* Dump the json into the log text */
         log = QString(response.toJson(QJsonDocument::Indented));
-        if (!token.isNull() && !expires.isNull()) {
+        if (token.isString() && expires.isString()) {
             m_token = token.toString();
             m_token_termination = util::epoch() + expires.toInt();
             m_logged_in = true;
             binfo("Successfully logged in");
         } else {
-            berr("Couldn't parse json response");
+            if (error.isString())
+                berr("Received error from spotify: %s", qt_to_utf8(error.toString()));
+            else
+                berr("Couldn't parse json response");
+
             result = false;
+            m_logged_in = false;
         }
 
         /* Refreshing the token can return a new refresh token */
