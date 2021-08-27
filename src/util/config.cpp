@@ -33,13 +33,13 @@
 
 namespace config {
 
+bool post_load = false;
 QList<output> outputs;
 config_t* instance = nullptr;
 uint16_t refresh_rate = 1000;
 const char* placeholder = nullptr;
 const char* cover_path = nullptr;
 const char* lyrics_path = nullptr;
-const char* selected_source = nullptr;
 const char* cover_placeholder = nullptr;
 bool download_cover = true;
 bool placeholder_when_paused = true;
@@ -92,7 +92,6 @@ void load()
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
-    selected_source = CGET_STR(CFG_SELECTED_SOURCE);
     placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
     remove_file_extensions = CGET_BOOL(CFG_REMOVE_EXTENSIONS);
 
@@ -107,7 +106,7 @@ void load()
     if (CGET_BOOL(CFG_SERVER_ENABLED) && !web_thread::start())
         berr("Couldn't start web server thread");
 
-    music_sources::select(selected_source);
+    music_sources::select(CGET_STR(CFG_SELECTED_SOURCE));
 }
 
 void close()

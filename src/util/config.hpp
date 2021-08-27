@@ -109,11 +109,11 @@ struct output {
 };
 
 extern config_t* instance;
+extern bool post_load;
 
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
 extern const char* placeholder;
-extern const char* selected_source;
 extern const char* cover_path;
 extern const char* lyrics_path;
 extern QList<output> outputs;

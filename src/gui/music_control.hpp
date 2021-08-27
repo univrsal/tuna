@@ -36,11 +36,17 @@ public:
     explicit music_control(QWidget* parent = nullptr);
     ~music_control();
 
+    void add_source(const QString& display, const QString& id);
+
+    void select_source(int index);
+
 private slots:
     void refresh_play_state();
     void showcontextmenu(const QPoint& pos);
     void toggle_title();
     void toggle_volume();
+    void toggle_source();
+    void source_changed(int index);
 
     void on_btn_prev_clicked();
     void on_btn_play_pause_clicked();

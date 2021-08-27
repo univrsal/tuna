@@ -60,6 +60,9 @@
        </spacer>
       </item>
       <item>
+       <widget class="QComboBox" name="cb_source"/>
+      </item>
+      <item>
        <widget class="QWidget" name="control_widget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">

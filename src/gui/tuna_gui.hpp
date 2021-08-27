@@ -54,13 +54,10 @@ public:
     void edit_output(const QString& format, const QString& path, bool log_mode);
     void get_selected_output(QString& format, QString& path, bool& log_mode);
 
+    void add_source(const QString& display, const QString& id, source_widget* w);
     void refresh();
-signals:
-    void source_registered(const QString& display, const QString& id, source_widget* w);
 
-public slots:
-    void add_music_source(const QString& display, const QString& id, source_widget* w);
-
+    void select_source(int index);
 private slots:
     /* Element interactions */
     void apply_pressed();

@@ -49,6 +49,23 @@ void init()
     instances.append(std::make_shared<gpmdp_source>());
     instances.append(std::make_shared<web_source>());
     obs_frontend_pop_ui_translation();
+
+    for (auto& s : instances) {
+        tuna_dialog->add_source(utf8_to_qt(s->name()), utf8_to_qt(s->id()), s->get_settings_tab());
+        if (music_dock)
+            music_dock->add_source(utf8_to_qt(s->name()), utf8_to_qt(s->id()));
+    }
+
+    const auto s = config_get_string(obs_frontend_get_global_config(), CFG_REGION, CFG_SELECTED_SOURCE);
+    auto i = 0;
+    for (const auto& src : qAsConst(music_sources::instances)) {
+        if (strcmp(src->id(), s) == 0)
+            break;
+        i++;
+    }
+    tuna_dialog->select_source(i);
+    if (music_dock)
+        music_dock->select_source(i);
 }
 
 void load()
@@ -169,7 +186,6 @@ music_source::music_source(const char* id, const char* name, source_widget* w)
     , m_name(name)
     , m_settings_tab(w)
 {
-    emit tuna_dialog->source_registered(name, id, w);
 }
 
 void music_source::load()

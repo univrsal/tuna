@@ -21,6 +21,7 @@
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
+#include "tuna_gui.hpp"
 #include "ui_music_control.h"
 #include <QDesktopWidget>
 #include <QMenu>
@@ -35,6 +36,7 @@ music_control::music_control(QWidget* parent)
     , ui(new Ui::music_control)
 {
     ui->setupUi(this);
+
     setVisible(false); /* Invisible by default to prevent it from showing until Geometry is loaded */
     const char* geo = CGET_STR(CFG_DOCK_GEOMETRY);
     if (!geo) {
@@ -47,12 +49,12 @@ music_control::music_control(QWidget* parent)
             setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), r));
         }
     }
-
+    connect(ui->cb_source, qOverload<int>(&QComboBox::currentIndexChanged), this, &music_control::source_changed);
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), SLOT(refresh_play_state()));
 
-    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showcontextmenu(const QPoint&)));
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showcontextmenu(QPoint)));
 
     /* This is dependent on tuna thread speed so lowering this wouldn't make a difference */
     m_timer->start(700);
@@ -64,6 +66,7 @@ music_control::music_control(QWidget* parent)
 
     ui->volume_widget->setVisible(CGET_BOOL(CFG_DOCK_VOLUME_VISIBLE));
     m_song_text->setVisible(CGET_BOOL(CFG_DOCK_INFO_VISIBLE));
+    ui->cb_source->setVisible(CGET_BOOL(CFG_DOCK_SOURCE_VISIBLE));
 }
 
 void music_control::save_settings()
@@ -71,6 +74,7 @@ void music_control::save_settings()
     if (config::instance) {
         CSET_BOOL(CFG_DOCK_VOLUME_VISIBLE, ui->volume_widget->isVisible());
         CSET_BOOL(CFG_DOCK_INFO_VISIBLE, m_song_text->isVisible());
+        CSET_BOOL(CFG_DOCK_SOURCE_VISIBLE, ui->cb_source->isVisible());
     }
 }
 
@@ -84,6 +88,17 @@ music_control::~music_control()
 
     delete ui;
     delete m_song_text;
+    deleteLater();
+}
+
+void music_control::add_source(const QString& display, const QString& id)
+{
+    ui->cb_source->addItem(display, id);
+}
+
+void music_control::select_source(int index)
+{
+    ui->cb_source->setCurrentIndex(index);
 }
 
 void music_control::on_btn_prev_clicked()
@@ -178,12 +193,15 @@ void music_control::showcontextmenu(const QPoint& pos)
 
     QAction title(T_DOCK_TOGGLE_INFO, this);
     QAction volume(T_DOCK_TOGGLE_VOLUME, this);
+    QAction source(T_DOCK_TOGGLE_SOURCE, this);
 
     connect(&title, SIGNAL(triggered()), this, SLOT(toggle_title()));
     connect(&volume, SIGNAL(triggered()), this, SLOT(toggle_volume()));
+    connect(&source, SIGNAL(triggered()), this, SLOT(toggle_source()));
 
     contextMenu.addAction(&title);
     contextMenu.addAction(&volume);
+    contextMenu.addAction(&source);
 
     contextMenu.exec(mapToGlobal(pos));
 }
@@ -200,6 +218,22 @@ void music_control::toggle_volume()
     if (flags & CAP_VOLUME_UP || flags & CAP_VOLUME_DOWN)
         ui->volume_widget->setVisible(!ui->volume_widget->isVisible());
     save_settings();
+}
+
+void music_control::toggle_source()
+{
+    ui->cb_source->setVisible(!ui->cb_source->isVisible());
+}
+
+void music_control::source_changed(int index)
+{
+    auto id = ui->cb_source->itemData(index).toString();
+    // This gets called during startup which would always set the selected source
+    // to Spotify which we don't want
+    if (config::post_load) {
+        music_sources::select(qt_to_utf8(id));
+        CSET_STR(CFG_SELECTED_SOURCE, qt_to_utf8(id));
+    }
 }
 
 void music_control::on_btn_voldown_clicked()

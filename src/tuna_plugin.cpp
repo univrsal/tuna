@@ -57,8 +57,8 @@ void register_gui()
     /* Register dock */
 #ifndef __APPLE__
     obs_frontend_push_ui_translation(obs_module_get_string);
-    auto* tmp = new music_control(main_window);
-    music_dock = reinterpret_cast<music_control*>(obs_frontend_add_dock(tmp));
+    music_dock = new music_control(main_window);
+    obs_frontend_add_dock(music_dock);
     obs_frontend_pop_ui_translation();
 #endif
 }
@@ -81,6 +81,7 @@ void obs_module_post_load()
     obs_source_t* vlc_source = obs_source_create("vlc_source", "tuna_module_load_vlc_presence_test_source", nullptr, nullptr);
     util::have_vlc_source = vlc_source != nullptr;
     obs_source_release(vlc_source);
+    config::post_load = true;
 }
 
 void obs_module_unload()

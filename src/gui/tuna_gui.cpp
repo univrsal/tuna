@@ -45,7 +45,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->setupUi(this);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply_pressed()));
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(tuna_gui_accepted()));
-    connect(this, &tuna_gui::source_registered, this, &tuna_gui::add_music_source);
 
     /* Other signals */
 #define ADD_SIGNAL(btn) connect(ui->btn, SIGNAL(clicked()), this, SLOT(btn##_clicked()))
@@ -119,20 +118,11 @@ void tuna_gui::toggleShowHide()
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
         ui->cb_dl_cover->setChecked(config::download_cover);
-        ui->cb_source->setCurrentIndex(ui->cb_source->findData(utf8_to_qt(config::selected_source)));
+        ui->cb_source->setCurrentIndex(ui->cb_source->findData(CGET_STR(CFG_SELECTED_SOURCE)));
         ui->cb_host_server->setChecked(CGET_BOOL(CFG_SERVER_ENABLED));
         ui->sb_web_port->setValue(utf8_to_qt(CGET_STR(CFG_SERVER_PORT)).toInt());
         ui->cb_remove_file_extensions->setChecked(config::remove_file_extensions);
         set_state();
-
-        const auto s = CGET_STR(CFG_SELECTED_SOURCE);
-        auto i = 0;
-        for (const auto& src : qAsConst(music_sources::instances)) {
-            if (strcmp(src->id(), s) == 0)
-                break;
-            i++;
-        }
-        ui->cb_source->setCurrentIndex(i);
 
         /* Load table contents */
         int row = 1; /* Clear all rows except headers */
@@ -149,7 +139,7 @@ void tuna_gui::toggleShowHide()
     }
 }
 
-void tuna_gui::add_music_source(const QString& display, const QString& id, source_widget* w)
+void tuna_gui::add_source(const QString& display, const QString& id, source_widget* w)
 {
     ui->cb_source->addItem(display, id);
     if (w) {
@@ -164,10 +154,15 @@ void tuna_gui::refresh()
         widget->tick();
 }
 
+void tuna_gui::select_source(int index)
+{
+    ui->cb_source->setCurrentIndex(index);
+}
+
 void tuna_gui::tuna_gui_accepted()
 {
     QString tmp = ui->cb_source->currentData().toByteArray();
-    CSET_STR(CFG_SELECTED_SOURCE, tmp.toStdString().c_str());
+    CSET_STR(CFG_SELECTED_SOURCE, qt_to_utf8(tmp));
     CSET_STR(CFG_COVER_PATH, qt_to_utf8(ui->txt_song_cover->text()));
     CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(ui->txt_song_lyrics->text()));
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
@@ -196,6 +191,8 @@ void tuna_gui::tuna_gui_accepted()
 
     config::refresh_rate = ui->sb_refresh_rate->value();
     tuna_thread::thread_mutex.unlock();
+    if (music_dock)
+        music_dock->select_source(ui->cb_source->currentIndex());
     config::load();
 }
 
