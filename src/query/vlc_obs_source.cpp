@@ -141,9 +141,9 @@ void vlc_obs_source::refresh()
         return;
     }
 
-    auto* calldata = calldata_create();
+    auto* cd = calldata_create();
 
-    auto get_meta = [](const char* tag_id, calldata_t* cd, proc_handler_t* ph) {
+    auto get_meta = [cd, ph](const char* tag_id) {
         const char* result = nullptr;
         calldata_set_string(cd, "tag_id", tag_id);
         bool failure = !proc_handler_call(ph, "get_metadata", cd);
@@ -156,14 +156,14 @@ void vlc_obs_source::refresh()
     m_current.set_duration(obs_source_media_get_duration(src));
 
     if (m_current.state() <= state_paused) {
-        auto artwork_url = get_meta("artwork_url", calldata, ph);
-        auto title = get_meta("title", calldata, ph);
-        auto artist = get_meta("artist", calldata, ph);
-        auto date = get_meta("date", calldata, ph);
-        auto album = get_meta("album", calldata, ph);
-        auto publisher = get_meta("publisher", calldata, ph);
-        auto track_number = get_meta("track_number", calldata, ph);
-        auto disc_number = get_meta("disc_number", calldata, ph);
+        auto artwork_url = get_meta("artwork_url");
+        auto title = get_meta("title");
+        auto artist = get_meta("artist");
+        auto date = get_meta("date");
+        auto album = get_meta("album");
+        auto publisher = get_meta("publisher");
+        auto track_number = get_meta("track_number");
+        auto disc_number = get_meta("disc_number");
 
         if (artwork_url != "")
             m_current.set_cover_link(QUrl::fromPercentEncoding(qt_to_utf8(artwork_url)));
@@ -183,9 +183,8 @@ void vlc_obs_source::refresh()
             m_current.set_track_number(disc_number.toUInt());
     }
 
-    calldata_destroy(calldata);
+    calldata_destroy(cd);
     obs_source_release(src);
-#undef GET_VLC_META
 }
 
 bool vlc_obs_source::execute_capability(capability c)
