@@ -23,7 +23,7 @@
 #include <obs-module.h>
 
 class vlc_obs_source : public music_source {
-    const char* m_target_source_name = nullptr;
+    std::string m_target_source_name {};
     obs_weak_source_t* m_weak_src = nullptr;
     /* Only log conversion issues once per file */
     bool reload();

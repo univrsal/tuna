@@ -39,7 +39,8 @@ vlc_obs_source::~vlc_obs_source()
 bool vlc_obs_source::reload()
 {
     auto result = !!m_weak_src;
-    if (!m_weak_src && (!m_target_source_name || m_target_source_name != std::string(T_VLC_NONE)))
+    const auto valid_vlc_id = !m_target_source_name.empty() && m_target_source_name != T_VLC_NONE;
+    if ((!m_weak_src || m_target_source_name != CGET_STR(CFG_VLC_ID)) && valid_vlc_id)
         load_vlc_source();
 
     if (m_weak_src) {
@@ -62,7 +63,7 @@ void vlc_obs_source::load_vlc_source()
     CDEF_STR(CFG_VLC_ID, "");
     m_target_source_name = CGET_STR(CFG_VLC_ID);
 
-    auto* src = obs_get_source_by_name(m_target_source_name);
+    auto* src = obs_get_source_by_name(m_target_source_name.c_str());
 
     obs_weak_source_release(m_weak_src);
     m_weak_src = nullptr;
@@ -72,7 +73,7 @@ void vlc_obs_source::load_vlc_source()
         if (strcmp(id, "vlc_source") == 0) {
             m_weak_src = obs_source_get_weak_source(src);
         } else {
-            binfo("%s (%s) is not a valid vlc source", m_target_source_name, id);
+            binfo("%s (%s) is not a valid vlc source", m_target_source_name.c_str(), id);
         }
         obs_source_release(src);
     }
