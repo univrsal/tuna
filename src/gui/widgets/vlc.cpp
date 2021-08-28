@@ -65,14 +65,7 @@ void vlc::load_settings()
     }
 
     if (doc.isObject()) {
-        auto test = QString(doc.toJson());
-        for (const auto& k : doc.object().keys()) {
-            auto map = doc.object()[k].toArray();
-            if (!map.isEmpty()) {
-                m_source_map[k] = map;
-            }
-        }
-        binfo("%s", qt_to_utf8(test));
+        m_source_map = doc.object();
     } else {
         berr("Failed to load vlc mappings: must be an object");
         return;
@@ -81,8 +74,9 @@ void vlc::load_settings()
 
 void vlc::build_list()
 {
+    auto sc = get_scene_collection();
     auto scene = ui->cb_scene->currentText();
-    auto maps = m_source_map[scene].toArray();
+    auto maps = m_source_map[sc].toObject()[scene].toArray();
     m_list->clear();
     for (const auto& map : maps) {
         if (valid_source_name(map.toString())) {
@@ -93,9 +87,10 @@ void vlc::build_list()
 
 bool vlc::has_mapping(const char* scene, const char* source)
 {
-    for (const auto& k : m_source_map.keys()) {
+    auto map = m_source_map[get_scene_collection()].toObject();
+    for (const auto& k : map.keys()) {
         if (k == utf8_to_qt(scene)) {
-            for (const auto& mapping : m_source_map[k].toArray()) {
+            for (const auto& mapping : map[k].toArray()) {
                 if (mapping == utf8_to_qt(source)) {
                     return true;
                 }
@@ -107,27 +102,27 @@ bool vlc::has_mapping(const char* scene, const char* source)
 
 void vlc::rebuild_mapping()
 {
-    QJsonObject new_map;
-    for (auto& k : m_source_map.keys()) {
-        auto* scene = obs_get_scene_by_name(qt_to_utf8(k));
-
+    auto sc = get_scene_collection();
+    auto map = m_source_map[sc].toObject();
+    for (auto& scene_id : map.keys()) {
+        auto* scene = obs_get_scene_by_name(qt_to_utf8(scene_id));
         if (scene) {
             QJsonArray arr;
-            for (const auto& m : m_source_map[k].toArray()) {
+            for (const auto& m : map[scene_id].toArray()) {
                 if (valid_source_name(m.toString()))
                     arr.append(m.toString());
             }
-            new_map[k] = arr;
             obs_scene_release(scene);
+            set_map(scene_id, arr);
         }
     }
-    m_source_map = new_map;
 }
 
 QJsonArray vlc::get_mappings_for_scene(const char* scene)
 {
-    if (m_source_map.contains(utf8_to_qt(scene)))
-        return m_source_map[utf8_to_qt(scene)].toArray();
+    auto sc = get_scene_collection();
+    if (m_source_map[sc].toObject().contains(utf8_to_qt(scene)))
+        return m_source_map[sc].toObject()[utf8_to_qt(scene)].toArray();
     return {};
 }
 
@@ -163,9 +158,9 @@ void vlc::on_scene_changed(int)
     refresh_sources();
     m_list->clear();
     auto id = ui->cb_scene->currentText();
-
-    if (m_source_map.contains(id)) {
-        auto val = m_source_map[id];
+    auto map = m_source_map[get_scene_collection()].toObject();
+    if (map.contains(id)) {
+        auto val = map[id];
         if (val.isArray()) {
             for (const auto& entry : val.toArray()) {
                 if (entry.isString())
@@ -177,10 +172,17 @@ void vlc::on_scene_changed(int)
 
 void vlc::on_remove_source()
 {
-    auto source = m_list->currentItem()->text();
-    auto scene = ui->cb_scene->currentText();
     m_list->takeItem(m_list->currentRow());
     rebuild_from_list();
+    refresh_sources();
+}
+
+void vlc::set_map(const QString& scene, const QJsonArray& map)
+{
+    auto sc = get_scene_collection();
+    auto obj = m_source_map[sc].toObject();
+    obj[scene] = map;
+    m_source_map[sc] = obj;
 }
 
 bool vlc::valid_source_name(const QString& str)
@@ -206,28 +208,36 @@ void vlc::rebuild_from_list()
     m_list->clear();
     m_list->addItems(valid_sources);
     auto scene = ui->cb_scene->currentText();
+    auto sc = get_scene_collection();
+    set_map(scene, QJsonArray::fromStringList(valid_sources));
+}
 
-    m_source_map[scene] = QJsonArray::fromStringList(valid_sources);
+QString vlc::get_scene_collection()
+{
+    auto* name = obs_frontend_get_current_scene_collection();
+    auto str = utf8_to_qt(name);
+    bfree(name);
+    return str;
 }
 
 void vlc::on_add_source()
 {
     auto src_id = ui->cb_source->currentText();
     auto scene_id = ui->cb_scene->currentText();
-
+    auto sc = get_scene_collection();
     auto* src = obs_get_source_by_name(qt_to_utf8(src_id));
     auto* scene = obs_get_scene_by_name(qt_to_utf8(scene_id));
 
     if (src && scene) {
         std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
-        if (m_source_map.contains(scene_id)) {
-            auto arr = m_source_map[scene_id].toArray();
+        if (m_source_map[sc].toObject().contains(scene_id)) {
+            auto arr = m_source_map[sc].toObject()[scene_id].toArray();
             arr.append(src_id);
-            m_source_map[scene_id] = arr;
+            set_map(scene_id, arr);
         } else {
             QJsonArray arr;
             arr.append(src_id);
-            m_source_map[scene_id] = arr;
+            set_map(scene_id, arr);
         }
 
         m_list->addItem(src_id);

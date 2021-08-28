@@ -48,6 +48,8 @@ public:
     void rebuild_mapping();
     QJsonArray get_mappings_for_scene(const char* scene);
     void rebuild_from_list();
+
+    QString get_scene_collection();
 private slots:
     void on_btn_refresh_vlc_clicked();
     void on_scene_changed(int index);
@@ -55,6 +57,7 @@ private slots:
     void on_remove_source();
 
 private:
+    void set_map(const QString& scene, const QJsonArray&);
     bool valid_source_name(const QString& str);
 
     obs_scene_t* get_selected_scene();
