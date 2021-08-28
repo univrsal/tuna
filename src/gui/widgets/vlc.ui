@@ -77,31 +77,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QListWidget" name="source_list">
-     <property name="dragDropMode">
-      <enum>QAbstractItemView::InternalMove</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="btn_remove_source">
      <property name="text">
       <string>tuna.gui.vlc.remove.source</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>189</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

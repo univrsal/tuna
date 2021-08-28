@@ -35,6 +35,16 @@ class vlc_obs_source : public music_source {
     std::string get_current_scene_name();
     int m_index = 0;
 
+    obs_source_t* get_source()
+    {
+        auto* src = obs_weak_source_get_source(m_weak_src);
+        if (!src) {
+            obs_weak_source_release(m_weak_src);
+            m_weak_src = nullptr;
+        }
+        return src;
+    }
+
 public:
     vlc_obs_source();
     ~vlc_obs_source();

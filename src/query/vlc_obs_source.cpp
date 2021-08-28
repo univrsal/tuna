@@ -155,7 +155,7 @@ void vlc_obs_source::refresh()
 
     /* we keep a reference here to make sure that this source won't be freed
      * while we still need it */
-    obs_source_t* src = obs_weak_source_get_source(m_weak_src);
+    obs_source_t* src = get_source();
     if (!src)
         return;
 
@@ -225,7 +225,7 @@ void vlc_obs_source::refresh()
 
 bool vlc_obs_source::execute_capability(capability c)
 {
-    obs_source_t* src = obs_weak_source_get_source(m_weak_src);
+    obs_source_t* src = get_source();
     if (!src)
         return false;
 

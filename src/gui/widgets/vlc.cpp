@@ -26,6 +26,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QSpacerItem>
 #include <obs-frontend-api.h>
 
 vlc::vlc(QWidget* parent)
@@ -33,10 +34,14 @@ vlc::vlc(QWidget* parent)
     , ui(new Ui::vlc)
 {
     ui->setupUi(this);
+    m_list = new drag_list(this);
+    m_list->setDragDropMode(QAbstractItemView::InternalMove);
+    auto* spacer = new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding);
+    ui->verticalLayout->addWidget(m_list);
+    ui->verticalLayout->addItem(spacer);
     connect(ui->cb_scene, qOverload<int>(&QComboBox::currentIndexChanged), this, &vlc::on_scene_changed);
     connect(ui->btn_add_source, &QPushButton::clicked, this, &vlc::on_add_source);
     connect(ui->btn_remove_source, &QPushButton::clicked, this, &vlc::on_remove_source);
-    connect(ui->source_list, &QListWidget::indexesMoved, this, &vlc::on_reorder_sources);
 }
 
 vlc::~vlc()
@@ -47,7 +52,6 @@ vlc::~vlc()
 void vlc::load_settings()
 {
     load_vlc_sources();
-    select_vlc_source(utf8_to_qt(CGET_STR(CFG_VLC_ID)));
     ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
     ui->cb_vlc_source_name->setEnabled(util::have_vlc_source);
 
@@ -76,10 +80,10 @@ void vlc::build_list()
 {
     auto scene = ui->cb_scene->currentText();
     auto maps = m_source_map[scene].toArray();
-    ui->source_list->clear();
+    m_list->clear();
     for (const auto& map : maps) {
         if (valid_source_name(map.toString())) {
-            ui->source_list->addItem(map.toString());
+            m_list->addItem(map.toString());
         }
     }
 }
@@ -132,18 +136,6 @@ void vlc::save_settings()
     }
 }
 
-static bool add_source(void* data, obs_source_t* src)
-{
-    auto* id = obs_source_get_id(src);
-    if (strcmp(id, "vlc_source") == 0) {
-        auto* name = obs_source_get_name(src);
-        QComboBox* cb = reinterpret_cast<QComboBox*>(data);
-        cb->addItem(utf8_to_qt(name));
-    }
-
-    return true;
-}
-
 void vlc::load_vlc_sources()
 {
     ui->cb_vlc_source_name->clear();
@@ -161,8 +153,6 @@ void vlc::load_vlc_sources()
         ui->cb_scene);
 
     refresh_sources();
-
-    obs_enum_sources(add_source, ui->cb_vlc_source_name);
 }
 
 void vlc::on_btn_refresh_vlc_clicked()
@@ -173,7 +163,7 @@ void vlc::on_btn_refresh_vlc_clicked()
 void vlc::on_scene_changed(int)
 {
     refresh_sources();
-    ui->source_list->clear();
+    m_list->clear();
     auto id = ui->cb_scene->currentText();
 
     if (m_source_map.contains(id)) {
@@ -181,7 +171,7 @@ void vlc::on_scene_changed(int)
         if (val.isArray()) {
             for (const auto& entry : val.toArray()) {
                 if (entry.isString())
-                    ui->source_list->addItem(new QListWidgetItem(entry.toString()));
+                    m_list->addItem(new QListWidgetItem(entry.toString()));
             }
         }
     }
@@ -189,14 +179,9 @@ void vlc::on_scene_changed(int)
 
 void vlc::on_remove_source()
 {
-    auto source = ui->source_list->currentItem()->text();
+    auto source = m_list->currentItem()->text();
     auto scene = ui->cb_scene->currentText();
-    ui->source_list->takeItem(ui->source_list->currentRow());
-    rebuild_from_list();
-}
-
-void vlc::on_reorder_sources(const QModelIndexList&)
-{
+    m_list->takeItem(m_list->currentRow());
     rebuild_from_list();
 }
 
@@ -213,15 +198,15 @@ bool vlc::valid_source_name(const QString& str)
 void vlc::rebuild_from_list()
 {
     QStringList valid_sources;
-    for (int i = 0; i < ui->source_list->count(); i++) {
-        auto item = ui->source_list->item(i);
+    for (int i = 0; i < m_list->count(); i++) {
+        auto item = m_list->item(i);
 
         if (item && valid_source_name(item->text()))
             valid_sources.append(item->text());
     }
 
-    ui->source_list->clear();
-    ui->source_list->addItems(valid_sources);
+    m_list->clear();
+    m_list->addItems(valid_sources);
     auto scene = ui->cb_scene->currentText();
 
     m_source_map[scene] = QJsonArray::fromStringList(valid_sources);
@@ -247,7 +232,7 @@ void vlc::on_add_source()
             m_source_map[scene_id] = arr;
         }
 
-        ui->source_list->addItem(src_id);
+        m_list->addItem(src_id);
     } else {
         QMessageBox::information(this, T_ERROR_TITLE, T_VLC_INVALID);
     }
@@ -289,6 +274,7 @@ void vlc::refresh_sources()
                 return true;
             },
             &d);
+        obs_scene_release(scene);
     }
 }
 
