@@ -75,6 +75,7 @@
 #define T_VLC_NONE              T_("tuna.gui.vlc.none")
 #define T_VLC_VERSION_ISSUE     T_("tuna.gui.vlc.issue.message")
 #define T_ERROR_TITLE           T_("tuna.gui.issue.title")
+#define T_VLC_INVALID           T_("tuna.gui.vlc.invalid")
 
 #define T_PROGRESS_FG           T_("tuna.source.progress.color.fg")
 #define T_PROGRESS_BG           T_("tuna.source.progress.color.bg")
@@ -94,12 +95,9 @@
 /* Outputs are saved into config folder on linux, but on windows
  * the home directory isn't really used anyways so just save it
  * there */
-#if UNIX
-#define OUTPUT_FOLDER ".config/"
-#define OUTPUT_FILE OUTPUT_FOLDER "outputs.json"
-#else
+#define CONFIG_FOLDER ".config/"
 #define OUTPUT_FILE "outputs.json"
-#endif
+#define VLC_SCENE_MAPPING "tuna_vlc_mappings.json"
 
 #define JSON_OUTPUT_PATH_ID     "output"
 #define JSON_FORMAT_ID             "format"

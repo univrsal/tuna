@@ -23,6 +23,7 @@
 #include "../util/constants.hpp"
 #include "../util/utility.hpp"
 #include <QUrl>
+#include <obs-frontend-api.h>
 
 vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC, new vlc)
@@ -39,10 +40,10 @@ vlc_obs_source::~vlc_obs_source()
 bool vlc_obs_source::reload()
 {
     auto result = !!m_weak_src;
-    const auto valid_vlc_id = !m_target_source_name.empty() && m_target_source_name != T_VLC_NONE;
-    if ((!m_weak_src || m_target_source_name != CGET_STR(CFG_VLC_ID)) && valid_vlc_id)
+    auto target_source = get_target_source();
+    const auto name_changed_or_no_weak_src = !m_weak_src || m_target_source_name != target_source;
+    if (name_changed_or_no_weak_src && !target_source.empty())
         load_vlc_source();
-
     if (m_weak_src) {
         auto src = obs_weak_source_get_source(m_weak_src);
         if (src) {
@@ -52,6 +53,11 @@ bool vlc_obs_source::reload()
                 m_current.set_state(state_stopped);
             }
             obs_source_release(src);
+        } else {
+            static_cast<vlc*>(m_settings_tab)->rebuild_mapping();
+            result = false;
+            obs_weak_source_release(m_weak_src);
+            m_weak_src = nullptr;
         }
     }
 
@@ -60,8 +66,7 @@ bool vlc_obs_source::reload()
 
 void vlc_obs_source::load_vlc_source()
 {
-    CDEF_STR(CFG_VLC_ID, "");
-    m_target_source_name = CGET_STR(CFG_VLC_ID);
+    m_target_source_name = get_target_source();
 
     auto* src = obs_get_source_by_name(m_target_source_name.c_str());
 
@@ -79,16 +84,47 @@ void vlc_obs_source::load_vlc_source()
     }
 }
 
+std::string vlc_obs_source::get_target_source()
+{
+    auto current_scene_name = get_current_scene_name();
+
+    if (!current_scene_name.empty()) {
+        m_target_scene = current_scene_name;
+        auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(current_scene_name.c_str());
+
+        m_index = qMin(mappings.size(), m_index);
+        return qt_to_utf8(mappings[m_index].toString());
+    }
+    return "";
+}
+
+std::string vlc_obs_source::get_current_scene_name()
+{
+    auto active_scene = obs_frontend_get_current_scene();
+    if (active_scene) {
+        auto name = obs_source_get_name(active_scene);
+        obs_source_release(active_scene);
+        return name;
+    }
+    return "";
+}
+
 bool vlc_obs_source::enabled() const
 {
     return util::have_vlc_source;
 }
 
+void vlc_obs_source::set_gui_values()
+{
+    music_source::set_gui_values();
+    static_cast<vlc*>(m_settings_tab)->build_list();
+}
+
 void vlc_obs_source::load()
 {
+    music_source::load();
     if (!util::have_vlc_source || m_weak_src)
         return;
-    music_source::load();
     load_vlc_source();
 }
 

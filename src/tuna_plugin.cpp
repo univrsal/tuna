@@ -72,6 +72,12 @@ bool obs_module_load()
     music_sources::init();
     config::load();
     obs_sources::register_progress();
+
+    obs_frontend_add_event_callback([](enum obs_frontend_event event, void*) {
+        if (event == OBS_FRONTEND_EVENT_EXIT)
+            tuna_thread::stop();
+    },
+        nullptr);
     return true;
 }
 

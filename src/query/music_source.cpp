@@ -51,6 +51,7 @@ void init()
     obs_frontend_pop_ui_translation();
 
     for (auto& s : instances) {
+        s->load();
         tuna_dialog->add_source(utf8_to_qt(s->name()), utf8_to_qt(s->id()), s->get_settings_tab());
         if (music_dock)
             music_dock->add_source(utf8_to_qt(s->name()), utf8_to_qt(s->id()));

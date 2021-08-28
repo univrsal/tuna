@@ -24,7 +24,9 @@
 #include <QGuiApplication>
 #include <QScreen>
 
+#include <QDir>
 #include <QFile>
+#include <QJsonDocument>
 #include <QMessageBox>
 #include <QTextStream>
 #include <ctime>
@@ -239,4 +241,53 @@ void remove_extensions(QString& str)
         }
     }
 }
+
+QString get_config_file_path(const char* name)
+{
+#ifdef UNIX
+    QDir home = QDir::home();
+    home.cd(CONFIG_FOLDER);
+
+    if (!home.exists() && !home.mkdir(".")) {
+        berr("Couldn't create config folder");
+        return "";
+    }
+#else
+    QDir home = QDir::homePath();
+#endif
+    return QDir::toNativeSeparators(home.absoluteFilePath(utf8_to_qt(name)));
+}
+
+bool open_config(const char* name, QJsonDocument& doc)
+{
+    QFile file(get_config_file_path(name));
+    if (file.open(QIODevice::ReadWrite)) {
+        doc = QJsonDocument::fromJson(file.readAll());
+        return true;
+    }
+    return false;
+}
+
+bool save_config(const char* name, const QJsonDocument& doc)
+{
+    auto path = get_config_file_path(name);
+    QFile save_file(get_config_file_path(name));
+    auto result = false;
+    if (save_file.open(QIODevice::WriteOnly)) {
+        auto data = doc.toJson();
+        auto wrote = save_file.write(data);
+        if (data.length() == wrote) {
+            result = true;
+        } else {
+            berr("Couldn't write config file to %s, only"
+                 "wrote %lli bytes out of %i",
+                qt_to_utf8(path), wrote, data.length());
+        }
+        save_file.close();
+    } else {
+        berr("Couldn't write config to %s", qt_to_utf8(path));
+    }
+    return result;
+}
+
 } // namespace util

@@ -39,6 +39,8 @@
 
 class song;
 
+class QJsonDocument;
+
 namespace util {
 
 extern bool have_vlc_source;
@@ -63,5 +65,8 @@ extern size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* 
 extern void set_thread_name(const char* name);
 
 extern void remove_extensions(QString& str);
+
+extern bool open_config(const char* name, QJsonDocument&);
+extern bool save_config(const char* name, const QJsonDocument&);
 
 } // namespace util

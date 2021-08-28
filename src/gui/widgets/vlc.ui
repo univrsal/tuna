@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>428</width>
-    <height>359</height>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,41 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>tuna.gui.vlc.scene</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cb_scene"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>tuna.gui.vlc.source</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cb_source"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_add_source">
+       <property name="text">
+        <string>tuna.gui.vlc.add</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QPushButton" name="btn_refresh_vlc">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -38,6 +73,20 @@
      </property>
      <property name="text">
       <string>tuna.gui.vlc.refresh</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QListWidget" name="source_list">
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::InternalMove</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btn_remove_source">
+     <property name="text">
+      <string>tuna.gui.vlc.remove.source</string>
      </property>
     </widget>
    </item>

@@ -24,11 +24,16 @@
 
 class vlc_obs_source : public music_source {
     std::string m_target_source_name {};
+    std::string m_target_scene {};
     obs_weak_source_t* m_weak_src = nullptr;
     /* Only log conversion issues once per file */
     bool reload();
 
     void load_vlc_source();
+
+    std::string get_target_source();
+    std::string get_current_scene_name();
+    int m_index = 0;
 
 public:
     vlc_obs_source();
@@ -39,4 +44,6 @@ public:
     bool execute_capability(capability c) override;
     bool valid_format(const QString& str) override;
     bool enabled() const override;
+
+    void set_gui_values() override;
 };

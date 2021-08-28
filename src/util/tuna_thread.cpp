@@ -52,7 +52,7 @@ void stop()
         return;
     {
         std::lock_guard<std::mutex> lock(thread_mutex);
-        /* Set status to noting before stopping */
+        /* Set status to nothing before stopping */
         auto src = music_sources::selected_source_unsafe();
         src->reset_info();
         util::handle_outputs(src->song_info());
