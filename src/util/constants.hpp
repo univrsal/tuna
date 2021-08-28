@@ -40,6 +40,9 @@
 #define S_PROGRESS_USE_BG       "use_bg"
 #define S_PROGRESS_HIDE_PAUSED  "hide_paused"
 
+#define S_HOTKEY_NEXT           "tuna.hotkey.vlc.next"
+#define S_HOTKEY_PREV           "tuna.hotkey.vlc.prev"
+
 /* Translation */
 #define T_(s)                   obs_module_text(s)
 #define T_MENU_TUNA             T_("tuna.gui.menu")
@@ -76,6 +79,8 @@
 #define T_VLC_VERSION_ISSUE     T_("tuna.gui.vlc.issue.message")
 #define T_ERROR_TITLE           T_("tuna.gui.issue.title")
 #define T_VLC_INVALID           T_("tuna.gui.vlc.invalid")
+#define T_HOTKEY_VLC_NEXT       T_("tuna.hotkey.vlc.next")
+#define T_HOTKEY_VLC_PREV       T_("tuna.hotkey.vlc.prev")
 
 #define T_PROGRESS_FG           T_("tuna.source.progress.color.fg")
 #define T_PROGRESS_BG           T_("tuna.source.progress.color.bg")

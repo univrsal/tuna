@@ -40,6 +40,8 @@ MODULE_EXPORT const char* obs_module_description(void)
     return "Song information plugin";
 }
 
+obs_hotkey_id vlc_next, vlc_prev;
+
 void register_gui()
 {
     /* UI registration from
@@ -63,6 +65,35 @@ void register_gui()
 #endif
 }
 
+void tuna_save_cb(obs_data_t* save_data, bool saving, void*)
+{
+    obs_data_t* data = nullptr;
+    obs_data_array_t *prev = nullptr, *next = nullptr;
+
+    if (saving) {
+        data = obs_data_create();
+        prev = obs_hotkey_save(vlc_prev);
+        next = obs_hotkey_save(vlc_next);
+        obs_data_set_array(data, "vlc_prev_hotkey", prev);
+        obs_data_set_array(data, "vlc_next_hotkey", next);
+        obs_data_set_obj(save_data, "tuna", data);
+        obs_data_array_release(prev);
+        obs_data_array_release(next);
+        obs_data_release(data);
+    } else {
+        data = obs_data_get_obj(save_data, "tuna");
+        if (!data)
+            data = obs_data_create();
+        prev = obs_data_get_array(data, "vlc_prev_hotkey");
+        next = obs_data_get_array(data, "vlc_next_hotkey");
+        obs_hotkey_load(vlc_prev, prev);
+        obs_hotkey_load(vlc_next, next);
+        obs_data_array_release(prev);
+        obs_data_array_release(next);
+        obs_data_release(data);
+    }
+}
+
 bool obs_module_load()
 {
     binfo("Loading v%s build time %s", TUNA_VERSION, BUILD_TIME);
@@ -72,6 +103,7 @@ bool obs_module_load()
     music_sources::init();
     config::load();
     obs_sources::register_progress();
+    obs_frontend_add_save_callback(&tuna_save_cb, nullptr);
 
     obs_frontend_add_event_callback([](enum obs_frontend_event event, void*) {
         if (event == OBS_FRONTEND_EVENT_EXIT)
@@ -81,12 +113,37 @@ bool obs_module_load()
     return true;
 }
 
+void vlc_next_cb(void*, obs_hotkey_id id, obs_hotkey_t*, bool pressed)
+{
+    if (id != vlc_next || !pressed)
+        return;
+    auto src = music_sources::get<vlc_obs_source>(S_SOURCE_VLC);
+    if (src && src->enabled())
+        src->next_vlc_source();
+}
+
+void vlc_prev_cb(void*, obs_hotkey_id id, obs_hotkey_t*, bool pressed)
+{
+    if (id != vlc_prev || !pressed)
+        return;
+    auto src = music_sources::get<vlc_obs_source>(S_SOURCE_VLC);
+    if (src && src->enabled())
+        src->prev_vlc_source();
+}
+
 void obs_module_post_load()
 {
     // Just tries to create a vlc source, preferably with a name that isn't already taken
     obs_source_t* vlc_source = obs_source_create("vlc_source", "tuna_module_load_vlc_presence_test_source", nullptr, nullptr);
     util::have_vlc_source = vlc_source != nullptr;
     obs_source_release(vlc_source);
+
+    if (util::have_vlc_source) {
+        vlc_next = obs_hotkey_register_frontend(S_HOTKEY_NEXT, T_HOTKEY_VLC_NEXT,
+            vlc_next_cb, nullptr);
+        vlc_prev = obs_hotkey_register_frontend(S_HOTKEY_PREV, T_HOTKEY_VLC_PREV,
+            vlc_prev_cb, nullptr);
+    }
     config::post_load = true;
 }
 

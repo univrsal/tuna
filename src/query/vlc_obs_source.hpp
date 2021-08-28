@@ -55,5 +55,7 @@ public:
     bool valid_format(const QString& str) override;
     bool enabled() const override;
 
+    void next_vlc_source();
+    void prev_vlc_source();
     void set_gui_values() override;
 };

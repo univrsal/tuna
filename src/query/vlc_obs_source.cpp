@@ -21,6 +21,7 @@
 #include "../gui/widgets/vlc.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
+#include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
 #include <QUrl>
 #include <obs-frontend-api.h>
@@ -112,6 +113,24 @@ std::string vlc_obs_source::get_current_scene_name()
 bool vlc_obs_source::enabled() const
 {
     return util::have_vlc_source;
+}
+
+void vlc_obs_source::next_vlc_source()
+{
+    tuna_thread::thread_mutex.lock();
+    auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(m_target_scene.c_str());
+    m_index = (m_index + 1) % mappings.size();
+    tuna_thread::thread_mutex.unlock();
+}
+
+void vlc_obs_source::prev_vlc_source()
+{
+    tuna_thread::thread_mutex.lock();
+    auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(m_target_scene.c_str());
+    m_index--;
+    if (m_index < 0)
+        m_index = mappings.size() - 1;
+    tuna_thread::thread_mutex.unlock();
 }
 
 void vlc_obs_source::set_gui_values()
