@@ -53,7 +53,10 @@ void vlc::load_settings()
 {
     load_vlc_sources();
     ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
-    ui->cb_vlc_source_name->setEnabled(util::have_vlc_source);
+    ui->btn_add_source->setEnabled(util::have_vlc_source);
+    ui->btn_remove_source->setEnabled(util::have_vlc_source);
+    ui->cb_scene->setEnabled(util::have_vlc_source);
+    ui->cb_source->setEnabled(util::have_vlc_source);
 
     QJsonDocument doc;
     if (!util::open_config(VLC_SCENE_MAPPING, doc)) {
@@ -130,17 +133,12 @@ QJsonArray vlc::get_mappings_for_scene(const char* scene)
 
 void vlc::save_settings()
 {
-    CSET_STR(CFG_VLC_ID, qt_to_utf8(ui->cb_vlc_source_name->currentText()));
-    if (!util::save_config(VLC_SCENE_MAPPING, QJsonDocument(m_source_map))) {
+    if (!util::save_config(VLC_SCENE_MAPPING, QJsonDocument(m_source_map)))
         berr("Failed to save vlc mappings");
-    }
 }
 
 void vlc::load_vlc_sources()
 {
-    ui->cb_vlc_source_name->clear();
-    ui->cb_vlc_source_name->addItem(T_VLC_NONE);
-
     ui->cb_scene->clear();
     ui->cb_source->clear();
 
@@ -276,14 +274,4 @@ void vlc::refresh_sources()
             &d);
         obs_scene_release(scene);
     }
-}
-
-void vlc::select_vlc_source(const QString& id)
-{
-    const auto idx = ui->cb_vlc_source_name->findText(id, Qt::MatchExactly);
-
-    if (idx >= 0)
-        ui->cb_vlc_source_name->setCurrentIndex(idx);
-    else
-        ui->cb_vlc_source_name->setCurrentIndex(0);
 }

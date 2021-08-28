@@ -40,7 +40,6 @@ public:
     explicit vlc(QWidget* parent = nullptr);
     ~vlc();
 
-    void select_vlc_source(const QString& id);
     void save_settings() override;
     void load_settings() override;
 
