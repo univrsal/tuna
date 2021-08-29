@@ -221,7 +221,7 @@ void vlc_obs_source::refresh()
         auto disc_number = get_meta("disc_number");
 
         if (artwork_url != "")
-            m_current.set_cover_link(QUrl::fromPercentEncoding(qt_to_utf8(artwork_url)));
+            m_current.set_cover_link(artwork_url);
         if (title != "")
             m_current.set_title(title);
         if (artist != "")
