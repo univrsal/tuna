@@ -26,7 +26,6 @@ class vlc_obs_source : public music_source {
     std::string m_target_source_name {};
     std::string m_target_scene {};
     obs_weak_source_t* m_weak_src = nullptr;
-    /* Only log conversion issues once per file */
     bool reload();
 
     void load_vlc_source();
