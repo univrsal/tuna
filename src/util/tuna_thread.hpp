@@ -24,7 +24,7 @@
 #include <thread>
 
 namespace tuna_thread {
-extern volatile bool thread_flag;
+extern std::atomic<bool> thread_flag;
 extern std::mutex thread_mutex;
 extern std::mutex copy_mutex;
 extern std::thread thread_handle;

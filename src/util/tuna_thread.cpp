@@ -28,7 +28,7 @@
 #include <util/threading.h>
 
 namespace tuna_thread {
-volatile bool thread_flag = false;
+std::atomic<bool> thread_flag { false };
 song copy;
 std::mutex thread_mutex;
 std::mutex copy_mutex;
@@ -36,14 +36,11 @@ std::thread thread_handle;
 
 bool start()
 {
-    std::lock_guard<std::mutex> lock(thread_mutex);
     if (thread_flag)
         return true;
-    thread_flag = true;
+    std::lock_guard<std::mutex> lock(thread_mutex);
     thread_handle = std::thread(thread_method);
-    bool result = thread_handle.native_handle();
-    thread_flag = result;
-    return result;
+    return thread_flag = thread_handle.native_handle();
 }
 
 void stop()
@@ -66,9 +63,10 @@ void thread_method()
 {
     os_set_thread_name("tuna-query");
 
-    while (true) {
+    while (thread_flag) {
         const uint64_t time = os_gettime_ns() / 1000000;
         {
+            // We don't want to hold the lock while waiting
             std::lock_guard<std::mutex> lock(thread_mutex);
             auto ref = music_sources::selected_source_unsafe();
             if (ref) {
@@ -88,15 +86,16 @@ void thread_method()
                 util::handle_outputs(s);
                 if (config::download_cover)
                     ref->handle_cover();
-                if (!thread_flag)
-                    break;
             }
         }
 
         /* Calculate how long refresh took and only wait the remaining time */
         uint64_t delta = std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate);
-        uint64_t wait = config::refresh_rate - delta;
-        os_sleep_ms(wait);
+        // Prevent integer wrapping
+        if (delta <= config::refresh_rate) {
+            uint64_t wait = config::refresh_rate - delta;
+            os_sleep_ms(wait);
+        }
     }
     binfo("Query thread stopped.");
 }
