@@ -52,6 +52,7 @@ vlc::~vlc()
 void vlc::load_settings()
 {
     load_vlc_sources();
+    build_list();
     ui->btn_refresh_vlc->setEnabled(util::have_vlc_source);
     ui->btn_add_source->setEnabled(util::have_vlc_source);
     ui->btn_remove_source->setEnabled(util::have_vlc_source);
