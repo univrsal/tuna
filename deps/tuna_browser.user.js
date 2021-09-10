@@ -9,6 +9,7 @@
 // @match        *://music.yandex.com/*
 // @match        *://music.yandex.ru/*
 // @match        *://www.deezer.com/*
+// @match        *://play.pretzel.rocks/*
 // @grant        unsafeWindow
 // @license      GPLv2
 // ==/UserScript==
@@ -162,6 +163,62 @@
                 let progress = query('.slider-counter-current', e => timestamp_to_ms(e.textContent));
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration });
+                }
+            } else if (hostname == "play.pretzel.rocks") {
+                // Pretzel.rocks support by Tarulia
+
+                // it seems nothing in the element or page changes
+                // there's also no <audio>-element to query status
+                // this is a super dirty method by selecting part of the SVG icon path on the Play/Pause Button
+                let status = "unknown";
+
+                if (document.querySelector("path[d*='8.064h1.696v12.864h-1.696V9.568zm5.888 0h1.664v12.864h-1.664V9.568z']")) {
+                  status = "playing";
+                }
+
+                if (document.querySelector("path[d*='8.992l9.568 5.536-9.568 5.536V10.496M11.168 8.64v14.72l12.672-7.328L11.168 8.64z']")) {
+                  status = "stopped"
+                }
+
+                let cover_url = query('div.rwQJb', e => {
+                    let img = e.getElementsByTagName('img');
+                    if (img.length > 0) {
+                        let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/large.jpg
+                        return src.replace('medium.jpg', 'large.jpg');
+                    }
+                    return null;
+                });
+
+                let title = query('div.kzpiRD', e => {
+                    let elements = e.getElementsByTagName('span');
+                    if (elements.length > 0) {
+                        return elements[0].textContent;
+                    }
+                    return null;
+                });
+
+                let artists = query('div.kzpiRD', e => {
+                    let elements = e.getElementsByTagName('a');
+                    if (elements.length > 0) {
+                        return elements[0].textContent;
+                    }
+                    return null;
+                });
+
+                let duration = query('div.hcriLb progress', e => e.max * 1000);
+                let progress = query('div.hcriLb progress', e => e.value * 1000);
+
+                // is it URL or title? soundcloud/spotify use href, yandax uses title
+                let album_url = query('div.kzpiRD', e => {
+                    let elements = e.getElementsByTagName('a');
+                    if (elements.length > 1) {
+                        return elements[1].textContent;
+                    }
+                    return null;
+                });
+
+                if (title !== null) {
+                    post({ cover_url, title, artists, status, progress, duration, album_url });
                 }
             }
         }, 500);
