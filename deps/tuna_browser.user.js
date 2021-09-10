@@ -221,7 +221,7 @@
                     post({ cover_url, title, artists, status, progress, duration, album_url });
                 }
             }
-        }, 500);
+        }, refresh_rate_ms);
 
     }
 
