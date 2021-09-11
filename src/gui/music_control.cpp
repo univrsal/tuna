@@ -133,10 +133,13 @@ void music_control::refresh_play_state()
         if (copy.state() <= state_paused) {
             last_title = copy.get_string_value('t');
             QString artists, title = copy.get_string_value('t');
-
             artists = copy.artists().join(", ");
-            info.append(artists);
-            info.append(" - ").append(title);
+            // Icecast and window title don't provide these
+            if (!artists.isEmpty()) {
+                info.append(artists);
+                info.append(" - ");
+            }
+            info.append(title);
             last_title = title;
         } else {
             info.append(utf8_to_qt(config::placeholder));
