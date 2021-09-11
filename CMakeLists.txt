@@ -79,6 +79,7 @@ set(tuna_ui
         src/gui/widgets/mpd.ui
         src/gui/widgets/window_title.ui
         src/gui/widgets/spotify.ui
+        src/gui/widgets/icecast.ui
         src/gui/widgets/vlc.ui)
 
 qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
@@ -99,7 +100,7 @@ if (APPLE)
     include_directories(${COCOA})
     set_source_files_properties("./src/util/window/window_helper_mac.mm"
         PROPERTIES COMPILE_FLAGS "-fobjc-arc")
-    
+
     # taglib needs zlib
     set(tuna_platform_deps
         ${COCOA}
@@ -149,6 +150,8 @@ set(tuna_sources
     ./src/query/gpmdp_source.hpp
     ./src/query/web_source.cpp
     ./src/query/web_source.hpp
+    ./src/query/icecast_source.cpp
+    ./src/query/icecast_source.hpp
     ./src/query/song.cpp
     ./src/query/song.hpp
     ./src/util/format.cpp
@@ -172,6 +175,8 @@ set(tuna_sources
     ./src/gui/widgets/mpd.hpp
     ./src/gui/widgets/window_title.cpp
     ./src/gui/widgets/window_title.hpp
+    ./src/gui/widgets/icecast.cpp
+    ./src/gui/widgets/icecast.hpp
     ./src/gui/widgets/spotify.cpp
     ./src/gui/widgets/spotify.hpp
     ./src/gui/widgets/vlc.cpp

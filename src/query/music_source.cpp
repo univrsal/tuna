@@ -25,6 +25,7 @@
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
 #include "gpmdp_source.hpp"
+#include "icecast_source.hpp"
 #include "lastfm_source.hpp"
 #include "mpd_source.hpp"
 #include "spotify_source.hpp"
@@ -48,6 +49,7 @@ void init()
     instances.append(std::make_shared<lastfm_source>());
     instances.append(std::make_shared<gpmdp_source>());
     instances.append(std::make_shared<web_source>());
+    instances.append(std::make_shared<icecast_source>());
     obs_frontend_pop_ui_translation();
 
     for (auto& s : instances) {

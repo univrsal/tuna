@@ -79,6 +79,8 @@
 #define CFG_LASTFM_USERNAME             "lastfm.username"
 #define CFG_LASTFM_API_KEY              "lastfm.apikey"
 
+#define CFG_ICECAST_URL                 "icecast.url"
+
 #define CFG_VLC_ID                      "vlc.id"
 #define CFG_FORCE_VLC_DECISION          "vlc.force.enable"
 #define CFG_ERROR_MESSAGE_SHOWN         "vlc.error.message.shown"

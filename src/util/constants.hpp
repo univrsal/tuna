@@ -31,6 +31,7 @@
 #define S_SOURCE_LAST_FM        "lastfm"
 #define S_SOURCE_WEB            "web"
 #define S_SOURCE_DEEZER         "deezer"
+#define S_SOURCE_ICECAST        "icecast"
 
 #define S_PROGRESS_FG           "fg"
 #define S_PROGRESS_BG           "bg"
@@ -56,6 +57,7 @@
 #define T_SOURCE_LASTFM         T_("tuna.gui.tab.lastfm")
 #define T_SOURCE_SPOTIFY        T_("tuna.gui.tab.spotify")
 #define T_SOURCE_VLC            T_("tuna.gui.tab.vlc")
+#define T_SOURCE_ICECAST        T_("tuna.gui.tab.icecast")
 #define T_SOURCE_GPMDP          T_("tuna.gui.tab.gpmdp")
 #define T_SOURCE_WINDOW_TITLE   T_("tuna.gui.tab.window_title")
 #define T_SOURCE_WEB            T_("tuna.gui.tab.web")
