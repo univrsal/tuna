@@ -55,6 +55,7 @@ void icecast_source::refresh()
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error_buffer);
         auto result = curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
 
         if (result == CURLE_OK) {
             // Pretty arbitrary, but I have tested this with some stations
