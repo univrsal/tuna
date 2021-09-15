@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.5)
-project(tuna VERSION 1.5.5)
+project(tuna VERSION 1.6.0)
 
 add_subdirectory(deps)
 
 set(PLUGIN_AUTHOR "univrsal")
 set(PLUGIN_GIT tuna)
-set(LINUX_MAINTAINER_EMAIL "uni@vrsal.cf")
+set(LINUX_MAINTAINER_EMAIL "uni@vrsal.de")
 set(MACOS_BUNDLEID "cf.vrsal.tuna")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
