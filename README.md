@@ -1,4 +1,4 @@
-![header](/preview.png "tuna running on obs linux")
+![header](https://obsproject.com/forum/attachments/screenshot_20201013_230446-jpg.62004/ "tuna running on obs linux")
 
 ![nightly](https://github.com/univrsal/tuna/workflows/nightly/badge.svg)
 
