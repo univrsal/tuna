@@ -167,20 +167,19 @@
             } else if (hostname == "play.pretzel.rocks") {
                 // Pretzel.rocks support by Tarulia
 
-                // it seems nothing in the element or page changes
-                // there's also no <audio>-element to query status
-                // this is a super dirty method by selecting part of the SVG icon path on the Play/Pause Button
                 let status = "unknown";
 
-                if (document.querySelector("path[d*='8.064h1.696v12.864h-1.696V9.568zm5.888 0h1.664v12.864h-1.664V9.568z']")) {
+                // pause button got an ARIA label on the new player
+                if (document.querySelector("svg[aria-labelledby='pause-button']")) {
                   status = "playing";
                 }
 
-                if (document.querySelector("path[d*='8.992l9.568 5.536-9.568 5.536V10.496M11.168 8.64v14.72l12.672-7.328L11.168 8.64z']")) {
+                // no ARIA label on Play button, so we do the old dirty method
+                if (document.querySelector("path[d^='M16.4371 12.6863C16.6222']")) {
                   status = "stopped"
                 }
 
-                let cover_url = query('div.rwQJb', e => {
+                let cover_url = query('div.ktzrwC', e => {
                     let img = e.getElementsByTagName('img');
                     if (img.length > 0) {
                         let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/large.jpg
