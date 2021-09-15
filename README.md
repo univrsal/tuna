@@ -15,5 +15,7 @@ Currently supports
     - Soundcloud 
     - Spotify Web Player
     - Deezer
+    - Yandex Music
+    - Pretzel.rocks
 
 <img src="src/gui/images/tuna.png" alt="hey tuna" width="180px">
