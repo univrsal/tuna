@@ -397,7 +397,7 @@ bool spotify_source::do_refresh_token(QString& log)
 
         /* Dump the json into the log text */
         log = QString(response.toJson(QJsonDocument::Indented));
-        if (token.isString() && expires.isString()) {
+        if (token.isString() && expires.isDouble()) {
             m_token = token.toString();
             m_token_termination = util::epoch() + expires.toInt();
             result = true;
