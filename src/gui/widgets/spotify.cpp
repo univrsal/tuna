@@ -36,6 +36,8 @@ spotify::spotify(QWidget* parent)
 spotify::~spotify()
 {
     delete ui;
+    delete m_token_refresh_promise;
+    delete m_token_request_promise;
 }
 
 void spotify::load_settings()
