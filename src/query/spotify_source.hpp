@@ -50,6 +50,7 @@ public:
     bool new_token(QString& log);
     void set_auth_code(const QString& auth_code) { m_auth_code = auth_code; }
     bool is_logged_in() const { return m_logged_in; }
+    int token_termination() const { return m_token_termination; }
     const QString& auth_code() const { return m_auth_code; }
     const QString& token() const { return m_token; }
     const QString& refresh_token() const { return m_refresh_token; }

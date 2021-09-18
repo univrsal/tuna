@@ -84,6 +84,7 @@ void spotify::save_settings()
         CSET_STR(CFG_SPOTIFY_TOKEN, qt_to_utf8(spotify->token()));
         CSET_STR(CFG_SPOTIFY_REFRESH_TOKEN, qt_to_utf8(spotify->refresh_token()));
         CSET_BOOL(CFG_SPOTIFY_LOGGEDIN, spotify->is_logged_in());
+        CSET_INT(CFG_SPOTIFY_TOKEN_TERMINATION, spotify->token_termination());
     }
 }
 

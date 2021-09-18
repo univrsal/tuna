@@ -375,12 +375,11 @@ bool spotify_source::do_refresh_token(QString& log)
 {
     build_credentials();
     static std::string request;
-    bool result = true;
+    bool result = false;
     QJsonDocument response;
 
     if (m_refresh_token.isEmpty()) {
         berr("Refresh token is empty!");
-        return false;
     }
 
     request = "grant_type=refresh_token&refresh_token=";
@@ -389,7 +388,6 @@ bool spotify_source::do_refresh_token(QString& log)
 
     if (response.isNull()) {
         berr("Couldn't refresh Spotify token, response was null");
-        return false;
     } else {
         const auto& response_obj = response.object();
         const auto& token = response_obj["access_token"];
@@ -402,16 +400,13 @@ bool spotify_source::do_refresh_token(QString& log)
         if (token.isString() && expires.isString()) {
             m_token = token.toString();
             m_token_termination = util::epoch() + expires.toInt();
-            m_logged_in = true;
+            result = true;
             binfo("Successfully logged in");
         } else {
             if (error.isString())
                 berr("Received error from spotify: %s", qt_to_utf8(error.toString()));
             else
                 berr("Couldn't parse json response");
-
-            result = false;
-            m_logged_in = false;
         }
 
         /* Refreshing the token can return a new refresh token */
@@ -425,6 +420,7 @@ bool spotify_source::do_refresh_token(QString& log)
     }
 
     m_logged_in = result;
+    save();
     return result;
 }
 
@@ -433,7 +429,7 @@ bool spotify_source::new_token(QString& log)
 {
     build_credentials();
     static std::string request;
-    bool result = true;
+    bool result = false;
     QJsonDocument response;
     request = "grant_type=authorization_code&code=";
     request.append(m_auth_code.toStdString());
@@ -456,10 +452,8 @@ bool spotify_source::new_token(QString& log)
             result = true;
         } else {
             berr("Couldn't parse json response!");
-            result = false;
         }
     } else {
-        result = false;
     }
 
     m_logged_in = result;
