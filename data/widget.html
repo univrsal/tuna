@@ -173,12 +173,12 @@
                 if (artists != last_artist) {
                     var artistLine = '';
                     if (artists != '')
-                        artistsLine += "by " + artists + " ";
+                        artistsLine += "<i>by</i> " + artists + " ";
 
                     // sometimes there is an album with no artist, we can still allow that
                     if (data['album'] != undefined &&
                         data['album'] != artists) // Some singles have the artist as the album, which looks strange with the other subtitle
-                        artistsLine += "on " + data['album'];
+                        artistsLine += "<i>on</i> " + data['album'];
 
                     // use &nbsp; in case we have neither artist nor album
                     // space is considered empty element, &nbsp; is not
