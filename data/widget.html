@@ -98,8 +98,8 @@
                 <img src="placeholder.png" id="cover">
             </div>
             <div class="info">
-                <p id="title">Title</p>
-                <p id="artist">Artist</p>
+                <p id="title">&nbsp;</p>
+                <p id="artist">&nbsp;</p>
                 <div id="timeline">
                     <div>
                         <p id="length">0:00</p>
@@ -155,7 +155,9 @@
                         artists += ', ';
                 }
 
-                document.getElementById('title').innerText = data['title'];
+                if (data['title'] != last_title)
+                    document.getElementById('title').innerText = data['title'];
+
                 if (data['cover_url'] == undefined ||
                     data['cover_url'] == '') {
                     document.getElementById('cover').src = "placeholder.png";
@@ -168,12 +170,20 @@
                     last_cover = data['cover_url'];
                 }
 
-                if (artists == '')
-                    document.getElementById('artist').innerHTML = '&nbsp;'; // space is considered empty element, &nbsp; is not
-                else if (artists === data['album'] || data['album'] === undefined) // Some singles have the artist as the album, which looks strange with the other subtitle
-                    document.getElementById('artist').innerHTML = 'by ' + artists;
-                else
-                    document.getElementById('artist').innerHTML = 'by ' + artists + ' on ' + data['album']
+                if (artists != last_artist) {
+                    var artistLine = '';
+                    if (artists != '')
+                        artistsLine += "by " + artists + " ";
+
+                    // sometimes there is an album with no artist, we can still allow that
+                    if (data['album'] != undefined &&
+                        data['album'] != artists) // Some singles have the artist as the album, which looks strange with the other subtitle
+                        artistsLine += "on " + data['album'];
+
+                    // use &nbsp; in case we have neither artist nor album
+                    // space is considered empty element, &nbsp; is not
+                    artistLine == '' ? document.getElementById('artist').innerHTML = "&nbsp;" : document.getElementById('artist').innerHTML = artistLine
+                }
 
                 var length = data['duration'];
                 var progress = data['progress'];
