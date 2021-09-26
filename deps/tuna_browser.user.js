@@ -169,12 +169,13 @@
 
                 let status = "unknown";
 
-                // pause button got an ARIA label on the new player
-                if (document.querySelector("svg[aria-labelledby='pause-button']")) {
+                // pretzel seems to flip-flop between having labels or not
+                // so we use the dirty but working method of selecting SVG paths
+                // since they shouldn't change much
+                if (document.querySelector("path[d^='M16.5 12.6016C17.3284']")) {
                   status = "playing";
                 }
 
-                // no ARIA label on Play button, so we do the old dirty method
                 if (document.querySelector("path[d^='M16.4371 12.6863C16.6222']")) {
                   status = "stopped"
                 }
