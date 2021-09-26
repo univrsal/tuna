@@ -32,7 +32,7 @@
             height: 100%;
             float: left;
         }
-        
+
         .image-box img {
             position: relative;
             z-index: -1;
@@ -50,7 +50,7 @@
             margin: 0px;
             padding-bottom: 2px;
         }
-        
+
         #artist {
             font-size: large;
         }
@@ -114,7 +114,7 @@
             </div>
         </div>
     </body>
-    
+
     <script>
         var last_cover = '';
         var last_artist = '';
@@ -130,7 +130,7 @@
 
             if (secs < 10)
                 secs = '0' + secs;
-            
+
             if (hrs > 0) {
                 if (mins < 10)
                     mins = '0' + mins;
@@ -145,7 +145,7 @@
             .then(data => {
                 // data now contains the json object with song metadata
 
-                
+
                 // artist list
                 var artists = '';
                 var array = data['artists'];
@@ -169,7 +169,7 @@
                     document.getElementById('artist').innerText = 'by ' + artists;
                 else
                     document.getElementById('artist').innerText = 'by ' + artists + ' from ' + data['album']
-                
+
                 var length = data['duration'];
                 var progress = data['progress'];
                 document.getElementById('progress').style.width = (progress / length) * 100 + '%';
@@ -177,7 +177,7 @@
                 // Timestamps
                 document.getElementById('length').innerText = format_ms(length);
                 document.getElementById('time-passed').innerText = format_ms(progress);
-                
+
                 last_artist = artists;
                 last_title = data['title'];
             })
@@ -185,7 +185,7 @@
                 // Do nothing
             });
         }
-        
+
         setInterval(fetch_data, 500);
     </script>
 </html>
