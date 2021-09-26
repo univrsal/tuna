@@ -148,7 +148,7 @@
 
                 // artist list
                 var artists = '';
-                var array = data['artists'];
+                var array = data['artists'] || []; // in some cases no artist is known/submitted
                 for (var i = 0; i < array.length; i++) {
                     artists += array[i];
                     if (i < array.length - 1)
@@ -156,7 +156,10 @@
                 }
 
                 document.getElementById('title').innerText = data['title'];
-                if (data['cover_url'] !== last_cover || // Refresh only if meta data suggests that the cover changed
+                if (data['cover_url'] == undefined ||
+                    data['cover_url'] == '') {
+                    document.getElementById('cover').src = "placeholder.png";
+                } else if (data['cover_url'] !== last_cover || // Refresh only if meta data suggests that the cover changed
                     (data['title'] !== last_title &&    // When using MPD the path is always the cover path configured in tuna
                     artists !== last_artist))           // which means it won't change so we check against other data
                 {
@@ -165,10 +168,12 @@
                     last_cover = data['cover_url'];
                 }
 
-                if (artists === data['album'] || data['album'] === undefined) // Some singles have the artist as the album, which looks strange with the other subtitle
-                    document.getElementById('artist').innerText = 'by ' + artists;
+                if (artists == '')
+                    document.getElementById('artist').innerHTML = '&nbsp;'; // space is considered empty element, &nbsp; is not
+                else if (artists === data['album'] || data['album'] === undefined) // Some singles have the artist as the album, which looks strange with the other subtitle
+                    document.getElementById('artist').innerHTML = 'by ' + artists;
                 else
-                    document.getElementById('artist').innerText = 'by ' + artists + ' from ' + data['album']
+                    document.getElementById('artist').innerHTML = 'by ' + artists + ' on ' + data['album']
 
                 var length = data['duration'];
                 var progress = data['progress'];
