@@ -32,7 +32,7 @@
             height: 100%;
             float: left;
         }
-        
+
         .image-box img {
             position: relative;
             z-index: -1;
@@ -50,7 +50,7 @@
             margin: 0px;
             padding-bottom: 2px;
         }
-        
+
         #artist {
             font-size: large;
         }
@@ -98,8 +98,8 @@
                 <img src="placeholder.png" id="cover">
             </div>
             <div class="info">
-                <p id="title">Title</p>
-                <p id="artist">Artist</p>
+                <p id="title">&nbsp;</p>
+                <p id="artist">&nbsp;</p>
                 <div id="timeline">
                     <div>
                         <p id="length">0:00</p>
@@ -114,7 +114,7 @@
             </div>
         </div>
     </body>
-    
+
     <script>
         var last_cover = '';
         var last_artist = '';
@@ -130,7 +130,7 @@
 
             if (secs < 10)
                 secs = '0' + secs;
-            
+
             if (hrs > 0) {
                 if (mins < 10)
                     mins = '0' + mins;
@@ -145,18 +145,23 @@
             .then(data => {
                 // data now contains the json object with song metadata
 
-                
+
                 // artist list
                 var artists = '';
-                var array = data['artists'];
+                var array = data['artists'] || []; // in some cases no artist is known/submitted
                 for (var i = 0; i < array.length; i++) {
                     artists += array[i];
                     if (i < array.length - 1)
                         artists += ', ';
                 }
 
-                document.getElementById('title').innerText = data['title'];
-                if (data['cover_url'] !== last_cover || // Refresh only if meta data suggests that the cover changed
+                if (data['title'] != last_title)
+                    document.getElementById('title').innerText = data['title'];
+
+                if (data['cover_url'] == undefined ||
+                    data['cover_url'] == '') {
+                    document.getElementById('cover').src = "placeholder.png";
+                } else if (data['cover_url'] !== last_cover || // Refresh only if meta data suggests that the cover changed
                     (data['title'] !== last_title &&    // When using MPD the path is always the cover path configured in tuna
                     artists !== last_artist))           // which means it won't change so we check against other data
                 {
@@ -165,11 +170,21 @@
                     last_cover = data['cover_url'];
                 }
 
-                if (artists === data['album'] || data['album'] === undefined) // Some singles have the artist as the album, which looks strange with the other subtitle
-                    document.getElementById('artist').innerText = 'by ' + artists;
-                else
-                    document.getElementById('artist').innerText = 'by ' + artists + ' from ' + data['album']
-                
+                if (artists != last_artist) {
+                    var artistLine = '';
+                    if (artists != '')
+                        artistsLine += "<i>by</i> " + artists + " ";
+
+                    // sometimes there is an album with no artist, we can still allow that
+                    if (data['album'] != undefined &&
+                        data['album'] != artists) // Some singles have the artist as the album, which looks strange with the other subtitle
+                        artistsLine += "<i>on</i> " + data['album'];
+
+                    // use &nbsp; in case we have neither artist nor album
+                    // space is considered empty element, &nbsp; is not
+                    artistLine == '' ? document.getElementById('artist').innerHTML = "&nbsp;" : document.getElementById('artist').innerHTML = artistLine
+                }
+
                 var length = data['duration'];
                 var progress = data['progress'];
                 document.getElementById('progress').style.width = (progress / length) * 100 + '%';
@@ -177,7 +192,7 @@
                 // Timestamps
                 document.getElementById('length').innerText = format_ms(length);
                 document.getElementById('time-passed').innerText = format_ms(progress);
-                
+
                 last_artist = artists;
                 last_title = data['title'];
             })
@@ -185,7 +200,7 @@
                 // Do nothing
             });
         }
-        
+
         setInterval(fetch_data, 500);
     </script>
 </html>
