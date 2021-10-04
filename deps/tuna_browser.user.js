@@ -200,7 +200,7 @@
                 let artists = query('div.kzpiRD', e => {
                     let elements = e.getElementsByTagName('a');
                     if (elements.length > 0) {
-                        return elements[0].textContent;
+                        return [ elements[0].textContent ];
                     }
                     return null;
                 });
