@@ -4,10 +4,14 @@ on:
     paths-ignore:
       - '**.md'
       - '**.ini'
+      - '**.html'
+      - '**.js'
   push:
     paths-ignore:
       - '**.md'
       - '**.ini'
+      - '**.html'
+      - '**.js'
     branches:
     - master
     tags:
