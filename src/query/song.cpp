@@ -329,6 +329,10 @@ void song::from_json(const QJsonObject& obj)
         }
     }
 
+    auto album = obj["album"];
+    if (album.isString())
+        set_album(album.toString());
+
     auto progress = obj["progress"];
     if (progress.isDouble())
         set_progress(progress.toInt());
