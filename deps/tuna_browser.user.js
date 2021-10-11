@@ -89,9 +89,19 @@
                 let progress = query('.playbackTimeline__timePassed span:nth-child(2)', e => timestamp_to_ms(e.textContent));
                 let duration = query('.playbackTimeline__duration span:nth-child(2)', e => timestamp_to_ms(e.textContent));
                 let album_url = query('.playbackSoundBadge__titleLink', e => e.href);
+                let album = null;
+                // this header only exists on album/set pages so we know this is a full album
+                album = query('.fullListenHero .soundTitle__title', e => {
+                    album_url = window.location.href;
+                    return e.innerText
+                })
+
+                album = query('div.playlist.playing', e => {
+                    return e.getElementsByClassName('soundTitle__title')[0].innerText;
+                })
 
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url });
+                    post({ cover_url, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname == 'open.spotify.com') {
                 let status = query('.player-controls [data-testid="control-button-pause"]', e => !!e ? 'playing' : 'stopped', 'unknown');
@@ -198,24 +208,35 @@
                 });
 
                 let artists = query('div.kzpiRD', e => {
-                    let elements = e.getElementsByTagName('a');
+                    let elements = e.querySelector('p:first-of-type').getElementsByTagName('a');
                     if (elements.length > 0) {
-                        return [ elements[0].textContent ];
+                        let artistArray = [];
+                        for (let i = 0; i < elements.length; i++) {
+                            artistArray.push(elements[i].textContent);
+                        }
+                        return artistArray;
+                    }
+                    return null;
+                });
+
+                let album = query('div.kzpiRD', e => {
+                    let elements = e.querySelector('p:last-of-type').getElementsByTagName('a');
+                    if (elements.length > 0) {
+                        return elements[0].textContent;
+                    }
+                    return null;
+                });
+
+                let album_url = query('div.kzpiRD', e => {
+                    let elements = e.querySelector('p:last-of-type').getElementsByTagName('a');
+                    if (elements.length > 0) {
+                        return elements[0].href;
                     }
                     return null;
                 });
 
                 let duration = query('div.hcriLb progress', e => e.max * 1000);
                 let progress = query('div.hcriLb progress', e => e.value * 1000);
-
-                // is it URL or title? soundcloud/spotify use href, yandax uses title
-                let album_url = query('div.kzpiRD', e => {
-                    let elements = e.getElementsByTagName('a');
-                    if (elements.length > 1) {
-                        return elements[1].textContent;
-                    }
-                    return null;
-                });
 
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration, album_url });
