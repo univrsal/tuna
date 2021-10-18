@@ -117,20 +117,22 @@ bool vlc_obs_source::enabled() const
 
 void vlc_obs_source::next_vlc_source()
 {
-    tuna_thread::thread_mutex.lock();
+    std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
     auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(m_target_scene.c_str());
+    if (mappings.empty())
+        return;
     m_index = (m_index + 1) % mappings.size();
-    tuna_thread::thread_mutex.unlock();
 }
 
 void vlc_obs_source::prev_vlc_source()
 {
-    tuna_thread::thread_mutex.lock();
+    std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
     auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(m_target_scene.c_str());
+    if (mappings.empty())
+        return;
     m_index--;
     if (m_index < 0)
         m_index = mappings.size() - 1;
-    tuna_thread::thread_mutex.unlock();
 }
 
 void vlc_obs_source::set_gui_values()
