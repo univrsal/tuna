@@ -150,7 +150,7 @@ QString capability_to_string(capability c)
     case CAP_DURATION:
         return utf8_to_qt("duration");
     case CAP_EXPLICIT:
-        return utf8_to_qt("is_explicid");
+        return utf8_to_qt("is_explicit");
     case CAP_LABEL:
         return utf8_to_qt("label");
     case CAP_LYRICS:
