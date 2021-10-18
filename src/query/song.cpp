@@ -288,6 +288,7 @@ void song::to_json(QJsonObject& obj) const
         default:
         case prec_unknown:
         case prec_year:
+            release["full"] = m_full_release;
             release["year"] = m_year;
             if (m_release_precision == prec_year)
                 precision = "year";
@@ -329,6 +330,14 @@ void song::from_json(const QJsonObject& obj)
         }
     }
 
+    auto is_explicit = obj["is_explicit"];
+    if (is_explicit.isBool())
+        set_explicit(is_explicit.toBool());
+
+    auto label = obj["label"];
+    if (label.isString())
+        set_label(label.toString());
+
     auto album = obj["album"];
     if (album.isString())
         set_album(album.toString());
@@ -340,4 +349,46 @@ void song::from_json(const QJsonObject& obj)
     auto duration = obj["duration"];
     if (duration.isDouble())
         set_duration(duration.toInt());
+
+    auto track = obj["track"];
+    if (track.isDouble())
+        set_duration(track.toInt());
+
+    auto disc = obj["disc"];
+    if (disc.isDouble())
+        set_duration(disc.toInt());
+    
+    auto release = obj["release_date"];
+    if (release.isObject()) {
+        if (release["precision"].isString()) {
+            auto prec = release["precision"].toString();
+            if (prec == "year")
+                m_release_precision = prec_year;
+            else if (prec == "month")
+                m_release_precision = prec_month;
+            else if (prec == "day")
+                m_release_precision = prec_day;
+            else
+                m_release_precision = prec_unknown;
+
+            switch (m_release_precision) {
+                case prec_day:
+                    if (release["day"].isString())
+                    set_day(release["day"].toString());
+                    /* fallthrough */
+                case prec_month:
+                    if (release["month"].isString())
+                    set_day(release["month"].toString());
+                    /* fallthrough */
+                case prec_year:
+                    if (release["year"].isString())
+                        set_day(release["year"].toString());
+                    break;
+                default:
+                case prec_unknown:
+                    if (release["full"].isString())
+                        m_full_release = release["full"].toString();
+            }
+        }
+    }
 }
