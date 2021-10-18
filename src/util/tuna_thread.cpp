@@ -93,8 +93,14 @@ void thread_method()
         uint64_t delta = std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate);
         // Prevent integer wrapping
         if (delta <= config::refresh_rate) {
-            uint64_t wait = config::refresh_rate - delta;
-            os_sleep_ms(wait);
+            int64_t wait = config::refresh_rate - delta;
+            const int32_t step = 50;
+
+            // We only wait 50 ms so we can catch the thread stopping faster
+            while (wait > 0 && thread_flag) {
+                os_sleep_ms(step);
+                wait -= step;
+            }
         }
     }
     binfo("Query thread stopped.");
