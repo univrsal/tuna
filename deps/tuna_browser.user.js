@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.9
+// @version      1.0.10
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -10,6 +10,7 @@
 // @match        *://music.yandex.ru/*
 // @match        *://www.deezer.com/*
 // @match        *://play.pretzel.rocks/*
+// @match        *://*.youtube.com/*
 // @grant        unsafeWindow
 // @license      GPLv2
 // ==/UserScript==
@@ -43,6 +44,7 @@
                 }
             }
         };
+
         xhr.send(JSON.stringify({data,hostname:window.location.hostname,date:Date.now()}));
     }
 
@@ -79,9 +81,8 @@
             }
 
             let hostname = window.location.hostname;
-
             // TODO: maybe add more?
-            if (hostname == 'soundcloud.com') {
+            if (hostname === 'soundcloud.com') {
                 let status = query('.playControl', e => e.classList.contains('playing') ? "playing" : "stopped", 'unknown');
                 let cover_url = query('.playbackSoundBadge span.sc-artwork', e => e.style.backgroundImage.slice(5, -2).replace('t50x50','t500x500'));
                 let title = query('.playbackSoundBadge__titleLink', e => e.title);
@@ -103,7 +104,7 @@
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration, album_url, album });
                 }
-            } else if (hostname == 'open.spotify.com') {
+            } else if (hostname === 'open.spotify.com') {
                 let status = query('.player-controls [data-testid="control-button-pause"]', e => !!e ? 'playing' : 'stopped', 'unknown');
                 let cover_url = query('[data-testid="CoverSlotExpanded__container"] .cover-art-image', e => e.style.backgroundImage.slice(5, -2));
                 let title = query('[data-testid="nowplaying-track-link"]', e => e.textContent);
@@ -115,7 +116,7 @@
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration, album_url });
                 }
-            } else if (hostname == 'music.yandex.ru') {
+            } else if (hostname === 'music.yandex.ru') {
                 // Yandex music support by MjKey
                 let status = query('.player-controls__btn_play', e => e.classList.contains('player-controls__btn_pause') ? "playing" : "stopped", 'unknown');
                 let cover_url = query('.entity-cover__image', e => e.style.backgroundImage.slice(5, -2).replace('50x50','200x200'));
@@ -128,7 +129,38 @@
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration, album_url });
                 }
-            } else if (hostname == 'www.deezer.com') {
+            } else if (hostname === 'www.youtube.com' || hostname === 'music.youtube.com') {
+              let artists = [];
+              
+              try {
+                artists = [ document.querySelector('#meta-contents').querySelector('#channel-name').innerText.replace('\n', '').trim() ];
+              } catch(e) {}
+              
+              let title = query('.style-scope.ytd-video-primary-info-renderer', e => {
+                let t = e.getElementsByClassName('title');
+                if (t && t.length > 0)
+                  return t[0].innerText;
+                return "";
+              });
+              let duration = query('video', e => e.duration * 1000);
+              let progress = query('video', e => e.currentTime * 1000);
+              let cover_url = "";
+              let status = query('video', e => e.paused ? 'stopped' : 'playing', 'unknown');
+              let regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+              let match = window.location.toString().match(regExp);
+              if (match && match[2].length == 11) {
+                cover_url = `https://i.ytimg.com/vi/${match[2]}/maxresdefault.jpg`;
+              }
+
+
+              if (title !== null) {
+                if (status !== 'stopped') {
+                     post({ cover_url, title, artists, status, progress: Math.floor(progress), duration });
+                } else {
+                  post({ status: 'stopped', title: '', artists: [], progress: 0, duration: 0});
+                }
+              }
+            } else if (hostname === 'www.deezer.com') {
                 let status = query('.player-controls', e => {
                     let buttons = e.getElementsByTagName('button');
                     if (buttons && buttons.length > 1) {
@@ -174,7 +206,7 @@
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration });
                 }
-            } else if (hostname == "play.pretzel.rocks") {
+            } else if (hostname === "play.pretzel.rocks") {
                 // Pretzel.rocks support by Tarulia
 
                 let status = "unknown";
