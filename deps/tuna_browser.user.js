@@ -129,7 +129,7 @@
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration, album_url });
                 }
-            } else if (hostname === 'www.youtube.com' || hostname === 'music.youtube.com') {
+            } else if (hostname === 'www.youtube.com') {
               let artists = [];
               
               try {
@@ -160,6 +160,36 @@
                   post({ status: 'stopped', title: '', artists: [], progress: 0, duration: 0});
                 }
               }
+            } else if (hostname === 'music.youtube.com') {
+                // Youtube Music support by Rubecks
+                const artistsSelectors = [
+                    '.ytmusic-player-bar.byline [href*="channel/"]:not([href*="channel/MPREb_"]):not([href*="browse/MPREb_"])', // Artists with links
+                    '.ytmusic-player-bar.byline .yt-formatted-string:nth-child(2n+1):not([href*="browse/"]):not([href*="channel/"]):not(:nth-last-child(1)):not(:nth-last-child(3))', // Artists without links
+                    '.ytmusic-player-bar.byline [href*="browse/FEmusic_library_privately_owned_artist_detaila_"]', // Self uploaded music
+                ];
+                const albumSelectors = [
+                    '.ytmusic-player-bar [href*="browse/MPREb_"]', // Albums from YTM with links
+                    '.ytmusic-player-bar [href*="browse/FEmusic_library_privately_owned_release_detailb_"]', // Self uploaded music
+                ];
+                let time = query('.ytmusic-player-bar.time-info', e => e.innerText.split(" / "));
+
+                let status = "unknown";
+                if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M6 19h4V5H6v14zm8-14v14h4V5h-4z']")) {
+                  status = "playing";
+                }
+                if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M8 5v14l11-7z']")) {
+                  status = "stopped"
+                }
+                let title = query('.ytmusic-player-bar.title', e => e.title);
+                let artists = Array.from(document.querySelectorAll(artistsSelectors)).map(x => x.innerText);
+                let cover_url = query('.ytmusic-player-bar.thumbnail-image-wrapper img', e => e.src.replace(/=w\d+-h\d+.*/,'=s0?imgmax=0')); // get max resolution
+                let album = query(albumSelectors, e => e.textContent);
+                let album_url = query(albumSelectors, e => e.href);
+                let progress = timestamp_to_ms(time[0]);
+                let duration = timestamp_to_ms(time[1]);
+                if (title !== null) {
+                    post({ cover_url, title, artists, status, progress, duration, album_url, album });
+                }
             } else if (hostname === 'www.deezer.com') {
                 let status = query('.player-controls', e => {
                     let buttons = e.getElementsByTagName('button');
