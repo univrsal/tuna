@@ -4,6 +4,9 @@
 
 # tuna
 Get song info from right within obs.
+
+Issues have moved to [git.vrsal.de/alex/tuna/issues](https://git.vrsal.de/alex/tuna/issues). You can submit new ones under [bugs.vrsal.de/alex/tuna](https://bugs.vrsal.de/alex/tuna) and comment under bugs.vrsal.de/alex/tuna/[issue number] (for example https://bugs.vrsal.de/alex/tuna/150 for [this](https://git.vrsal.de/alex/tuna/issues/150) issue)
+    
 Currently supports
 - Spotify
 - MPD
