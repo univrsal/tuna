@@ -45,6 +45,8 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->setupUi(this);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply_pressed()));
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(tuna_gui_accepted()));
+    connect(ui->cb_dl_cover, SIGNAL(stateChanged()), this, SLOT(cb_try_download_cover_clicked));
+    connect(ui->cb_download_missing, SIGNAL(stateChanged()), this, SLOT(cb_download_missing_covers_clicked));
 
     /* Other signals */
 #define ADD_SIGNAL(btn) connect(ui->btn, SIGNAL(clicked()), this, SLOT(btn##_clicked()))
@@ -118,6 +120,7 @@ void tuna_gui::toggleShowHide()
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
         ui->cb_dl_cover->setChecked(config::download_cover);
+        ui->cb_download_missing->setChecked(CGET_BOOL(CFG_DOWNLOAD_MISSING_COVER));
         ui->cb_source->setCurrentIndex(ui->cb_source->findData(CGET_STR(CFG_SELECTED_SOURCE)));
         ui->cb_host_server->setChecked(CGET_BOOL(CFG_SERVER_ENABLED));
         ui->sb_web_port->setValue(utf8_to_qt(CGET_STR(CFG_SERVER_PORT)).toInt());
@@ -168,6 +171,7 @@ void tuna_gui::tuna_gui_accepted()
     CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
     CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
+    CSET_BOOL(CFG_DOWNLOAD_MISSING_COVER, ui->cb_download_missing->isChecked());
     CSET_BOOL(CFG_SERVER_ENABLED, ui->cb_host_server->isChecked());
     CSET_STR(CFG_SERVER_PORT, qt_to_utf8(QString::number(ui->sb_web_port->value())));
     CSET_BOOL(CFG_REMOVE_EXTENSIONS, ui->cb_remove_file_extensions->isChecked());
@@ -289,4 +293,14 @@ void tuna_gui::btn_edit_output_clicked()
         obs_frontend_pop_ui_translation();
         dialog->exec();
     }
+}
+
+void tuna_gui::cb_try_download_cover_clicked(int state)
+{
+    ui->cb_download_missing->setEnabled(state == Qt::CheckState::Checked);
+}
+
+void tuna_gui::cb_download_missing_covers_clicked(int state)
+{
+    ui->cb_cover_size->setEnabled(state == Qt::CheckState::Checked);
 }

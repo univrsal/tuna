@@ -55,6 +55,7 @@
 #define CFG_SONG_FORMAT                 "song_format"
 #define CFG_SONG_PLACEHOLDER            "song_placeholder"
 #define CFG_DOWNLOAD_COVER              "download_cover"
+#define CFG_DOWNLOAD_MISSING_COVER      "download_missing_cover"
 #define CFG_REMOVE_EXTENSIONS           "removeextensions"
 
 #define CFG_SPOTIFY_LOGGEDIN            "spotify.login"

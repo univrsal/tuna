@@ -70,7 +70,8 @@ private slots:
     void btn_add_output_clicked();
     void btn_remove_output_clicked();
     void btn_edit_output_clicked();
-
+    void cb_try_download_cover_clicked(int);
+    void cb_download_missing_covers_clicked(int);
 private:
     void choose_file(QString& path, const char* title, const char* file_types);
     Ui::tuna_gui* ui;

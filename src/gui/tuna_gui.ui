@@ -42,7 +42,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideLeft</enum>
@@ -157,6 +157,54 @@
           <string>tuna.gui.tab.basics.song.cover.enable</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QCheckBox" name="cb_download_missing">
+           <property name="text">
+            <string>tuna.gui.tab.basics.song.cover.download.missing</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cb_cover_size">
+           <property name="currentIndex">
+            <number>2</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>64x64</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>128x128</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>256x256</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>512x512</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>1024x1024</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Largest available</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QFrame" name="frame_lyrics">
@@ -298,12 +346,8 @@
              </property>
              <property name="font">
               <font>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignCenter</set>
              </property>
             </column>
             <column>
@@ -312,12 +356,8 @@
              </property>
              <property name="font">
               <font>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignCenter</set>
              </property>
             </column>
             <column>
@@ -326,12 +366,8 @@
              </property>
              <property name="font">
               <font>
-               <weight>75</weight>
                <bold>true</bold>
               </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignCenter</set>
              </property>
             </column>
            </widget>
