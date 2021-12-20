@@ -169,42 +169,25 @@
          </item>
          <item>
           <widget class="QComboBox" name="cb_cover_size">
-           <property name="currentIndex">
-            <number>2</number>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <item>
-            <property name="text">
-             <string>64x64</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>128x128</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>256x256</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>512x512</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1024x1024</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Largest available</string>
-            </property>
-           </item>
+           <property name="currentIndex">
+            <number>-1</number>
+           </property>
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cb_remove_file_extensions">
+         <property name="text">
+          <string>tuna.gui.tab.basics.removeextensions</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QFrame" name="frame_lyrics">
@@ -317,7 +300,7 @@
              <bool>false</bool>
             </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>false</bool>
+             <bool>true</bool>
             </attribute>
             <attribute name="horizontalHeaderMinimumSectionSize">
              <number>37</number>
@@ -445,13 +428,6 @@
              </spacer>
             </item>
            </layout>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="cb_remove_file_extensions">
-            <property name="text">
-             <string>tuna.gui.tab.basics.removeextensions</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>

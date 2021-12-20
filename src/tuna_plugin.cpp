@@ -149,5 +149,5 @@ void obs_module_post_load()
 
 void obs_module_unload()
 {
-    config::save();
+    config::close();
 }

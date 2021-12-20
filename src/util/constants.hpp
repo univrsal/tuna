@@ -69,6 +69,7 @@
 #define T_SELECT_COVER_FILE     T_("tuna.gui.select.cover.file")
 #define T_SELECT_LYRICS_FILE    T_("tuna.gui.select.lyrics.file")
 #define T_SELECT_MPD_FOLDER     T_("tuna.gui.select.mpd.folder")
+#define T_LARGEST_COVER         T_("tuna.gui.tab.basics.song.cover.largest")
 
 #define T_SONG_PATH             T_("tuna.gui.tab.basics.song.info")
 #define T_SONG_FORMAT           T_("tuna.gui.tab.basics.song.format")

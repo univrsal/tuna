@@ -56,6 +56,7 @@
 #define CFG_SONG_PLACEHOLDER            "song_placeholder"
 #define CFG_DOWNLOAD_COVER              "download_cover"
 #define CFG_DOWNLOAD_MISSING_COVER      "download_missing_cover"
+#define CFG_COVER_SIZE                  "cover_size"
 #define CFG_REMOVE_EXTENSIONS           "removeextensions"
 
 #define CFG_SPOTIFY_LOGGEDIN            "spotify.login"
@@ -126,12 +127,14 @@ extern bool download_cover;
 extern bool download_missing_cover;
 extern bool remove_file_extensions;
 extern bool placeholder_when_paused;
+extern uint16_t cover_size;
 
 void init();
 
 void load();
 
 void save();
+void close();
 
 void load_outputs();
 

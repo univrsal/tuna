@@ -111,7 +111,7 @@ void lastfm_source::parse_song(const QJsonObject& s)
                     m_current.set_cover_link(cover.toObject()["#text"].toString());
             }
         }
-        util::download_cover(m_current);
+        util::download_cover(m_current.cover());
     }
 
     if (s["artist"].isObject())

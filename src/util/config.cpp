@@ -38,6 +38,7 @@ QList<output> outputs;
 config_t* instance = nullptr;
 uint16_t refresh_rate = 1000;
 uint16_t webserver_port = 1608;
+uint16_t cover_size = 256;
 QString placeholder = {};
 QString cover_path = {};
 QString lyrics_path = {};
@@ -70,6 +71,7 @@ void init()
     CDEF_BOOL(CFG_RUNNING, false);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, config::download_cover);
     CDEF_BOOL(CFG_DOWNLOAD_MISSING_COVER, config::download_cover);
+    CDEF_UINT(CFG_COVER_SIZE, config::cover_size);
     CDEF_UINT(CFG_REFRESH_RATE, config::refresh_rate);
     CDEF_UINT(CFG_SERVER_PORT, config::webserver_port);
     CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
@@ -88,8 +90,8 @@ void load()
 {
     if (!instance)
         init();
-    bool run = CGET_BOOL(CFG_RUNNING);
 
+    tuna_thread::thread_mutex.lock();
     load_outputs();
     cover_path = CGET_STR(CFG_COVER_PATH);
     lyrics_path = CGET_STR(CFG_LYRICS_PATH);
@@ -101,17 +103,20 @@ void load()
     webserver_enabled = CGET_BOOL(CFG_SERVER_ENABLED);
     webserver_port = CGET_UINT(CFG_SERVER_PORT);
     selected_source = CGET_STR(CFG_SELECTED_SOURCE);
-
-    /* Sources */
-    tuna_thread::thread_mutex.lock();
+    cover_size = CGET_UINT(CFG_COVER_SIZE);
     music_sources::load();
     tuna_thread::thread_mutex.unlock();
 
+    auto run = CGET_BOOL(CFG_RUNNING);
     if (run && !tuna_thread::start())
         berr("Couldn't start query thread");
+    else if (!run)
+        tuna_thread::stop();
 
     if (webserver_enabled && !web_thread::start())
         berr("Couldn't start web server thread");
+    else if (!webserver_enabled)
+            web_thread::stop();
 
     music_sources::select(qt_to_utf8(selected_source));
 }
@@ -119,11 +124,6 @@ void load()
 void save()
 {
     tuna_thread::thread_mutex.lock();
-    save_outputs();
-    util::reset_cover();
-    tuna_thread::thread_mutex.unlock();
-    music_sources::deinit();
-    web_thread::stop();
     CSET_STR(CFG_COVER_PATH, qt_to_utf8(cover_path));
     CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(lyrics_path));
     CSET_UINT(CFG_REFRESH_RATE, refresh_rate);
@@ -134,13 +134,14 @@ void save()
     CSET_BOOL(CFG_SERVER_ENABLED, webserver_enabled);
     CSET_UINT(CFG_SERVER_PORT, webserver_port);
     CSET_STR(CFG_SELECTED_SOURCE, qt_to_utf8(selected_source));
+    CSET_UINT(CFG_COVER_SIZE, cover_size);
+    save_outputs();
+    tuna_thread::thread_mutex.unlock();
 }
 
 void load_outputs()
 {
-    std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
     outputs.clear();
-
     QJsonDocument doc;
     if (util::open_config(OUTPUT_FILE, doc)) {
         QJsonArray array;
@@ -179,6 +180,15 @@ void save_outputs()
         output_array.append(output);
     }
     util::save_config(OUTPUT_FILE, QJsonDocument(output_array));
+}
+
+void close()
+{
+    save();
+    tuna_thread::stop();
+    web_thread::stop();
+    util::reset_cover();
+    music_sources::deinit();
 }
 
 }

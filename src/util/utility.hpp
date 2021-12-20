@@ -47,7 +47,9 @@ extern bool have_vlc_source;
 
 extern bool curl_download(const char* url, const char* path);
 
-extern bool download_cover(const song& song);
+QJsonDocument curl_get_json(const char* url);
+
+extern bool download_cover(const QString& url);
 
 extern void reset_cover();
 

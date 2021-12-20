@@ -88,6 +88,18 @@ tuna_gui::tuna_gui(QWidget* parent)
     m_refresh = new QTimer(this);
     connect(m_refresh, &QTimer::timeout, this, &tuna_gui::refresh);
     m_refresh->start(250);
+
+    int i = 0;
+    for (const auto& Size : { 64, 128, 256, 512, 1024 }) {
+        ui->cb_cover_size->addItem(QString::number(Size) + "x" + QString::number(Size), Size);
+        if (config::cover_size == Size)
+            ui->cb_cover_size->setCurrentIndex(i);
+        i++;
+    }
+    ui->cb_cover_size->addItem(T_LARGEST_COVER, 8129);
+
+    if (config::cover_size == 8129)
+        ui->cb_cover_size->setCurrentIndex(i);
 }
 
 void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)
@@ -165,7 +177,9 @@ void tuna_gui::select_source(int index)
 
 void tuna_gui::tuna_gui_accepted()
 {
-    config::selected_source = qt_to_utf8(ui->cb_source->currentText());
+    tuna_thread::thread_mutex.lock();
+    // Save UI values into temp storage
+    config::selected_source = qt_to_utf8(ui->cb_source->currentData().toString());
     config::cover_path = qt_to_utf8(ui->txt_song_cover->text());
     config::lyrics_path = qt_to_utf8(ui->txt_song_lyrics->text());
     config::refresh_rate = ui->sb_refresh_rate->value();
@@ -175,17 +189,10 @@ void tuna_gui::tuna_gui_accepted()
     config::webserver_enabled = ui->cb_host_server->isChecked();
     config::webserver_port = ui->sb_web_port->value();
     config::remove_file_extensions = ui->cb_remove_file_extensions->isChecked();
-
-    if (config::webserver_enabled && !web_thread::thread_flag) {
-        if (!web_thread::start()) {
-            berr("Failed to start web server");
-        }
-    } else if (!config::webserver_enabled && web_thread::thread_flag) {
-        web_thread::stop();
-    }
+    config::cover_size = ui->cb_cover_size->currentData().toInt();
+    config::refresh_rate = ui->sb_refresh_rate->value();
 
     /* save outputs */
-    tuna_thread::thread_mutex.lock();
     config::outputs.clear();
     for (int row = 0; row < ui->tbl_outputs->rowCount(); row++) {
         config::output tmp;
@@ -194,18 +201,20 @@ void tuna_gui::tuna_gui_accepted()
         tmp.path = ui->tbl_outputs->item(row, 2)->text();
         config::outputs.push_back(tmp);
     }
-    config::save();
+
+    // Save temp storage into obs config
 
     for (auto& w : m_source_widgets) {
         if (w)
             w->save_settings();
     }
 
-    config::refresh_rate = ui->sb_refresh_rate->value();
     tuna_thread::thread_mutex.unlock();
+
+    config::save();
+    config::load();
     if (music_dock)
         music_dock->select_source(ui->cb_source->currentIndex());
-    config::load();
 }
 
 void tuna_gui::apply_pressed()

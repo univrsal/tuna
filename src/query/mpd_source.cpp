@@ -190,19 +190,15 @@ void mpd_source::handle_cover()
 
             /* try to find a cover image in the same folder*/
             if (cover::find_local_cover(file_path, tmp)) {
-                tmp = "file://" + tmp; /* cURL needs this to download the file */
-                QString old = m_current.cover();
-                m_current.set_cover_link(tmp);
-                result = util::download_cover(m_current);
-                /* reset the cover link so the comparsion m_current == m_prev works */
-                m_current.set_cover_link(old);
-                result = true;
+                tmp = "file://" + tmp; /* cURL needs this to "download" the file */
+                result = util::download_cover(tmp);
             }
         }
-        if (!result)
+        if (!result && !download_missing_cover())
             util::reset_cover();
     } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
-        util::reset_cover();
+        if (!download_missing_cover())
+            util::reset_cover();
     }
 }
 

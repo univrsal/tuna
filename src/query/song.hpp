@@ -66,7 +66,9 @@ public:
     bool is_playing() const { return m_playing_state == state_playing; }
     bool is_paused() const { return !is_playing(); }
 
+    bool has_cover_lookup_information() const;
     uint16_t data() const { return m_data; }
+    const QString& album() const { return m_album; }
     const QString& cover() const { return m_cover; }
     const QString& lyrics() const { return m_lyrics; }
     const QString& year() const { return m_year; }

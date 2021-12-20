@@ -363,7 +363,7 @@ void request_token(const std::string& request, const std::string& credentials, Q
             binfo("Spotify response: %s", qt_to_utf8(str));
         }
     } else {
-        berr("Curl returned error code %i", res);
+        berr("Curl returned error code (%i) %s", res, curl_easy_strerror(res));
     }
 
     curl_slist_free_all(list);

@@ -69,6 +69,7 @@ protected:
 
     void begin_refresh() { m_prev = m_current; }
 
+    bool download_missing_cover();
 public:
     music_source(const char* id, const char* name, source_widget* w = nullptr);
 

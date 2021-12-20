@@ -50,6 +50,11 @@ void song::clear()
     m_full_release = "";
 }
 
+bool song::has_cover_lookup_information() const
+{
+    return m_artists.size() > 0 && !m_album.isEmpty();
+}
+
 void song::update_release_precision()
 {
     if (!m_day.isEmpty() && !m_month.isEmpty() && !m_year.isEmpty()) {

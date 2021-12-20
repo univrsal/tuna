@@ -71,7 +71,7 @@ bool curl_download(const char* url, const char* path)
         CURLcode res = curl_easy_perform(curl);
 
         if (res != CURLE_OK) {
-            berr("Couldn't fetch file from %s to %s", url, path);
+            berr("Couldn't fetch file from %s to %s, curl error: %s (%i)", url, path, curl_easy_strerror(res), res);
         } else {
             result = true;
             bdebug("Fetched %s to %s", url, path);
@@ -98,14 +98,14 @@ void download_lyrics(const song& song)
     }
 }
 
-bool download_cover(const song& song)
+bool download_cover(const QString& url)
 {
-    if (song.cover() == "n/a")
+    if (url == "n/a")
         return false;
     bool result = false;
     auto path = config::cover_path;
     auto tmp = path + ".tmp";
-    result = curl_download(qt_to_utf8(song.cover()), qt_to_utf8(tmp));
+    result = curl_download(qt_to_utf8(url), qt_to_utf8(tmp));
 
     /* Replace cover only after download is done */
     QFile current(path);
@@ -196,11 +196,40 @@ size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
     try {
         str->append(ptr, new_length);
     } catch (std::bad_alloc& e) {
-        berr("Error reading curl response: %s", e.what());
+        berr("Error reading curl, exception: %s", e.what());
         return 0;
     }
     return new_length;
 }
+
+QJsonDocument curl_get_json(const char* url)
+{
+    CURL* curl = curl_easy_init();
+    if (curl) {
+        std::string response;
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+#ifdef DEBUG
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+#endif
+        CURLcode res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK) {
+            berr("Couldn't fetch json from %s curl error: %s (%i)", url, curl_easy_strerror(res), res);
+        } else {
+            QJsonParseError err;
+            auto doc = QJsonDocument::fromJson(response.c_str(), &err);
+            if (doc.isNull())
+                berr("Couldn't parse json from url %s: %s", url, err.errorString().toStdString().c_str());
+            else
+                return doc;
+        }
+    }
+    berr("curl_easy_init() failed when receiving json from %s", url);
+    return {};
+}
+
 
 void set_thread_name(const char* name)
 {

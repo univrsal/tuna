@@ -34,6 +34,9 @@
 #include "window_source.hpp"
 #include <QRegularExpression>
 #include <obs-frontend-api.h>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 namespace music_sources {
 static int selected_index = -1;
@@ -128,8 +131,7 @@ std::shared_ptr<music_source> selected_source()
 {
     if (selected_index >= 0) {
         std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
-        auto ref = std::shared_ptr<music_source>(instances[selected_index]);
-        return ref;
+        return std::shared_ptr<music_source>(instances[selected_index]);
     }
     return nullptr;
 }
@@ -184,6 +186,26 @@ void deinit()
 }
 }
 
+bool music_source::download_missing_cover()
+{
+    static const QString request = "https://itunes.apple.com/search?term={}&media=music&entity=album"; // should we also look for singles?
+    if (config::download_missing_cover && m_current.has_cover_lookup_information()) {
+        auto search_term = QUrl::toPercentEncoding(m_current.artists()[0] + " " + m_current.album());
+        auto url = request;
+        url = url.replace("{}", search_term);
+        auto doc = util::curl_get_json(qt_to_utf8(url));
+        if (doc["results"].isArray()) {
+            auto first = doc["results"].toArray()[0].toObject();
+            if (first["artworkUrl60"].isString()) {
+                auto url = first["artworkUrl60"].toString();
+                url = url.replace("60x60", QString::number(config::cover_size) + "x" + QString::number(config::cover_size));
+                return util::download_cover(url);
+            }
+        }
+    }
+    return false;
+}
+
 music_source::music_source(const char* id, const char* name, source_widget* w)
     : m_id(id)
     , m_name(name)
@@ -215,10 +237,20 @@ void music_source::handle_cover()
         return;
 
     if (m_current.state() == state_playing) {
-        if (!util::download_cover(m_current))
+        if (!util::download_cover(m_current.cover())) {
+            if (!download_missing_cover())
+                util::reset_cover();
+        }
+    } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
+        /* We either
+            - are in a stopped/unknown state                -> reset cover
+            - are paused & want a placeholder when paused   -> reset cover
+            - do not have a cover                           -> try downloading cover
+        */
+        if (!(m_current.data() & CAP_COVER))
+            download_missing_cover();
+        else
             util::reset_cover();
-    } else if (m_current.state() != state_paused || config::placeholder_when_paused || !(m_current.data() & CAP_COVER)) {
-        util::reset_cover();
     }
 }
 
