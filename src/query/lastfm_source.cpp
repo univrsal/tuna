@@ -165,7 +165,7 @@ long lastfm_request(QJsonDocument& response_json, const QString& url)
     CURL* curl = curl_easy_init();
     std::string response;
     long http_code = -1;
-    //curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    // curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, qt_to_utf8(url));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);

@@ -92,8 +92,8 @@ void download_lyrics(const song& song)
 
     if (song.data() & CAP_LYRICS && last_lyrics != song.lyrics()) {
         last_lyrics = song.lyrics();
-        if (!curl_download(qt_to_utf8(song.lyrics()), config::lyrics_path)) {
-            berr("Couldn't dowload lyrics from '%s' to '%s'", qt_to_utf8(song.lyrics()), config::lyrics_path);
+        if (!curl_download(qt_to_utf8(song.lyrics()), qt_to_utf8(config::lyrics_path))) {
+            berr("Couldn't dowload lyrics from '%s' to '%s'", qt_to_utf8(song.lyrics()), qt_to_utf8(config::lyrics_path));
         }
     }
 }
@@ -103,7 +103,7 @@ bool download_cover(const song& song)
     if (song.cover() == "n/a")
         return false;
     bool result = false;
-    auto path = utf8_to_qt(config::cover_path);
+    auto path = config::cover_path;
     auto tmp = path + ".tmp";
     result = curl_download(qt_to_utf8(song.cover()), qt_to_utf8(tmp));
 
@@ -111,7 +111,7 @@ bool download_cover(const song& song)
     QFile current(path);
     current.remove();
 
-    if (result && !QFile::rename(tmp, utf8_to_qt(config::cover_path))) {
+    if (result && !QFile::rename(tmp, config::cover_path)) {
         berr("Couldn't rename temporary cover file");
         result = false;
     }
@@ -120,10 +120,10 @@ bool download_cover(const song& song)
 
 void reset_cover()
 {
-    auto path = utf8_to_qt(config::cover_path);
+    auto path = config::cover_path;
     QFile current(path);
     current.remove();
-    if (!QFile::copy(utf8_to_qt(config::cover_placeholder), path))
+    if (!QFile::copy(config::cover_placeholder, path))
         berr("Couldn't move placeholder cover");
 }
 

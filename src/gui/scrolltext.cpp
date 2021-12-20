@@ -96,17 +96,17 @@ void scroll_text::paintEvent(QPaintEvent*)
             x += m_whole_text_size.width();
         }
 
-        //Apply Alpha Channel
+        // Apply Alpha Channel
         pb.setCompositionMode(QPainter::CompositionMode_DestinationIn);
         pb.setClipRect(width() - 15, 0, 15, height());
         pb.drawImage(0, 0, m_alpha_channel);
         pb.setClipRect(0, 0, 15, height());
-        //initial situation: don't apply alpha channel in the left half of the image at all; apply it more and more until scrollPos gets positive
+        // initial situation: don't apply alpha channel in the left half of the image at all; apply it more and more until scrollPos gets positive
         if (m_scroll_pos < 0)
             pb.setOpacity((qreal)(qMax(-8, m_scroll_pos) + 8) / 8.0);
         pb.drawImage(0, 0, m_alpha_channel);
 
-        //pb.end();
+        // pb.end();
         p.drawImage(0, 0, m_buffer);
     } else {
         p.drawStaticText(QPointF((width() - m_whole_text_size.width()) / 2,
@@ -117,26 +117,26 @@ void scroll_text::paintEvent(QPaintEvent*)
 
 void scroll_text::resizeEvent(QResizeEvent*)
 {
-    //When the widget is resized, we need to update the alpha channel.
+    // When the widget is resized, we need to update the alpha channel.
 
     m_alpha_channel = QImage(size(), QImage::Format_ARGB32_Premultiplied);
     m_buffer = QImage(size(), QImage::Format_ARGB32_Premultiplied);
 
-    //Create Alpha Channel:
+    // Create Alpha Channel:
     if (width() > 64) {
-        //create first scanline
+        // create first scanline
         QRgb* scanline1 = (QRgb*)m_alpha_channel.scanLine(0);
         for (int x = 1; x < 16; ++x)
             scanline1[x - 1] = scanline1[width() - x] = qRgba(0, 0, 0, x << 4);
         for (int x = 15; x < width() - 15; ++x)
             scanline1[x] = qRgb(0, 0, 0);
-        //copy scanline to the other ones
+        // copy scanline to the other ones
         for (int y = 1; y < height(); ++y)
             memcpy(m_alpha_channel.scanLine(y), (uchar*)scanline1, width() * 4);
     } else
         m_alpha_channel.fill(qRgb(0, 0, 0));
 
-    //Update scrolling state
+    // Update scrolling state
     bool newScrollEnabled = (m_single_text_width > width() - m_left_margin);
     if (newScrollEnabled != m_scroll_enabled)
         update_text();

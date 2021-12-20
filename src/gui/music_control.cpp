@@ -142,7 +142,7 @@ void music_control::refresh_play_state()
             info.append(title);
             last_title = title;
         } else {
-            info.append(utf8_to_qt(config::placeholder));
+            info.append(config::placeholder);
             last_title = "n/a";
         }
         info.replace("%s", " ");

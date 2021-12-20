@@ -82,10 +82,6 @@
 
 #define CFG_ICECAST_URL                 "icecast.url"
 
-#define CFG_VLC_ID                      "vlc.id"
-#define CFG_FORCE_VLC_DECISION          "vlc.force.enable"
-#define CFG_ERROR_MESSAGE_SHOWN         "vlc.error.message.shown"
-
 #define CFG_WINDOW_TITLE                "window.title"
 #define CFG_WINDOW_PAUSE                "window.title.pause"
 #define CFG_WINDOW_SEARCH               "window.search"
@@ -116,12 +112,18 @@ extern bool post_load;
 
 /* Temp storage for config values */
 extern uint16_t refresh_rate;
-extern const char* placeholder;
-extern const char* cover_path;
-extern const char* lyrics_path;
+extern uint16_t webserver_port;
+
+extern QString selected_source;
+extern QString placeholder;
+extern QString cover_path;
+extern QString lyrics_path;
+extern QString cover_placeholder;
+
 extern QList<output> outputs;
-extern const char* cover_placeholder;
+extern bool webserver_enabled;
 extern bool download_cover;
+extern bool download_missing_cover;
 extern bool remove_file_extensions;
 extern bool placeholder_when_paused;
 
@@ -129,7 +131,7 @@ void init();
 
 void load();
 
-void close();
+void save();
 
 void load_outputs();
 

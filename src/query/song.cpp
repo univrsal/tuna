@@ -357,7 +357,7 @@ void song::from_json(const QJsonObject& obj)
     auto disc = obj["disc"];
     if (disc.isDouble())
         set_duration(disc.toInt());
-    
+
     auto release = obj["release_date"];
     if (release.isObject()) {
         if (release["precision"].isString()) {
@@ -372,22 +372,22 @@ void song::from_json(const QJsonObject& obj)
                 m_release_precision = prec_unknown;
 
             switch (m_release_precision) {
-                case prec_day:
-                    if (release["day"].isString())
+            case prec_day:
+                if (release["day"].isString())
                     set_day(release["day"].toString());
-                    /* fallthrough */
-                case prec_month:
-                    if (release["month"].isString())
+                /* fallthrough */
+            case prec_month:
+                if (release["month"].isString())
                     set_day(release["month"].toString());
-                    /* fallthrough */
-                case prec_year:
-                    if (release["year"].isString())
-                        set_day(release["year"].toString());
-                    break;
-                default:
-                case prec_unknown:
-                    if (release["full"].isString())
-                        m_full_release = release["full"].toString();
+                /* fallthrough */
+            case prec_year:
+                if (release["year"].isString())
+                    set_day(release["year"].toString());
+                break;
+            default:
+            case prec_unknown:
+                if (release["full"].isString())
+                    m_full_release = release["full"].toString();
             }
         }
     }

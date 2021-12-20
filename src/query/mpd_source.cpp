@@ -159,7 +159,7 @@ void mpd_source::refresh()
          * retrieval of the cover is done via m_song_file_path which checks
          * the song file for cover tags as well as the folder the file is in
          */
-        QString path = utf8_to_qt(config::cover_path);
+        QString path = config::cover_path;
 
         // Convert to proper file:// url
         path = '/' + path;

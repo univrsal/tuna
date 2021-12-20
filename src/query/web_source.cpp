@@ -30,9 +30,8 @@ void web_source::refresh()
 {
     begin_refresh();
     m_current.clear();
-    web_thread::song_mutex.lock();
+    std::lock_guard<std::mutex> lock(web_thread::current_song_mutex);
     m_current = web_thread::current_song;
-    web_thread::song_mutex.unlock();
 }
 
 bool web_source::execute_capability(capability)

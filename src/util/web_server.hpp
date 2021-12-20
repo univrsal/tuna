@@ -18,15 +18,16 @@
 
 #pragma once
 #include "../query/song.hpp"
+#include <atomic>
 #include <mutex>
 #include <thread>
 
 /* This thread runs a server that hosts music information in a JSON file */
 namespace web_thread {
-extern std::mutex song_mutex;
-extern std::mutex thread_mutex;
 extern std::thread thread_handle;
+extern std::mutex current_song_mutex;
 extern song current_song;
+extern std::atomic<bool> thread_flag;
 bool start();
 void stop();
 void thread_method();

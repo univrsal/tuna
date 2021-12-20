@@ -32,11 +32,10 @@ extern "C" {
 
 namespace web_thread {
 
-volatile bool thread_flag = false;
-std::mutex thread_mutex;
-std::mutex song_mutex;
 std::thread thread_handle;
+std::mutex current_song_mutex;
 song current_song;
+std::atomic<bool> thread_flag {};
 
 struct mg_mgr mgr;
 struct mg_connection* nc;
@@ -88,11 +87,11 @@ static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
     QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
 
     if (err.error == QJsonParseError::NoError && doc.isObject()) {
-        song_mutex.lock();
         auto data = doc.object()["data"];
-        if (data.isObject())
+        if (data.isObject()) {
+            std::lock_guard<std::mutex> lock(current_song_mutex);
             current_song.from_json(data.toObject());
-        song_mutex.unlock();
+        }
     } else {
         bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
         bwarn("JSON: %s", msg->body.ptr);
@@ -189,9 +188,7 @@ void stop()
     auto port = CGET_STR(CFG_SERVER_PORT);
     binfo("Stopping web server running on %s", port);
 
-    thread_mutex.lock();
     thread_flag = false;
-    thread_mutex.unlock();
     thread_handle.join();
     mg_mgr_free(&mgr);
 }
@@ -202,10 +199,10 @@ void thread_method()
 
     for (;;) {
         mg_mgr_poll(&mgr, 500);
-        std::lock_guard<std::mutex> lock(thread_mutex);
         if (!thread_flag)
             break;
     }
+    binfo("Web server thread stopped");
 }
 
 }

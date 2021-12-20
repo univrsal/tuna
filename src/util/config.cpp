@@ -37,11 +37,15 @@ bool post_load = false;
 QList<output> outputs;
 config_t* instance = nullptr;
 uint16_t refresh_rate = 1000;
-const char* placeholder = nullptr;
-const char* cover_path = nullptr;
-const char* lyrics_path = nullptr;
-const char* cover_placeholder = nullptr;
+uint16_t webserver_port = 1608;
+QString placeholder = {};
+QString cover_path = {};
+QString lyrics_path = {};
+QString cover_placeholder = {};
+QString selected_source = {};
+bool webserver_enabled = false;
 bool download_cover = true;
+bool download_missing_cover = true;
 bool placeholder_when_paused = true;
 bool remove_file_extensions = true;
 
@@ -61,14 +65,13 @@ void init()
     CDEF_STR(CFG_SELECTED_SOURCE, S_SOURCE_SPOTIFY);
     CDEF_STR(CFG_SPOTIFY_CLIENT_ID, "847d7cf0c5dc4ff185161d1f000a9d0e");
 
-    CDEF_BOOL(CFG_REMOVE_EXTENSIONS, true);
-    CDEF_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, true);
+    CDEF_BOOL(CFG_REMOVE_EXTENSIONS, config::remove_file_extensions);
+    CDEF_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, config::placeholder_when_paused);
     CDEF_BOOL(CFG_RUNNING, false);
-    CDEF_BOOL(CFG_DOWNLOAD_COVER, true);
-    CDEF_BOOL(CFG_FORCE_VLC_DECISION, false);
-    CDEF_BOOL(CFG_ERROR_MESSAGE_SHOWN, false);
-    CDEF_UINT(CFG_REFRESH_RATE, refresh_rate);
-    CDEF_STR(CFG_SERVER_PORT, "1608");
+    CDEF_BOOL(CFG_DOWNLOAD_COVER, config::download_cover);
+    CDEF_BOOL(CFG_DOWNLOAD_MISSING_COVER, config::download_cover);
+    CDEF_UINT(CFG_REFRESH_RATE, config::refresh_rate);
+    CDEF_UINT(CFG_SERVER_PORT, config::webserver_port);
     CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
 
     CDEF_BOOL(CFG_DOCK_VISIBLE, false);
@@ -76,8 +79,9 @@ void init()
     CDEF_BOOL(CFG_DOCK_VOLUME_VISIBLE, true);
     CDEF_BOOL(CFG_SERVER_ENABLED, false);
 
-    if (!cover_placeholder)
-        cover_placeholder = obs_module_file("placeholder.png");
+    auto tmp = obs_module_file("placeholder.png");
+    cover_placeholder = tmp;
+    bfree((void*)tmp);
 }
 
 void load()
@@ -94,6 +98,9 @@ void load()
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
     placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
     remove_file_extensions = CGET_BOOL(CFG_REMOVE_EXTENSIONS);
+    webserver_enabled = CGET_BOOL(CFG_SERVER_ENABLED);
+    webserver_port = CGET_UINT(CFG_SERVER_PORT);
+    selected_source = CGET_STR(CFG_SELECTED_SOURCE);
 
     /* Sources */
     tuna_thread::thread_mutex.lock();
@@ -103,27 +110,35 @@ void load()
     if (run && !tuna_thread::start())
         berr("Couldn't start query thread");
 
-    if (CGET_BOOL(CFG_SERVER_ENABLED) && !web_thread::start())
+    if (webserver_enabled && !web_thread::start())
         berr("Couldn't start web server thread");
 
-    music_sources::select(CGET_STR(CFG_SELECTED_SOURCE));
+    music_sources::select(qt_to_utf8(selected_source));
 }
 
-void close()
+void save()
 {
     tuna_thread::thread_mutex.lock();
     save_outputs();
     util::reset_cover();
     tuna_thread::thread_mutex.unlock();
-    bfree((void*)cover_placeholder);
     music_sources::deinit();
     web_thread::stop();
+    CSET_STR(CFG_COVER_PATH, qt_to_utf8(cover_path));
+    CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(lyrics_path));
+    CSET_UINT(CFG_REFRESH_RATE, refresh_rate);
+    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(placeholder));
+    CSET_BOOL(CFG_DOWNLOAD_COVER, download_cover);
+    CSET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, placeholder_when_paused);
+    CSET_BOOL(CFG_REMOVE_EXTENSIONS, remove_file_extensions);
+    CSET_BOOL(CFG_SERVER_ENABLED, webserver_enabled);
+    CSET_UINT(CFG_SERVER_PORT, webserver_port);
+    CSET_STR(CFG_SELECTED_SOURCE, qt_to_utf8(selected_source));
 }
 
 void load_outputs()
 {
-
-    tuna_thread::thread_mutex.lock();
+    std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
     outputs.clear();
 
     QJsonDocument doc;
@@ -150,7 +165,6 @@ void load_outputs()
         }
         binfo("Loaded %i outputs", array.size());
     }
-    tuna_thread::thread_mutex.unlock();
 }
 
 void save_outputs()

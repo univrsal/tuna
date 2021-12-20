@@ -49,7 +49,7 @@ namespace cover {
 
 bool write_bytes_to_file(const TagLib::ByteVector& data)
 {
-    QFile f(utf8_to_qt(config::cover_path));
+    QFile f(config::cover_path);
     bool success = true;
     if (f.open(QIODevice::WriteOnly)) {
         success = f.write(data.data(), data.size()) == data.size();

@@ -22,6 +22,7 @@
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
+#include "../util/web_server.hpp"
 #include "music_control.hpp"
 #include "output_edit_dialog.hpp"
 #include "ui_tuna_gui.h"
@@ -115,15 +116,15 @@ void tuna_gui::toggleShowHide()
         music_sources::set_gui_values();
 
         /* load basic values */
-        ui->txt_song_cover->setText(utf8_to_qt(config::cover_path));
-        ui->txt_song_lyrics->setText(utf8_to_qt(config::lyrics_path));
+        ui->txt_song_cover->setText(config::cover_path);
+        ui->txt_song_lyrics->setText(config::lyrics_path);
         ui->sb_refresh_rate->setValue(config::refresh_rate);
-        ui->txt_song_placeholder->setText(utf8_to_qt(config::placeholder));
+        ui->txt_song_placeholder->setText(config::placeholder);
         ui->cb_dl_cover->setChecked(config::download_cover);
-        ui->cb_download_missing->setChecked(CGET_BOOL(CFG_DOWNLOAD_MISSING_COVER));
-        ui->cb_source->setCurrentIndex(ui->cb_source->findData(CGET_STR(CFG_SELECTED_SOURCE)));
-        ui->cb_host_server->setChecked(CGET_BOOL(CFG_SERVER_ENABLED));
-        ui->sb_web_port->setValue(utf8_to_qt(CGET_STR(CFG_SERVER_PORT)).toInt());
+        ui->cb_download_missing->setChecked(config::download_missing_cover);
+        ui->cb_source->setCurrentIndex(ui->cb_source->findData(config::selected_source));
+        ui->cb_host_server->setChecked(config::webserver_enabled);
+        ui->sb_web_port->setValue(config::webserver_port);
         ui->cb_remove_file_extensions->setChecked(config::remove_file_extensions);
         set_state();
 
@@ -164,17 +165,24 @@ void tuna_gui::select_source(int index)
 
 void tuna_gui::tuna_gui_accepted()
 {
-    QString tmp = ui->cb_source->currentData().toByteArray();
-    CSET_STR(CFG_SELECTED_SOURCE, qt_to_utf8(tmp));
-    CSET_STR(CFG_COVER_PATH, qt_to_utf8(ui->txt_song_cover->text()));
-    CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(ui->txt_song_lyrics->text()));
-    CSET_UINT(CFG_REFRESH_RATE, ui->sb_refresh_rate->value());
-    CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(ui->txt_song_placeholder->text()));
-    CSET_BOOL(CFG_DOWNLOAD_COVER, ui->cb_dl_cover->isChecked());
-    CSET_BOOL(CFG_DOWNLOAD_MISSING_COVER, ui->cb_download_missing->isChecked());
-    CSET_BOOL(CFG_SERVER_ENABLED, ui->cb_host_server->isChecked());
-    CSET_STR(CFG_SERVER_PORT, qt_to_utf8(QString::number(ui->sb_web_port->value())));
-    CSET_BOOL(CFG_REMOVE_EXTENSIONS, ui->cb_remove_file_extensions->isChecked());
+    config::selected_source = qt_to_utf8(ui->cb_source->currentText());
+    config::cover_path = qt_to_utf8(ui->txt_song_cover->text());
+    config::lyrics_path = qt_to_utf8(ui->txt_song_lyrics->text());
+    config::refresh_rate = ui->sb_refresh_rate->value();
+    config::placeholder = qt_to_utf8(ui->txt_song_placeholder->text());
+    config::download_cover = ui->cb_dl_cover->isChecked();
+    config::download_missing_cover = ui->cb_download_missing->isChecked();
+    config::webserver_enabled = ui->cb_host_server->isChecked();
+    config::webserver_port = ui->sb_web_port->value();
+    config::remove_file_extensions = ui->cb_remove_file_extensions->isChecked();
+
+    if (config::webserver_enabled && !web_thread::thread_flag) {
+        if (!web_thread::start()) {
+            berr("Failed to start web server");
+        }
+    } else if (!config::webserver_enabled && web_thread::thread_flag) {
+        web_thread::stop();
+    }
 
     /* save outputs */
     tuna_thread::thread_mutex.lock();
@@ -186,7 +194,7 @@ void tuna_gui::tuna_gui_accepted()
         tmp.path = ui->tbl_outputs->item(row, 2)->text();
         config::outputs.push_back(tmp);
     }
-    config::save_outputs();
+    config::save();
 
     for (auto& w : m_source_widgets) {
         if (w)
