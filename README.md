@@ -5,7 +5,7 @@
 # tuna
 Get song info from right within obs.
 
-Issues have moved to [git.vrsal.xyz/alex/tuna/issues](https://git.vrsal.xyz/alex/tuna/issues). You can submit new ones under [bugs.vrsal.xyz/alex/tuna](https://bugs.vrsal.xyz/alex/tuna) and comment under bugs.vrsal.de/alex/tuna/[issue number] (for example https://bugs.vrsal.xyz/alex/tuna/150 for [this](https://git.vrsal.xyz/alex/tuna/issues/150) issue)
+Issues have moved to [git.vrsal.xyz/alex/tuna/issues](https://git.vrsal.xyz/alex/tuna/issues). You can submit new ones under [bugs.vrsal.xyz/alex/tuna](https://bugs.vrsal.xyz/alex/tuna) and comment under bugs.vrsal.xyz/alex/tuna/[issue number] (for example https://bugs.vrsal.xyz/alex/tuna/150 for [this](https://git.vrsal.xyz/alex/tuna/issues/150) issue)
     
 Currently supports
 - Spotify
