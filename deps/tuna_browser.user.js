@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.11
+// @version      1.0.12
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -131,11 +131,11 @@
                 }
             } else if (hostname === 'www.youtube.com') {
               let artists = [];
-              
+
               try {
                 artists = [ document.querySelector('#meta-contents').querySelector('#channel-name').innerText.replace('\n', '').trim() ];
               } catch(e) {}
-              
+
               let title = query('.style-scope.ytd-video-primary-info-renderer', e => {
                 let t = e.getElementsByClassName('title');
                 if (t && t.length > 0)
@@ -238,21 +238,22 @@
                 }
             } else if (hostname === "play.pretzel.rocks") {
                 // Pretzel.rocks support by Tarulia
+                // Thanks to Rory from Pretzel for helping out :)
 
                 let status = "unknown";
 
                 // pretzel seems to flip-flop between having labels or not
                 // so we use the dirty but working method of selecting SVG paths
                 // since they shouldn't change much
-                if (document.querySelector("path[d^='M16.5 12.6016C17.3284']")) {
+                if (document.querySelector("path[d^='M26.5 16.3464C27.3284']")) {
                   status = "playing";
                 }
 
-                if (document.querySelector("path[d^='M16.4371 12.6863C16.6222']")) {
-                  status = "stopped"
+                if (document.querySelector("path[d^='M26.4371 16.7893C26.6222']")) {
+                  status = "stopped";
                 }
 
-                let cover_url = query('div.ktzrwC', e => {
+                let cover_url = query('[data-testid=track-artwork]', e => {
                     let img = e.getElementsByTagName('img');
                     if (img.length > 0) {
                         let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/large.jpg
@@ -261,16 +262,12 @@
                     return null;
                 });
 
-                let title = query('div.kzpiRD', e => {
-                    let elements = e.getElementsByTagName('span');
-                    if (elements.length > 0) {
-                        return elements[0].textContent;
-                    }
-                    return null;
+                let title = query('[data-testid=title]', e => {
+                    return e.textContent;
                 });
 
-                let artists = query('div.kzpiRD', e => {
-                    let elements = e.querySelector('p:first-of-type').getElementsByTagName('a');
+                let artists = query('[data-testid=artist]', e => {
+                    let elements = e.getElementsByTagName('a');
                     if (elements.length > 0) {
                         let artistArray = [];
                         for (let i = 0; i < elements.length; i++) {
@@ -281,27 +278,19 @@
                     return null;
                 });
 
-                let album = query('div.kzpiRD', e => {
-                    let elements = e.querySelector('p:last-of-type').getElementsByTagName('a');
-                    if (elements.length > 0) {
-                        return elements[0].textContent;
-                    }
-                    return null;
+                let album = query('[data-testid=album]', e => {
+                    return e.textContent;
                 });
 
-                let album_url = query('div.kzpiRD', e => {
-                    let elements = e.querySelector('p:last-of-type').getElementsByTagName('a');
-                    if (elements.length > 0) {
-                        return elements[0].href;
-                    }
-                    return null;
+                let album_url = query('[data-testid=album]', e => {
+                    return e.href;
                 });
 
-                let duration = query('div.hcriLb progress', e => e.max * 1000);
-                let progress = query('div.hcriLb progress', e => e.value * 1000);
+                let duration = query('[data-testid=track-progress-bar]', e => e.max * 1000);
+                let progress = query('[data-testid=track-progress-bar]', e => e.value * 1000);
 
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url });
+                    post({ cover_url, title, artists, status, progress, duration, album_url, album });
                 }
             }
         }, refresh_rate_ms);
