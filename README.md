@@ -14,7 +14,7 @@ Currently supports
 - [last.fm](https://last.fm) scrobbling
 - OBS VLC source
 - [Google Play Music™ Desktop Player](https://github.com/MarshallOfSound/Google-Play-Music-Desktop-Player-UNOFFICIAL-)
-- Through [tampermonkey script](https://greasyfork.org/en/scripts/413575-tuna-browser-script):
+- Through [tampermonkey script](https://github.com/univrsal/tuna/raw/master/deps/tuna_browser.user.js):
     - Soundcloud 
     - Spotify Web Player
     - Deezer
