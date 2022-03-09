@@ -242,22 +242,19 @@
 
                 let status = "unknown";
 
-                // pretzel seems to flip-flop between having labels or not
-                // so we use the dirty but working method of selecting SVG paths
-                // since they shouldn't change much
-                if (document.querySelector("path[d^='M26.5 16.3464C27.3284']")) {
+                if (document.querySelector("[data-testid=pause-button]")) {
                   status = "playing";
                 }
 
-                if (document.querySelector("path[d^='M26.4371 16.7893C26.6222']")) {
+                if (document.querySelector("[data-testid=play-button]")) {
                   status = "stopped";
                 }
 
                 let cover_url = query('[data-testid=track-artwork]', e => {
                     let img = e.getElementsByTagName('img');
                     if (img.length > 0) {
-                        let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/large.jpg
-                        return src.replace('medium.jpg', 'large.jpg');
+                        let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/medium.jpg
+                        return src.replace('medium.jpg', 'large.jpg'); // https://img.pretzel.rocks/artwork/9Mf8m9/large.jpg
                     }
                     return null;
                 });
