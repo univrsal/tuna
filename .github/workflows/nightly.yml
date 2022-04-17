@@ -17,144 +17,11 @@ on:
     tags:
     - "v*"
 jobs:
-  macos64:
-    name: "macOS 64-bit"
-    runs-on: [macos-latest]
-    env:
-      QT_VERSION: 5.15.2
-      MACOS_DEPS_VERSION: '2021-03-25'
-      project-git: tuna
-      project-name: tuna
-    steps:
-      - name: Checkout plugin
-        uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}
-          submodules: 'recursive'
-      - name: 'Get ${{ env.project-git }} git info'
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        run: |
-          git fetch --prune --unshallow
-          echo "GIT_BRANCH=${{ github.event.pull_request.head.ref }}" >> $GITHUB_ENV
-          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-      - name: Cache OBS build
-        id: cache-obs-build-macos
-        uses: actions/cache@v1
-        with:
-          path: obs-studio
-          key: obs-deps-macos
-      - name: 'Restore pre-built dependencies from cache'
-        id: deps-cache
-        uses: actions/cache@v1
-        env:
-          CACHE_NAME: 'deps-cache'
-        with:
-          path: /tmp/obsdeps
-          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}
-      - name: 'Restore pre-built Qt dependency from cache'
-        id: deps-qt-cache
-        uses: actions/cache@v1
-        env:
-          CACHE_NAME: 'deps-qt-cache'
-        with:
-          path: /tmp/obsdeps
-          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ env.MACOS_DEPS_VERSION }}
-      - name: 'Install prerequisite: Pre-built dependencies'
-        if: steps.deps-cache.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-deps-x86_64-${{ env.MACOS_DEPS_VERSION }}.tar.gz
-          tar -xf ./macos-deps-x86_64-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
-      - name: 'Install prerequisite: Pre-built dependency Qt'
-        if: steps.deps-qt-cache.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          curl -L -O https://github.com/obsproject/obs-deps/releases/download/${{ env.MACOS_DEPS_VERSION }}/macos-qt-${{ env.QT_VERSION }}-x86_64-${{ env.MACOS_DEPS_VERSION }}.tar.gz
-          tar -xf ./macos-qt-${{ env.QT_VERSION }}-x86_64-${{ env.MACOS_DEPS_VERSION }}.tar.gz -C "/tmp"
-          xattr -r -d com.apple.quarantine /tmp/obsdeps
-      - name: Checkout OBS
-        if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
-        uses: actions/checkout@v2
-        with:
-          repository: obsproject/obs-studio
-          submodules: 'recursive'
-          path: obs-studio
-      - name: 'Fetch prune'
-        if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
-        run: git fetch --prune
-      - name: 'Get OBS-Studio git info'
-        shell: bash
-        working-directory: ${{ github.workspace }}/obs-studio
-        run: |
-          echo "OBS_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
-          echo "OBS_GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "OBS_GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-      - name: Configure and build OBS
-        if: steps.cache-obs-build-macos.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          cd ${{ github.workspace }}/obs-studio
-          git checkout ${{ env.OBS_GIT_TAG }}
-          mkdir build && cd build
-          echo "=> Building obs-studio.."
-
-          cmake .. -DCMAKE_OSX_DEPLOYMENT_TARGET=10.11 -DQTDIR="/tmp/obsdeps" -DDepsPath="/tmp/obsdeps" \
-            -DBUILD_CAPTIONS=OFF -DDISABLE_PLUGINS=true -DENABLE_SCRIPTING=0
-          make -j4
-      - name: Configure and build plugin
-        shell: bash
-        run: |
-          cd ${{ github.workspace }}
-          echo "=> Building plugin for macOS."
-          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-          mkdir -p build && cd build
-          cmake .. \
-            -DQTDIR=/tmp/obsdeps \
-            -DLIBOBS_INCLUDE_DIR=${{ github.workspace }}/obs-studio/libobs \
-            -DLIBOBS_LIB=${{ github.workspace }}/obs-studio/build/libobs/libobs.dylib \
-            -DOBS_FRONTEND_LIB:STRING="${{ github.workspace }}/obs-studio/build/UI/obs-frontend-api/libobs-frontend-api.dylib" \
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-            -DCREDS="${{ secrets.SPOTIFY_TOKEN }}" \
-            -DLASTFM_CREDS="${{ secrets.LASTFM_KEY }}" \
-            -DCMAKE_INSTALL_PREFIX=/usr \
-          && make -j4
-      - name: 'Install prerequisite: Packages app'
-        if: success()
-        shell: bash
-        run: |
-          curl -L -O http://s.sudre.free.fr/Software/files/Packages.dmg
-          sudo hdiutil attach ./Packages.dmg
-          sudo installer -pkg /Volumes/Packages\ 1.2.9/Install\ Packages.pkg -target /
-      - name: Package
-        working-directory: ${{ github.workspace }}
-        if: success()
-        shell: bash
-        run: |
-          echo "=> Modifying ${{ env.project-name }}.so"
-          install_name_tool \
-          -change /tmp/obsdeps/lib/QtWidgets.framework/Versions/5/QtWidgets \
-            @executable_path/../Frameworks/QtWidgets.framework/Versions/5/QtWidgets \
-          -change /tmp/obsdeps/lib/QtGui.framework/Versions/5/QtGui \
-            @executable_path/../Frameworks/QtGui.framework/Versions/5/QtGui \
-          -change /tmp/obsdeps/lib/QtCore.framework/Versions/5/QtCore \
-            @executable_path/../Frameworks/QtCore.framework/Versions/5/QtCore \
-          ./build/lib${{ env.project-name }}.so
-          otool -L ./build/lib${{ env.project-name }}.so
-          packagesbuild ./package/installer-macOS.pkgproj
-          mv ./package/build/*.pkg ./package/${{ env.project-name }}.${{ env.GIT_TAG }}.macos.pkg
-      - name: Publish
-        if: success()
-        uses: actions/upload-artifact@v2-preview
-        with:
-          name: '${{ env.project-name }}.${{ env.GIT_TAG }}.installer.macos'
-          path: ./package/*.pkg 
   build-linux:
     name: 'Linux 64bit'
     runs-on: ubuntu-latest
     env:
-      obs-studio-version: 26.1.1
+      obs-studio-version: 27.2.4
       project-name: tuna
       project-git: tuna
       maintainer: uni@vrsal.de
@@ -247,13 +114,13 @@ jobs:
         path: ${{github.workspace}}/package/*.deb
   windows:
     name: 'Windows 32/64bit'
-    runs-on: [windows-latest]
+    runs-on: [windows-2019]
     env:
       QT_VERSION: '5.15.2'
       WINDOWS_DEPS_VERSION: '2019'
       CMAKE_GENERATOR: "Visual Studio 16 2019"
       CMAKE_SYSTEM_VERSION: "10.0"
-      obs-studio-version: 5.15.2
+      obs-studio-version: 27.2.4
       project-git: tuna
       project-name: tuna
     steps:
