@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.com/univrsal/tuna
- * Copyright 2021 univrsal <uni@vrsal.de>.
+ * Copyright 2022 univrsal <uni@vrsal.xyz>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +32,11 @@
 #include "vlc_obs_source.hpp"
 #include "web_source.hpp"
 #include "window_source.hpp"
-#include <QRegularExpression>
-#include <obs-frontend-api.h>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
+#include <QRegularExpression>
+#include <obs-frontend-api.h>
 
 namespace music_sources {
 static int selected_index = -1;

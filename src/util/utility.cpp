@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.com/univrsal/tuna
- * Copyright 2021 univrsal <uni@vrsal.de>.
+ * Copyright 2022 univrsal <uni@vrsal.xyz>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -229,7 +229,6 @@ QJsonDocument curl_get_json(const char* url)
     berr("curl_easy_init() failed when receiving json from %s", url);
     return {};
 }
-
 
 void set_thread_name(const char* name)
 {

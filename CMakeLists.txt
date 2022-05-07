@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
-project(tuna VERSION 1.6.1)
+project(tuna VERSION 1.6.2)
 
 add_subdirectory(deps)
 
 set(PLUGIN_AUTHOR "univrsal")
 set(PLUGIN_GIT tuna)
-set(LINUX_MAINTAINER_EMAIL "uni@vrsal.de")
-set(MACOS_BUNDLEID "cf.vrsal.tuna")
+set(LINUX_MAINTAINER_EMAIL "uni@vrsal.xyz")
+set(MACOS_BUNDLEID "xyz.vrsal.tuna")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_PREFIX_PATH "${QTDIR}")

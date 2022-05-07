@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
  * github.com/univrsal/tuna
- * Copyright 2021 univrsal <uni@vrsal.de>.
+ * Copyright 2022 univrsal <uni@vrsal.xyz>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ void load()
     if (webserver_enabled && !web_thread::start())
         berr("Couldn't start web server thread");
     else if (!webserver_enabled)
-            web_thread::stop();
+        web_thread::stop();
 
     music_sources::select(qt_to_utf8(selected_source));
 }
