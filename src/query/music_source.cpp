@@ -196,6 +196,14 @@ bool music_source::download_missing_cover()
         auto doc = util::curl_get_json(qt_to_utf8(url));
         if (doc["results"].isArray()) {
             auto first = doc["results"].toArray()[0].toObject();
+
+            // We don't want to use the wrong cover so we check if the first (probably also best) search result
+            // has a matching title. (We search if the title contains the currently playing title or the other
+            // way around in case the titles aren't exactly the same (eg. it has something like a "(Single)"
+            // prefix or postfix
+            if (!first["collectionName"].toString().toLower().contains(m_current.title().toLower()) || m_current.title().toLower().contains(first["collectionName"].toString().toLower())) {
+                return false;
+            }
             if (first["artworkUrl60"].isString()) {
                 auto url = first["artworkUrl60"].toString();
                 url = url.replace("60x60", QString::number(config::cover_size) + "x" + QString::number(config::cover_size));
