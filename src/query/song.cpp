@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #include "song.hpp"
+#include "../util/config.hpp"
 #include "../util/format.hpp"
 #include "music_source.hpp"
 #include <QJsonArray>
@@ -263,8 +264,12 @@ void song::to_json(QJsonObject& obj) const
     }
     obj["status"] = status;
 
-    if (m_data & CAP_COVER)
-        obj["cover_url"] = m_cover;
+    if (m_data & CAP_COVER) {
+        // Actual file:// url (can't be used in the browser source anymore)
+        obj["cover_path"] = m_cover;
+        // Just points to the /cover.png end point
+        obj["cover_url"] = QString("http://localhost:%1/cover.png").arg(QString::number(config::webserver_port));
+    }
 
     if (m_data & CAP_LYRICS)
         obj["lyrics_url"] = m_lyrics;

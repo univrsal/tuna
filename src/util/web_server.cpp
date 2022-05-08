@@ -41,7 +41,7 @@ struct mg_mgr mgr;
 struct mg_connection* nc;
 
 /* GET requests will result in song information */
-static inline void handle_get(struct mg_connection* nc)
+static inline void handle_info_get(struct mg_connection* nc)
 {
     /* Write current song to json
      * and properly convert it to utf8
@@ -76,6 +76,12 @@ static inline void handle_get(struct mg_connection* nc)
         "\r\n"
         "%s",
         int(len), TUNA_VERSION, str.c_str());
+}
+
+static inline void handle_cover_get(struct mg_connection* nc, struct mg_http_message* msg)
+{
+    struct mg_http_serve_opts opts = { .mime_types = "png=image/png" };
+    mg_http_serve_file(nc, msg, qt_to_utf8(config::cover_path), &opts);
 }
 
 /* POST means we're getting information */
@@ -145,9 +151,13 @@ static void event_handler(struct mg_connection* nc, int ev, void* d, void* priv)
     if (ev == MG_EV_HTTP_MSG) {
         auto* incoming = reinterpret_cast<struct mg_http_message*>(d);
         QString method = utf8_to_qt(incoming->method.ptr);
-        if (method.startsWith("GET"))
-            handle_get(nc);
-        else if (method.startsWith("POST"))
+        QString uri = utf8_to_qt(incoming->uri.ptr).split(" ")[0];
+        if (method.startsWith("GET")) {
+            if (uri.startsWith("/cover.png"))
+                handle_cover_get(nc, incoming);
+            else
+                handle_info_get(nc);
+        } else if (method.startsWith("POST"))
             handle_post(nc, incoming);
         else if (method.startsWith("OPTIONS"))
             handle_options(nc);
