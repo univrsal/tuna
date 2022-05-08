@@ -49,6 +49,7 @@ void song::clear()
     m_month = "";
     m_year = "";
     m_full_release = "";
+    m_file_name = "";
 }
 
 bool song::has_cover_lookup_information() const
@@ -81,6 +82,14 @@ void song::append_artist(const QString& a)
         m_data |= CAP_ARTIST;
 }
 
+void song::set_file_name(const QString& f)
+{
+    if (!f.isEmpty()) {
+        m_file_name = f;
+        m_data |= CAP_FILE_NAME;
+    }
+}
+
 void song::set_label(const QString& l)
 {
     if (!l.isEmpty())
@@ -99,8 +108,7 @@ void song::set_title(const QString& title)
 {
     if (!title.isEmpty())
         m_data |= CAP_TITLE;
-    m_title = title;
-    util::remove_extensions(m_title);
+    m_title = util::remove_extensions(title);
 }
 
 void song::set_duration(int ms)
@@ -185,6 +193,8 @@ const QString& song::get_string_value(char specifier) const
         return m_year;
     case 'b':
         return m_label;
+    case 'f':
+        return m_file_name;
     default:
         return empty;
     }

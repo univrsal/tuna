@@ -66,7 +66,9 @@ extern size_t write_callback(char* ptr, size_t size, size_t nmemb, std::string* 
 /* Redirected from util/threading.h because it clashes with mongoose */
 extern void set_thread_name(const char* name);
 
-extern void remove_extensions(QString& str);
+extern QString remove_extensions(QString const& str);
+
+extern QString file_from_path(QString const& file);
 
 extern bool open_config(const char* name, QJsonDocument&);
 extern bool save_config(const char* name, const QJsonDocument&);

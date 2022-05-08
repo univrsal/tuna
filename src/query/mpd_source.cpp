@@ -29,7 +29,7 @@
 mpd_source::mpd_source()
     : music_source(S_SOURCE_MPD, T_SOURCE_MPD, new mpd)
 {
-    m_capabilities = CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_STOP_SONG | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
+    m_capabilities = CAP_FILE_NAME | CAP_TITLE | CAP_ALBUM | CAP_LABEL | CAP_STOP_SONG | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_COVER;
     m_address = nullptr;
     m_port = 0;
 }
@@ -100,16 +100,6 @@ static inline play_state from_mpd_state(mpd_state s)
     }
 }
 
-static QString title_from_path(QString path)
-{
-    auto splits = path.split("/");
-    if (splits.empty() || splits.last().isEmpty())
-        return "unknown";
-    auto result = splits.last();
-    util::remove_extensions(result);
-    return result;
-}
-
 void mpd_source::refresh()
 {
     struct mpd_connection* connection = connect();
@@ -159,8 +149,12 @@ void mpd_source::refresh()
             m_current.set_label(label);
 
         QString file_path = utf8_to_qt(uri);
-        if (uri && !title)
-            m_current.set_title(title_from_path(file_path));
+        if (uri) {
+            auto file = util::file_from_path(file_path);
+            m_current.set_file_name(file);
+            if (!title)
+                m_current.set_title(util::remove_extensions(file));
+        }
 
         m_current.set_duration(mpd_song_get_duration_ms(mpd_song));
 

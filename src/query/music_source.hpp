@@ -43,6 +43,7 @@ enum capability {
     CAP_PROGRESS = 1 << 10,         /* Get play progress in ms  */
     CAP_STATUS = 1 << 11,           /* Get song playing satus   */
     CAP_LABEL = 1 << 12,            /* Song production label    */
+    CAP_FILE_NAME = 1 << 13,        /* Song file name/path      */
     CAP_TIME_LEFT = CAP_PROGRESS |  /* Duration - Progress      */
                     CAP_DURATION,
 

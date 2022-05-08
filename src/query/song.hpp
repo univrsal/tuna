@@ -37,7 +37,7 @@ class song {
     uint16_t m_data;
     QString m_title, m_album, m_cover, m_lyrics, m_label;
     QList<QString> m_artists;
-    QString m_year, m_month, m_day, m_full_release;
+    QString m_year, m_month, m_day, m_full_release, m_file_name;
     int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
     bool m_is_explicit;
     play_state m_playing_state;
@@ -47,6 +47,7 @@ public:
     song();
     void update_release_precision();
     void append_artist(const QString& a);
+    void set_file_name(QString const&);
     void set_cover_link(const QString& link);
     void set_title(const QString& title);
     void set_duration(int ms);
@@ -68,6 +69,7 @@ public:
 
     bool has_cover_lookup_information() const;
     uint16_t data() const { return m_data; }
+    const QString& file_name() const { return m_file_name; }
     const QString& album() const { return m_album; }
     const QString& cover() const { return m_cover; }
     const QString& lyrics() const { return m_lyrics; }

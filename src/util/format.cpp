@@ -87,6 +87,7 @@ void init()
     specifiers.emplace_back(new specifier_string('a', CAP_ALBUM));
     specifiers.emplace_back(new specifier_string('y', CAP_RELEASE));
     specifiers.emplace_back(new specifier_string('b', CAP_LABEL));
+    specifiers.emplace_back(new specifier_string('f', CAP_FILE_NAME));
     specifiers.emplace_back(new specifier_string_list('m', CAP_ARTIST));
     specifiers.emplace_back(new specifier_date('r', CAP_RELEASE));
     specifiers.emplace_back(new specifier_int('d', CAP_DISC_NUMBER));

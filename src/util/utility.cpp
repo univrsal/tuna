@@ -235,8 +235,9 @@ void set_thread_name(const char* name)
     os_set_thread_name(name);
 }
 
-void remove_extensions(QString& str)
+QString remove_extensions(QString const& str)
 {
+    QString result = str;
     if (CGET_BOOL(CFG_REMOVE_EXTENSIONS)) {
         /* that's every single format supported by vlc, i think */
         auto exts = { ".aac", ".ac3", ".adts", ".aif", ".aifc", ".aiff", ".amr", ".amv",
@@ -262,12 +263,13 @@ void remove_extensions(QString& str)
             ".mpeg2", ".mpg4", ".mpgv", ".thd", ".vfo", ".xavc", ".xwm", ".zab" };
 
         for (const auto& ext : exts) {
-            if (str.toLower().endsWith(ext)) {
-                str.chop(strlen(ext));
+            if (result.endsWith(ext, Qt::CaseInsensitive)) {
+                result.chop(strlen(ext));
                 break;
             }
         }
     }
+    return result;
 }
 
 QString get_config_file_path(const char* name)
@@ -316,6 +318,14 @@ bool save_config(const char* name, const QJsonDocument& doc)
         berr("Couldn't write config to %s", qt_to_utf8(path));
     }
     return result;
+}
+
+QString file_from_path(const QString& path)
+{
+    auto splits = path.split("/");
+    if (splits.empty() || splits.last().isEmpty())
+        return "unknown";
+    return splits.last();
 }
 
 } // namespace util

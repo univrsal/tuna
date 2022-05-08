@@ -29,7 +29,7 @@
 vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC, new vlc)
 {
-    m_capabilities = CAP_TITLE | CAP_LABEL | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
+    m_capabilities = CAP_FILE_NAME | CAP_TITLE | CAP_LABEL | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
 }
 
 vlc_obs_source::~vlc_obs_source()
@@ -221,7 +221,10 @@ void vlc_obs_source::refresh()
         auto publisher = get_meta("publisher");
         auto track_number = get_meta("track_number");
         auto disc_number = get_meta("disc_number");
+        auto file_url = get_meta("url");
 
+        if (file_url != "")
+            m_current.set_file_name(file_url);
         if (artwork_url != "")
             m_current.set_cover_link(artwork_url);
         if (title != "")

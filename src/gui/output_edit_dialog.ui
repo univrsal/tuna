@@ -293,6 +293,16 @@
          <string>tuna.gui.tab.basics.format.time.left</string>
         </property>
        </item>
+       <item row="6" column="2">
+        <property name="text">
+         <string>%f</string>
+        </property>
+       </item>
+       <item row="6" column="3">
+        <property name="text">
+         <string>tuna.gui.tab.basics.format.file_name</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
