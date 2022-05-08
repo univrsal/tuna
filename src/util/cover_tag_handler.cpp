@@ -49,6 +49,8 @@ namespace cover {
 
 bool write_bytes_to_file(const TagLib::ByteVector& data)
 {
+    if (data.isEmpty())
+        return false;
     QFile f(config::cover_path);
     bool success = true;
     if (f.open(QIODevice::WriteOnly)) {
