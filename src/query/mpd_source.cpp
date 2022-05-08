@@ -100,6 +100,16 @@ static inline play_state from_mpd_state(mpd_state s)
     }
 }
 
+static QString title_from_path(QString path)
+{
+    auto splits = path.split("/");
+    if (splits.empty() || splits.last().isEmpty())
+        return "unknown";
+    auto result = splits.last();
+    util::remove_extensions(result);
+    return result;
+}
+
 void mpd_source::refresh()
 {
     struct mpd_connection* connection = connect();
@@ -130,6 +140,7 @@ void mpd_source::refresh()
         const char* num = mpd_song_get_tag(mpd_song, MPD_TAG_TRACK, 0);
         const char* disc = mpd_song_get_tag(mpd_song, MPD_TAG_DISC, 0);
         const char* label = mpd_song_get_tag(mpd_song, MPD_TAG_LABEL, 0);
+        const char* uri = mpd_song_get_uri(mpd_song);
 #undef MPD_TAG_LABEL
 
         if (title)
@@ -147,10 +158,13 @@ void mpd_source::refresh()
         if (label)
             m_current.set_label(label);
 
+        QString file_path = utf8_to_qt(uri);
+        if (uri && !title)
+            m_current.set_title(title_from_path(file_path));
+
         m_current.set_duration(mpd_song_get_duration_ms(mpd_song));
 
         /* Absolute path to current song file */
-        QString file_path = utf8_to_qt(mpd_song_get_uri(mpd_song));
         file_path.prepend(m_base_folder);
         m_song_file_path = file_path;
 
