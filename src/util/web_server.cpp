@@ -80,7 +80,9 @@ static inline void handle_info_get(struct mg_connection* nc)
 
 static inline void handle_cover_get(struct mg_connection* nc, struct mg_http_message* msg)
 {
-    struct mg_http_serve_opts opts = { .mime_types = "png=image/png" };
+    struct mg_http_serve_opts opts {
+    };
+    opts.mime_types = "png=image/png";
     mg_http_serve_file(nc, msg, qt_to_utf8(config::cover_path), &opts);
 }
 
