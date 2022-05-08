@@ -122,11 +122,12 @@ void execute(QString& q)
 
 bool specifier::replace(QString& slice, const song& s, const QString& data) const
 {
+    int max_length = get_truncate_arg(slice);
+    slice = slice.remove(0, 1); // Always remove the specifier and the truncate argument
     if (!(s.data() & m_tag_id))
         return false; /* We do not have the information needed for this specifier */
 
     /* get truncation, if specified */
-    int max_length = get_truncate_arg(slice);
     QString copy = data;
     if (slice[0].isUpper())
         copy = copy.toUpper();
@@ -134,7 +135,6 @@ bool specifier::replace(QString& slice, const song& s, const QString& data) cons
         copy.truncate(max_length);
         copy.append("...");
     }
-    slice = slice.remove(0, 1);
     slice.prepend(copy);
 
     return true;
