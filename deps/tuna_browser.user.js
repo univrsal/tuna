@@ -297,7 +297,7 @@
                     "playing":"playing",
                     "paused":"stopped"
                 }
-                let status = mediaSessionStatesToTunaStates[navigator.mediaSession.playbackState] || "unknown"]
+                let status = mediaSessionStatesToTunaStates[navigator.mediaSession.playbackState] || "unknown";
                 // let cover_url = not supported yet!
                 let title = navigator.mediaSession.metadata.title;
                 let artists = [navigator.mediaSession.metadata.artist];
