@@ -289,6 +289,27 @@
                 if (title !== null) {
                     post({ cover_url, title, artists, status, progress, duration, album_url, album });
                 }
+            } else if (hostname === "app.plex.tv") {
+                // simple plex web support by javaarchive
+                const mediaSessionStatesToTunaStates = {
+                    "none": "unknown",
+                    "playing":"playing,
+                    "paused":"stopped"
+                }
+                let status = mediaSessionStatesToTunaStates[navigator.mediaSession.playbackState] || "unknown"]
+                // let cover_url = not supported yet!
+                let title = navigator.mediaSession.metadata.title;
+                let artists = [navigator.mediaSession.metadata.artist];
+                let progress = document.getElementsByTagName("audio")[0].currentTime * 1000;
+                let duration = document.getElementsByTagName("audio")[0].duration * 1000;
+                let artworks = navigator.mediaSession.metadata.artwork;
+                let album = navigator.mediaSession.metadata.album;
+                let album_url = artworks[artworks.length - 1].src;
+                let cover_url = album_url; // For now. 
+                
+                if (title !== null) {
+                    post({ cover_url, title, artists, status, progress, duration, album, album_url });
+                }
             }
         }, refresh_rate_ms);
 
