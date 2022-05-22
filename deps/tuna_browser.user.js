@@ -11,6 +11,7 @@
 // @match        *://www.deezer.com/*
 // @match        *://play.pretzel.rocks/*
 // @match        *://*.youtube.com/*
+// @match        *://app.plex.tv/*
 // @grant        unsafeWindow
 // @license      GPLv2
 // ==/UserScript==
