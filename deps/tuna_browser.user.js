@@ -292,18 +292,22 @@
                 }
             } else if (hostname === "app.plex.tv") {
                 // simple plex web support by javaarchive
+                // this is kind of more "universal" as it reads data from the browser media session api
+                // see https://developer.mozilla.org/en-US/docs/Web/API/Media_Session_API for more info
                 const mediaSessionStatesToTunaStates = {
                     "none": "unknown",
                     "playing":"playing",
                     "paused":"stopped"
                 }
                 let status = mediaSessionStatesToTunaStates[navigator.mediaSession.playbackState] || "unknown";
-                // let cover_url = not supported yet!
                 if(navigator.mediaSession.metadata){
                     let title = navigator.mediaSession.metadata.title;
                     let artists = [navigator.mediaSession.metadata.artist];
-                    let progress = document.getElementsByTagName("audio")[0].currentTime * 1000;
-                    let duration = document.getElementsByTagName("audio")[0].duration * 1000;
+                    
+                    let mediaElem = document.getElementsByTagName("audio")[0]; // add || document.getElementsByTagName("video")[0] to support sites like yt music where video includes audio
+                    let progress = mediaElem.currentTime * 1000;
+                    let duration = mediaElem.duration * 1000;
+                    
                     let artworks = navigator.mediaSession.metadata.artwork;
                     let album = navigator.mediaSession.metadata.album;
                     let album_url = artworks[artworks.length - 1].src;
