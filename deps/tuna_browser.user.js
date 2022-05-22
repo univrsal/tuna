@@ -294,7 +294,7 @@
                 // simple plex web support by javaarchive
                 const mediaSessionStatesToTunaStates = {
                     "none": "unknown",
-                    "playing":"playing,
+                    "playing":"playing",
                     "paused":"stopped"
                 }
                 let status = mediaSessionStatesToTunaStates[navigator.mediaSession.playbackState] || "unknown"]
