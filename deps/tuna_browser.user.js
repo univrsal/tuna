@@ -305,8 +305,8 @@
                     let artists = [navigator.mediaSession.metadata.artist];
                     
                     let mediaElem = document.getElementsByTagName("audio")[0]; // add || document.getElementsByTagName("video")[0] to support sites like yt music where video includes audio
-                    let progress = mediaElem.currentTime * 1000;
-                    let duration = mediaElem.duration * 1000;
+                    let progress = Math.floor(mediaElem.currentTime) * 1000;
+                    let duration = Math.floor(mediaElem.duration) * 1000;
                     
                     let artworks = navigator.mediaSession.metadata.artwork;
                     let album = navigator.mediaSession.metadata.album;
