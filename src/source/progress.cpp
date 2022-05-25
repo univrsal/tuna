@@ -39,8 +39,8 @@ void progress_source::tick(float seconds)
     if (m_state == state_playing) {
         seconds *= 1000; /* s -> ms */
         if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
-            if (tmp.get_int_value('p') != m_synced_progress) {
-                m_synced_progress = tmp.get_int_value('p');
+            if (tmp.progress_ms() != m_synced_progress) {
+                m_synced_progress = tmp.progress_ms();
                 m_adjusted_progress = m_synced_progress + seconds;
             } else {
                 m_adjusted_progress += seconds;
@@ -49,7 +49,7 @@ void progress_source::tick(float seconds)
             m_adjusted_progress += seconds;
         }
 
-        float duration = tmp.get_int_value('l');
+        float duration = tmp.duration_ms();
         if (duration > 0)
             m_progress = m_adjusted_progress / duration;
         m_progress = fmaxf(fminf(1, m_progress), 0);

@@ -101,12 +101,6 @@ void spotify_source::load()
     }
 }
 
-bool spotify_source::valid_format(const QString& format)
-{
-    // Label isn't supported
-    return !format.contains("%b");
-}
-
 /* implementation further down */
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
     QJsonDocument& response_json, const char* custom_request_type = nullptr);

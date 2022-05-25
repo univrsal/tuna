@@ -21,15 +21,15 @@
 #include "song.hpp"
 #include <QDate>
 #include <QObject>
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 
 #include "../gui/tuna_gui.hpp"
 #include "src/util/utility.hpp"
 
 /* clang-format off */
 
-enum capability {
+enum capability : uint32_t {
     CAP_TITLE = 1 << 0,             /* Song title               */
     CAP_ARTIST = 1 << 1,            /* Song artitst             */
     CAP_ALBUM = 1 << 2,             /* Album name               */
@@ -101,7 +101,7 @@ public:
     /* Execute and return true if successful */
     virtual bool execute_capability(capability c) = 0;
     virtual void set_gui_values();
-    virtual bool valid_format(const QString& str);
+    bool valid_format(const QString& str);
     virtual void handle_cover();
 
     source_widget* get_settings_tab() { return m_settings_tab; }

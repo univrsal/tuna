@@ -17,7 +17,9 @@
  *************************************************************************/
 
 #pragma once
+#include "utility.hpp"
 #include <QString>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -26,29 +28,48 @@ class song;
 namespace format {
 
 void init();
-void execute(QString& out);
+bool execute(QString& out);
 
 class specifier {
 protected:
-    char m_id;
-    int m_tag_id;
+    QString m_id {};
+    std::function<QString(const song&)> m_data_getter {};
+    uint32_t m_required_caps {};
 
 public:
     virtual ~specifier() = default;
     specifier() = default;
-    specifier(char id, int tag_id)
+    specifier(const char* id, uint32_t caps, std::function<QString(const song&)> data_getter)
         : m_id(id)
-        , m_tag_id(tag_id)
+        , m_data_getter(data_getter)
+        , m_required_caps(caps)
     {
     }
 
-    virtual bool do_format(QString& slice, const song& s) const;
-    bool replace(QString& slice, const song& s, const QString& data = "") const;
+    const QString& get_id() const { return m_id; }
+    QString get_name() const
+    {
+        auto Tmp = "tuna.format." + m_id;
+        return utf8_to_qt(obs_module_text(qt_to_utf8(Tmp)));
+    }
 
-    char get_id() const { return m_id; }
-    int tag_capability() { return m_tag_id; }
+    QString get_data(song const& s) const { return m_data_getter(s); }
+
+    virtual bool for_encoding() const { return true; }
+
+    uint32_t get_required_caps() const { return m_required_caps; }
 };
 
+class static_specifier : public specifier {
+public:
+    static_specifier(const char* id, std::function<QString(const song&)> data_getter)
+        : specifier(id, 0, data_getter)
+    {
+    }
+    bool for_encoding() const override { return false; }
+};
+
+/*
 class specifier_time : public specifier {
 public:
     specifier_time(char id, int tag_id)
@@ -113,7 +134,7 @@ public:
 
     bool do_format(QString& slice, const song& s) const override;
 };
-
+*/
 extern const std::vector<std::unique_ptr<specifier>>& get_specifiers();
 
 }

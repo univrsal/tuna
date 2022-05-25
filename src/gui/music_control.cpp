@@ -128,11 +128,11 @@ void music_control::refresh_play_state()
     ui->btn_play_pause->setIcon(QIcon(icon));
 
     /* refresh song info */
-    if (copy.get_string_value('t') != last_title) {
+    if (copy.title() != last_title) {
         QString info = utf8_to_qt(T_DOCK_SONG_INFO);
         if (copy.state() <= state_paused) {
-            last_title = copy.get_string_value('t');
-            QString artists, title = copy.get_string_value('t');
+            last_title = copy.title();
+            QString artists, title = copy.title();
             artists = copy.artists().join(", ");
             // Icecast and window title don't provide these
             if (!artists.isEmpty()) {

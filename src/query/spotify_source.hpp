@@ -45,7 +45,6 @@ public:
     void load() override;
     void refresh() override;
     bool execute_capability(capability c) override;
-    bool valid_format(const QString& str) override;
     bool do_refresh_token(QString& log);
     bool new_token(QString& log);
     void set_auth_code(const QString& auth_code) { m_auth_code = auth_code; }

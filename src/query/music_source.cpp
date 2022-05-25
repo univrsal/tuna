@@ -264,18 +264,6 @@ void music_source::handle_cover()
 
 bool music_source::valid_format(const QString& str)
 {
-    QString regexStr = "%[";
-    QRegularExpression regex;
-
-    for (auto& s : format::get_specifiers()) {
-        /* We only check for unsupported format specifiers and skip those
-         * that don't need any track info */
-        if (m_capabilities & s->tag_capability() || s->tag_capability() == 0)
-            continue;
-        regexStr += QChar(s->get_id()) + QChar::toUpper(s->get_id());
-    }
-    regexStr += "]+";
-    regex.setPattern(regexStr);
-
-    return !regex.match(str).hasMatch();
+    QString copy = str;
+    return format::execute(copy);
 }

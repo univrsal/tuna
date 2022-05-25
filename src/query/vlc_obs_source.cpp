@@ -29,7 +29,7 @@
 vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC, new vlc)
 {
-    m_capabilities = CAP_FILE_NAME | CAP_TITLE | CAP_LABEL | CAP_ALBUM | CAP_PROGRESS | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE | CAP_DURATION | CAP_PLAY_PAUSE | CAP_NEXT_SONG | CAP_PREV_SONG;
+    m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_LYRICS | CAP_DURATION | CAP_DISC_NUMBER | CAP_TRACK_NUMBER | CAP_PROGRESS | CAP_STATUS | CAP_LABEL | CAP_FILE_NAME | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
 }
 
 vlc_obs_source::~vlc_obs_source()
@@ -280,11 +280,5 @@ bool vlc_obs_source::execute_capability(capability c)
     }
 
     obs_source_release(src);
-    return true;
-}
-
-bool vlc_obs_source::valid_format(const QString& str)
-{
-    UNUSED_PARAMETER(str);
     return true;
 }

@@ -33,8 +33,8 @@ song::song()
 void song::clear()
 {
     m_data = 0x0;
-    m_title = "n/a";
-    m_album = "n/a";
+    m_title = "";
+    m_album = "";
     m_cover = "n/a";
     m_lyrics = "n/a";
     m_artists.clear();
@@ -178,52 +178,17 @@ void song::set_day(const QString& d)
     update_release_precision();
 }
 
-const QString& song::get_string_value(char specifier) const
-{
-    static QString empty("");
-
-    switch (specifier) {
-    case 't':
-        return m_title;
-    case 'a':
-        return m_album;
-    case 'r':
-        return m_full_release;
-    case 'y':
-        return m_year;
-    case 'b':
-        return m_label;
-    case 'f':
-        return m_file_name;
-    default:
-        return empty;
-    }
-}
-
-int32_t song::get_int_value(char specifier) const
-{
-    switch (specifier) {
-    case 'd':
-        return m_disc_number;
-    case 'n':
-        return m_track_number;
-    case 'p':
-        return m_progress_ms;
-    case 'l':
-        return m_duration_ms;
-    case 'o':
-        return m_duration_ms - m_progress_ms;
-    default:
-        return 0;
-    }
-}
-
 bool song::operator==(const song& other) const
 {
     /* basically compare all data that shouldn't change in between
      * updates, unless the song changes
      */
-    return state() == other.state() && data() == other.data() && cover() == other.cover() && label() == other.label() && get_int_value('d') == other.get_int_value('d') && get_int_value('a') == other.get_int_value('a') && get_int_value('l') == other.get_int_value('l') && get_string_value('t') == other.get_string_value('t') && get_string_value('a') == other.get_string_value('a') && get_string_value('y') == other.get_string_value('y') && get_string_value('b') == other.get_string_value('b') && get_string_value('r') == other.get_string_value('r');
+    /* clang-format off */
+    return state() == other.state() && data() == other.data() && cover() == other.cover() && label() == other.label() &&
+           disc_number() == other.disc_number() && track_number() == other.track_number() &&
+           duration_ms() == other.duration_ms() && title() == other.title() && album() == other.album() &&
+           year() == other.year() && label() == other.label() && m_full_release == other.m_full_release;
+    /* clang-format on */
 }
 
 bool song::operator!=(const song& other) const
@@ -234,28 +199,16 @@ bool song::operator!=(const song& other) const
 void song::to_json(QJsonObject& obj) const
 {
     obj = QJsonObject();
-
-    for (const auto& f : format::get_specifiers()) {
-        if (m_data & f->tag_capability()) {
-            auto key = music_sources::capability_to_string(capability(f->tag_capability()));
-            switch (f->get_id()) {
-            case 'd':
-            case 'n':
-            case 'p':
-            case 'l':
-            case 'o':
-                obj[key] = get_int_value(f->get_id());
-                break;
-            case 't':
-            case 'a':
-            case 'r':
-            case 'y':
-            case 'b':
-                obj[key] = get_string_value(f->get_id());
-                break;
-            }
-        }
-    }
+    obj["album"] = album();
+    obj["disc_number"] = disc_number();
+    obj["duration"] = duration_ms();
+    obj["is_explicit"] = is_explicit();
+    obj["label"] = label();
+    obj["lyrics"] = lyrics();
+    obj["progress"] = progress_ms();
+    obj["time_left"] = duration_ms() - progress_ms();
+    obj["title"] = title();
+    obj["track_number"] = track_number();
 
     /* Special cases: Status, Cover link, Artists as list, release as year, month, day */
     QString status = "unknown";
@@ -344,7 +297,8 @@ void song::from_json(const QJsonObject& obj)
 
     auto artists = obj["artists"];
     if (artists.isArray()) {
-        for (auto a : artists.toArray()) {
+        const auto arr = artists.toArray();
+        for (auto const& a : arr) {
             if (a.isString())
                 append_artist(a.toString());
         }

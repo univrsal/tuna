@@ -34,7 +34,7 @@ enum play_state { state_playing,
     state_unknown };
 
 class song {
-    uint16_t m_data;
+    uint32_t m_data;
     QString m_title, m_album, m_cover, m_lyrics, m_label;
     QList<QString> m_artists;
     QString m_year, m_month, m_day, m_full_release, m_file_name;
@@ -66,9 +66,11 @@ public:
     play_state state() const { return m_playing_state; }
     bool is_playing() const { return m_playing_state == state_playing; }
     bool is_paused() const { return !is_playing(); }
+    bool is_explicit() const { return m_is_explicit; }
 
     bool has_cover_lookup_information() const;
-    uint16_t data() const { return m_data; }
+    uint32_t data() const { return m_data; }
+    bool has(uint32_t cap) const { return m_data & cap; }
     const QString& file_name() const { return m_file_name; }
     const QString& album() const { return m_album; }
     const QString& cover() const { return m_cover; }
@@ -78,9 +80,12 @@ public:
     const QString& day() const { return m_day; }
     const QString& title() const { return m_title; }
     const QString& label() const { return m_label; }
-    const QString& get_string_value(char specififer) const;
     const QList<QString>& artists() const { return m_artists; }
-    int32_t get_int_value(char specifier) const;
+    int32_t duration_ms() const { return m_duration_ms; }
+    int32_t progress_ms() const { return m_progress_ms; }
+    int32_t track_number() const { return m_track_number; }
+    int32_t disc_number() const { return m_disc_number; }
+
     date_precision release_precision() const { return m_release_precision; }
 
     bool operator==(const song& other) const;

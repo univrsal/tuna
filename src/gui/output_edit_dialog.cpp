@@ -19,12 +19,14 @@
 #include "output_edit_dialog.hpp"
 #include "../query/music_source.hpp"
 #include "../util/constants.hpp"
+#include "../util/format.hpp"
 #include "tuna_gui.hpp"
 #include "ui_output_edit_dialog.h"
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QTableWidgetItem>
 #include <QValidator>
 #ifdef _WIN32
 #    include <QTextStream>
@@ -46,9 +48,23 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     ui->lbl_format_error->setVisible(false);
     ui->lbl_format_error->setStyleSheet("QLabel { color: red;"
                                         "font-weight: bold; }");
-    ui->tableWidget->setColumnWidth(0, 40);
-    ui->tableWidget->setColumnWidth(1, 180);
-    ui->tableWidget->setColumnWidth(2, 40);
+    ui->table_format->setColumnWidth(0, 110);
+    ui->table_format->setColumnWidth(1, 140);
+    ui->table_format->setColumnWidth(2, 110);
+
+    auto const& spec = format::get_specifiers();
+    auto rows = std::ceil(spec.size() / 2.);
+    for (int i = 0; i < rows; i++)
+        ui->table_format->insertRow(i);
+
+    for (int i = 0; i < spec.size(); i += 2) {
+        ui->table_format->setItem(i / 2, 0, new QTableWidgetItem(spec[i]->get_id()));
+        ui->table_format->setItem(i / 2, 1, new QTableWidgetItem(spec[i]->get_name()));
+        if (i + 1 < spec.size()) {
+            ui->table_format->setItem(i / 2, 2, new QTableWidgetItem(spec[i + 1]->get_id()));
+            ui->table_format->setItem(i / 2, 3, new QTableWidgetItem(spec[i + 1]->get_name()));
+        }
+    }
 
     if (m == edit_mode::modify) {
         QString format, path;
