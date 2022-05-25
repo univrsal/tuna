@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #pragma once
+#include "../query/song.hpp"
 #include "utility.hpp"
 #include <QString>
 #include <functional>
@@ -34,15 +35,23 @@ class specifier {
 protected:
     QString m_id {};
     std::function<QString(const song&)> m_data_getter {};
-    uint32_t m_required_caps {};
+    std::vector<meta::type> m_required_caps {};
 
 public:
     virtual ~specifier() = default;
     specifier() = default;
-    specifier(const char* id, uint32_t caps, std::function<QString(const song&)> data_getter)
+
+    specifier(const char* id, std::vector<meta::type> caps, std::function<QString(const song&)> data_getter)
         : m_id(id)
         , m_data_getter(data_getter)
         , m_required_caps(caps)
+    {
+    }
+
+    specifier(const char* id, meta::type cap, std::function<QString(const song&)> data_getter)
+        : m_id(id)
+        , m_data_getter(data_getter)
+        , m_required_caps({ cap })
     {
     }
 
@@ -57,84 +66,18 @@ public:
 
     virtual bool for_encoding() const { return true; }
 
-    uint32_t get_required_caps() const { return m_required_caps; }
+    std::vector<meta::type> const& get_required_caps() const { return m_required_caps; }
 };
 
 class static_specifier : public specifier {
 public:
     static_specifier(const char* id, std::function<QString(const song&)> data_getter)
-        : specifier(id, 0, data_getter)
+        : specifier(id, meta::NONE, data_getter)
     {
     }
     bool for_encoding() const override { return false; }
 };
 
-/*
-class specifier_time : public specifier {
-public:
-    specifier_time(char id, int tag_id)
-        : specifier(id, tag_id)
-    {
-    }
-
-    bool do_format(QString& slice, const song& s) const override;
-};
-
-class specifier_int : public specifier {
-public:
-    specifier_int(char id, int tag_id)
-        : specifier(id, tag_id)
-    {
-    }
-
-    bool do_format(QString& slice, const song& s) const override;
-};
-
-class specifier_string : public specifier {
-public:
-    specifier_string(char id, int tag_id)
-        : specifier(id, tag_id)
-    {
-    }
-
-    bool do_format(QString& slice, const song& s) const override;
-};
-
-class specifier_static : public specifier {
-    QString m_static_value;
-
-public:
-    specifier_static(char id, const QString& value)
-        : specifier(id, 0)
-        , m_static_value(value)
-    {
-    }
-
-    bool do_format(QString& slice, const song& s) const override;
-};
-
-class specifier_string_list : public specifier {
-    const QList<QString>* m_data;
-
-public:
-    specifier_string_list(char id, int tag_id)
-        : specifier(id, tag_id)
-    {
-    }
-
-    bool do_format(QString& slice, const song& s) const override;
-};
-
-class specifier_date : public specifier {
-public:
-    specifier_date(char id, int tag_id)
-        : specifier(id, tag_id)
-    {
-    }
-
-    bool do_format(QString& slice, const song& s) const override;
-};
-*/
 extern const std::vector<std::unique_ptr<specifier>>& get_specifiers();
 
 }

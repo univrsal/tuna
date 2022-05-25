@@ -28,7 +28,7 @@
 window_source::window_source()
     : music_source(S_SOURCE_WINDOW_TITLE, T_SOURCE_WINDOW_TITLE, new window_title)
 {
-    m_capabilities = CAP_TITLE;
+    supported_metadata({ meta::TITLE });
 }
 
 bool window_source::enabled() const

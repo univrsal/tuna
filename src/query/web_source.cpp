@@ -23,7 +23,7 @@
 web_source::web_source()
     : music_source(S_SOURCE_WEB, T_SOURCE_WEB)
 {
-    m_capabilities = CAP_ARTIST | CAP_TITLE | CAP_ALBUM | CAP_PROGRESS | CAP_TIME_LEFT | CAP_DURATION | CAP_COVER;
+    supported_metadata({ meta::ARTIST, meta::TITLE, meta::ALBUM, meta::PROGRESS, meta::DURATION, meta::COVER });
 }
 
 void web_source::refresh()

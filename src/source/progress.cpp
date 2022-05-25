@@ -38,7 +38,7 @@ void progress_source::tick(float seconds)
     m_state = tmp.state();
     if (m_state == state_playing) {
         seconds *= 1000; /* s -> ms */
-        if ((tmp.data() & CAP_DURATION) && (tmp.data() & CAP_PROGRESS)) {
+        if (tmp.has<meta::DURATION>() && tmp.has<meta::PROGRESS>()) {
             if (tmp.progress_ms() != m_synced_progress) {
                 m_synced_progress = tmp.progress_ms();
                 m_adjusted_progress = m_synced_progress + seconds;

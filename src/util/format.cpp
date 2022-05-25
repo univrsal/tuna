@@ -50,13 +50,13 @@ QString time_format(int32_t ms)
 void init()
 {
     /* Register format specifiers with their data */
-    specifiers.emplace_back(new specifier("title", CAP_TITLE, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("title", meta::TITLE, [](song const& s) -> QString {
         return s.title();
     }));
-    specifiers.emplace_back(new specifier("album", CAP_ALBUM, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("album", meta::ALBUM, [](song const& s) -> QString {
         return s.album();
     }));
-    specifiers.emplace_back(new specifier("release_date", CAP_RELEASE, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("release_date", meta::RELEASE, [](song const& s) -> QString {
         if (s.release_precision() == prec_day)
             return QString("%1.%2.%3").arg(s.year(), s.month(), s.day());
         if (s.release_precision() == prec_month)
@@ -65,40 +65,40 @@ void init()
             return s.year();
         return "";
     }));
-    specifiers.emplace_back(new specifier("release_year", CAP_RELEASE, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("release_year", meta::RELEASE, [](song const& s) -> QString {
         return s.year();
     }));
-    specifiers.emplace_back(new specifier("release_month", CAP_RELEASE, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("release_month", meta::RELEASE, [](song const& s) -> QString {
         return s.month();
     }));
-    specifiers.emplace_back(new specifier("release_day", CAP_RELEASE, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("release_day", meta::RELEASE, [](song const& s) -> QString {
         return s.day();
     }));
-    specifiers.emplace_back(new specifier("label", CAP_LABEL, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("label", meta::LABEL, [](song const& s) -> QString {
         return s.label();
     }));
-    specifiers.emplace_back(new specifier("file_name", CAP_FILE_NAME, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("file_name", meta::FILE_NAME, [](song const& s) -> QString {
         return s.file_name();
     }));
-    specifiers.emplace_back(new specifier("first_artist", CAP_ARTIST, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("first_artist", meta::ARTIST, [](song const& s) -> QString {
         return s.artists().count() > 0 ? s.artists()[0] : "";
     }));
-    specifiers.emplace_back(new specifier("artists", CAP_ARTIST, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("artists", meta::ARTIST, [](song const& s) -> QString {
         return s.artists().count() > 0 ? s.artists().join(", ") : "";
     }));
-    specifiers.emplace_back(new specifier("track_number", CAP_TRACK_NUMBER, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("track_number", meta::TRACK_NUMBER, [](song const& s) -> QString {
         return QString::number(s.track_number());
     }));
-    specifiers.emplace_back(new specifier("disc_number", CAP_DISC_NUMBER, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("disc_number", meta::DISC_NUMBER, [](song const& s) -> QString {
         return QString::number(s.disc_number());
     }));
-    specifiers.emplace_back(new specifier("progress", CAP_PROGRESS, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("progress", meta::PROGRESS, [](song const& s) -> QString {
         return time_format(s.progress_ms());
     }));
-    specifiers.emplace_back(new specifier("duration", CAP_DURATION, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("duration", meta::DURATION, [](song const& s) -> QString {
         return time_format(s.duration_ms());
     }));
-    specifiers.emplace_back(new specifier("time_left", CAP_TIME_LEFT, [](song const& s) -> QString {
+    specifiers.emplace_back(new specifier("time_left", { meta::PROGRESS, meta::DURATION }, [](song const& s) -> QString {
         return time_format(s.duration_ms() - s.progress_ms());
     }));
     specifiers.emplace_back(new static_specifier("line_break", [](song const& s) -> QString {
@@ -156,7 +156,7 @@ bool execute(QString& q)
             bool formatting = false;
             if (auto* spec = handle_specifier(it, truncate, uppercase, formatting)) {
                 auto data = spec->get_data(src_ref->song_info());
-                if (!(src_ref->get_capabilities() & spec->get_required_caps()))
+                if (!src_ref->provides_metadata(spec->get_required_caps()))
                     result = false;
                 if (truncate > 0 && data.length() > truncate) {
                     data.truncate(truncate);
@@ -172,7 +172,8 @@ bool execute(QString& q)
                 result = false;
             }
         } else {
-            q += *it;
+            if (it != copy.end())
+                q += *it;
         }
         if (it == copy.end())
             return result;

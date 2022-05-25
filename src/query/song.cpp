@@ -32,7 +32,7 @@ song::song()
 
 void song::clear()
 {
-    m_data = 0x0;
+    m_data.fill(false);
     m_title = "";
     m_album = "";
     m_cover = "n/a";
@@ -78,102 +78,92 @@ void song::append_artist(const QString& a)
 {
     if (!a.isEmpty())
         m_artists.append(a);
-    if (!m_artists.isEmpty())
-        m_data |= CAP_ARTIST;
+    m_data[meta::ARTIST] = m_artists.isEmpty();
 }
 
 void song::set_file_name(const QString& f)
 {
-    if (!f.isEmpty()) {
-        m_file_name = f;
-        m_data |= CAP_FILE_NAME;
-    }
+    m_data[meta::FILE_NAME] = true;
+    m_file_name = f;
 }
 
 void song::set_label(const QString& l)
 {
-    if (!l.isEmpty())
-        m_data |= CAP_LABEL;
+    m_data[meta::LABEL] = !l.isEmpty();
     m_label = l;
 }
 
 void song::set_cover_link(const QString& link)
 {
-    if (!link.isEmpty())
-        m_data |= CAP_COVER;
+    m_data[meta::COVER] = !link.isEmpty();
     m_cover = link;
 }
 
 void song::set_title(const QString& title)
 {
-    if (!title.isEmpty())
-        m_data |= CAP_TITLE;
+    m_data[meta::TITLE] = !title.isEmpty();
     m_title = util::remove_extensions(title);
 }
 
 void song::set_duration(int ms)
 {
-    if (ms > 0)
-        m_data |= CAP_DURATION;
+    m_data[meta::DURATION] = ms > 0;
     m_duration_ms = ms;
 }
 
 void song::set_progress(int ms)
 {
-    m_data |= CAP_PROGRESS;
+    m_data[meta::PROGRESS] = ms > 0;
     m_progress_ms = ms;
 }
 
 void song::set_album(const QString& album)
 {
-    if (!album.isEmpty())
-        m_data |= CAP_ALBUM;
+    m_data[meta::ALBUM] = !album.isEmpty();
     m_album = album;
 }
 
 void song::set_explicit(bool e)
 {
-    m_data |= CAP_EXPLICIT;
+    m_data[meta::EXPLICIT] = true;
     m_is_explicit = e;
 }
 
 void song::set_state(play_state p)
 {
-    m_data |= CAP_STATUS;
+    m_data[meta::STATUS] = true;
     m_playing_state = p;
 }
 
 void song::set_disc_number(int i)
 {
-    if (i > 0)
-        m_data |= CAP_DISC_NUMBER;
+    m_data[meta::DISC_NUMBER] = i > 0;
     m_disc_number = i;
 }
 
 void song::set_track_number(int i)
 {
-    if (i > 0)
-        m_data |= CAP_TRACK_NUMBER;
+    m_data[meta::TRACK_NUMBER] = i > 0;
     m_track_number = i;
 }
 
 void song::set_year(const QString& y)
 {
-    m_data |= CAP_RELEASE;
+    m_data[meta::RELEASE] = true;
     m_year = y;
     update_release_precision();
 }
 
 void song::set_month(const QString& m)
 {
-    m_data |= CAP_RELEASE;
+    m_data[meta::RELEASE] = true;
     m_month = m;
     update_release_precision();
 }
 
 void song::set_day(const QString& d)
 {
-    m_data |= CAP_RELEASE;
+    m_data[meta::RELEASE] = true;
     m_day = d;
     update_release_precision();
 }
@@ -227,17 +217,19 @@ void song::to_json(QJsonObject& obj) const
     }
     obj["status"] = status;
 
-    if (m_data & CAP_COVER) {
+    if (m_data[meta::COVER]) {
         // Actual file:// url (can't be used in the browser source anymore)
+        // also this can be the place holder when there's no cover
+        // even if fetching from itunes is enabled so cover_url should be used
         obj["cover_path"] = m_cover;
         // Just points to the /cover.png end point
         obj["cover_url"] = QString("http://localhost:%1/cover.png").arg(QString::number(config::webserver_port));
     }
 
-    if (m_data & CAP_LYRICS)
+    if (has<meta::LYRICS>())
         obj["lyrics_url"] = m_lyrics;
 
-    if (m_data & CAP_ARTIST) {
+    if (has<meta::ARTIST>()) {
         QJsonArray list;
         for (const auto& artist : m_artists) {
             list.append(artist);
@@ -245,7 +237,7 @@ void song::to_json(QJsonObject& obj) const
         obj["artists"] = list;
     }
 
-    if (m_data & CAP_RELEASE) {
+    if (has<meta::RELEASE>()) {
         QJsonObject release;
         QString precision = "unknown";
         switch (m_release_precision) {

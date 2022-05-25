@@ -29,7 +29,8 @@
 mpd_source::mpd_source()
     : music_source(S_SOURCE_MPD, T_SOURCE_MPD, new mpd)
 {
-    m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_LYRICS | CAP_DURATION | CAP_DISC_NUMBER | CAP_TRACK_NUMBER | CAP_PROGRESS | CAP_STATUS | CAP_LABEL | CAP_FILE_NAME | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
+    m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER, meta::PROGRESS, meta::STATUS, meta::LABEL, meta::FILE_NAME });
     m_address = nullptr;
     m_port = 0;
 }

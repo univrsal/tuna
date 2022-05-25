@@ -25,7 +25,7 @@
 gpmdp_source::gpmdp_source()
     : music_source(S_SOURCE_GPMDP, T_SOURCE_GPMDP)
 {
-    m_capabilities = CAP_ALBUM | CAP_TITLE | CAP_ARTIST | CAP_STATUS | CAP_DURATION | CAP_PROGRESS | CAP_COVER;
+    supported_metadata({ meta::ALBUM, meta::TITLE, meta::ARTIST, meta::STATUS, meta::DURATION, meta::PROGRESS, meta::COVER });
 #if _WIN32
     m_path = qgetenv("APPDATA") + "/Google Play Music Desktop Player/json_store/playback.json";
 #elif __unix__

@@ -47,7 +47,8 @@ spotify_source::spotify_source()
     : music_source(S_SOURCE_SPOTIFY, T_SOURCE_SPOTIFY, new spotify)
 {
     build_credentials();
-    m_capabilities = CAP_TITLE | CAP_ARTIST | CAP_ALBUM | CAP_RELEASE | CAP_COVER | CAP_DURATION | CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG | CAP_STATUS;
+    m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG;
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::STATUS });
 }
 
 bool spotify_source::enabled() const
@@ -513,7 +514,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
         timeout = 5 * timeout_multiplier++;
         berr(
             "CURL failed while sending spotify command (HTTP error %i, cURL error %i: '%s'). Waiting %i seconds before trying again",
-            http_code, res, curl_easy_strerror(res), timeout);
+            int(http_code), res, curl_easy_strerror(res), timeout);
     }
 
     curl_slist_free_all(list);

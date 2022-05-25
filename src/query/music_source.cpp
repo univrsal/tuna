@@ -136,42 +136,6 @@ std::shared_ptr<music_source> selected_source()
     return nullptr;
 }
 
-QString capability_to_string(capability c)
-{
-    switch (c) {
-    default:
-        return utf8_to_qt("invalid");
-    case CAP_ALBUM:
-        return utf8_to_qt("album");
-    case CAP_ARTIST:
-        return utf8_to_qt("artist");
-    case CAP_COVER:
-        return utf8_to_qt("cover");
-    case CAP_DISC_NUMBER:
-        return utf8_to_qt("disc_number");
-    case CAP_DURATION:
-        return utf8_to_qt("duration");
-    case CAP_EXPLICIT:
-        return utf8_to_qt("is_explicit");
-    case CAP_LABEL:
-        return utf8_to_qt("label");
-    case CAP_LYRICS:
-        return utf8_to_qt("lyrics");
-    case CAP_PROGRESS:
-        return utf8_to_qt("progress");
-    case CAP_RELEASE:
-        return utf8_to_qt("release");
-    case CAP_STATUS:
-        return utf8_to_qt("status");
-    case CAP_TIME_LEFT:
-        return utf8_to_qt("time_left");
-    case CAP_TITLE:
-        return utf8_to_qt("title");
-    case CAP_TRACK_NUMBER:
-        return utf8_to_qt("track_number");
-    }
-}
-
 void deinit()
 {
     /* check if all source references were decreased correctly */
@@ -255,7 +219,7 @@ void music_source::handle_cover()
             - are paused & want a placeholder when paused   -> reset cover
             - do not have a cover                           -> try downloading cover
         */
-        if (!(m_current.data() & CAP_COVER))
+        if (!m_current.has<meta::COVER>())
             download_missing_cover();
         else
             util::reset_cover();

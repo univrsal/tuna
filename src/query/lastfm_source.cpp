@@ -33,7 +33,7 @@ long lastfm_request(QJsonDocument& response_json, const QString& url);
 lastfm_source::lastfm_source()
     : music_source(S_SOURCE_LAST_FM, T_SOURCE_LASTFM, new lastfm)
 {
-    m_capabilities = CAP_ALBUM | CAP_COVER | CAP_TITLE | CAP_ARTIST | CAP_DURATION;
+    supported_metadata({ meta::ALBUM, meta::COVER, meta::TITLE, meta::ARTIST, meta::DURATION });
 }
 
 void lastfm_source::load()

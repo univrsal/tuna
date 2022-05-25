@@ -90,7 +90,7 @@ void download_lyrics(const song& song)
 {
     static QString last_lyrics = "";
 
-    if (song.data() & CAP_LYRICS && last_lyrics != song.lyrics()) {
+    if (song.has<meta::LYRICS>() && last_lyrics != song.lyrics()) {
         last_lyrics = song.lyrics();
         if (!curl_download(qt_to_utf8(song.lyrics()), qt_to_utf8(config::lyrics_path))) {
             berr("Couldn't dowload lyrics from '%s' to '%s'", qt_to_utf8(song.lyrics()), qt_to_utf8(config::lyrics_path));

@@ -27,7 +27,7 @@
 icecast_source::icecast_source()
     : music_source(S_SOURCE_ICECAST, T_SOURCE_ICECAST, new icecast)
 {
-    m_capabilities = CAP_TITLE;
+    supported_metadata({ meta::TITLE });
 }
 
 void icecast_source::load()

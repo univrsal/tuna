@@ -19,6 +19,7 @@
 #pragma once
 #include <QList>
 #include <QString>
+#include <array>
 #include <stdint.h>
 
 class QJsonObject;
@@ -33,8 +34,52 @@ enum play_state { state_playing,
     state_stopped,
     state_unknown };
 
+namespace meta {
+enum type : uint8_t {
+    NONE,
+    TITLE,
+    ARTIST,
+    ALBUM,
+    RELEASE,
+    COVER,
+    LYRICS,
+    DURATION,
+    EXPLICIT,
+    DISC_NUMBER,
+    TRACK_NUMBER,
+    PROGRESS,
+    STATUS,
+    LABEL,
+    FILE_NAME,
+
+    /* VLC source specific */
+    GENRE,
+    COPYRIGHT,
+    DESCRIPTION,
+    RATING,
+    DATE,
+    SETTING,
+    URL,
+    LANGUAGE,
+    NOW_PLAYING,
+    PUBLISHER,
+    ENCODED_BY,
+    ARTWORK_URL,
+    TRACK_TOTAL,
+    DIRECTOR,
+    SEASON,
+    EPISODE,
+    SHOW_NAME,
+    ACTORS,
+    ALBUM_ARTIST,
+    DISC_TOTAL,
+
+    COUNT
+};
+}
+
 class song {
-    uint32_t m_data;
+    std::array<bool, meta::COUNT> m_data;
     QString m_title, m_album, m_cover, m_lyrics, m_label;
     QList<QString> m_artists;
     QString m_year, m_month, m_day, m_full_release, m_file_name;
@@ -69,8 +114,6 @@ public:
     bool is_explicit() const { return m_is_explicit; }
 
     bool has_cover_lookup_information() const;
-    uint32_t data() const { return m_data; }
-    bool has(uint32_t cap) const { return m_data & cap; }
     const QString& file_name() const { return m_file_name; }
     const QString& album() const { return m_album; }
     const QString& cover() const { return m_cover; }
@@ -86,6 +129,7 @@ public:
     int32_t track_number() const { return m_track_number; }
     int32_t disc_number() const { return m_disc_number; }
 
+    std::array<bool, meta::COUNT> const& data() const { return m_data; }
     date_precision release_precision() const { return m_release_precision; }
 
     bool operator==(const song& other) const;
@@ -93,4 +137,10 @@ public:
 
     void to_json(QJsonObject& obj) const;
     void from_json(const QJsonObject& obj);
+
+    template<uint8_t T>
+    bool has() const
+    {
+        return m_data[T];
+    }
 };
