@@ -1,6 +1,6 @@
 /*************************************************************************
  * This file is part of tuna
- * github.com/univrsal/tuna
+ * git.vrsal.xyz/alex/tuna
  * Copyright 2022 univrsal <uni@vrsal.xyz>.
  *
  * This program is free software: you can redistribute it and/or modify
