@@ -150,11 +150,6 @@ void song::from_json(const QJsonObject& obj)
     clear();
     m_data = obj;
 
-    // TODO: the json object should use "cover"
-    auto cover = obj["cover_url"];
-    if (cover.isString())
-        set(meta::COVER, cover.toString());
-
     auto release = obj["release_date"];
     if (release.isObject()) {
         if (release["precision"].isString()) {
