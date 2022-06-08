@@ -48,8 +48,6 @@ void progress_source::tick(float seconds)
                 m_adjusted_progress = float(m_synced_progress) + seconds;
             } else {
                 auto catchup = diff / 3000.f;
-                if (diff > 0)
-                    bdebug("Catchup %f, diff %f", catchup, diff);
                 // basically speed up the progress bar if we are behind on the actual position
                 // or slow it down if we are ahead. Speedup/slowdown at most 2% of seconds
                 m_adjusted_progress += seconds * (1 + catchup * (seconds * 0.04));
