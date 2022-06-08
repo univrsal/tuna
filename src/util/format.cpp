@@ -21,6 +21,8 @@
 #include "../query/song.hpp"
 #include "../util/config.hpp"
 #include "../util/tuna_thread.hpp"
+#include <QJsonDocument>
+#include <QLocale>
 
 namespace format {
 
@@ -50,59 +52,76 @@ QString time_format(int32_t ms)
 void init()
 {
     /* Register format specifiers with their data */
-    specifiers.emplace_back(new specifier("title", meta::TITLE, [](song const& s) -> QString {
-        return s.title();
+    specifiers.emplace_back(new specifier("title", meta::TITLE));
+    specifiers.emplace_back(new specifier("album", meta::ALBUM));
+    specifiers.emplace_back(new specifier("label", meta::LABEL));
+    specifiers.emplace_back(new specifier("file_name", meta::FILE_NAME));
+
+    specifiers.emplace_back(new specifier("release_day", meta::RELEASE_DAY, [](song const& s) -> QString {
+        return QString::number(s.get<int>(meta::RELEASE_DAY));
     }));
-    specifiers.emplace_back(new specifier("album", meta::ALBUM, [](song const& s) -> QString {
-        return s.album();
+    specifiers.emplace_back(new specifier("release_month", meta::RELEASE_MONTH, [](song const& s) -> QString {
+        return QString::number(s.get<int>(meta::RELEASE_MONTH));
     }));
+    specifiers.emplace_back(new specifier("release_year", meta::RELEASE_YEAR, [](song const& s) -> QString {
+        return QString::number(s.get<int>(meta::RELEASE_YEAR));
+    }));
+
     specifiers.emplace_back(new specifier("release_date", meta::RELEASE, [](song const& s) -> QString {
-        if (s.release_precision() == prec_day)
-            return QString("%1.%2.%3").arg(s.year(), s.month(), s.day());
-        if (s.release_precision() == prec_month)
-            return QString("%1.%2").arg(s.year(), s.month());
-        if (s.release_precision() == prec_year)
-            return s.year();
+        auto day = s.has(meta::RELEASE_DAY);
+        auto month = s.has(meta::RELEASE_MONTH);
+        auto year = s.has(meta::RELEASE_YEAR);
+
+        if (day && month && year) {
+            QDate d;
+            d.setDate(s.get<int>(meta::RELEASE_YEAR), s.get<int>(meta::RELEASE_MONTH), s.get<int>(meta::RELEASE_DAY));
+            return QLocale::system().toString(d, QLocale::ShortFormat);
+        } else if (month && year) {
+            return QString("%1.%2").arg(s.get<int>(meta::RELEASE_YEAR), s.get<int>(meta::RELEASE_MONTH));
+        } else if (year) {
+            return QString::number(s.get<int>(meta::RELEASE_YEAR));
+        }
         return "";
     }));
-    specifiers.emplace_back(new specifier("release_year", meta::RELEASE, [](song const& s) -> QString {
-        return s.year();
-    }));
-    specifiers.emplace_back(new specifier("release_month", meta::RELEASE, [](song const& s) -> QString {
-        return s.month();
-    }));
-    specifiers.emplace_back(new specifier("release_day", meta::RELEASE, [](song const& s) -> QString {
-        return s.day();
-    }));
-    specifiers.emplace_back(new specifier("label", meta::LABEL, [](song const& s) -> QString {
-        return s.label();
-    }));
-    specifiers.emplace_back(new specifier("file_name", meta::FILE_NAME, [](song const& s) -> QString {
-        return s.file_name();
-    }));
+
     specifiers.emplace_back(new specifier("first_artist", meta::ARTIST, [](song const& s) -> QString {
-        return s.artists().count() > 0 ? s.artists()[0] : "";
+        auto l = s.get<QStringList>(meta::ARTIST);
+        if (!l.isEmpty())
+            return l[0];
+        return "";
     }));
     specifiers.emplace_back(new specifier("artists", meta::ARTIST, [](song const& s) -> QString {
-        return s.artists().count() > 0 ? s.artists().join(", ") : "";
+        return s.get<QStringList>(meta::ARTIST).join(", ");
     }));
     specifiers.emplace_back(new specifier("track_number", meta::TRACK_NUMBER, [](song const& s) -> QString {
-        return QString::number(s.track_number());
+        return QString::number(s.get<int>(meta::TRACK_NUMBER));
     }));
     specifiers.emplace_back(new specifier("disc_number", meta::DISC_NUMBER, [](song const& s) -> QString {
-        return QString::number(s.disc_number());
+        return QString::number(s.get<int>(meta::DISC_NUMBER));
     }));
     specifiers.emplace_back(new specifier("progress", meta::PROGRESS, [](song const& s) -> QString {
-        return time_format(s.progress_ms());
+        return time_format(s.get<int>(meta::PROGRESS));
     }));
     specifiers.emplace_back(new specifier("duration", meta::DURATION, [](song const& s) -> QString {
-        return time_format(s.duration_ms());
+        return time_format(s.get<int>(meta::DURATION));
     }));
     specifiers.emplace_back(new specifier("time_left", { meta::PROGRESS, meta::DURATION }, [](song const& s) -> QString {
-        return time_format(s.duration_ms() - s.progress_ms());
+        return time_format(s.get<int>(meta::DURATION) - s.get<int>(meta::PROGRESS));
     }));
     specifiers.emplace_back(new static_specifier("line_break", [](song const& s) -> QString {
         return "\n";
+    }));
+    specifiers.emplace_back(new static_specifier("json_compact", [](song const& s) -> QString {
+        QJsonObject obj;
+        s.to_json(obj);
+        QJsonDocument doc(obj);
+        return QString(doc.toJson(QJsonDocument::Compact));
+    }));
+    specifiers.emplace_back(new static_specifier("json_formatted", [](song const& s) -> QString {
+        QJsonObject obj;
+        s.to_json(obj);
+        QJsonDocument doc(obj);
+        return QString(doc.toJson(QJsonDocument::Indented));
     }));
 }
 

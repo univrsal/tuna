@@ -156,7 +156,6 @@ void spotify_source::refresh()
 
     if (response.isObject())
         obj = response.object();
-    const QString str(response.toJson());
 
     if (http_code == HTTP_OK) {
         const auto& progress = obj["progress_ms"];
@@ -166,7 +165,7 @@ void spotify_source::refresh()
 
         /* If an ad is playing we assume playback is paused */
         if (play_type.isString() && play_type.toString() == "ad") {
-            m_current.set_state(state_paused);
+            m_current.set(meta::STATUS, state_paused);
             return;
         }
 
@@ -175,14 +174,14 @@ void spotify_source::refresh()
                 berr("Spotify session is private! Can't read track");
             } else {
                 parse_track_json(obj["item"]);
-                m_current.set_state(playing.toBool() ? state_playing : state_stopped);
+                m_current.set(meta::STATUS, playing.toBool() ? state_playing : state_stopped);
             }
-            m_current.set_progress(progress.toInt());
+            m_current.set(meta::PROGRESS, progress.toInt());
         } else {
             QString str(response.toJson());
             berr("Couldn't fetch song data from spotify json: %s", str.toStdString().c_str());
         }
-        m_last_state = m_current.state();
+        m_last_state = m_current.get<int>(meta::STATUS);
     } else if (http_code == HTTP_NO_CONTENT) {
         /* No session running */
         m_current.clear();
@@ -210,25 +209,27 @@ void spotify_source::parse_track_json(const QJsonValue& track)
 
     m_current.clear();
 
+    QStringList tmp;
     /* Get All artists */
     for (const auto& artist : qAsConst(artists))
-        m_current.append_artist(artist.toObject()["name"].toString());
+        tmp.append(artist.toObject()["name"].toString());
+    m_current.set(meta::ARTIST, tmp);
 
     /* Cover link */
     const auto& covers = album["images"];
     if (covers.isArray()) {
         const QJsonValue v = covers.toArray()[0];
         if (v.isObject() && v.toObject().contains("url"))
-            m_current.set_cover_link(v.toObject()["url"].toString());
+            m_current.set(meta::COVER, v.toObject()["url"].toString());
     }
 
     /* Other stuff */
-    m_current.set_title(trackObj["name"].toString());
-    m_current.set_duration(trackObj["duration_ms"].toInt());
-    m_current.set_album(album["name"].toString());
-    m_current.set_explicit(trackObj["explicit"].toBool());
-    m_current.set_disc_number(trackObj["disc_number"].toInt());
-    m_current.set_track_number(trackObj["track_number"].toInt());
+    m_current.set(meta::TITLE, trackObj["name"].toString());
+    m_current.set(meta::DURATION, trackObj["duration_ms"].toInt());
+    m_current.set(meta::ALBUM, album["name"].toString());
+    m_current.set(meta::EXPLICIT, trackObj["explicit"].toBool());
+    m_current.set(meta::DISC_NUMBER, trackObj["disc_number"].toInt());
+    m_current.set(meta::TRACK_NUMBER, trackObj["track_number"].toInt());
 
     /* Release date */
     const auto& date = album["release_date"].toString();
@@ -236,13 +237,13 @@ void spotify_source::parse_track_json(const QJsonValue& track)
         QStringList list = date.split("-");
         switch (list.length()) {
         case 3:
-            m_current.set_day(list[2]);
+            m_current.set(meta::RELEASE_DAY, list[2]);
             [[clang::fallthrough]];
         case 2:
-            m_current.set_month(list[1]);
+            m_current.set(meta::RELEASE_MONTH, list[1]);
             [[clang::fallthrough]];
         case 1:
-            m_current.set_year(list[0]);
+            m_current.set(meta::RELEASE_YEAR, list[0]);
         }
     }
 }
@@ -255,7 +256,7 @@ bool spotify_source::execute_capability(capability c)
 
     switch (c) {
     case CAP_PLAY_PAUSE:
-        if (m_current.state() == state_playing) {
+        if (m_current.get<int>(meta::STATUS) == state_playing) {
             [[clang::fallthrough]];
         case CAP_STOP_SONG:
             http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, "PUT");

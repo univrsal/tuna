@@ -29,8 +29,17 @@
 vlc_obs_source::vlc_obs_source()
     : music_source(S_SOURCE_VLC, T_SOURCE_VLC, new vlc)
 {
-    m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
-    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER, meta::PROGRESS, meta::STATUS, meta::LABEL, meta::FILE_NAME });
+    /* clang-format off */
+    m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE |
+        CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE,
+        meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER,
+        meta::PROGRESS, meta::STATUS, meta::LABEL, meta::FILE_NAME,
+        meta::GENRE, meta::COPYRIGHT, meta::DESCRIPTION, meta::RATING, meta::DATE,
+        meta::SETTING, meta::URL, meta::LANGUAGE, meta::NOW_PLAYING, meta::PUBLISHER,
+        meta::ENCODED_BY, meta::ARTWORK_URL, meta::TRACK_TOTAL, meta::DIRECTOR, meta::SEASON,
+        meta::EPISODE, meta::SHOW_NAME, meta::ALBUM_ARTIST, meta::DISC_TOTAL });
+    /* clang-format on */
 }
 
 vlc_obs_source::~vlc_obs_source()
@@ -52,7 +61,7 @@ bool vlc_obs_source::reload()
             result = obs_source_showing(src);
             if (!result) {
                 m_current.clear();
-                m_current.set_state(state_stopped);
+                m_current.set(meta::STATUS, state_stopped);
             }
             obs_source_release(src);
         } else {
@@ -183,11 +192,11 @@ void vlc_obs_source::refresh()
 
     begin_refresh();
     m_current.clear();
-    m_current.set_state(from_obs_state(obs_source_media_get_state(src)));
+    m_current.set(meta::STATUS, from_obs_state(obs_source_media_get_state(src)));
 
     /* Prevent polling when vlc is stopped, which otherwise could cause a crash
        when closing obs */
-    if (m_current.state() == state_stopped) {
+    if (m_current.get<int>(meta::STATUS) == state_stopped) {
         obs_source_release(src);
         return;
     }
@@ -210,38 +219,26 @@ void vlc_obs_source::refresh()
         return utf8_to_qt(result);
     };
 
-    m_current.set_progress(obs_source_media_get_time(src));
-    m_current.set_duration(obs_source_media_get_duration(src));
+    m_current.set(meta::PROGRESS, (int)obs_source_media_get_time(src));
+    m_current.set(meta::DURATION, (int)obs_source_media_get_duration(src));
 
-    if (m_current.state() <= state_paused) {
-        auto artwork_url = get_meta("artwork_url");
-        auto title = get_meta("title");
-        auto artist = get_meta("artist");
-        auto date = get_meta("date");
-        auto album = get_meta("album");
-        auto publisher = get_meta("publisher");
-        auto track_number = get_meta("track_number");
-        auto disc_number = get_meta("disc_number");
-        auto file_url = get_meta("url");
+    if (m_current.get<int>(meta::STATUS) <= state_paused) {
+#define check(t, d)        \
+    auto t = get_meta(#t); \
+    if (t != "")           \
+    m_current.set(d, t)
 
-        if (file_url != "")
-            m_current.set_file_name(file_url);
-        if (artwork_url != "")
-            m_current.set_cover_link(artwork_url);
-        if (title != "")
-            m_current.set_title(title);
-        if (artist != "")
-            m_current.append_artist(artist);
-        if (date != "")
-            m_current.set_year(date);
-        if (album != "")
-            m_current.set_album(album);
-        if (publisher != "")
-            m_current.set_label(publisher);
-        if (track_number != "")
-            m_current.set_track_number(track_number.toUInt());
-        if (disc_number != "")
-            m_current.set_track_number(disc_number.toUInt());
+        check(artwork_url, meta::COVER);
+        check(title, meta::TITLE);
+        check(artist, meta::ARTIST);
+        check(date, meta::RELEASE);
+        check(album, meta::ALBUM);
+        check(publisher, meta::LABEL);
+        check(track_number, meta::TRACK_NUMBER);
+        check(disc_number, meta::DISC_NUMBER);
+        check(url, meta::FILE_NAME);
+        check(genre, meta::GENRE);
+#undef check
     }
 
     calldata_destroy(cd);

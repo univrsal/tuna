@@ -23,7 +23,6 @@
 #include <QDateTime>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonValue>
 #include <ctime>
 extern "C" {
 #include <mongoose.h>
@@ -91,11 +90,12 @@ static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
 {
     /* Parse POST data JSON */
     QByteArray arr = QByteArray(msg->body.ptr, msg->body.len);
-    QJsonParseError err;
+    QJsonParseError err{};
     QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
 
     if (err.error == QJsonParseError::NoError && doc.isObject()) {
         auto data = doc.object()["data"];
+
         if (data.isObject()) {
             std::lock_guard<std::mutex> lock(current_song_mutex);
             current_song.from_json(data.toObject());

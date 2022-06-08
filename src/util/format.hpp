@@ -41,18 +41,30 @@ public:
     virtual ~specifier() = default;
     specifier() = default;
 
-    specifier(const char* id, std::vector<meta::type> caps, std::function<QString(const song&)> data_getter)
+    specifier(const char* id, std::vector<meta::type> caps, std::function<QString(const song&)> data_getter = nullptr)
         : m_id(id)
-        , m_data_getter(data_getter)
         , m_required_caps(caps)
     {
+        if (data_getter) {
+            m_data_getter = data_getter;
+        } else {
+            m_data_getter = [this](song const& s) -> QString {
+                return s.get(m_required_caps[0]);
+            };
+        }
     }
 
-    specifier(const char* id, meta::type cap, std::function<QString(const song&)> data_getter)
+    specifier(const char* id, meta::type cap, std::function<QString(const song&)> data_getter = nullptr)
         : m_id(id)
-        , m_data_getter(data_getter)
         , m_required_caps({ cap })
     {
+        if (data_getter) {
+            m_data_getter = data_getter;
+        } else {
+            m_data_getter = [this](song const& s) -> QString {
+                return s.get(m_required_caps[0]);
+            };
+        }
     }
 
     const QString& get_id() const { return m_id; }

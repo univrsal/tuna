@@ -90,10 +90,11 @@ void download_lyrics(const song& song)
 {
     static QString last_lyrics = "";
 
-    if (song.has<meta::LYRICS>() && last_lyrics != song.lyrics()) {
-        last_lyrics = song.lyrics();
-        if (!curl_download(qt_to_utf8(song.lyrics()), qt_to_utf8(config::lyrics_path))) {
-            berr("Couldn't dowload lyrics from '%s' to '%s'", qt_to_utf8(song.lyrics()), qt_to_utf8(config::lyrics_path));
+    auto l = song.get(meta::LYRICS);
+    if (!l.isEmpty() && l != last_lyrics) {
+        last_lyrics = l;
+        if (!curl_download(qt_to_utf8(l), qt_to_utf8(config::lyrics_path))) {
+            berr("Couldn't dowload lyrics from '%s' to '%s'", qt_to_utf8(l), qt_to_utf8(config::lyrics_path));
         }
     }
 }
@@ -162,7 +163,7 @@ void handle_outputs(const song& s)
         tmp_text = o.format;
         format::execute(tmp_text);
 
-        if (tmp_text.isEmpty() || s.state() >= state_paused) {
+        if (tmp_text.isEmpty() || s.get<int>(meta::STATUS) >= state_paused) {
             tmp_text = config::placeholder;
             /* OBS seems to cut leading and trailing spaces
              * when loading the config file so this workaround
@@ -170,7 +171,7 @@ void handle_outputs(const song& s)
             tmp_text.replace("%s", " ");
             tmp_text.replace("%e", "\n");
         }
-        if (s.state() >= state_paused && o.log_mode)
+        if (s.get<int>(meta::STATUS) >= state_paused && o.log_mode)
             continue; /* No song playing text doesn't make sense in the log */
         write_song(o, tmp_text);
     }

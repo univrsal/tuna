@@ -23,6 +23,7 @@
 #include "../util/config.hpp"
 #include "../util/cover_tag_handler.hpp"
 #include "../util/utility.hpp"
+#include <QStringList>
 #include <obs-module.h>
 #include <taglib/fileref.h>
 
@@ -30,7 +31,7 @@ mpd_source::mpd_source()
     : music_source(S_SOURCE_MPD, T_SOURCE_MPD, new mpd)
 {
     m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
-    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER, meta::PROGRESS, meta::STATUS, meta::LABEL, meta::FILE_NAME });
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::RELEASE_DAY, meta::RELEASE_MONTH, meta::RELEASE_YEAR, meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER, meta::PROGRESS, meta::STATUS, meta::LABEL, meta::FILE_NAME });
     m_address = nullptr;
     m_port = 0;
 }
@@ -117,8 +118,8 @@ void mpd_source::refresh()
 
     if (status) {
         auto new_state = mpd_status_get_state(status);
-        m_current.set_progress(mpd_status_get_elapsed_ms(status));
-        m_current.set_state(from_mpd_state(new_state));
+        m_current.set<int>(meta::PROGRESS, ((int)mpd_status_get_elapsed_ms(status)));
+        m_current.set<int>(meta::STATUS, from_mpd_state(new_state));
     }
 
 /* Thanks ubuntu for using ancient packages */
@@ -126,7 +127,7 @@ void mpd_source::refresh()
     if (mpd_song) {
         const char* title = mpd_song_get_tag(mpd_song, MPD_TAG_TITLE, 0);
         const char* artists = mpd_song_get_tag(mpd_song, MPD_TAG_ARTIST, 0);
-        const char* year = mpd_song_get_tag(mpd_song, MPD_TAG_DATE, 0);
+        const char* date = mpd_song_get_tag(mpd_song, MPD_TAG_DATE, 0);
         const char* album = mpd_song_get_tag(mpd_song, MPD_TAG_ALBUM, 0);
         const char* num = mpd_song_get_tag(mpd_song, MPD_TAG_TRACK, 0);
         const char* disc = mpd_song_get_tag(mpd_song, MPD_TAG_DISC, 0);
@@ -135,29 +136,40 @@ void mpd_source::refresh()
 #undef MPD_TAG_LABEL
 
         if (title)
-            m_current.set_title(title);
+            m_current.set(meta::TITLE, utf8_to_qt(title));
         if (artists)
-            m_current.append_artist(artists);
-        if (year)
-            m_current.set_year(year);
+            m_current.set(meta::ARTIST, QStringList(utf8_to_qt(artists)));
+        if (date) {
+            QStringList list = utf8_to_qt(date).split("-");
+            switch (list.length()) {
+            case 3:
+                m_current.set(meta::RELEASE_DAY, QString(list[2]).toInt());
+                [[clang::fallthrough]];
+            case 2:
+                m_current.set(meta::RELEASE_MONTH, QString(list[1]).toInt());
+                [[clang::fallthrough]];
+            case 1:
+                m_current.set(meta::RELEASE_YEAR, QString(list[0]).toInt());
+            }
+        }
         if (album)
-            m_current.set_album(album);
+            m_current.set(meta::ALBUM, utf8_to_qt(album));
         if (num)
-            m_current.set_track_number(QString(num).toUInt());
+            m_current.set(meta::TRACK_NUMBER, QString(num).toInt());
         if (disc)
-            m_current.set_disc_number(QString(disc).toUInt());
+            m_current.set(meta::DISC_NUMBER, QString(disc).toInt());
         if (label)
-            m_current.set_label(label);
+            m_current.set(meta::LABEL, utf8_to_qt(label));
 
         QString file_path = utf8_to_qt(uri);
         if (uri) {
             auto file = util::file_from_path(file_path);
-            m_current.set_file_name(file);
+            m_current.set(meta::FILE_NAME, file);
             if (!title)
-                m_current.set_title(util::remove_extensions(file));
+                m_current.set(meta::TITLE, util::remove_extensions(file));
         }
 
-        m_current.set_duration(mpd_song_get_duration_ms(mpd_song));
+        m_current.set(meta::DURATION, (int)mpd_song_get_duration_ms(mpd_song));
 
         /* Absolute path to current song file */
         file_path.prepend(m_base_folder);
@@ -174,7 +186,7 @@ void mpd_source::refresh()
         path = '/' + path;
         path.replace('\\', '/'); // url has to use unix separators
         path = "file://" + path;
-        m_current.set_cover_link(path);
+        m_current.set(meta::COVER, path);
     }
 
     mpd_connection_free(connection);
@@ -189,7 +201,7 @@ void mpd_source::handle_cover()
     if (m_current == m_prev)
         return;
 
-    if (m_current.state() == state_playing) {
+    if (m_current.get<int>(meta::STATUS) == state_playing) {
         bool result = false;
         QString file_path = m_song_file_path, tmp;
         if (cover::find_embedded_cover(file_path)) {
@@ -205,7 +217,7 @@ void mpd_source::handle_cover()
         }
         if (!result && !download_missing_cover())
             util::reset_cover();
-    } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
+    } else if (m_current.get<int>(meta::STATUS) != state_paused || config::placeholder_when_paused) {
         if (!download_missing_cover())
             util::reset_cover();
     }

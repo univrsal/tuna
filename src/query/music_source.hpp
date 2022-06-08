@@ -99,7 +99,7 @@ public:
     bool provides_metadata(std::vector<meta::type> const& m)
     {
         for (auto const& d : m) {
-            if (!m_supported_metadata[d])
+            if (!m_supported_metadata[d] && d != meta::NONE)
                 return false;
         }
         return true;

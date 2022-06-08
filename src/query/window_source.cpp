@@ -116,15 +116,15 @@ void window_source::refresh()
     begin_refresh();
     m_current.clear();
     if (result.isEmpty()) {
-        m_current.set_state(state_stopped);
+        m_current.set(meta::STATUS, state_stopped);
     } else {
         /* Replace & cut */
         result.replace(m_search, m_replace);
         if (0 < m_cut_end + m_cut_begin && m_cut_end + m_cut_begin < result.length())
             result = result.mid(m_cut_begin, result.length() - m_cut_begin - m_cut_end);
 
-        m_current.set_state(state_playing);
-        m_current.set_title(result);
+        m_current.set(meta::STATUS, state_playing);
+        m_current.set(meta::TITLE, result);
     }
 }
 

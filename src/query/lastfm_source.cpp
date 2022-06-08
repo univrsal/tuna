@@ -100,33 +100,33 @@ void lastfm_source::parse_song(const QJsonObject& s)
 {
     if (s["@attr"].isObject()) {
         auto attr_obj = s["@attr"].toObject();
-        m_current.set_state(attr_obj["nowplaying"].toString() == "true" ? state_playing : state_stopped);
+        m_current.set(meta::STATUS, attr_obj["nowplaying"].toString() == "true" ? state_playing : state_stopped);
 
-        if (m_current.is_playing()) {
+        if (m_current.get<int>(meta::STATUS) == state_playing) {
             auto covers = s["image"];
             if (covers.isArray() && covers.toArray().size() > 0) {
                 auto cover_array = covers.toArray();
                 auto cover = cover_array[cover_array.size() - 1];
                 if (cover.isObject())
-                    m_current.set_cover_link(cover.toObject()["#text"].toString());
+                    m_current.set(meta::COVER, cover.toObject()["#text"].toString());
             }
         }
-        util::download_cover(m_current.cover());
+        util::download_cover(m_current.get(meta::COVER));
     }
 
     if (s["artist"].isObject())
-        m_current.append_artist(s["artist"].toObject()["#text"].toString());
+        m_current.set(meta::ARTIST, s["artist"].toObject()["#text"].toString());
 
     if (s["album"].isObject())
-        m_current.set_album(s["album"].toObject()["#text"].toString());
+        m_current.set(meta::ALBUM, s["album"].toObject()["#text"].toString());
 
     if (s["name"].isString())
-        m_current.set_title(s["name"].toString());
+        m_current.set(meta::TITLE, s["name"].toString());
 
-    if (!m_current.artists().empty() && !m_current.title().isEmpty()) {
+    if (m_current.has(meta::ARTIST) && m_current.has(meta::TITLE)) {
         /* Try and get song duration */
-        QString artist = QUrl::toPercentEncoding(m_current.artists()[0]);
-        QString track = QUrl::toPercentEncoding(m_current.title());
+        QString artist = QUrl::toPercentEncoding(m_current.get<QStringList>(meta::ARTIST).at(0));
+        QString track = QUrl::toPercentEncoding(m_current.get(meta::TITLE));
         QString track_request = "https://ws.audioscrobbler.com/2.0/?method="
                                 "track.getInfo&api_key="
             + m_api_key + "&artist=" + artist + "&track=" + track + "&format=json";
@@ -141,7 +141,7 @@ void lastfm_source::parse_song(const QJsonObject& s)
                     bool ok = false;
                     int i = duration.toString().toInt(&ok);
                     if (ok)
-                        m_current.set_duration(i);
+                        m_current.set(meta::DURATION, i);
                 }
             }
         }

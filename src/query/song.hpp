@@ -17,8 +17,12 @@
  *************************************************************************/
 
 #pragma once
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QList>
+#include <QMap>
 #include <QString>
+#include <QVariant>
 #include <array>
 #include <stdint.h>
 
@@ -35,12 +39,60 @@ enum play_state { state_playing,
     state_unknown };
 
 namespace meta {
+static const char* ids[] = {
+    "none",
+    "title",
+    "artists",
+    "album",
+    "release_date",
+    "release_day",
+    "release_month",
+    "release_year",
+    "cover_path",
+    "lyrics",
+    "duration",
+    "explicit",
+    "disc_number",
+    "track_number",
+    "progress",
+    "status_id",
+    "label",
+    "file_name",
+
+    /* VLC source specific */
+    "genre",
+    "copyright",
+    "description",
+    "rating",
+    "date",
+    "setting",
+    "url",
+    "language",
+    "now_playing",
+    "publisher",
+    "encoded_by",
+    "artwork_url",
+    "track_total",
+    "director",
+    "season",
+    "episode",
+    "show_name",
+    "actors",
+    "album_artist",
+    "disc_total",
+
+    "count"
+};
+
 enum type : uint8_t {
     NONE,
     TITLE,
     ARTIST,
     ALBUM,
     RELEASE,
+    RELEASE_DAY,
+    RELEASE_MONTH,
+    RELEASE_YEAR,
     COVER,
     LYRICS,
     DURATION,
@@ -76,60 +128,41 @@ enum type : uint8_t {
 
     COUNT
 };
+static_assert(sizeof(ids) / sizeof(char*) - 1 == COUNT, "");
 }
 
 class song {
-    std::array<bool, meta::COUNT> m_data;
-    QString m_title, m_album, m_cover, m_lyrics, m_label;
-    QList<QString> m_artists;
-    QString m_year, m_month, m_day, m_full_release, m_file_name;
-    int32_t m_disc_number, m_track_number, m_duration_ms, m_progress_ms;
-    bool m_is_explicit;
-    play_state m_playing_state;
     date_precision m_release_precision;
+    QJsonObject m_data;
 
 public:
     song();
     void update_release_precision();
-    void append_artist(const QString& a);
-    void set_file_name(QString const&);
-    void set_cover_link(const QString& link);
-    void set_title(const QString& title);
-    void set_duration(int ms);
-    void set_progress(int ms);
-    void set_album(const QString& album);
-    void set_explicit(bool e);
-    void set_state(play_state p);
-    void set_disc_number(int i);
-    void set_track_number(int i);
-    void set_year(const QString& y);
-    void set_month(const QString& m);
-    void set_day(const QString& d);
-    void set_label(const QString& l);
     void clear();
 
-    play_state state() const { return m_playing_state; }
-    bool is_playing() const { return m_playing_state == state_playing; }
-    bool is_paused() const { return !is_playing(); }
-    bool is_explicit() const { return m_is_explicit; }
-
     bool has_cover_lookup_information() const;
-    const QString& file_name() const { return m_file_name; }
-    const QString& album() const { return m_album; }
-    const QString& cover() const { return m_cover; }
-    const QString& lyrics() const { return m_lyrics; }
-    const QString& year() const { return m_year; }
-    const QString& month() const { return m_month; }
-    const QString& day() const { return m_day; }
-    const QString& title() const { return m_title; }
-    const QString& label() const { return m_label; }
-    const QList<QString>& artists() const { return m_artists; }
-    int32_t duration_ms() const { return m_duration_ms; }
-    int32_t progress_ms() const { return m_progress_ms; }
-    int32_t track_number() const { return m_track_number; }
-    int32_t disc_number() const { return m_disc_number; }
 
-    std::array<bool, meta::COUNT> const& data() const { return m_data; }
+    template<meta::type T>
+    void reset()
+    {
+        m_data[meta::ids[T]] = QJsonValue();
+    }
+
+    bool has(meta::type id) const
+    {
+        return m_data.contains(meta::ids[id]);
+    }
+
+    template<class T = QString>
+    T get(meta::type id, T const& def = {}) const;
+
+    template<class T>
+    void set(meta::type id, T const& v);
+
+    template<class T>
+    bool is(meta::type id) const;
+
+    QJsonObject const& data() const { return m_data; }
     date_precision release_precision() const { return m_release_precision; }
 
     bool operator==(const song& other) const;
@@ -137,10 +170,105 @@ public:
 
     void to_json(QJsonObject& obj) const;
     void from_json(const QJsonObject& obj);
-
-    template<uint8_t T>
-    bool has() const
-    {
-        return m_data[T];
-    }
 };
+
+template<>
+inline QString song::get(meta::type id, QString const& def) const
+{
+    if (has(id)) {
+        auto const& data = m_data[meta::ids[id]];
+        Q_ASSERT(data.isString());
+        return data.toString();
+    }
+    return def;
+}
+
+template<>
+inline int song::get(meta::type id, int const& def) const
+{
+    if (has(id)) {
+        auto const& data = m_data[meta::ids[id]];
+        Q_ASSERT(data.isDouble());
+        return data.toInt();
+    }
+    return def;
+}
+
+template<>
+inline QStringList song::get(meta::type id, QStringList const& def) const
+{
+    if (has(id)) {
+        auto const& data = m_data[meta::ids[id]];
+        Q_ASSERT(data.isArray());
+        QStringList l;
+        auto const& arr = data.toArray();
+        for (auto const& v : arr) {
+            if (v.isString())
+                l.append(v.toString());
+        }
+        return l;
+    }
+    return def;
+}
+
+template<>
+inline bool song::get(meta::type id, bool const& def) const
+{
+    if (has(id)) {
+        auto const& data = m_data[meta::ids[id]];
+        Q_ASSERT(data.isBool());
+        return data.toBool();
+    }
+    return def;
+}
+
+template<>
+inline bool song::is<bool>(meta::type id) const
+{
+    return has(id) && m_data[meta::ids[id]].isBool();
+}
+
+template<>
+inline bool song::is<QString>(meta::type id) const
+{
+    return has(id) && m_data[meta::ids[id]].isString();
+}
+
+template<>
+inline bool song::is<int>(meta::type id) const
+{
+    return has(id) && m_data[meta::ids[id]].isDouble();
+}
+
+template<>
+inline void song::set(meta::type id, QString const& v)
+{
+    m_data[meta::ids[id]] = v;
+}
+
+template<>
+inline void song::set(meta::type id, play_state const& v)
+{
+    m_data[meta::ids[id]] = (int)v;
+}
+
+template<>
+inline void song::set(meta::type id, int const& v)
+{
+    m_data[meta::ids[id]] = v;
+}
+
+template<>
+inline void song::set(meta::type id, bool const& v)
+{
+    m_data[meta::ids[id]] = v;
+}
+
+template<>
+inline void song::set(meta::type id, QStringList const& v)
+{
+    QJsonArray a;
+    for (auto const& l : v)
+        a.append(l);
+    m_data[meta::ids[id]] = a;
+}

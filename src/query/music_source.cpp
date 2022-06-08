@@ -154,7 +154,7 @@ bool music_source::download_missing_cover()
 {
     static const QString request = "https://itunes.apple.com/search?term={}&media=music&entity=album"; // should we also look for singles?
     if (config::download_missing_cover && m_current.has_cover_lookup_information()) {
-        auto search_term = QUrl::toPercentEncoding(m_current.artists()[0] + " " + m_current.album());
+        auto search_term = QUrl::toPercentEncoding(m_current.get<QStringList>(meta::ARTIST)[0] + " " + m_current.get(meta::ALBUM));
         auto url = request;
         url = url.replace("{}", search_term);
         auto doc = util::curl_get_json(qt_to_utf8(url));
@@ -165,7 +165,7 @@ bool music_source::download_missing_cover()
             // has a matching title. (We search if the title contains the currently playing title or the other
             // way around in case the titles aren't exactly the same (eg. it has something like a "(Single)"
             // prefix or postfix
-            if (!first["collectionName"].toString().toLower().contains(m_current.title().toLower()) || m_current.title().toLower().contains(first["collectionName"].toString().toLower())) {
+            if (!first["collectionName"].toString().toLower().contains(m_current.get(meta::TITLE).toLower()) || m_current.get(meta::TITLE).toLower().contains(first["collectionName"].toString().toLower())) {
                 return false;
             }
             if (first["artworkUrl60"].isString()) {
@@ -208,18 +208,18 @@ void music_source::handle_cover()
     if (m_current == m_prev)
         return;
 
-    if (m_current.state() == state_playing) {
-        if (!util::download_cover(m_current.cover())) {
+    if (m_current.get<int>(meta::STATUS) == state_playing) {
+        if (!util::download_cover(m_current.get(meta::COVER))) {
             if (!download_missing_cover())
                 util::reset_cover();
         }
-    } else if (m_current.state() != state_paused || config::placeholder_when_paused) {
+    } else if (m_current.get<int>(meta::STATUS) != state_paused || config::placeholder_when_paused) {
         /* We either
             - are in a stopped/unknown state                -> reset cover
             - are paused & want a placeholder when paused   -> reset cover
             - do not have a cover                           -> try downloading cover
         */
-        if (!m_current.has<meta::COVER>())
+        if (!m_current.has(meta::COVER))
             download_missing_cover();
         else
             util::reset_cover();

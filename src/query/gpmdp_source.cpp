@@ -50,14 +50,14 @@ void gpmdp_source::refresh()
         auto song = obj["song"].toObject();
         auto time = obj["time"].toObject();
 
-        m_current.set_state(obj["playing"].toBool() ? state_playing : state_stopped);
-        m_current.set_title(song["title"].toString());
-        m_current.append_artist(song["artist"].toString());
-        m_current.set_album(song["album"].toString());
-        m_current.set_cover_link(song["albumArt"].toString());
+        m_current.set(meta::STATUS, obj["playing"].toBool() ? state_playing : state_stopped);
+        m_current.set(meta::TITLE, song["title"].toString());
+        m_current.set(meta::ARTIST, song["artist"].toString());
+        m_current.set(meta::ALBUM, song["album"].toString());
+        m_current.set(meta::COVER, song["albumArt"].toString());
 
-        m_current.set_duration(time["total"].toInt());
-        m_current.set_progress(time["current"].toInt());
+        m_current.set(meta::DURATION, time["total"].toInt());
+        m_current.set(meta::PROGRESS, time["current"].toInt());
         file.close();
     }
 }

@@ -77,8 +77,8 @@ void icecast_source::refresh()
                 if (!stats.isEmpty()) {
                     auto source = stats["source"].toObject();
                     if (source["title"].isString()) {
-                        m_current.set_title(source["title"].toString());
-                        m_current.set_state(state_playing);
+                        m_current.set(meta::TITLE, source["title"].toString());
+                        m_current.set(meta::STATUS, state_playing);
                     }
                 }
             }

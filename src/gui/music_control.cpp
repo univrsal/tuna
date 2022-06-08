@@ -124,16 +124,16 @@ void music_control::refresh_play_state()
     tuna_thread::copy_mutex.lock();
     copy = tuna_thread::copy;
     tuna_thread::copy_mutex.unlock();
-    QString icon = copy.state() == state_playing ? "://images/icons/pause.svg" : "://images/icons/play.svg";
+    QString icon = copy.get<int>(meta::STATUS) == state_playing ? "://images/icons/pause.svg" : "://images/icons/play.svg";
     ui->btn_play_pause->setIcon(QIcon(icon));
 
     /* refresh song info */
-    if (copy.title() != last_title) {
+    if (copy.get(meta::TITLE) != last_title) {
         QString info = utf8_to_qt(T_DOCK_SONG_INFO);
-        if (copy.state() <= state_paused) {
-            last_title = copy.title();
-            QString artists, title = copy.title();
-            artists = copy.artists().join(", ");
+        if (copy.get<int>(meta::STATUS) <= state_paused) {
+            last_title = copy.get(meta::TITLE);
+            QString artists, title = copy.get(meta::TITLE);
+            artists = copy.get<QStringList>(meta::ARTIST).join(", ");
             // Icecast and window title don't provide these
             if (!artists.isEmpty()) {
                 info.append(artists);
