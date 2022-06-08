@@ -3,6 +3,8 @@ creds.txt
 .DS_Store
 *.user
 build-*/
+.idea
 package/*.txt
 package/*.iss
 package/*.pkgproj
+/cmake-build-debug/
