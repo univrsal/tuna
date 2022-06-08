@@ -30,6 +30,7 @@ class progress_source {
 
     /* Song progress grabbed from current music source */
     int32_t m_synced_progress = 0;
+    int32_t m_duration = 0;
     /* Song progress adjusted with frame time */
     float m_adjusted_progress = 0.f;
     bool m_bounce_up = true;

@@ -35,23 +35,37 @@ void progress_source::tick(float seconds)
     tuna_thread::copy_mutex.lock();
     tmp = tuna_thread::copy;
     tuna_thread::copy_mutex.unlock();
-    m_state = tmp.state();
-    if (m_state == state_playing) {
+    m_state = (play_state)tmp.get<int>(meta::STATUS);
+    if (m_state == state_playing && tmp.has(meta::DURATION)) {
         seconds *= 1000; /* s -> ms */
-        if (tmp.has<meta::DURATION>() && tmp.has<meta::PROGRESS>()) {
-            if (tmp.progress_ms() != m_synced_progress) {
-                m_synced_progress = tmp.progress_ms();
-                m_adjusted_progress = m_synced_progress + seconds;
+        if (tmp.has(meta::PROGRESS)) {
+            // Retrieve new progress, if it changed
+            // we allow difference of 3 seconds because otherwise the progress bar
+            // sometimes jumps around
+            m_synced_progress = tmp.get<int>(meta::PROGRESS);
+            auto diff = m_synced_progress - m_adjusted_progress;
+            if (abs(diff) > 3000) {
+                m_adjusted_progress = float(m_synced_progress) + seconds;
             } else {
-                m_adjusted_progress += seconds;
+                auto catchup = diff / 3000.f;
+                if (diff > 0)
+                    bdebug("Catchup %f, diff %f", catchup, diff);
+                // basically speed up the progress bar if we are behind on the actual position
+                // or slow it down if we are ahead. Speedup/slowdown at most 2% of seconds
+                m_adjusted_progress += seconds * (1 + catchup * (seconds * 0.04));
             }
         } else if (m_synced_progress > 0) {
             m_adjusted_progress += seconds;
         }
 
-        float duration = tmp.duration_ms();
+        auto duration = tmp.get<int>(meta::DURATION);
+        if (duration != m_duration) { // Song changed, so we reset these values
+            m_duration = duration;
+            m_synced_progress = 0;
+            m_adjusted_progress = 0;
+        }
         if (duration > 0)
-            m_progress = m_adjusted_progress / duration;
+            m_progress = m_adjusted_progress / float(duration);
         m_progress = fmaxf(fminf(1, m_progress), 0);
     } else if (m_state == state_paused) {
         float step = 0.0005f * m_cx;
