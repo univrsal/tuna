@@ -52,6 +52,7 @@ bool remove_file_extensions = true;
 
 void init()
 {
+    util::create_config_folder();
     if (!instance)
         instance = obs_frontend_get_global_config();
 

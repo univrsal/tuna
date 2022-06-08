@@ -27,7 +27,6 @@
 #include <QDir>
 #include <QFile>
 #include <QJsonDocument>
-#include <QMessageBox>
 #include <QTextStream>
 #include <ctime>
 #include <curl/curl.h>
@@ -35,6 +34,7 @@
 #include <stdio.h>
 #include <util/platform.h>
 #include <util/threading.h>
+#include <util/util.hpp>
 
 namespace util {
 
@@ -273,7 +273,7 @@ QString remove_extensions(QString const& str)
     return result;
 }
 
-QString get_config_file_path(const char* name)
+QString get_config_file_path_legacy(const char* name)
 {
 #ifdef UNIX
     QDir home = QDir::home();
@@ -289,10 +289,27 @@ QString get_config_file_path(const char* name)
     return QDir::toNativeSeparators(home.absoluteFilePath(utf8_to_qt(name)));
 }
 
+QString get_config_file_path(QString const& name)
+{
+    BPtr<char> path = obs_module_config_path(qt_to_utf8(name));
+    return utf8_to_qt(path.Get());
+}
+
 bool open_config(const char* name, QJsonDocument& doc)
 {
-    QFile file(get_config_file_path(name));
-    if (file.open(QIODevice::ReadWrite)) {
+    auto new_path = get_config_file_path(name);
+    QFile new_file(new_path);
+
+    if (new_file.exists() && new_file.open(QIODevice::ReadWrite)) {
+        doc = QJsonDocument::fromJson(new_file.readAll());
+        return true;
+    }
+    // Try the old location
+    auto old_path = get_config_file_path_legacy(name);
+    QFile file(old_path);
+    binfo("Could not find '%s' trying old location '%s'", qt_to_utf8(new_path), qt_to_utf8(old_path));
+
+    if (file.exists() && file.open(QIODevice::ReadWrite)) {
         doc = QJsonDocument::fromJson(file.readAll());
         return true;
     }
@@ -302,7 +319,7 @@ bool open_config(const char* name, QJsonDocument& doc)
 bool save_config(const char* name, const QJsonDocument& doc)
 {
     auto path = get_config_file_path(name);
-    QFile save_file(get_config_file_path(name));
+    QFile save_file(path);
     auto result = false;
     if (save_file.open(QIODevice::WriteOnly)) {
         auto data = doc.toJson();
@@ -327,6 +344,13 @@ QString file_from_path(const QString& path)
     if (splits.empty() || splits.last().isEmpty())
         return "unknown";
     return splits.last();
+}
+
+void create_config_folder()
+{
+    BPtr<char> path = obs_module_config_path("");
+    if (os_mkdirs(path) == MKDIR_ERROR)
+        berr("Failed to create config directory %s", path.Get());
 }
 
 } // namespace util

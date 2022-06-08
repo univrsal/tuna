@@ -73,4 +73,5 @@ extern QString file_from_path(QString const& file);
 extern bool open_config(const char* name, QJsonDocument&);
 extern bool save_config(const char* name, const QJsonDocument&);
 
+extern void create_config_folder();
 } // namespace util

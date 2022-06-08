@@ -68,7 +68,7 @@ void vlc::load_settings()
     if (doc.isObject()) {
         m_source_map = doc.object();
     } else {
-        berr("Failed to load vlc mappings: must be an object");
+        berr("Failed to load vlc mappings: Json content must be an object");
         return;
     }
 }
