@@ -20,7 +20,7 @@
 #include "../util/config.hpp"
 #include "../util/format.hpp"
 #include "music_source.hpp"
-#include <QJsonArray>
+#include <QLocale>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>

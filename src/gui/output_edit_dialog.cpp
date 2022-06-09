@@ -27,7 +27,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QTableWidgetItem>
-#include <QValidator>
+#include <cmath>
 #ifdef _WIN32
 #    include <QTextStream>
 #endif

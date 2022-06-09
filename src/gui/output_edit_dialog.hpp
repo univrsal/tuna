@@ -20,8 +20,6 @@
 
 #include <QDialog>
 
-class format_validator;
-
 namespace Ui {
 class output_edit_dialog;
 }
