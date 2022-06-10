@@ -115,7 +115,7 @@ void lastfm_source::parse_song(const QJsonObject& s)
     }
 
     if (s["artist"].isObject())
-        m_current.set(meta::ARTIST, s["artist"].toObject()["#text"].toString());
+        m_current.set(meta::ARTIST, QStringList(s["artist"].toObject()["#text"].toString()));
 
     if (s["album"].isObject())
         m_current.set(meta::ALBUM, s["album"].toObject()["#text"].toString());

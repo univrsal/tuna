@@ -90,7 +90,7 @@ static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
 {
     /* Parse POST data JSON */
     QByteArray arr = QByteArray(msg->body.ptr, msg->body.len);
-    QJsonParseError err{};
+    QJsonParseError err {};
     QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
 
     if (err.error == QJsonParseError::NoError && doc.isObject()) {

@@ -72,6 +72,7 @@ static const char* ids[] = {
     "publisher",
     "encoded_by",
     "artwork_url",
+    "track_id",
     "track_total",
     "director",
     "season",
@@ -117,6 +118,7 @@ enum type : uint8_t {
     PUBLISHER,
     ENCODED_BY,
     ARTWORK_URL,
+    TRACK_ID,
     TRACK_TOTAL,
     DIRECTOR,
     SEASON,
@@ -243,6 +245,8 @@ inline bool song::is<int>(meta::type id) const
 template<>
 inline void song::set(meta::type id, QString const& v)
 {
+    // This _needs_ to be a qstringlist
+    Q_ASSERT(id != meta::ARTIST);
     m_data[meta::ids[id]] = v;
 }
 

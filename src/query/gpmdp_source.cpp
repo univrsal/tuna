@@ -52,7 +52,7 @@ void gpmdp_source::refresh()
 
         m_current.set(meta::STATUS, obj["playing"].toBool() ? state_playing : state_stopped);
         m_current.set(meta::TITLE, song["title"].toString());
-        m_current.set(meta::ARTIST, song["artist"].toString());
+        m_current.set(meta::ARTIST, QStringList(song["artist"].toString()));
         m_current.set(meta::ALBUM, song["album"].toString());
         m_current.set(meta::COVER, song["albumArt"].toString());
 

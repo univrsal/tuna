@@ -211,7 +211,7 @@ void vlc_obs_source::refresh()
     auto* cd = calldata_create();
 
     auto get_meta = [cd, ph](const char* tag_id) {
-        const char* result = nullptr;
+        const char* result = "";
         calldata_set_string(cd, "tag_id", tag_id);
         bool failure = !proc_handler_call(ph, "get_metadata", cd);
         if (failure || !calldata_get_string(cd, "tag_data", &result))
@@ -228,16 +228,47 @@ void vlc_obs_source::refresh()
     if (t != "")           \
     m_current.set(d, t)
 
+#define check_num(t, d)          \
+    auto t = get_meta(#t);       \
+    if (t != "") {               \
+        bool ok = false;         \
+        auto i = t.toInt(&ok);   \
+        if (ok)                  \
+            m_current.set(d, i); \
+    }
+        // Some of these could technically be numbers
+        // like season or episode, but I think that VLC
+        // allows users to enter anything in there so we'll
+        // just use strings instead of assuming that it'll always be a number
         check(artwork_url, meta::COVER);
         check(title, meta::TITLE);
-        check(artist, meta::ARTIST);
         check(date, meta::RELEASE);
         check(album, meta::ALBUM);
         check(publisher, meta::LABEL);
-        check(track_number, meta::TRACK_NUMBER);
-        check(disc_number, meta::DISC_NUMBER);
         check(url, meta::FILE_NAME);
         check(genre, meta::GENRE);
+        check(copyright, meta::COPYRIGHT);
+        check(description, meta::DESCRIPTION);
+        check(rating, meta::RATING);
+        check(setting, meta::SETTING);
+        check(language, meta::LANGUAGE);
+        check(now_playing, meta::NOW_PLAYING);
+        check(encoded_by, meta::ENCODED_BY);
+        check(track_id, meta::TRACK_ID);
+        check(director, meta::DIRECTOR);
+        check(season, meta::SEASON);
+        check(episode, meta::EPISODE);
+        check(show_name, meta::SHOW_NAME);
+        check(actors, meta::ACTORS);
+        check(album_artist, meta::ALBUM_ARTIST);
+        check_num(track_number, meta::TRACK_NUMBER);
+        check_num(disc_number, meta::DISC_NUMBER);
+        check_num(track_total, meta::TRACK_TOTAL);
+        check_num(disc_total, meta::DISC_TOTAL);
+
+        auto artist = get_meta("artist");
+        if (artist != "")
+            m_current.set(meta::ARTIST, QStringList(artist));
 #undef check
     }
 

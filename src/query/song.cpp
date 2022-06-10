@@ -20,10 +20,10 @@
 #include "../util/config.hpp"
 #include "../util/format.hpp"
 #include "music_source.hpp"
-#include <QLocale>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QLocale>
 
 song::song()
 {
