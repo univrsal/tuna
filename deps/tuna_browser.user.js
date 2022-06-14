@@ -106,7 +106,7 @@
                 }
             } else if (hostname === 'open.spotify.com') {
                 let status = query('.player-controls [data-testid="control-button-pause"]', e => !!e ? 'playing' : 'stopped', 'unknown');
-                let cover = query('[data-testid="CoverSlotExpanded__container"] .cover-art-image', e => e.style.backgroundImage.slice(5, -2));
+                let cover = query('[data-testid="coverSlotExpanded__container"] .cover-art-image', e => e.style.backgroundImage.slice(5, -2));
                 let title = query('[data-testid="nowplaying-track-link"]', e => e.textContent);
                 let artists = query('span[draggable] a[href*="artist"]', e => Array.from(e));
                 let progress = query('.playback-bar .playback-bar__progress-time', e => timestamp_to_ms(e[0].textContent));
@@ -133,7 +133,7 @@
               let artists = [];
 
               try {
-                artists = [ document.querySelector('#meta-contents').querySelector('#channel-name').innerText.replace('\n', '').trim() ];
+                artists = [ document.querySelector('#meta-contents').querySelector('#channel-name').getElementsByTagName('a')[0].innerText.trim() ];
               } catch(e) {}
 
               let title = query('.style-scope.ytd-video-primary-info-renderer', e => {
@@ -296,3 +296,4 @@
 
     StartFunction();
 })();
+
