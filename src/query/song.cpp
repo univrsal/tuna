@@ -150,6 +150,11 @@ void song::from_json(const QJsonObject& obj)
     clear();
     m_data = obj;
 
+    // TODO: Use only one of the three cover_path/cover_url/cover
+    // currently sources use cover_path, the web browser widget uses cover_url
+    // and the user script uses cover
+    set(meta::COVER, obj["cover"].toString());
+
     auto release = obj["release_date"];
     if (release.isObject()) {
         if (release["precision"].isString()) {
