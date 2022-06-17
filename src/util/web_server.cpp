@@ -82,6 +82,7 @@ static inline void handle_cover_get(struct mg_connection* nc, struct mg_http_mes
     struct mg_http_serve_opts opts {
     };
     opts.mime_types = "png=image/png";
+    opts.extra_headers = "Cache-Control: no-store\r\n";
     mg_http_serve_file(nc, msg, qt_to_utf8(config::cover_path), &opts);
 }
 
