@@ -149,7 +149,7 @@ void load_outputs()
             { "%t", "{title}" },
             { "%T", "{TITLE}" },
             { "%e", "{linebreak}" },
-            { "%m", "{artist}" },
+            { "%m", "{artists}" },
             { "%M", "{ARTIST}" },
             { "%n", "{track_number}" },
             { "%a", "{album}" },
