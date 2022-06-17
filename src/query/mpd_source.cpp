@@ -46,9 +46,11 @@ struct mpd_connection* mpd_source::connect()
 {
     struct mpd_connection* result = nullptr;
     if (m_local)
-        result = mpd_connection_new(nullptr, 0, 2000); // 0 ms timeout on windows blocks this thread, which is bad
+        result = mpd_connection_new(nullptr, 0, 20); // 0 ms timeout on windows blocks this thread, which is bad
+                                                     // but it also can't be as high as the refresh rate otherwise
+                                                     // the frehfresh thread will never sleep
     else
-        result = mpd_connection_new(qt_to_utf8(m_address), m_port, 2000);
+        result = mpd_connection_new(qt_to_utf8(m_address), m_port, 20);
 
     if (mpd_connection_get_error(result) != MPD_ERROR_SUCCESS) {
         if (util::epoch() - m_last_error_log > 5) {
