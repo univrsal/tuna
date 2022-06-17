@@ -28,8 +28,10 @@
 #include <QJsonObject>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
+#include <tuple>
 #include <util/config-file.h>
 #include <util/platform.h>
+#include <vector>
 
 namespace config {
 
@@ -142,6 +144,29 @@ void save()
 
 void load_outputs()
 {
+    auto legacy_convert = [](const QString& old) -> QString {
+        static std::vector<std::tuple<QString, QString>> conversions = {
+            { "%t", "{title}" },
+            { "%T", "{TITLE}" },
+            { "%e", "{linebreak}" },
+            { "%m", "{artist}" },
+            { "%M", "{ARTIST}" },
+            { "%n", "{track_number}" },
+            { "%a", "{album}" },
+            { "%A", "{ALBUM}" },
+            { "%r", "{release_date}" },
+            { "%y", "{release_year}" },
+            { "%p", "{progress}" },
+            { "%l", "{duration}" },
+            { "%b", "{label}" },
+            { "%o", "{time_left}" },
+        };
+        QString copy = old;
+        for (auto const& t : conversions)
+            copy.replace(std::get<0>(t), std::get<1>(t), Qt::CaseSensitive);
+        return copy;
+    };
+
     outputs.clear();
     QJsonDocument doc;
     if (util::open_config(OUTPUT_FILE, doc)) {
@@ -152,7 +177,8 @@ void load_outputs()
         for (const auto& val : qAsConst(array)) {
             QJsonObject obj = val.toObject();
             output tmp;
-            tmp.format = obj[JSON_FORMAT_ID].toString();
+            tmp.format = legacy_convert(obj[JSON_FORMAT_ID].toString());
+
             tmp.path = obj[JSON_OUTPUT_PATH_ID].toString();
             if (obj[JSON_FORMAT_LOG_MODE].isBool())
                 tmp.log_mode = obj[JSON_FORMAT_LOG_MODE].toBool();

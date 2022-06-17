@@ -93,7 +93,7 @@ void thread_method()
          * but we wait at least 10 ms otherwise we will immediately lock the mutex
          * again which can stall other threads that are waiting to lock it
          */
-        uint64_t delta = std::max<uint64_t>(std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate),10);
+        uint64_t delta = std::max<uint64_t>(std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate), 10);
         // Prevent integer wrapping
         if (delta <= config::refresh_rate) {
             int64_t wait = config::refresh_rate - delta;
