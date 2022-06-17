@@ -131,7 +131,7 @@ void song::to_json(QJsonObject& obj) const
         default:
         case prec_unknown:
         case prec_year:
-            release["full"] = get<int>(meta::RELEASE);
+            release["full"] = get(meta::RELEASE);
             release["year"] = get<int>(meta::RELEASE_YEAR);
             if (m_release_precision == prec_year)
                 precision = "year";
