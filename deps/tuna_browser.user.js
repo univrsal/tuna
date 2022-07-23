@@ -119,7 +119,7 @@
             } else if (hostname === 'music.yandex.ru') {
                 // Yandex music support by MjKey
                 let status = query('.player-controls__btn_play', e => e.classList.contains('player-controls__btn_pause') ? "playing" : "stopped", 'unknown');
-                let cover = query('.entity-cover__image', e => e.style.backgroundImage.slice(5, -2).replace('50x50','200x200'));
+                let cover = query('.track-cover .entity-cover__image', e => e.src.replace('50x50','200x200'));
                 let title = query('.track__title', e => e.title);
                 let artists = [ query('.track__artists', e => e.textContent) ];
                 let progress = query('.progress__left', e => timestamp_to_ms(e.textContent));
