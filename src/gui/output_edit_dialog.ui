@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>523</width>
-    <height>563</height>
+    <width>580</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>523</width>
-    <height>0</height>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -103,7 +103,7 @@
         <bool>false</bool>
        </property>
        <attribute name="horizontalHeaderVisible">
-        <bool>false</bool>
+        <bool>true</bool>
        </attribute>
        <attribute name="horizontalHeaderStretchLastSection">
         <bool>true</bool>
@@ -116,22 +116,22 @@
        </attribute>
        <column>
         <property name="text">
-         <string/>
+         <string>tuna.gui.tab.output.edit.dialog.format</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string/>
+         <string>tuna.gui.tab.output.edit.dialog.value</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string/>
+         <string>tuna.gui.tab.output.edit.dialog.format</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string/>
+         <string>tuna.gui.tab.output.edit.dialog.value</string>
         </property>
        </column>
       </widget>
