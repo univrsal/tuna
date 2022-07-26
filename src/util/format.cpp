@@ -57,7 +57,12 @@ void init()
     }));
 
     /* Register format specifiers with their data */
-    specifiers.emplace_back(new specifier("title", meta::TITLE));
+    specifiers.emplace_back(new specifier("title", meta::TITLE, [](song const& s) -> QString {
+        auto title = s.get(meta::TITLE);
+        if (config::remove_file_extensions)
+            title = util::remove_extensions(title);
+        return title;
+    }));
     specifiers.emplace_back(new specifier("album", meta::ALBUM));
     specifiers.emplace_back(new specifier("label", meta::LABEL));
     specifiers.emplace_back(new specifier("file_name", meta::FILE_NAME));
