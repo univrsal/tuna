@@ -152,7 +152,7 @@ public:
 
     bool has(meta::type id) const
     {
-        return m_data.contains(meta::ids[id]);
+        return m_data.contains(meta::ids[id]) && !m_data[meta::ids[id]].isNull();
     }
 
     template<class T = QString>
