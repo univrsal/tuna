@@ -41,11 +41,14 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     m_tuna = dynamic_cast<tuna_gui*>(parent);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    connect(ui->browse, SIGNAL(clicked()), this, SLOT(browse_clicked()));
-    connect(ui->txt_format, SIGNAL(textChanged(const QString&)), this, SLOT(format_changed(const QString&)));
-    connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(accept_clicked()));
+    connect(ui->browse, &QPushButton::clicked, this, &output_edit_dialog::browse_clicked);
+    connect(ui->txt_format, &QLineEdit::textChanged, this, &output_edit_dialog::format_changed);
+    connect(ui->buttonBox->button(QDialogButtonBox::Ok), &QPushButton::clicked, this, &output_edit_dialog::accept_clicked);
 
+    ui->lbl_format_old->setVisible(false);
     ui->lbl_format_error->setVisible(false);
+    ui->lbl_format_old->setStyleSheet("QLabel { color: red;"
+                                      "font-weight: bold; }");
     ui->lbl_format_error->setStyleSheet("QLabel { color: red;"
                                         "font-weight: bold; }");
     ui->table_format->setColumnWidth(0, 110);
@@ -119,6 +122,10 @@ void output_edit_dialog::format_changed(const QString& format)
     auto src = music_sources::selected_source();
     if (src)
         ui->lbl_format_error->setVisible(!src->valid_format(format));
+
+    static QRegularExpression e("%[a-zA-Z](\\[[0-9]+\\])?");
+    Q_ASSERT(e.isValid());
+    ui->lbl_format_old->setVisible(e.match(format).hasMatch());
 }
 
 void output_edit_dialog::browse_clicked()

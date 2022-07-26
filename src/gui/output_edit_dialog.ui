@@ -150,6 +150,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="lbl_format_old">
+       <property name="text">
+        <string>tuna.gui.output.edit.dialog.format.old</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLineEdit" name="txt_format"/>
      </item>
      <item>
