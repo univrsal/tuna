@@ -73,7 +73,7 @@ void init()
     CDEF_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, config::placeholder_when_paused);
     CDEF_BOOL(CFG_RUNNING, false);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, config::download_cover);
-    CDEF_BOOL(CFG_DOWNLOAD_MISSING_COVER, config::download_cover);
+    CDEF_BOOL(CFG_DOWNLOAD_MISSING_COVER, config::download_missing_cover);
     CDEF_UINT(CFG_COVER_SIZE, config::cover_size);
     CDEF_UINT(CFG_REFRESH_RATE, config::refresh_rate);
     CDEF_UINT(CFG_SERVER_PORT, config::webserver_port);
@@ -101,6 +101,7 @@ void load()
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
+    download_missing_cover = CGET_BOOL(CFG_DOWNLOAD_MISSING_COVER);
     placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
     remove_file_extensions = CGET_BOOL(CFG_REMOVE_EXTENSIONS);
     webserver_enabled = CGET_BOOL(CFG_SERVER_ENABLED);
@@ -132,6 +133,7 @@ void save()
     CSET_UINT(CFG_REFRESH_RATE, refresh_rate);
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(placeholder));
     CSET_BOOL(CFG_DOWNLOAD_COVER, download_cover);
+    CSET_BOOL(CFG_DOWNLOAD_MISSING_COVER, download_missing_cover);
     CSET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, placeholder_when_paused);
     CSET_BOOL(CFG_REMOVE_EXTENSIONS, remove_file_extensions);
     CSET_BOOL(CFG_SERVER_ENABLED, webserver_enabled);
