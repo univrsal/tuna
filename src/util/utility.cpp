@@ -143,7 +143,11 @@ void write_song(config::output& o, const QString& str)
 
     if (success) {
         QTextStream stream(&out);
+#if QT_VERSION_MAJOR < 6
         stream.setCodec("UTF-8");
+#else
+        stream.setEncoding(QStringConverter::Utf8);
+#endif
         stream << str;
         if (o.log_mode)
             stream << "\n";

@@ -1,4 +1,4 @@
-/*************************************************************************
+﻿/*************************************************************************
  * This file is part of tuna
  * git.vrsal.xyz/alex/tuna
  * Copyright 2022 univrsal <uni@vrsal.xyz>.
@@ -61,7 +61,7 @@ void scroll_text::set_separator(QString separator)
 void scroll_text::update_text()
 {
     m_timer.stop();
-#if QT_VERSION_MINOR <= 10
+#if QT_VERSION_MINOR <= 10 && QT_VERSION_MAJOR < 6
 #    define horizontalAdvance width
 #endif
     m_single_text_width = fontMetrics().horizontalAdvance(m_text);

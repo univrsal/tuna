@@ -23,13 +23,22 @@
 #include "../util/tuna_thread.hpp"
 #include "tuna_gui.hpp"
 #include "ui_music_control.h"
-#include <QDesktopWidget>
 #include <QMenu>
+#include <QScreen>
 #include <QSizePolicy>
 #include <QStyle>
 #include <obs-frontend-api.h>
 
 class music_control* music_dock = nullptr;
+
+QRect desktop_rect()
+{
+    QRegion virtualGeometry;
+    for (auto screen : QGuiApplication::screens()) {
+        virtualGeometry += screen->geometry();
+    }
+    return virtualGeometry.boundingRect();
+}
 
 music_control::music_control(QWidget* parent)
     : QDockWidget(parent)
@@ -45,7 +54,7 @@ music_control::music_control(QWidget* parent)
 
         QRect wg = normalGeometry();
         if (!util::window_pos_valid(wg)) {
-            QRect r = reinterpret_cast<QApplication*>(obs_frontend_get_main_window())->desktop()->geometry();
+            QRect r = desktop_rect();
             setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), r));
         }
     }

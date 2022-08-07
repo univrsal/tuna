@@ -25,7 +25,7 @@ if (MSVC OR APPLE)
 endif()
 
 find_package(LibObs REQUIRED)
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt6Widgets REQUIRED)
 find_package(Libcurl REQUIRED)
 
 option(LOCAL_INSTALLATION "Whether to install for the current user (default: OFF)" OFF)
@@ -82,8 +82,8 @@ set(tuna_ui
         src/gui/widgets/icecast.ui
         src/gui/widgets/vlc.ui)
 
-qt5_wrap_ui(tuna_ui_headers ${tuna_ui})
-qt5_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
+qt6_wrap_ui(tuna_ui_headers ${tuna_ui})
+qt6_add_resources(tuna_qrc_sources src/gui/tuna.qrc)
 
 if (UNIX AND NOT APPLE)
     add_definitions(-DLINUX=1)
@@ -194,16 +194,16 @@ add_library(tuna MODULE
 include_directories(
     "${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api"
     ${LIBOBS_INCLUDE_DIR}
-    ${Qt5Core_INCLUDES}
-    ${Qt5Widgets_INCLUDES}
+    ${Qt6Core_INCLUDES}
+    ${Qt6Widgets_INCLUDES}
 )
 
 target_link_libraries(tuna
     ${LIBOBS_LIBRARIES}
     tag
     mpdclient
-    Qt5::Widgets
-    Qt5::Core
+    Qt6::Widgets
+    Qt6::Core
     ${OBS_FRONTEND_LIB}
     ${LIBCURL_LIBRARIES}
     ${tuna_platform_deps})

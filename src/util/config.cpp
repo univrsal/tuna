@@ -188,7 +188,7 @@ void load_outputs()
                 tmp.log_mode = false;
 
             if (obj[JSON_LAST_OUTPUT].isString())
-                tmp.last_output = obj[JSON_LAST_OUTPUT].isString();
+                tmp.last_output = obj[JSON_LAST_OUTPUT].toString();
             else
                 tmp.last_output = "";
             outputs.push_back(tmp);
