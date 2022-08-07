@@ -12,8 +12,6 @@ on:
       - '**.ini'
       - '**.html'
       - '**.js'
-    branches:
-    - master
     tags:
     - "v*"
 jobs:
