@@ -12,6 +12,8 @@ on:
       - '**.ini'
       - '**.html'
       - '**.js'
+    branches:
+    - "*"
     tags:
     - "v*"
 jobs:
