@@ -146,10 +146,10 @@ void mpd_source::refresh()
             switch (list.length()) {
             case 3:
                 m_current.set(meta::RELEASE_DAY, QString(list[2]).toInt());
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case 2:
                 m_current.set(meta::RELEASE_MONTH, QString(list[1]).toInt());
-                [[clang::fallthrough]];
+                [[fallthrough]];
             case 1:
                 m_current.set(meta::RELEASE_YEAR, QString(list[0]).toInt());
             }

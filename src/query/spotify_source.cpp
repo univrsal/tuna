@@ -238,10 +238,10 @@ void spotify_source::parse_track_json(const QJsonValue& track)
         switch (list.length()) {
         case 3:
             m_current.set(meta::RELEASE_DAY, list[2]);
-            [[clang::fallthrough]];
+            [[fallthrough]];
         case 2:
             m_current.set(meta::RELEASE_MONTH, list[1]);
-            [[clang::fallthrough]];
+            [[fallthrough]];
         case 1:
             m_current.set(meta::RELEASE_YEAR, list[0]);
         }
@@ -257,7 +257,6 @@ bool spotify_source::execute_capability(capability c)
     switch (c) {
     case CAP_PLAY_PAUSE:
         if (m_current.get<int>(meta::STATUS) == state_playing) {
-            [[clang::fallthrough]];
         case CAP_STOP_SONG:
             http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, "PUT");
         } else {
