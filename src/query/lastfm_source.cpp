@@ -134,9 +134,9 @@ void lastfm_source::parse_song(const QJsonObject& s)
         QJsonDocument response;
         auto code = lastfm_request(response, track_request);
         if (code == HTTP_OK) {
-            auto track = response.object()["track"];
-            if (track.isObject()) {
-                auto duration = track.toObject()["duration"];
+            auto track_obj = response.object()["track"];
+            if (track_obj.isObject()) {
+                auto duration = track_obj.toObject()["duration"];
                 if (duration.isString()) {
                     bool ok = false;
                     int i = duration.toString().toInt(&ok);
