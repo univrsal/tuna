@@ -20,7 +20,6 @@
 #include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
-#include "../util/cover_tag_handler.hpp"
 #include "../util/format.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
@@ -169,9 +168,9 @@ bool music_source::download_missing_cover()
                 return false;
             }
             if (first["artworkUrl60"].isString()) {
-                auto url = first["artworkUrl60"].toString();
-                url = url.replace("60x60", QString::number(config::cover_size) + "x" + QString::number(config::cover_size));
-                return util::download_cover(url);
+                auto url2 = first["artworkUrl60"].toString();
+                url2 = url2.replace("60x60", QString::number(config::cover_size) + "x" + QString::number(config::cover_size));
+                return util::download_cover(url2);
             }
         }
     }
