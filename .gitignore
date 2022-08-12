@@ -4,7 +4,4 @@ creds.txt
 *.user
 build-*/
 .idea
-package/*.txt
-package/*.iss
-package/*.pkgproj
 /cmake-build-debug/
