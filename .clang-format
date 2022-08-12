@@ -1,4 +1,4 @@
----
+Standard: Cpp11
 Language: Cpp
 BasedOnStyle: WebKit
 SpaceAfterTemplateKeyword: false
@@ -10,4 +10,10 @@ IndentPPDirectives: AfterHash
 BreakBeforeBraces: Custom
 BraceWrapping:
     AfterFunction: true
+    AfterObjCDeclaration: false
 NamespaceIndentation: None
+ObjCBlockIndentWidth: 4
+ObjCSpaceAfterProperty: true
+ObjCSpaceBeforeProtocolList: true
+---
+Language: ObjC
