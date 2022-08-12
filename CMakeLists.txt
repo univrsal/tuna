@@ -15,8 +15,8 @@ include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 include_directories(${MONGOOSE_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
-
-find_package(ZLIB)
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIR})
 
 # Replace `Your Name Here` with the name (yours or your organization's) you want to see as the
 # author of the plugin (in the plugin's metadata itself and in the installers)
