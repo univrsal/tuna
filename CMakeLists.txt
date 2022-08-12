@@ -10,6 +10,7 @@ string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
 find_package(Libcurl REQUIRED)
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
