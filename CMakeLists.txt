@@ -11,7 +11,7 @@ add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
-find_package(Libcurl REQUIRED)
+find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
@@ -199,7 +199,7 @@ endif()
 
 # Uncomment those lines if you want to use Qt in your plugin
 find_qt(COMPONENTS Widgets Core)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets tag mpdclient ZLIB::ZLIB)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets tag mpdclient ZLIB::ZLIB CURL::libcurl)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
 
 configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)
