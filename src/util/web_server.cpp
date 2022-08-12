@@ -149,7 +149,7 @@ static inline void handle_options(struct mg_connection* nc)
         date, TUNA_VERSION);
 }
 
-static void event_handler(struct mg_connection* nc, int ev, void* d, void* priv)
+static void event_handler(struct mg_connection* nc, int ev, void* d, void*)
 {
     if (ev == MG_EV_HTTP_MSG) {
         auto* incoming = reinterpret_cast<struct mg_http_message*>(d);

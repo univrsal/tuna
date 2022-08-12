@@ -294,6 +294,7 @@ bool vlc_obs_source::execute_capability(capability c)
         break;
     case CAP_PLAY_PAUSE:
         obs_source_media_play_pause(src, state == OBS_MEDIA_STATE_PLAYING);
+        break;
     case CAP_STOP_SONG:
         obs_source_media_stop(src);
         break;

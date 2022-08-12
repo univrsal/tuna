@@ -193,7 +193,7 @@ void load_outputs()
                 tmp.last_output = "";
             outputs.push_back(tmp);
         }
-        binfo("Loaded %i outputs", array.size());
+        binfo("Loaded %i outputs", (int)array.size());
     }
 }
 

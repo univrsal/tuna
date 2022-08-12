@@ -170,7 +170,7 @@ long lastfm_request(QJsonDocument& response_json, const QString& url)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 #ifdef DEBUG
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, CURL_DEBUG);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
 #endif
     CURLcode res = curl_easy_perform(curl);
 

@@ -26,7 +26,7 @@
 #include <vector>
 
 #include "../gui/tuna_gui.hpp"
-#include "src/util/utility.hpp"
+#include "util/utility.hpp"
 
 /* clang-format off */
 

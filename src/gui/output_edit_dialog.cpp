@@ -60,10 +60,10 @@ output_edit_dialog::output_edit_dialog(edit_mode m, QWidget* parent)
     for (int i = 0; i < rows; i++)
         ui->table_format->insertRow(i);
 
-    for (int i = 0; i < spec.size(); i += 2) {
+    for (int i = 0; i < int(spec.size()); i += 2) {
         ui->table_format->setItem(i / 2, 0, new QTableWidgetItem(spec[i]->get_id()));
         ui->table_format->setItem(i / 2, 1, new QTableWidgetItem(spec[i]->get_name()));
-        if (i + 1 < spec.size()) {
+        if (i + 1 < int(spec.size())) {
             ui->table_format->setItem(i / 2, 2, new QTableWidgetItem(spec[i + 1]->get_id()));
             ui->table_format->setItem(i / 2, 3, new QTableWidgetItem(spec[i + 1]->get_name()));
         }

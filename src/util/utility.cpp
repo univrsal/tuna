@@ -333,7 +333,7 @@ bool save_config(const char* name, const QJsonDocument& doc)
         } else {
             berr("Couldn't write config file to %s, only"
                  "wrote %lli bytes out of %i",
-                qt_to_utf8(path), wrote, data.length());
+                qt_to_utf8(path), wrote, int(data.length()));
         }
         save_file.close();
     } else {

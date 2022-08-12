@@ -109,7 +109,7 @@ void init()
     specifiers.emplace_back(new specifier("artists", meta::ARTIST, [](song const& s) -> QString {
         return s.get<QStringList>(meta::ARTIST).join(", ");
     }));
-    specifiers.emplace_back(new static_specifier("line_break", [](song const& s) -> QString {
+    specifiers.emplace_back(new static_specifier("line_break", [](song const&) -> QString {
         return "\n";
     }));
     specifiers.emplace_back(new static_specifier("json_compact", [](song const& s) -> QString {
