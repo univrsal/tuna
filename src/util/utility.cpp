@@ -33,7 +33,11 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
-#include <util/threading.h>
+#if _WIN32
+__attribute__((visibility("default"))) __declspec(dllimport) void os_set_thread_name(const char* name);
+#else
+#    include <util/threading.h>
+#endif
 #include <util/util.hpp>
 
 namespace util {
@@ -237,7 +241,11 @@ QJsonDocument curl_get_json(const char* url)
 
 void set_thread_name(const char* name)
 {
+#if _WIN32
+
+#else
     os_set_thread_name(name);
+#endif
 }
 
 QString remove_extensions(QString const& str)
