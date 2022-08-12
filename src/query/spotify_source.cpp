@@ -141,7 +141,7 @@ void spotify_source::refresh()
         if (os_gettime_ns() - m_timout_start >= m_timeout_length) {
             m_timout_start = 0;
             m_timeout_length = 0;
-            binfo("API timeout of %li seconds is over", m_timeout_length);
+            binfo("API timeout of %i seconds is over", int(m_timeout_length));
         } else {
             bdebug("Waiting for Spotify-API timeout");
             return;
