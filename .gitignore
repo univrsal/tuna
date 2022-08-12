@@ -2,6 +2,6 @@ creds.txt
 *.autosave
 .DS_Store
 *.user
-build-*/
+build-tuna*/
 .idea
 /cmake-build-debug/
