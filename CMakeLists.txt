@@ -9,15 +9,15 @@ add_subdirectory(deps)
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
+
+find_package(Libcurl REQUIRED)
+find_package(ZLIB REQUIRED)
+include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${TAGLIB_INCLUDE_DIRS})
 include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 include_directories(${MONGOOSE_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
-
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIR})
-message(STATUS "USING ZLIB@" ${ZLIB_INCLUDE_DIR})
 
 # Replace `Your Name Here` with the name (yours or your organization's) you want to see as the
 # author of the plugin (in the plugin's metadata itself and in the installers)
@@ -145,9 +145,7 @@ if (LOCAL_INSTALLATION)
                     "${PROJECT_SOURCE_DIR}/data"
                     "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/data"
         )
-        target_sources(tuna PUBLIC "./src/util/window/window_helper_nix.cpp")
     elseif (WIN32)
-        target_sources(tuna PUBLIC "./src/util/window/window_helper_win.cpp")
         if(NOT DEFINED OBS_FRONTEND_LIB)
             set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
             message(FATAL_ERROR "Could not find OBS Frontend API\'s library !")
@@ -188,6 +186,14 @@ else()
     find_package(obs-frontend-api REQUIRED)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
+endif()
+
+if (WIN32)
+    target_sources(tuna PUBLIC "./src/util/window/window_helper_win.cpp")
+elseif(UNIX AND NOT APPLE)
+    target_sources(tuna PUBLIC "./src/util/window/window_helper_nix.cpp")
+elseif(APPLE)
+    target_sources(tuna PUBLIC "./src/util/window/window_helper_mac.mm")
 endif()
 
 # Uncomment those lines if you want to use Qt in your plugin
