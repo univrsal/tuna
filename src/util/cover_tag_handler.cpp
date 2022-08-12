@@ -148,29 +148,29 @@ bool get_embedded(TagLib::FileRef fr)
 {
     bool found = false;
 
-    if (TagLib::MPEG::File* file = dynamic_cast<TagLib::MPEG::File*>(fr.file())) {
-        if (file->hasID3v2Tag()) {
-            found = extract_id3(file->ID3v2Tag());
-        } else if (file->hasAPETag()) {
-            found = extract_ape(file->APETag());
+    if (TagLib::MPEG::File* mpeg = dynamic_cast<TagLib::MPEG::File*>(fr.file())) {
+        if (mpeg->hasID3v2Tag()) {
+            found = extract_id3(mpeg->ID3v2Tag());
+        } else if (mpeg->hasAPETag()) {
+            found = extract_ape(mpeg->APETag());
         }
-    } else if (TagLib::FLAC::File* file = dynamic_cast<TagLib::FLAC::File*>(fr.file())) {
-        found = extract_flac(file);
-        if (!found && file->ID3v2Tag())
-            found = extract_id3(file->ID3v2Tag());
-    } else if (TagLib::MP4::File* file = dynamic_cast<TagLib::MP4::File*>(fr.file())) {
-        found = extract_mp4(file);
-    } else if (TagLib::ASF::File* file = dynamic_cast<TagLib::ASF::File*>(fr.file())) {
-        found = extract_asf(file);
-    } else if (TagLib::APE::File* file = dynamic_cast<TagLib::APE::File*>(fr.file())) {
-        if (file->APETag())
-            found = extract_ape(file->APETag());
-    } else if (TagLib::MPC::File* file = dynamic_cast<TagLib::MPC::File*>(fr.file())) {
-        if (file->APETag())
-            found = extract_ape(file->APETag());
-    } else if (TagLib::Ogg::Opus::File* file = dynamic_cast<TagLib::Ogg::Opus::File*>(fr.file())) {
-        if (file->tag())
-            found = extract_opus(file);
+    } else if (TagLib::FLAC::File* flac = dynamic_cast<TagLib::FLAC::File*>(fr.file())) {
+        found = extract_flac(flac);
+        if (!found && flac->ID3v2Tag())
+            found = extract_id3(flac->ID3v2Tag());
+    } else if (TagLib::MP4::File* mp4 = dynamic_cast<TagLib::MP4::File*>(fr.file())) {
+        found = extract_mp4(mp4);
+    } else if (TagLib::ASF::File* asf = dynamic_cast<TagLib::ASF::File*>(fr.file())) {
+        found = extract_asf(asf);
+    } else if (TagLib::APE::File* ape = dynamic_cast<TagLib::APE::File*>(fr.file())) {
+        if (ape->APETag())
+            found = extract_ape(ape->APETag());
+    } else if (TagLib::MPC::File* mpc = dynamic_cast<TagLib::MPC::File*>(fr.file())) {
+        if (mpc->APETag())
+            found = extract_ape(mpc->APETag());
+    } else if (TagLib::Ogg::Opus::File* ogg = dynamic_cast<TagLib::Ogg::Opus::File*>(fr.file())) {
+        if (ogg->tag())
+            found = extract_opus(ogg);
     }
 
     return found;
