@@ -12,6 +12,8 @@ set(MPD_DEFAULT_PORT 6600)
 set(MPD_DEFAULT_HOST "localhost")
 set(MPD_DEFAULT_SOCKET "/var/run/mpd/socket")
 
+find_package(ZLIB REQUIRED)
+
 include(CheckFunctionExists)
 include(taglib/ConfigureChecks.cmake)
 include(CTest)
@@ -22,6 +24,8 @@ check_function_exists(strndup HAVE_STRNDUP)
 check_function_exists(getaddrinfo HAVE_GETADDRINFO)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libmpdclient/include)
+include_directories(${ZLIB_INCLUDE_DIR})
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libmpdclient/include/mpd/version.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/libmpdclient/include/mpd/version.h)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libmpd.config.h.in
@@ -364,6 +368,7 @@ set(tag_LIB_SRCS
 add_library(tag STATIC ${tag_LIB_SRCS} ${tag_HDRS})
 add_library(mpdclient STATIC ${libmpdclient_SRC})
 
+target_include_directories(tag PUBLIC ${ZLIB_INCLUDE_DIR})
 target_compile_definitions(tag PUBLIC TAGLIB_STATIC)
 set_property(TARGET tag PROPERTY POSITION_INDEPENDENT_CODE 1)
 set_property(TARGET tag PROPERTY CXX_STANDARD 98)
