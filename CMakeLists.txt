@@ -16,6 +16,8 @@ include_directories(${MONGOOSE_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
 
+find_package(ZLIB)
+
 # Replace `Your Name Here` with the name (yours or your organization's) you want to see as the
 # author of the plugin (in the plugin's metadata itself and in the installers)
 set(PLUGIN_AUTHOR "univrsal")
@@ -189,7 +191,7 @@ endif()
 
 # Uncomment those lines if you want to use Qt in your plugin
 find_qt(COMPONENTS Widgets Core)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets tag mpdclient)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt::Core Qt::Widgets tag mpdclient ZLIB::ZLIB)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
 
 configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)
