@@ -50,6 +50,7 @@ find . -type d \( \
     -path ./plugins/mac-syphon/syphon-framework -o \
     -path ./plugins/obs-outputs/ftl-sdk -o \
     -path ./plugins/obs-websocket/deps \
+    -path ./deps \
 \) -prune -false -type f -o \
     -name '*.h' -or \
     -name '*.hpp' -or \
