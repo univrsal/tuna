@@ -62,7 +62,9 @@ jobs:
           libcurl4-openssl-dev \
           cmake \
           obs-studio \
-          qtbase6-dev
+          qt6-base-dev \
+          libqt6svg6-dev \
+          qt6-base-private-dev
         sudo wget -O /usr/include/obs/obs-frontend-api.h https://raw.githubusercontent.com/obsproject/obs-studio/28.0.0-beta1/UI/obs-frontend-api/obs-frontend-api.h
         sudo ldconfig
     - name: Build plugin
