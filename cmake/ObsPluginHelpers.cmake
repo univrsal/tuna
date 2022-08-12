@@ -466,6 +466,7 @@ if(OS_MACOS)
         target_sources(${target} PRIVATE ${_DATA_FILE})
         set_source_files_properties(${_DATA_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION
                                                              Resources/${_RELATIVE_PATH})
+        message(STATUS "-----!!!!!!--- ${_RELATIVE_PATH} // ${_GROUP_NAME}")
         string(REPLACE "\\" "\\\\" ${_GROUP_NAME} ${_RELATIVE_PATH})
         source_group("Resources\\${_GROUP_NAME}" FILES ${_DATA_FILE})
       endforeach()
