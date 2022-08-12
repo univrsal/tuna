@@ -25,6 +25,7 @@ progress_source::progress_source(obs_source_t* src, obs_data_t* settings)
     : m_source(src)
 {
     update(settings);
+    UNUSED_PARAMETER(m_source);
 }
 
 progress_source::~progress_source() { }
