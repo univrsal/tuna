@@ -91,7 +91,7 @@ void lastfm_source::refresh()
          */
         m_next_refresh = os_gettime_ns() + 5000000000;
     } else {
-        berr("Received error code from last.fm request: %li", code);
+        berr("Received error code from last.fm request: %i", int(code));
         m_next_refresh = os_gettime_ns() + 1500000000;
     }
 }

@@ -193,7 +193,7 @@ void spotify_source::refresh()
         if (http_code == STATUS_RETRY_AFTER && !header.empty()) {
             extract_timeout(header, m_timeout_length);
             if (m_timeout_length) {
-                bwarn("Spotify-API Rate limit hit, waiting %li seconds\n", m_timeout_length);
+                bwarn("Spotify-API Rate limit hit, waiting %i seconds\n", int(m_timeout_length));
                 m_timeout_length *= SECOND_TO_NS;
                 m_timout_start = os_gettime_ns();
             }
@@ -281,7 +281,7 @@ bool spotify_source::execute_capability(capability c)
     /* Parse response */
     if (http_code != HTTP_NO_CONTENT) {
         QString r(response.toJson());
-        binfo("Couldn't run spotify command! HTTP code: %li", http_code);
+        binfo("Couldn't run spotify command! HTTP code: %i", int(http_code));
         binfo("Spotify controls only work for premium users!");
         binfo("Response: %s", qt_to_utf8(r));
     }
