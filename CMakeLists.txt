@@ -190,11 +190,11 @@ else()
 endif()
 
 if (WIN32)
-    target_sources(tuna PUBLIC "./src/util/window/window_helper_win.cpp")
+    target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./src/util/window/window_helper_win.cpp")
 elseif(UNIX AND NOT APPLE)
-    target_sources(tuna PUBLIC "./src/util/window/window_helper_nix.cpp")
+    target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./src/util/window/window_helper_nix.cpp")
 elseif(APPLE)
-    target_sources(tuna PUBLIC "./src/util/window/window_helper_mac.mm")
+    target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./src/util/window/window_helper_mac.mm")
 endif()
 
 # Uncomment those lines if you want to use Qt in your plugin
