@@ -369,7 +369,7 @@ add_library(tag STATIC ${tag_LIB_SRCS} ${tag_HDRS})
 add_library(mpdclient STATIC ${libmpdclient_SRC})
 
 target_include_directories(tag PUBLIC ${ZLIB_INCLUDE_DIR})
-target_compile_definitions(tag PUBLIC TAGLIB_STATIC)
+target_compile_definitions(tag PUBLIC TAGLIB_STATIC TAGLIB_DEPRECATED=[[deprecated]])
 set_property(TARGET tag PROPERTY POSITION_INDEPENDENT_CODE 1)
 set_property(TARGET tag PROPERTY CXX_STANDARD 98)
 set_property(TARGET mpdclient PROPERTY POSITION_INDEPENDENT_CODE 1)
