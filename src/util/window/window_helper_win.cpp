@@ -9,12 +9,10 @@
 #include <util/platform.h>
 #include <windows.h>
 
-using namespace std;
-
-static bool GetWindowTitle(HWND window, string& title)
+static bool GetWindowTitle(HWND window, std::string& title)
 {
-    size_t len = (size_t)GetWindowTextLengthW(window);
-    wstring wtitle;
+    std::size_t len = (size_t)GetWindowTextLengthW(window);
+    std::wstring wtitle;
 
     wtitle.resize(len);
     if (!GetWindowTextW(window, &wtitle[0], (int)len + 1))
@@ -26,7 +24,7 @@ static bool GetWindowTitle(HWND window, string& title)
     return true;
 }
 
-static bool GetWindowExe(HWND window, string& exe)
+static bool GetWindowExe(HWND window, std::string& exe)
 {
     bool result = false;
     DWORD proc_id = 0;
@@ -72,26 +70,26 @@ static bool WindowValid(HWND window)
     return true;
 }
 
-void GetWindowList(vector<string>& windows)
+void GetWindowList(std::vector<std::string>& windows)
 {
     HWND window = GetWindow(GetDesktopWindow(), GW_CHILD);
 
     while (window) {
-        string title;
+        std::string title;
         if (WindowValid(window) && GetWindowTitle(window, title))
             windows.emplace_back(title);
         window = GetNextWindow(window, GW_HWNDNEXT);
     }
 }
 
-void GetWindowAndExeList(vector<pair<string, string>>& list)
+void GetWindowAndExeList(std::vector<std::pair<std::string, std::string>>& list)
 {
     HWND window = GetWindow(GetDesktopWindow(), GW_CHILD);
 
     while (window) {
-        string title, exe;
+        std::string title, exe;
         if (WindowValid(window) && GetWindowTitle(window, title) && GetWindowExe(window, exe)) {
-            list.emplace_back(pair<string, string>(exe, title));
+            list.emplace_back(std::pair<std::string, std::string>(exe, title));
         }
         window = GetNextWindow(window, GW_HWNDNEXT);
     }

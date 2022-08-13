@@ -147,47 +147,36 @@ if (LOCAL_INSTALLATION)
                     "$ENV{HOME}/.config/obs-studio/plugins/${CMAKE_PROJECT_NAME}/data"
         )
     elseif (WIN32)
-        if(NOT DEFINED OBS_FRONTEND_LIB)
-            set(OBS_FRONTEND_LIB "OBS_FRONTEND_LIB-NOTFOUND" CACHE FILEPATH "OBS frontend library")
-            message(FATAL_ERROR "Could not find OBS Frontend API\'s library !")
-        endif()
         # Enable Multicore Builds and disable FH4 (to not depend on VCRUNTIME140_1.DLL when building with VS2019)
         if (MSVC)
             add_definitions(/MP /d2FH4-)
         endif()
-        include_directories(
-            "${LIBOBS_INCLUDE_DIR}"
-        )
-        target_link_libraries(${CMAKE_PROJECT_NAME}
-            "${OBS_FRONTEND_LIB}"
-        )
-        get_filename_component(LibOBS_DIR ${LIBOBS_LIB} DIRECTORY)
+
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
             # Copy to obs-studio dev environment for immediate testing
             COMMAND if $<CONFIG:Debug>==1 (
                 "${CMAKE_COMMAND}" -E copy
                     "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>"
-                    "${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/64bit")
+                    "${libobs_DIR}/../rundir/$<CONFIG>/obs-plugins/64bit")
             COMMAND if $<CONFIG:Debug>==1 (
                 "${CMAKE_COMMAND}" -E copy
                     "$<TARGET_PDB_FILE:${CMAKE_PROJECT_NAME}>"
-                    "${LibOBS_DIR}/../../rundir/$<CONFIG>/obs-plugins/64bit")
+                    "${libobs_DIR}/../rundir/$<CONFIG>/obs-plugins/64bit")
             COMMAND if $<CONFIG:Debug>==1 (
                 "${CMAKE_COMMAND}" -E make_directory
-                    "${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
+                    "${libobs_DIR}/../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
             COMMAND if $<CONFIG:Debug>==1 (
                 "${CMAKE_COMMAND}" -E copy_directory
                     "${PROJECT_SOURCE_DIR}/data"
-                    "${LibOBS_DIR}/../../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
+                    "${libobs_DIR}/../rundir/$<CONFIG>/data/obs-plugins/${CMAKE_PROJECT_NAME}")
         )
     endif()
-
-else()
-    find_package(libobs REQUIRED)
-    find_package(obs-frontend-api REQUIRED)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 endif()
+
+find_package(libobs REQUIRED)
+find_package(obs-frontend-api REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::obs-frontend-api)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 if (WIN32)
     target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./src/util/window/window_helper_win.cpp")

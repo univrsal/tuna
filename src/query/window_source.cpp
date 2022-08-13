@@ -60,7 +60,7 @@ void window_source::load()
     m_process_name = utf8_to_qt(CGET_STR(CFG_WINDOW_PROCESS_NAME));
 }
 
-QString window_source::get_title(const vector<string>& windows)
+QString window_source::get_title(const std::vector<std::string>& windows)
 {
     QRegularExpression regex(m_title);
     QString result = "";
@@ -85,7 +85,7 @@ QString window_source::get_title(const vector<string>& windows)
     return result;
 }
 
-QString window_source::get_title(const vector<pair<string, string>>& processes)
+QString window_source::get_title(const std::vector<std::pair<std::string, std::string>>& processes)
 {
     QString result = "";
     for (const auto& p : processes) {
@@ -104,11 +104,11 @@ void window_source::refresh()
     QString result;
 
     if (m_use_process_name) {
-        vector<pair<string, string>> processes;
+        std::vector<std::pair<std::string, std::string>> processes;
         GetWindowAndExeList(processes);
         result = get_title(processes);
     } else {
-        vector<string> windows;
+        std::vector<std::string> windows;
         GetWindowList(windows);
         result = get_title(windows);
     }

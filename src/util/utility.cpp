@@ -33,14 +33,7 @@
 #include <obs-module.h>
 #include <stdio.h>
 #include <util/platform.h>
-#if _WIN32
-inline void os_set_thread_name(const char*)
-{
-    // I'm too lazy to fix this
-}
-#else
-#    include <util/threading.h>
-#endif
+#include <util/threading.h>
 #include <util/util.hpp>
 
 namespace util {
