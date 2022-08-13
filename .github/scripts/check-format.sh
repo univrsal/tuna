@@ -34,12 +34,12 @@ elif type clang-format 2> /dev/null ; then
     V=$(clang-format --version)
     if [[ $V != *"version 13.0"* ]]; then
         echo "clang-format is not 13.0 (returned ${V})"
-        exit 1
     fi
 else
     echo "No appropriate clang-format found (expected clang-format-13.0.0, or clang-format)"
     exit 1
 fi
+
 
 find . -type d \( \
     -path ./\*build\* -o \
@@ -49,8 +49,8 @@ find . -type d \( \
     -path ./plugins/enc-amf -o \
     -path ./plugins/mac-syphon/syphon-framework -o \
     -path ./plugins/obs-outputs/ftl-sdk -o \
-    -path ./plugins/obs-websocket/deps -o \
-    -path ./deps \
+    -path ./deps -o \
+    -path ./plugins/obs-websocket/deps \
 \) -prune -false -type f -o \
     -name '*.h' -or \
     -name '*.hpp' -or \
