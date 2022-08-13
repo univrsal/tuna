@@ -40,7 +40,7 @@ struct mg_mgr mgr;
 struct mg_connection* nc;
 
 /* GET requests will result in song information */
-static inline void handle_info_get(struct mg_connection* nc)
+static inline void handle_info_get(struct mg_connection* conn)
 {
     /* Write current song to json
      * and properly convert it to utf8
@@ -63,7 +63,7 @@ static inline void handle_info_get(struct mg_connection* nc)
     os_wcs_to_utf8(wstr.c_str(), 0, &str[0], len + 1);
 
     /* Send basic http response with json */
-    mg_printf(nc,
+    mg_printf(conn,
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: application/json; charset=utf-8\r\n"
         "Content-Length: %i\r\n"
@@ -77,17 +77,17 @@ static inline void handle_info_get(struct mg_connection* nc)
         int(len), TUNA_VERSION, str.c_str());
 }
 
-static inline void handle_cover_get(struct mg_connection* nc, struct mg_http_message* msg)
+static inline void handle_cover_get(struct mg_connection* conn, struct mg_http_message* msg)
 {
     struct mg_http_serve_opts opts {
     };
     opts.mime_types = "png=image/png";
     opts.extra_headers = "Cache-Control: no-store\r\n";
-    mg_http_serve_file(nc, msg, qt_to_utf8(config::cover_path), &opts);
+    mg_http_serve_file(conn, msg, qt_to_utf8(config::cover_path), &opts);
 }
 
 /* POST means we're getting information */
-static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
+static void handle_post(struct mg_connection* conn, struct mg_http_message* msg)
 {
     /* Parse POST data JSON */
     QByteArray arr = QByteArray(msg->body.ptr, msg->body.len);
@@ -104,7 +104,7 @@ static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
     } else {
         bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
         bwarn("JSON: %s", msg->body.ptr);
-        mg_printf(nc,
+        mg_printf(conn,
             "HTTP/1.1 400 Bad request\r\n"
             "Connection: close\r\n"
             "Server: tuna/%s\r\n"
@@ -114,7 +114,7 @@ static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
     }
 
     /* Simple OK reponse with mirror of received data */
-    mg_printf(nc,
+    mg_printf(conn,
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: text/plain; charset=utf-8\r\n"
         "Content-Length: %i\r\n"
@@ -128,7 +128,7 @@ static void handle_post(struct mg_connection* nc, struct mg_http_message* msg)
         int(msg->body.len), TUNA_VERSION, msg->body.ptr);
 }
 
-static inline void handle_options(struct mg_connection* nc)
+static inline void handle_options(struct mg_connection* conn)
 {
     /* UTC time */
     time_t now = time(nullptr);
@@ -136,7 +136,7 @@ static inline void handle_options(struct mg_connection* nc)
     strftime(date, sizeof(date), "%d, %b %Y %H:%M:%S GMT", gmtime(&now));
 
     /* Confirm that we allow post */
-    mg_printf(nc,
+    mg_printf(conn,
         "HTTP/1.1 204 No Content\r\n"
         "Cache-Control: max-age=604800\r\n"
         "Access-Control-Allow-Origin: *\r\n"
@@ -149,7 +149,7 @@ static inline void handle_options(struct mg_connection* nc)
         date, TUNA_VERSION);
 }
 
-static void event_handler(struct mg_connection* nc, int ev, void* d, void*)
+static void event_handler(struct mg_connection* conn, int ev, void* d, void*)
 {
     if (ev == MG_EV_HTTP_MSG) {
         auto* incoming = reinterpret_cast<struct mg_http_message*>(d);
@@ -157,13 +157,13 @@ static void event_handler(struct mg_connection* nc, int ev, void* d, void*)
         QString uri = utf8_to_qt(incoming->uri.ptr).split(" ")[0];
         if (method.startsWith("GET")) {
             if (uri.startsWith("/cover.png"))
-                handle_cover_get(nc, incoming);
+                handle_cover_get(conn, incoming);
             else
-                handle_info_get(nc);
+                handle_info_get(conn);
         } else if (method.startsWith("POST"))
-            handle_post(nc, incoming);
+            handle_post(conn, incoming);
         else if (method.startsWith("OPTIONS"))
-            handle_options(nc);
+            handle_options(conn);
     }
 }
 
