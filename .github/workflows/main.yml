@@ -11,11 +11,12 @@ on:
   pull_request:
     paths-ignore:
       - '**.md'
-    branches:
-      - master
+      - '**.ini'
+      - '**.js'
+      - '**.html'
 
 env:
-  PLUGIN_NAME: 'obs-plugintemplate'
+  PLUGIN_NAME: 'tuna'
 
 jobs:
   clang_check:
