@@ -3201,14 +3201,20 @@ static void iolog(struct mg_connection *c, char *buf, long n, bool r) {
   }
 }
 
+#if _WIN32
+#define CONVERT_TO_INT(a) ((int) a)
+#else
+#define CONVERT_TO_INT(a) (a)
+#endif
+
 static long mg_sock_send(struct mg_connection *c, const void *buf, size_t len) {
   long n;
   if (c->is_udp) {
     union usa usa;
     socklen_t slen = tousa(&c->peer, &usa);
-    n = sendto(FD(c), (char *) buf, len, 0, &usa.sa, slen);
+    n = sendto(FD(c), (char *) buf, CONVERT_TO_INT(len), 0, &usa.sa, slen);
   } else {
-    n = send(FD(c), (char *) buf, len, MSG_NONBLOCKING);
+      n = send(FD(c), (char *) buf, CONVERT_TO_INT(len), MSG_NONBLOCKING);
   }
   return n == 0 ? -1 : n < 0 && mg_sock_would_block() ? 0 : n;
 }
@@ -3309,10 +3315,10 @@ static long mg_sock_recv(struct mg_connection *c, void *buf, size_t len) {
   if (c->is_udp) {
     union usa usa;
     socklen_t slen = tousa(&c->peer, &usa);
-    n = recvfrom(FD(c), (char *) buf, len, 0, &usa.sa, &slen);
+    n = recvfrom(FD(c), (char *) buf, CONVERT_TO_INT(len), 0, &usa.sa, &slen);
     if (n > 0) tomgaddr(&usa, &c->peer, slen != sizeof(usa.sin));
   } else {
-    n = recv(FD(c), (char *) buf, len, MSG_NONBLOCKING);
+      n = recv(FD(c), (char *) buf, CONVERT_TO_INT(len), MSG_NONBLOCKING);
   }
   return n == 0 ? -1 : n < 0 && mg_sock_would_block() ? 0 : n;
 }
@@ -3508,7 +3514,7 @@ static bool mg_socketpair(SOCKET sp[2], union usa usa[2]) {
 
 void mg_mgr_wakeup(struct mg_connection *c, const void *buf, size_t len) {
   if (buf == NULL || len == 0) buf = (void *) "", len = 1;
-  send((SOCKET) (size_t) c->pfn_data, (const char *) buf, len, MSG_NONBLOCKING);
+  send((SOCKET) (size_t) c->pfn_data, (const char *) buf, CONVERT_TO_INT(len), MSG_NONBLOCKING);
 }
 
 static void pf1(struct mg_connection *c, int ev, void *ev_data, void *fn_data) {
@@ -4784,7 +4790,7 @@ static void mg_ws_mask(struct mg_connection *c, size_t len) {
 size_t mg_ws_send(struct mg_connection *c, const char *buf, size_t len,
                   int op) {
   uint8_t header[14];
-  size_t header_len = mkhdr(len, op, c->is_client, header);
+  size_t header_len = mkhdr(len, op, (bool) c->is_client, header);
   mg_send(c, header, header_len);
   LOG(LL_VERBOSE_DEBUG, ("WS out: %d [%.*s]", (int) len, (int) len, buf));
   mg_send(c, buf, len);
@@ -4939,7 +4945,7 @@ void mg_ws_upgrade(struct mg_connection *c, struct mg_http_message *hm,
 
 size_t mg_ws_wrap(struct mg_connection *c, size_t len, int op) {
   uint8_t header[14], *p;
-  size_t header_len = mkhdr(len, op, c->is_client, header);
+  size_t header_len = mkhdr(len, op, (bool) c->is_client, header);
 
   // NOTE: order of operations is important!
   mg_iobuf_add(&c->send, c->send.len, NULL, header_len, MG_IO_SIZE);
