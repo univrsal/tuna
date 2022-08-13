@@ -17,15 +17,12 @@
  *************************************************************************/
 
 #include "tuna_thread.hpp"
-#include "../gui/music_control.hpp"
-#include "../gui/tuna_gui.hpp"
 #include "../query/music_source.hpp"
 #include "config.hpp"
 #include "utility.hpp"
 #include <algorithm>
 #include <obs-module.h>
 #include <util/platform.h>
-#include <util/threading.h>
 
 namespace tuna_thread {
 std::atomic<bool> thread_flag { false };
@@ -61,7 +58,7 @@ void stop()
 
 void thread_method()
 {
-    os_set_thread_name("tuna-query");
+    util::set_thread_name("tuna-query");
 
     while (thread_flag) {
         const uint64_t time = os_gettime_ns() / 1000000;

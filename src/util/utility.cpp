@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <util/platform.h>
 #if _WIN32
-inline void os_set_thread_name(const char* name)
+inline void os_set_thread_name(const char*)
 {
     // I'm too lazy to fix this
 }
@@ -244,11 +244,7 @@ QJsonDocument curl_get_json(const char* url)
 
 void set_thread_name(const char* name)
 {
-#if _WIN32
-
-#else
     os_set_thread_name(name);
-#endif
 }
 
 QString remove_extensions(QString const& str)
