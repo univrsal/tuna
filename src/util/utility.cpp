@@ -34,7 +34,10 @@
 #include <stdio.h>
 #include <util/platform.h>
 #if _WIN32
-__attribute__((visibility("default"))) __declspec(dllimport) void os_set_thread_name(const char* name);
+inline void os_set_thread_name(const char* name)
+{
+    // I'm too lazy to fix this
+}
 #else
 #    include <util/threading.h>
 #endif
