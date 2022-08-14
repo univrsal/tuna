@@ -194,6 +194,7 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
     local -a cmake_args=(
       -DCMAKE_BUILD_TYPE=${BUILD_CONFIG:-RelWithDebInfo}
       -DQT_VERSION=${QT_VERSION}
+      -DLINUX_PORTABLE=OFF
       -DCMAKE_PREFIX_PATH="${_plugin_deps}"
     )
 
