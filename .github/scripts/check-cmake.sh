@@ -44,6 +44,7 @@ find . -type d \( \
     -path ./plugins/mac-syphon/syphon-framework -o \
     -path ./plugins/obs-outputs/ftl-sdk -o \
     -path ./plugins/obs-vst -o \
+    -path ./deps -o \
     -path ./plugins/obs-browser -o \
     -path ./plugins/win-dshow/libdshowcapture -o \
     -path ./plugins/obs-websocket/deps \
