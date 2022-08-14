@@ -45,7 +45,8 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #    pragma pack(pop)
 
-inline void os_set_thread_name(const char* name) {
+inline void os_set_thread_name(const char* name)
+{
     THREADNAME_INFO info;
     info.dwType = 0x1000;
     info.szName = name;
@@ -58,7 +59,7 @@ inline void os_set_thread_name(const char* name) {
     }
 }
 #else
-#include <util/threading.h>
+#    include <util/threading.h>
 #endif
 #include <util/util.hpp>
 
