@@ -78,6 +78,6 @@
             "qtVersion": 6
         }
     },
-    "name": "obs-plugintemplate",
-    "version": "1.0.0"
+    "name": "tuna",
+    "version": "1.8.0"
 }
