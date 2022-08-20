@@ -6,6 +6,8 @@ param(
     [string] $Target,
     [ValidateSet('Visual Studio 17 2022', 'Visual Studio 16 2019')]
     [string] $CMakeGenerator,
+    [string] $LastFMKey,
+    [string] $SpotifyToken,
     [switch] $SkipAll,
     [switch] $SkipBuild,
     [switch] $SkipDeps,
@@ -75,6 +77,8 @@ function Build {
             "-DCMAKE_BUILD_TYPE=${Configuration}"
             "-DCMAKE_PREFIX_PATH:PATH=$(Resolve-Path -Path "${ProjectRoot}/../obs-build-dependencies/${DepsPath}")"
             "-DQT_VERSION=${script:QtVersion}"
+            "-DCREDS=$SpotifyToken"
+            "-DLASTFM_CREDS=$LastFMKey"
         )
 
         Log-Debug "Attempting to configure OBS with CMake arguments: $($CmakeArgs | Out-String)"

@@ -65,15 +65,14 @@ runs:
 
     - name: Run Windows Build
       if: ${{ runner.os == 'Windows' }}
-      env:
-        LASTFM_KEY: ${{ inputs.lastfmKey }}
-        SPOTIFY_TOKEN: ${{ inputs.spotifyToken }}
       shell: pwsh
       run: |
         $BuildArgs = @{
           Target = '${{ inputs.target }}'
           Configuration = '${{ inputs.config }}'
           CMakeGenerator = '${{ inputs.visualStudio }}'
+          SpotifyToken = '${{ inputs.spotifyToken }}'
+          LastFMKey = '${{ inputs.lastfmKey }}'
         }
 
         if ( ( Test-Path env:CI ) -and ( Test-Path env:RUNNER_DEBUG ) ) {
