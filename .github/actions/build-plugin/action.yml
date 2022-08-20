@@ -32,6 +32,8 @@ runs:
       shell: zsh {0}
       env:
         CODESIGN_IDENT: ${{ inputs.codesignIdent }}
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_TOKEN: ${{ inputs.spotifyToken }}
       run: |
         build_args=(
           -c ${{ inputs.config }}
@@ -46,6 +48,9 @@ runs:
     - name: Run Linux Build
       if: ${{ runner.os == 'Linux' }}
       shell: bash
+      env:
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_TOKEN: ${{ inputs.spotifyToken }}
       run: |
         build_args=(
           -c ${{ inputs.config }}
@@ -60,6 +65,9 @@ runs:
 
     - name: Run Windows Build
       if: ${{ runner.os == 'Windows' }}
+      env:
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_TOKEN: ${{ inputs.spotifyToken }}
       shell: pwsh
       run: |
         $BuildArgs = @{

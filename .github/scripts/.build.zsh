@@ -196,6 +196,8 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
       -DQT_VERSION=${QT_VERSION}
       -DLINUX_PORTABLE=OFF
       -DCMAKE_PREFIX_PATH="${_plugin_deps}"
+      -DCREDS="${SPOTIFY_TOKEN}"
+      -DLASTFM_CREDS="${LASTFM_KEY}"
     )
 
     if (( _loglevel == 0 )) cmake_args+=(-Wno_deprecated -Wno-dev --log-level=ERROR)
@@ -216,6 +218,8 @@ Usage: %B${functrace[1]%:*}%b <option> [<options>]
           -DCMAKE_OSX_DEPLOYMENT_TARGET=${DEPLOYMENT_TARGET:-10.15}
           -DOBS_CODESIGN_LINKER=ON
           -DOBS_BUNDLE_CODESIGN_IDENTITY="${CODESIGN_IDENT:--}"
+	  -DCREDS="${SPOTIFY_TOKEN}"
+	  -DLASTFM_CREDS="${LASTFM_KEY}"
         )
         num_procs=$(( $(sysctl -n hw.ncpu) + 1 ))
         ;;
