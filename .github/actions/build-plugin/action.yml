@@ -24,6 +24,13 @@ inputs:
     description: 'Working directory for packaging'
     required: false
     default: ${{ github.workspace }}
+  lastfmKey:
+    description: 'Last.fm API Key'
+    required: false
+    default: ''
+  spotifyToken: 'Spotify API Secret'
+    required: false
+    default: ''
 runs:
   using: 'composite'
   steps:
