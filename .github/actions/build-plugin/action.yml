@@ -29,7 +29,7 @@ inputs:
     required: false
     default: ''
   spotifyToken:
-    'Spotify API Secret'
+    description: 'Spotify API Secret'
     required: false
     default: ''
 runs:
