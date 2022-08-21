@@ -28,7 +28,8 @@ inputs:
     description: 'Last.fm API Key'
     required: false
     default: ''
-  spotifyToken: 'Spotify API Secret'
+  spotifyToken:
+    'Spotify API Secret'
     required: false
     default: ''
 runs:
