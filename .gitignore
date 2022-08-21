@@ -5,3 +5,4 @@ creds.txt
 build-tuna*/
 .idea
 /cmake-build-debug/
+*.generated.h
