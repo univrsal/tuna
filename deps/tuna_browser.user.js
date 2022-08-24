@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.13
+// @version      1.0.14
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -18,6 +18,8 @@
 
 (function() {
     'use strict';
+    console.log("Loading tuna browser script");
+
     // Configuration
     var port = 1608;
     var refresh_rate_ms = 500;
@@ -106,16 +108,18 @@
                     post({ cover_url, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === 'open.spotify.com') {
-                let status = query('.player-controls [data-testid="control-button-pause"]', e => !!e ? 'playing' : 'stopped', 'unknown');
-                let cover_url = query('[data-testid="CoverSlotExpanded__container"] .cover-art-image', e => e.style.backgroundImage.slice(5, -2));
-                let title = query('[data-testid="nowplaying-track-link"]', e => e.textContent);
-                let artists = query('span[draggable] a[href*="artist"]', e => Array.from(e));
-                let progress = query('.playback-bar .playback-bar__progress-time', e => timestamp_to_ms(e[0].textContent));
-                let duration = query('.playback-bar .playback-bar__progress-time', e => timestamp_to_ms(e[1].textContent));
-                let album_url = query('[data-testid="nowplaying-track-link"]', e => e.href);
+                let data = navigator.mediaSession;
+                let album = data.metadata.album;
+                let status = query('.vnCew8qzJq3cVGlYFXRI', e => e === null ? 'stopped' : (e.getAttribute('aria-label') === 'Play' ? 'stopped' : 'playing'));
+                let cover = data.metadata.artwork[0].src;
+                let title =  data.metadata.title
+                let artists = [data.metadata.artist]
+                let progress = query('.playback-bar__progress-time-elapsed', e => timestamp_to_ms(e.textContent));
+                let duration = query('.npFSJSO1wsu3mEEGb5bh', e => timestamp_to_ms(e.textContent));
+                
 
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url });
+                    post({ cover, title, artists, status, progress, duration, album });
                 }
             } else if (hostname === 'music.yandex.ru') {
                 // Yandex music support by MjKey
