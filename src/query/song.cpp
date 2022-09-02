@@ -155,6 +155,15 @@ void song::from_json(const QJsonObject& obj)
     // and the user script uses cover
     set(meta::COVER, obj["cover"].toString());
 
+    auto status = play_state::state_unknown;
+    if (obj["status"].toString() == "playing")
+        status = play_state::state_playing;
+    else if (obj["status"].toString() == "stopped")
+        status = play_state::state_stopped;
+    else if (obj["status"].toString() == "paused")
+        status = play_state::state_stopped;
+    set(meta::STATUS, status);
+
     auto release = obj["release_date"];
     if (release.isObject()) {
         if (release["precision"].isString()) {
