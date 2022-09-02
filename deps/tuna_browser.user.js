@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.14
+// @version      1.0.15
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -87,7 +87,7 @@
             // TODO: maybe add more?
             if (hostname === 'soundcloud.com') {
                 let status = query('.playControl', e => e.classList.contains('playing') ? "playing" : "stopped", 'unknown');
-                let cover_url = query('.playbackSoundBadge span.sc-artwork', e => e.style.backgroundImage.slice(5, -2).replace('t50x50','t500x500'));
+                let cover = query('.playbackSoundBadge span.sc-artwork', e => e.style.backgroundImage.slice(5, -2).replace('t50x50','t500x500'));
                 let title = query('.playbackSoundBadge__titleLink', e => e.title);
                 let artists = [ query('.playbackSoundBadge__lightLink', e => e.title) ];
                 let progress = query('.playbackTimeline__timePassed span:nth-child(2)', e => timestamp_to_ms(e.textContent));
@@ -105,7 +105,7 @@
                 })
 
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url, album });
+                    post({ cover, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === 'open.spotify.com') {
                 let data = navigator.mediaSession;
@@ -124,7 +124,7 @@
             } else if (hostname === 'music.yandex.ru') {
                 // Yandex music support by MjKey
                 let status = query('.player-controls__btn_play', e => e.classList.contains('player-controls__btn_pause') ? "playing" : "stopped", 'unknown');
-                let cover_url = query('.entity-cover__image', e => e.style.backgroundImage.slice(5, -2).replace('50x50','200x200'));
+                let cover = query('.entity-cover__image', e => e.style.backgroundImage.slice(5, -2).replace('50x50','200x200'));
                 let title = query('.track__title', e => e.title);
                 let artists = [ query('.track__artists', e => e.textContent) ];
                 let progress = query('.progress__left', e => timestamp_to_ms(e.textContent));
@@ -132,7 +132,7 @@
                 let album_url = query('.track-cover a', e => e.title);
 
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url });
+                    post({ cover, title, artists, status, progress, duration, album_url });
                 }
             } else if (hostname === 'www.youtube.com') {
               let artists = [];
@@ -160,7 +160,7 @@
 
               if (title !== null) {
                 if (status !== 'stopped') {
-                     post({ cover_url, title, artists, status, progress: Math.floor(progress), duration });
+                     post({ cover, title, artists, status, progress: Math.floor(progress), duration });
                 } else {
                   post({ status: 'stopped', title: '', artists: [], progress: 0, duration: 0});
                 }
@@ -187,13 +187,14 @@
                 }
                 let title = query('.ytmusic-player-bar.title', e => e.title);
                 let artists = Array.from(document.querySelectorAll(artistsSelectors)).map(x => x.innerText);
-                let cover_url = query('.ytmusic-player-bar.thumbnail-image-wrapper img', e => e.src.replace(/=w\d+-h\d+.*/,'=s0?imgmax=0')); // get max resolution
                 let album = query(albumSelectors, e => e.textContent);
+                let artwork = navigator.mediaSession.metadata.artwork;
+                let cover = artwork[artwork.length - 1].src;
                 let album_url = query(albumSelectors, e => e.href);
                 let progress = timestamp_to_ms(time[0]);
                 let duration = timestamp_to_ms(time[1]);
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url, album });
+                    post({ cover, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === 'www.deezer.com') {
                 let status = query('.player-controls', e => {
@@ -208,7 +209,7 @@
                     return "unknown";
                 });
 
-                let cover_url = query('button.queuelist.is-available', e => {
+                let cover = query('button.queuelist.is-available', e => {
                     let img = e.getElementsByTagName('img');
                     if (img.length > 0) {
                         let src = img[0].src; // https://e-cdns-images.dzcdn.net/images/cover/c4217689cc86e3e6a289162239424dc3/28x28-000000-80-0-0.jpg
@@ -239,7 +240,7 @@
                 let duration = query('.slider-counter-max', e => timestamp_to_ms(e.textContent));
                 let progress = query('.slider-counter-current', e => timestamp_to_ms(e.textContent));
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration });
+                    post({ cover, title, artists, status, progress, duration });
                 }
             } else if (hostname === "play.pretzel.rocks") {
                 // Pretzel.rocks support by Tarulia
@@ -255,7 +256,7 @@
                   status = "stopped";
                 }
 
-                let cover_url = query('[data-testid=track-artwork]', e => {
+                let cover = query('[data-testid=track-artwork]', e => {
                     let img = e.getElementsByTagName('img');
                     if (img.length > 0) {
                         let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/medium.jpg
@@ -292,7 +293,7 @@
                 let progress = query('[data-testid=track-progress-bar]', e => e.value * 1000);
 
                 if (title !== null) {
-                    post({ cover_url, title, artists, status, progress, duration, album_url, album });
+                    post({ cover, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === "app.plex.tv") {
                 // simple plex web support by javaarchive
@@ -315,10 +316,10 @@
                     let artworks = navigator.mediaSession.metadata.artwork;
                     let album = navigator.mediaSession.metadata.album;
                     let album_url = artworks[artworks.length - 1].src;
-                    let cover_url = album_url; // For now. 
+                    let cover = album_url; // For now. 
 
                     if (title !== null) {
-                        post({ cover_url, title, artists, status, progress, duration, album, album_url });
+                        post({ cover, title, artists, status, progress, duration, album, album_url });
                     }
                 }
             }
