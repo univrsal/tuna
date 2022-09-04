@@ -1,7 +1,7 @@
 {
     "dependencies": {
         "obs-studio": {
-            "version": "28.0.0-beta1",
+            "version": "28.0.1",
             "repository": "https://github.com/obsproject/obs-studio.git",
             "branch": "master",
             "hash": "43a49dca47344a5170159ef99b86b97f90d4e4ad"
@@ -79,5 +79,5 @@
         }
     },
     "name": "tuna",
-    "version": "1.8.0"
+    "version": "1.8.2"
 }
