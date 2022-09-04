@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.15
+// @version      1.0.16
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -138,7 +138,7 @@
               let artists = [];
 
               try {
-                artists = [ document.querySelector('#meta-contents').querySelector('#channel-name').innerText.replace('\n', '').trim() ];
+                artists = [ document.querySelector('div#upload-info').querySelector('a').innerText.trim().replace("\n", "") ];
               } catch(e) {}
 
               let title = query('.style-scope.ytd-video-primary-info-renderer', e => {
@@ -149,16 +149,23 @@
               });
               let duration = query('video', e => e.duration * 1000);
               let progress = query('video', e => e.currentTime * 1000);
-              let cover_url = "";
+              let cover = "";
               let status = query('video', e => e.paused ? 'stopped' : 'playing', 'unknown');
               let regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
               let match = window.location.toString().match(regExp);
               if (match && match[2].length == 11) {
-                cover_url = `https://i.ytimg.com/vi/${match[2]}/maxresdefault.jpg`;
+                cover = `https://i.ytimg.com/vi/${match[2]}/maxresdefault.jpg`;
               }
 
 
               if (title !== null) {
+                title = title.replace(`${artists.join(", ")} - `, "");
+                title = title.replace(` - ${artists.join(", ")}`, "");
+                title = title.replace(`${artists.join(", ")}`, "");
+                title = title.replace("(Official Audio)", "");
+                title = title.replace("(Official Music Video)", "");
+                title = title.replace("(Original Video)", "");
+                title = title.replace("(Original Mix)", "");
                 if (status !== 'stopped') {
                      post({ cover, title, artists, status, progress: Math.floor(progress), duration });
                 } else {
