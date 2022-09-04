@@ -29,9 +29,12 @@ class mpd_source : public music_source {
     QString m_song_file_path;
     uint16_t m_port;
     bool m_local;
+    mpd_connection* m_connection {};
+    int m_connection_error_count {};
 
 public:
     mpd_source();
+    ~mpd_source() { close_connection(); }
 
     void load() override;
     void refresh() override;
@@ -41,6 +44,12 @@ public:
     void reset_info() override;
 
 private:
-    struct mpd_connection* connect();
+    void ensure_connection();
+
+    void close_connection()
+    {
+        mpd_connection_free(m_connection);
+        m_connection = nullptr;
+    }
     uint64_t m_last_error_log = 0;
 };

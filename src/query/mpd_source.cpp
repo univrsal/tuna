@@ -42,15 +42,16 @@ void mpd_source::reset_info()
     disconnect();
 }
 
-struct mpd_connection* mpd_source::connect()
+void mpd_source::ensure_connection()
 {
-    struct mpd_connection* result = nullptr;
+    if (m_connection)
+        return;
+    mpd_connection* result {};
+
     if (m_local)
-        result = mpd_connection_new(nullptr, 0, 20); // 0 ms timeout on windows blocks this thread, which is bad
-                                                     // but it also can't be as high as the refresh rate otherwise
-                                                     // the frehfresh thread will never sleep
+        result = mpd_connection_new(nullptr, 0, 1000);
     else
-        result = mpd_connection_new(qt_to_utf8(m_address), m_port, 20);
+        result = mpd_connection_new(qt_to_utf8(m_address), m_port, 1000);
 
     if (mpd_connection_get_error(result) != MPD_ERROR_SUCCESS) {
         if (util::epoch() - m_last_error_log > 5) {
@@ -65,9 +66,10 @@ struct mpd_connection* mpd_source::connect()
         }
 
         mpd_connection_free(result);
-        result = nullptr;
+        m_connection = nullptr;
+    } else {
+        m_connection = result;
     }
-    return result;
 }
 
 bool mpd_source::enabled() const
@@ -106,22 +108,39 @@ static inline play_state from_mpd_state(mpd_state s)
 
 void mpd_source::refresh()
 {
-    struct mpd_connection* connection = connect();
+    ensure_connection();
     struct mpd_status* status = nullptr;
     struct mpd_song* mpd_song = nullptr;
 
-    if (!connection)
+    if (!m_connection)
         return;
     begin_refresh();
     m_current.clear();
 
-    status = mpd_run_status(connection);
-    mpd_song = mpd_run_current_song(connection);
+    status = mpd_run_status(m_connection);
+    mpd_song = mpd_run_current_song(m_connection);
 
     if (status) {
         auto new_state = mpd_status_get_state(status);
         m_current.set<int>(meta::PROGRESS, ((int)mpd_status_get_elapsed_ms(status)));
         m_current.set<int>(meta::STATUS, from_mpd_state(new_state));
+    } else {
+        if (util::epoch() - m_last_error_log > 5) {
+            if (m_local) {
+                berr("local mpd connection on default port (usually %i) failed with error '%s'", 6600,
+                    mpd_connection_get_error_message(m_connection));
+            } else {
+                berr("mpd connection to %s:%hu failed with error '%s'", qt_to_utf8(m_address), m_port,
+                    mpd_connection_get_error_message(m_connection));
+            }
+            m_connection_error_count++;
+            m_last_error_log = util::epoch();
+            if (m_connection_error_count > 5) {
+                berr("Too many mpd connection errors, trying to reconnect.");
+                m_connection_error_count = 0;
+                close_connection(); // Try again on next refresh
+            }
+        }
     }
 
 /* Thanks ubuntu for using ancient packages */
@@ -191,7 +210,6 @@ void mpd_source::refresh()
         m_current.set(meta::COVER, path);
     }
 
-    mpd_connection_free(connection);
     if (mpd_song)
         mpd_song_free(mpd_song);
     if (status)
@@ -227,39 +245,38 @@ void mpd_source::handle_cover()
 
 bool mpd_source::execute_capability(capability c)
 {
-    struct mpd_connection* connection = connect();
-    if (!connection)
+    ensure_connection();
+    if (!m_connection)
         return false;
     bool result = false;
     switch (c) {
     case CAP_NEXT_SONG:
-        result = mpd_run_next(connection);
+        result = mpd_run_next(m_connection);
         break;
     case CAP_PREV_SONG:
-        result = mpd_run_previous(connection);
+        result = mpd_run_previous(m_connection);
         break;
     case CAP_VOLUME_UP:
-        result = mpd_run_change_volume(connection, 2);
+        result = mpd_run_change_volume(m_connection, 2);
         break;
     case CAP_VOLUME_DOWN:
-        result = mpd_run_change_volume(connection, -2);
+        result = mpd_run_change_volume(m_connection, -2);
         break;
     case CAP_VOLUME_MUTE:
-        result = mpd_run_set_volume(connection, 0);
+        result = mpd_run_set_volume(m_connection, 0);
         break;
     case CAP_PLAY_PAUSE:
-        result = mpd_run_toggle_pause(connection);
+        result = mpd_run_toggle_pause(m_connection);
         if (m_stopped)
-            result = mpd_run_play_pos(connection, 0);
+            result = mpd_run_play_pos(m_connection, 0);
         m_stopped = false;
         break;
     case CAP_STOP_SONG:
         m_stopped = true;
-        result = mpd_run_stop(connection);
+        result = mpd_run_stop(m_connection);
         break;
     default:;
     }
 
-    mpd_connection_free(connection);
     return result;
 }
