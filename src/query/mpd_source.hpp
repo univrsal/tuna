@@ -48,7 +48,8 @@ private:
 
     void close_connection()
     {
-        mpd_connection_free(m_connection);
+        if (m_connection)
+            mpd_connection_free(m_connection);
         m_connection = nullptr;
     }
     uint64_t m_last_error_log = 0;
