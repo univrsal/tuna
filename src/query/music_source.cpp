@@ -153,7 +153,8 @@ bool music_source::download_missing_cover()
 {
     static const QString request = "https://itunes.apple.com/search?term={}&media=music&entity=album"; // should we also look for singles?
     if (config::download_missing_cover && m_current.has_cover_lookup_information()) {
-        auto search_term = QUrl::toPercentEncoding(m_current.get<QStringList>(meta::ARTIST)[0] + " " + m_current.get(meta::ALBUM));
+        auto artists = m_current.get<QStringList>(meta::ARTIST);
+        auto search_term = QUrl::toPercentEncoding(artists[0] + " " + m_current.get(meta::ALBUM));
         auto url = request;
         url = url.replace("{}", search_term);
         auto doc = util::curl_get_json(qt_to_utf8(url));
