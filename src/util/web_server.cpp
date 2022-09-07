@@ -18,15 +18,16 @@
 
 #include "web_server.hpp"
 #include "config.hpp"
+#include "plugin-macros.generated.h"
 #include "tuna_thread.hpp"
 #include "utility.hpp"
 #include <QDateTime>
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <ctime>
-extern "C" {
-#include <mongoose.h>
-}
+#include <httplib.h>
+#include <sstream>
 #include <util/platform.h>
 
 namespace web_thread {
@@ -34,13 +35,11 @@ namespace web_thread {
 std::thread thread_handle;
 std::mutex current_song_mutex;
 song current_song;
-std::atomic<bool> thread_flag {};
 
-struct mg_mgr mgr;
-struct mg_connection* nc;
+httplib::Server* server {};
 
-/* GET requests will result in song information */
-static inline void handle_info_get(struct mg_connection* conn)
+//* GET requests will result in song information */
+static inline void handle_info_get(const httplib::Request&, httplib::Response& res)
 {
     /* Write current song to json
      * and properly convert it to utf8
@@ -62,160 +61,111 @@ static inline void handle_info_get(struct mg_connection* conn)
     str.resize(len);
     os_wcs_to_utf8(wstr.c_str(), 0, &str[0], len + 1);
 
-    /* Send basic http response with json */
-    mg_printf(conn,
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: application/json; charset=utf-8\r\n"
-        "Content-Length: %i\r\n"
-        "Connection: close\r\n"
-        "Cache-Control: no-store\r\n"
-        "Content-Language: en-US\r\n"
-        "Server: tuna/%s\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
-        "\r\n"
-        "%s",
-        int(len), TUNA_VERSION, str.c_str());
+    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Server", "tuna/" PLUGIN_VERSION);
+    res.set_header("Content-Type", "application/json; charset=utf-8");
+    res.set_header("Connection", "close");
+    res.set_header("Cache-Control", "no-store");
+    res.set_header("Content-Language", "en-US");
+    res.set_content(str.c_str(), "application/json; charset=utf-8");
+    res.status = 200;
 }
 
-static inline void handle_cover_get(struct mg_connection* conn, struct mg_http_message* msg)
-{
-    struct mg_http_serve_opts opts {
-    };
-    opts.mime_types = "png=image/png";
-    opts.extra_headers = "Cache-Control: no-store\r\n";
-    mg_http_serve_file(conn, msg, qt_to_utf8(config::cover_path), &opts);
-}
-
-/* POST means we're getting information */
-static void handle_post(struct mg_connection* conn, struct mg_http_message* msg)
+//* POST means we're getting information */
+static void handle_post(const httplib::Request& req, httplib::Response& res)
 {
     /* Parse POST data JSON */
-    QByteArray arr = QByteArray(msg->body.ptr, msg->body.len);
+    auto str = utf8_to_qt(req.body.c_str());
     QJsonParseError err {};
-    QJsonDocument doc = QJsonDocument::fromJson(arr, &err);
+    QJsonDocument doc = QJsonDocument::fromJson(str.toUtf8(), &err);
 
     if (err.error == QJsonParseError::NoError && doc.isObject()) {
-        auto data = doc.object()["data"];
+        auto const data = doc.object()["data"];
 
         if (data.isObject()) {
+            auto const obj = data.toObject();
             std::lock_guard<std::mutex> lock(current_song_mutex);
-            current_song.from_json(data.toObject());
+            current_song.from_json(obj);
         }
     } else {
         bwarn("Error while parsing JSON received via POST: %s", qt_to_utf8(err.errorString()));
-        bwarn("JSON: %s", msg->body.ptr);
-        mg_printf(conn,
-            "HTTP/1.1 400 Bad request\r\n"
-            "Connection: close\r\n"
-            "Server: tuna/%s\r\n"
-            "\r\n",
-            TUNA_VERSION);
+        bwarn("JSON: %s", req.body.c_str());
+        res.set_content(qt_to_utf8(err.errorString()), "text/plain");
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Server", "tuna/" PLUGIN_VERSION);
+        res.status = 500;
         return;
     }
 
-    /* Simple OK reponse with mirror of received data */
-    mg_printf(conn,
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain; charset=utf-8\r\n"
-        "Content-Length: %i\r\n"
-        "Connection: close\r\n"
-        "Cache-Control: no-store\r\n"
-        "Content-Language: en-US\r\n"
-        "Server: tuna/%s\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
-        "\r\n"
-        "%s",
-        int(msg->body.len), TUNA_VERSION, msg->body.ptr);
-}
-
-static inline void handle_options(struct mg_connection* conn)
-{
-    /* UTC time */
-    time_t now = time(nullptr);
-    char date[100];
-    strftime(date, sizeof(date), "%d, %b %Y %H:%M:%S GMT", gmtime(&now));
-
-    /* Confirm that we allow post */
-    mg_printf(conn,
-        "HTTP/1.1 204 No Content\r\n"
-        "Cache-Control: max-age=604800\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
-        "Access-Control-Allow-Methods: POST\r\n"
-        "Access-Control-Allow-Headers: *\r\n"
-        "Access-Control-Max-Age: 84600\r\n"
-        "Date: %s\r\n"
-        "Server: tuna/%s\r\n"
-        "\r\n",
-        date, TUNA_VERSION);
-}
-
-static void event_handler(struct mg_connection* conn, int ev, void* d, void*)
-{
-    if (ev == MG_EV_HTTP_MSG) {
-        auto* incoming = reinterpret_cast<struct mg_http_message*>(d);
-        QString method = utf8_to_qt(incoming->method.ptr);
-        QString uri = utf8_to_qt(incoming->uri.ptr).split(" ")[0];
-        if (method.startsWith("GET")) {
-            if (uri.startsWith("/cover.png"))
-                handle_cover_get(conn, incoming);
-            else
-                handle_info_get(conn);
-        } else if (method.startsWith("POST"))
-            handle_post(conn, incoming);
-        else if (method.startsWith("OPTIONS"))
-            handle_options(conn);
-    }
+    /* Simple OK reponse */
+    res.set_content("200 OK", "text/plain; charset=utf-8");
+    res.set_header("Connection", "close");
+    res.set_header("Cache-Control", "no-store");
+    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Server", "tuna/" PLUGIN_VERSION);
+    res.set_header("Connection", "close");
+    res.set_header("Cache-Control", "no-store");
+    res.set_header("Content-Language", "en-US");
+    res.status = 200;
 }
 
 bool start()
 {
-    if (thread_flag)
+    if (server && server->is_running() && server->is_valid())
         return true;
-    thread_flag = true;
+    stop();
+    server = new httplib::Server;
 
-    bool result = true;
-    auto port = CGET_STR(CFG_SERVER_PORT);
-    std::string url = "http://localhost:";
-    url = url.append(port);
-    binfo("Starting web server on %s", port);
-    mg_log_set_callback([](const void* buf, size_t, void*) { binfo("mongoose: %s", (char*)buf); }, nullptr);
-    mg_mgr_init(&mgr);
-    nc = mg_http_listen(&mgr, url.c_str(), event_handler, NULL);
-
-    if (!nc) {
-        berr("Failed to start listener");
-        return false;
-    }
+    server->set_logger([](const httplib::Request&, const httplib::Response&) {});
+    server->Options("/", [](const httplib::Request&, httplib::Response& res) {
+        time_t now = time(nullptr);
+        char date[100];
+        strftime(date, sizeof(date), "%d, %b %Y %H:%M:%S GMT", gmtime(&now));
+        res.set_header("Cache-control", "max-age=604800");
+        res.set_header("Access-Control-Allow-Methods", "POST");
+        res.set_header("Access-Control-Allow-Headers", "*");
+        res.set_header("Access-Control-Max-Age", "84600");
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Date", date);
+        res.set_content(date, "text/plain");
+    });
+    server->Get("/cover.png", [](const httplib::Request&, httplib::Response& res) {
+        QFile f(config::cover_path);
+        if (f.open(QIODevice::ReadOnly)) {
+            auto data = f.readAll();
+            res.set_content(data, data.length(), "image/png");
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_header("Cache-Control", "no-cache");
+            res.status = 200;
+        } else {
+            res.set_content("500 Internal Server Error: Couldn't open cover file", "text/plain");
+            res.status = 500;
+        }
+    });
+    server->Get("/", handle_info_get);
+    server->Post("/", handle_post);
 
     thread_handle = std::thread(thread_method);
-    result = thread_handle.native_handle();
-
-    thread_flag = result;
-    return result;
+    return thread_handle.native_handle();
 }
 
 void stop()
 {
-    if (!thread_flag)
-        return;
-    auto port = CGET_STR(CFG_SERVER_PORT);
-    binfo("Stopping web server running on %s", port);
-
-    thread_flag = false;
-    thread_handle.join();
-    mg_mgr_free(&mgr);
+    if (server) {
+        if (server->is_running() && server->is_valid())
+            server->stop();
+        delete server;
+        server = nullptr;
+        thread_handle.join();
+        binfo("Stopped webserver");
+    }
 }
 
 void thread_method()
 {
     util::set_thread_name("tuna-webserver");
-
-    for (;;) {
-        mg_mgr_poll(&mgr, 500);
-        if (!thread_flag)
-            break;
-    }
-    binfo("Web server thread stopped");
+    auto port = CGET_STR(CFG_SERVER_PORT);
+    binfo("Webserver listening on %s", port);
+    server->listen("0.0.0.0", atoi(port));
 }
-
 }

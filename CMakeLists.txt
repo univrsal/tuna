@@ -17,7 +17,7 @@ include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${TAGLIB_INCLUDE_DIRS})
 include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
-include_directories(${MONGOOSE_INCLUDE_DIRS})
+include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
 # Replace `Your Name Here` with the name (yours or your organization's) you want to see as the
@@ -116,7 +116,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   ./src/gui/widgets/spotify.hpp
   ./src/gui/widgets/vlc.cpp
   ./src/gui/widgets/vlc.hpp
-  "${MONGOOSE_SRC}"
 )
 
 # Import libobs as main plugin dependency

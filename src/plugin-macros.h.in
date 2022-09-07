@@ -1,6 +1,6 @@
 /*
 Plugin Name
-Copyright (C) <Year> <Developer> <Email Address>
+Copyright (C) 2022 univrsal <uni@vrsal.xyz>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,7 +21,5 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #define PLUGIN_NAME "@CMAKE_PROJECT_NAME@"
 #define PLUGIN_VERSION "@CMAKE_PROJECT_VERSION@"
-
-#define blog(level, msg, ...) blog(level, "[" PLUGIN_NAME "] " msg, ##__VA_ARGS__)
 
 #endif // PLUGINNAME_H

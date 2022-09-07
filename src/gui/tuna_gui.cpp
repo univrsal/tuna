@@ -30,7 +30,7 @@
 #include <QMessageBox>
 #include <QString>
 #include <curl/curl.h>
-#include <mongoose.h>
+#include <httplib.h>
 #include <mpd/client.h>
 #include <obs-frontend-api.h>
 #include <string>
@@ -81,7 +81,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     about_text = about_text.replace("%libobsversion%", MAKE_VERSION_STRING(LIBOBS_API, VER));
     about_text = about_text.replace("%taglibversion%", MAKE_VERSION_STRING(TAGLIB, VERSION));
     about_text = about_text.replace("%mpdversion%", MAKE_VERSION_STRING(LIBMPDCLIENT, VERSION));
-    about_text = about_text.replace("%mgversion%", MG_VERSION);
+    about_text = about_text.replace("%cpphttplib%", CPPHTTPLIB_VERSION);
 
     ui->label->setText(about_text);
 
