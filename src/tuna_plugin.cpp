@@ -96,7 +96,8 @@ void tuna_save_cb(obs_data_t* save_data, bool saving, void*)
 
 bool obs_module_load()
 {
-    binfo("Loading v%s build time %s", TUNA_VERSION, BUILD_TIME);
+    binfo("Loading v%s (build time %s). Qt version: compile-time: %s, run-time: %s. libobs: compile-time: %s, run-time: %s",
+        TUNA_VERSION, BUILD_TIME, QT_VERSION_STR, qVersion(), OBS_VERSION_CANONICAL, obs_get_version_string());
     config::init();
     register_gui();
     format::init();
