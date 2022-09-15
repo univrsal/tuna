@@ -44,12 +44,17 @@ void spotify::load_settings()
 {
     auto id = utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_ID));
     auto secret = utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_SECRET));
+    auto state = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
+
     ui->txt_client_id->setText(id);
     ui->txt_secret->setText(secret);
-    apply_login_state(CGET_BOOL(CFG_SPOTIFY_LOGGEDIN), "");
+    apply_login_state(state);
 
-    if (!id.isEmpty() || !secret.isEmpty())
-        binfo("Using custom Spotify credentials. ID set: %s, secret set: %s", id.isEmpty() ? "no" : "yes", secret.isEmpty() ? "no" : "yes");
+    if (!state)
+        binfo("Not logged into Spotify.") else binfo("Logged into Spotify.")
+
+            if (!id.isEmpty() || !secret.isEmpty())
+                binfo("Using custom Spotify credentials. ID set: %s, secret set: %s", id.isEmpty() ? "no" : "yes", secret.isEmpty() ? "no" : "yes");
 }
 
 void spotify::tick()
