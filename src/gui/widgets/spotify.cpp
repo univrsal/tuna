@@ -42,9 +42,14 @@ spotify::~spotify()
 
 void spotify::load_settings()
 {
-    ui->txt_client_id->setText(utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_ID)));
-    ui->txt_secret->setText(utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_SECRET)));
+    auto id = utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_ID));
+    auto secret = utf8_to_qt(CGET_STR(CFG_SPOTIFY_CLIENT_SECRET));
+    ui->txt_client_id->setText(id);
+    ui->txt_secret->setText(secret);
     apply_login_state(CGET_BOOL(CFG_SPOTIFY_LOGGEDIN), "");
+
+    if (!id.isEmpty() || !secret.isEmpty())
+        binfo("Using custom Spotify credentials. ID set: %s, secret set: %s", id.isEmpty() ? "no" : "yes", secret.isEmpty() ? "no" : "yes");
 }
 
 void spotify::tick()
