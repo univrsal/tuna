@@ -242,7 +242,6 @@ void vlc_obs_source::refresh()
         // just use strings instead of assuming that it'll always be a number
         check(artwork_url, meta::COVER);
         check(title, meta::TITLE);
-        check(date, meta::RELEASE);
         check(album, meta::ALBUM);
         check(publisher, meta::LABEL);
         check(url, meta::FILE_NAME);
@@ -269,6 +268,22 @@ void vlc_obs_source::refresh()
         auto artist = get_meta("artist");
         if (artist != "")
             m_current.set(meta::ARTIST, QStringList(artist));
+
+        auto date = get_meta("date");
+        if (!date.isEmpty()) {
+            auto splits = date.split("-");
+
+            if (splits.count() > 2) {
+                m_current.set(meta::RELEASE_DAY, splits[2].toInt());
+                m_current.set(meta::RELEASE_MONTH, splits[1].toInt());
+                m_current.set(meta::RELEASE_YEAR, splits[0].toInt());
+            } else if (splits.count() > 1) {
+                m_current.set(meta::RELEASE_MONTH, splits[1].toInt());
+                m_current.set(meta::RELEASE_YEAR, splits[0].toInt());
+            } else {
+                m_current.set(meta::RELEASE_YEAR, date.toInt());
+            }
+        }
 #undef check
     }
 
