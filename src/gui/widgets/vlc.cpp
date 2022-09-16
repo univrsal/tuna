@@ -139,9 +139,11 @@ void vlc::load_vlc_sources()
     ui->cb_source->clear();
 
     obs_enum_scenes([](void* _data, obs_source_t* src) {
-        auto* name = obs_source_get_name(src);
-        auto* cb = reinterpret_cast<QComboBox*>(_data);
-        cb->addItem(utf8_to_qt(name));
+        if (obs_source_is_scene(src)) {
+            auto* name = obs_source_get_name(src);
+            auto* cb = reinterpret_cast<QComboBox*>(_data);
+            cb->addItem(utf8_to_qt(name));
+        }
         return true;
     },
         ui->cb_scene);
