@@ -259,32 +259,44 @@ obs_scene_t* vlc::get_selected_scene()
 struct source_data {
     QComboBox* cb;
     vlc* v;
+    int recursion_count = 0;
+    const char* root_scene_name;
 };
+
+static bool get_vlc_sources_from_scene(obs_scene_t* s, obs_sceneitem_t* item, void* _data)
+{
+    auto* d = reinterpret_cast<source_data*>(_data);
+    auto* src = obs_sceneitem_get_source(item);
+    auto* scene = obs_scene_get_source(s);
+
+    if (d->recursion_count > 10) {
+        /* wtf??? */
+        binfo("Recursion exceeded 10 levels when looking for vlc sources in scene '%s'", obs_source_get_name(scene));
+        return false;
+    }
+
+    if (src && scene) {
+        auto* id = obs_source_get_id(src);
+        if (strcmp(id, "vlc_source") == 0) {
+            auto* scene_name = d->recursion_count > 0 ? d->root_scene_name : obs_source_get_name(scene);
+            auto* src_name = obs_source_get_name(src);
+            if (!d->v->has_mapping(scene_name, src_name))
+                d->cb->addItem(utf8_to_qt(src_name));
+        } else if (obs_source_is_group(src)) {
+            source_data dnew = { d->cb, d->v, d->recursion_count + 1, d->root_scene_name };
+            obs_scene_enum_items(obs_group_from_source(src), get_vlc_sources_from_scene, &dnew);
+        }
+    }
+    return true;
+}
 
 void vlc::refresh_sources()
 {
     ui->cb_source->clear();
     auto* scene = get_selected_scene();
-    source_data d = { ui->cb_source, this };
+    source_data d = { ui->cb_source, this, 0, obs_source_get_name(obs_scene_get_source(scene)) };
     if (scene) {
-        obs_scene_enum_items(
-            scene, [](obs_scene_t* s, obs_sceneitem_t* item, void* _data) {
-                auto* src = obs_sceneitem_get_source(item);
-                auto* scene = obs_scene_get_source(s);
-                if (src && scene) {
-                    auto* id = obs_source_get_id(src);
-                    if (strcmp(id, "vlc_source") == 0) {
-                        auto* scene_name = obs_source_get_name(scene);
-                        auto* src_name = obs_source_get_name(src);
-                        auto* d = reinterpret_cast<source_data*>(_data);
-                        if (!d->v->has_mapping(scene_name, src_name))
-                            d->cb->addItem(utf8_to_qt(src_name));
-                    }
-                }
-
-                return true;
-            },
-            &d);
+        obs_scene_enum_items(scene, get_vlc_sources_from_scene, &d);
         obs_scene_release(scene);
     }
 }
