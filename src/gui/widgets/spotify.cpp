@@ -224,13 +224,10 @@ void spotify::apply_login_state(bool state, const QString& log)
 
 void spotify::on_btn_performrefresh_clicked()
 {
-    QString log;
-    bool result = false;
     auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
 
     if (spotify) {
         spotify->set_auth_code(ui->txt_auth_code->text());
-        result = spotify->do_refresh_token(log);
         m_token_refresh_promise = new std::promise<spotify::result>;
         m_token_refresh_future = m_token_refresh_promise->get_future();
 
@@ -243,5 +240,4 @@ void spotify::on_btn_performrefresh_clicked()
     } else {
         berr("Couldn't get spotify source instance");
     }
-    apply_login_state(result, log);
 }
