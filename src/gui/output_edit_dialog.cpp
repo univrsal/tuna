@@ -120,8 +120,10 @@ void output_edit_dialog::accept_clicked()
 void output_edit_dialog::format_changed(const QString& format)
 {
     auto src = music_sources::selected_source();
-    if (src)
-        ui->lbl_format_error->setVisible(!src->valid_format(format));
+    if (src) {
+        auto copy = format;
+        ui->lbl_format_error->setVisible(!format::execute(copy));
+    }
 
     static QRegularExpression e("%[a-zA-Z](\\[[0-9]+\\])?");
     Q_ASSERT(e.isValid());

@@ -225,9 +225,3 @@ void music_source::handle_cover()
             util::reset_cover();
     }
 }
-
-bool music_source::valid_format(const QString& str)
-{
-    QString copy = str;
-    return format::execute(copy);
-}
