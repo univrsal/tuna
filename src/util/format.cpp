@@ -144,6 +144,10 @@ void init()
     specifiers.emplace_back(new specifier("album_artist", meta::ALBUM_ARTIST));
     int_specifier("disc_total", meta::DISC_TOTAL);
     int_specifier("track_total", meta::TRACK_TOTAL);
+
+    std::sort(specifiers.begin(), specifiers.end(), [](auto const& a, auto const& b) {
+        return a->get_id()[0] < b->get_id()[1];
+    });
 }
 
 bool execute(QString& q)
