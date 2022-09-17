@@ -273,15 +273,17 @@ void vlc_obs_source::refresh()
         if (!date.isEmpty()) {
             auto splits = date.split("-");
 
-            if (splits.count() > 2) {
+            switch (splits.length()) {
+            case 3:
                 m_current.set(meta::RELEASE_DAY, splits[2].toInt());
+                [[fallthrough]];
+            case 2:
                 m_current.set(meta::RELEASE_MONTH, splits[1].toInt());
+                [[fallthrough]];
+            case 1:
                 m_current.set(meta::RELEASE_YEAR, splits[0].toInt());
-            } else if (splits.count() > 1) {
-                m_current.set(meta::RELEASE_MONTH, splits[1].toInt());
-                m_current.set(meta::RELEASE_YEAR, splits[0].toInt());
-            } else {
-                m_current.set(meta::RELEASE_YEAR, date.toInt());
+                break;
+            default:;
             }
         }
 #undef check
