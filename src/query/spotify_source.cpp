@@ -48,7 +48,7 @@ spotify_source::spotify_source()
 {
     build_credentials();
     m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG;
-    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::STATUS });
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::STATUS, meta::URL });
 }
 
 bool spotify_source::enabled() const
@@ -206,6 +206,7 @@ void spotify_source::parse_track_json(const QJsonValue& track)
     const auto& trackObj = track.toObject();
     const auto& album = trackObj["album"].toObject();
     const auto& artists = trackObj["artists"].toArray();
+    const auto& urls = trackObj["external_urls"].toObject();
 
     m_current.clear();
 
@@ -221,6 +222,11 @@ void spotify_source::parse_track_json(const QJsonValue& track)
         const QJsonValue v = covers.toArray()[0];
         if (v.isObject() && v.toObject().contains("url"))
             m_current.set(meta::COVER, v.toObject()["url"].toString());
+    }
+
+    /* Song link */
+    if (!urls.isEmpty() && urls["spotify"].isString()) {
+        m_current.set(meta::URL, urls["spotify"].toString());
     }
 
     /* Other stuff */
