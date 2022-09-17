@@ -243,13 +243,13 @@ void spotify_source::parse_track_json(const QJsonValue& track)
         QStringList list = date.split("-");
         switch (list.length()) {
         case 3:
-            m_current.set(meta::RELEASE_DAY, list[2]);
+            m_current.set(meta::RELEASE_DAY, list[2].toInt());
             [[fallthrough]];
         case 2:
-            m_current.set(meta::RELEASE_MONTH, list[1]);
+            m_current.set(meta::RELEASE_MONTH, list[1].toInt());
             [[fallthrough]];
         case 1:
-            m_current.set(meta::RELEASE_YEAR, list[0]);
+            m_current.set(meta::RELEASE_YEAR, list[0].toInt());
         }
     }
 }
