@@ -66,6 +66,7 @@ void init()
     specifiers.emplace_back(new specifier("album", meta::ALBUM));
     specifiers.emplace_back(new specifier("label", meta::LABEL));
     specifiers.emplace_back(new specifier("file_name", meta::FILE_NAME));
+    specifiers.emplace_back(new specifier("url", meta::URL));
 
     int_specifier("release_day", meta::RELEASE_DAY);
     int_specifier("release_month", meta::RELEASE_MONTH);
