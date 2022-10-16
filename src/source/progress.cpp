@@ -32,7 +32,7 @@ progress_source::~progress_source() { }
 
 void progress_source::tick(float seconds)
 {
-    song tmp;
+    song tmp {};
     tuna_thread::copy_mutex.lock();
     tmp = tuna_thread::copy;
     tuna_thread::copy_mutex.unlock();
