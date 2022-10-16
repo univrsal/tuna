@@ -103,8 +103,10 @@ std::string vlc_obs_source::get_target_source()
         m_target_scene = current_scene_name;
         auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(current_scene_name.c_str());
 
-        m_index = qMin(mappings.size(), m_index);
-        return qt_to_utf8(mappings[m_index].toString());
+        if (!mappings.empty()) {
+            m_index = qMin(mappings.size(), m_index);
+            return qt_to_utf8(mappings[m_index].toString());
+        }
     }
     return "";
 }
