@@ -37,12 +37,12 @@ bool mpris_source::init_dbus_session()
     dbus_error_init(&error);
     cbus = dbus_bus_get(DBUS_BUS_SESSION, &error);
     if (dbus_error_is_set(&error)) {
-        berr("Error getting Bus: %s\n", error.message);
+        berr("[MPRIS] Error getting Bus: %s", error.message);
         dbus_error_free(&error);
         return false;
     }
     if (!cbus) {
-        berr("Error getting Bus: cbus is null\n");
+        berr("[MPRIS] Error getting Bus: cbus is null");
         return false;
     }
 
@@ -59,7 +59,7 @@ bool mpris_source::dbus_add_matches()
     dbus_bus_add_match(m_dbus_connection, "type='signal', interface='org.freedesktop.DBus.Properties',member='PropertiesChanged', path='/org/mpris/MediaPlayer2'", &error);
 
     if (dbus_error_is_set(&error)) {
-        berr("Error while adding match (%s)\n", error.message);
+        berr("[MPRIS] Error while adding match (%s)", error.message);
         dbus_error_free(&error);
         return false;
     }
@@ -67,7 +67,7 @@ bool mpris_source::dbus_add_matches()
     dbus_bus_add_match(m_dbus_connection, "type='signal', interface='org.freedesktop.DBus', member='NameOwnerChanged', path='/org/freedesktop/DBus'", &error);
 
     if (dbus_error_is_set(&error)) {
-        berr("Error while adding match (%s)\n", error.message);
+        berr("[MPRIS] Error while adding match (%s)", error.message);
         dbus_error_free(&error);
         return false;
     }
@@ -89,7 +89,7 @@ bool mpris_source::dbus_register_names()
     msg = dbus_message_new_method_call("org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus", "ListNames");
 
     if (!dbus_connection_send_with_reply(m_dbus_connection, msg, &resp_pending, -1)) {
-        berr("Out Of Memory!\n");
+        berr("[MPRIS] Out Of Memory!");
         return false;
     }
 
@@ -140,13 +140,13 @@ char* mpris_source::dbus_get_name_owner(const char* name)
 
     resp = dbus_connection_send_with_reply_and_block(m_dbus_connection, msg, -1, &error); // TODO: remove blocking call
     if (dbus_error_is_set(&error)) {
-        berr("Error while reading owner name (%s)\n", error.message);
+        berr("[MPRIS] Error while reading owner name (%s)", error.message);
     } else {
         char* resp_name {};
 
         if (!dbus_message_get_args(resp, &error, DBUS_TYPE_STRING, &resp_name, DBUS_TYPE_INVALID)) {
             if (dbus_error_is_set(&error))
-                berr("Error while reading owner name (%s)\n", error.message);
+                berr("[MPRIS] Error while reading owner name (%s)", error.message);
         } else {
             ret = bstrdup(resp_name);
         }
@@ -170,7 +170,7 @@ DBusHandlerResult mpris_source::handle_dbus(DBusMessage* message)
             DBUS_TYPE_STRING, &new_name,
             DBUS_TYPE_INVALID)) {
         if (dbus_error_is_set(&error)) {
-            berr("Error while reading new names signal (%s)\n", error.message);
+            berr("[MPRIS] Error while reading new names signal (%s)", error.message);
             dbus_error_free(&error);
         }
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -179,11 +179,11 @@ DBusHandlerResult mpris_source::handle_dbus(DBusMessage* message)
 
     if (QString(name).startsWith(MPRIS_NAME_START)) { // if mpris name
         if (registering_name) {
-            binfo("registration of %s as %s\n", new_name, name);
+            binfo("[MPRIS] Registration of %s as %s", new_name, name);
             std::lock_guard<std::mutex> lock(m_internal_mutex);
-            m_players[utf8_to_qt(new_name)] = utf8_to_qt(new_name);
+            m_players[utf8_to_qt(new_name)] = format_name(name);
         } else {
-            binfo("unregistering of %s as %s\n", old_name, name);
+            binfo("[MPRIS] Unregistering of %s as %s", old_name, name);
             std::lock_guard<std::mutex> lock(m_internal_mutex);
             m_players.remove(utf8_to_qt(old_name));
         }
@@ -306,7 +306,7 @@ void mpris_source::parse_array(DBusMessageIter* iter, QString const& player, int
 {
     if (level > 20) {
         // WTF???
-        berr("MPRIS: Metadata recursion exceeded 20 levels");
+        berr("[MPRIS] Metadata recursion exceeded 20 levels");
         return;
     }
 
@@ -326,7 +326,7 @@ void mpris_source::parse_array(DBusMessageIter* iter, QString const& player, int
             break;
         case DBUS_TYPE_VARIANT:
             if (property_name == NULL) {
-                berr("Error: Encountered property before its name, ignoring\n");
+                berr("[MPRIS] Encountered property before its name, ignoring");
                 continue;
             }
             if (strcmp(property_name, "PlaybackStatus") == 0) {
@@ -334,7 +334,7 @@ void mpris_source::parse_array(DBusMessageIter* iter, QString const& player, int
                 char* status;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &status);
-                bdebug("Status: %s\n", status);
+                bdebug("[MPRIS] Status: %s", status);
                 if (strcmp(status, "Playing") == 0)
                     m_info[player].metadata.set(meta::STATUS, play_state::state_playing);
                 else if (strcmp(status, "Paused") == 0)
@@ -354,11 +354,11 @@ void mpris_source::parse_array(DBusMessageIter* iter, QString const& player, int
                 m_info[player].metadata.set(meta::PROGRESS, pos / 1000);
                 m_info[player].update_time = util::epoch();
             } else {
-                bdebug("not handled %s\n", property_name);
+                bdebug("[MPRIS] Not handled %s", property_name);
             }
             break;
         default:
-            berr("parse error\n");
+            berr("[MPRIS] Parse error");
         }
         dbus_message_iter_next(iter);
     }
@@ -381,7 +381,7 @@ DBusHandlerResult mpris_source::handle_mpris(DBusMessage* message)
         switch (current_type) {
         case DBUS_TYPE_STRING:
             dbus_message_iter_get_basic(&iter, &property_name);
-            bdebug("%s", property_name);
+            bdebug("[MPRIS] Dbus type: %s", property_name);
             break;
         case DBUS_TYPE_ARRAY:
             if (strcmp(property_name, "org.mpris.MediaPlayer2.Player") == 0) {
@@ -412,7 +412,7 @@ mpris_source::mpris_source()
     : music_source(S_SOURCE_MPRIS, T_SOURCE_MPRIS, new mpris)
 {
     supported_metadata({ meta::ALBUM, meta::TITLE, meta::ARTIST, meta::STATUS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER, meta::PROGRESS, meta::COVER });
-    bdebug("Initialising dbus session for mpris source");
+    bdebug("[MPRIS] Initialising dbus session for mpris source");
     if (init_dbus()) {
         m_thread_flag = true;
         m_internal_thread = std::thread([](mpris_source* s) {
@@ -421,7 +421,7 @@ mpris_source::mpris_source()
         },
             this);
     } else {
-        berr("Failed to initialize mpris source");
+        berr("[MPRIS] Failed to initialize mpris source");
     }
 }
 
@@ -470,12 +470,12 @@ void mpris_source::internal_refresh()
 
         do {
             if (!dbus_connection_read_write_dispatch(m_dbus_connection, 500)) {
-                berr("Failed to call dbus_connection_read_write_dispatch");
+                berr("[MPRIS] Failed to call dbus_connection_read_write_dispatch");
                 break;
             }
             remains = dbus_connection_get_dispatch_status(m_dbus_connection);
             if (remains == DBUS_DISPATCH_NEED_MEMORY) {
-                bwarn("Need more memory to read dbus messages\n");
+                bwarn("[MPRIS] Need more memory to read dbus messages");
             }
         } while (remains != DBUS_DISPATCH_COMPLETE);
     }
@@ -488,7 +488,7 @@ DBusHandlerResult mpris_source::handle_message(DBusConnection* connection, DBusM
     const char* dest = dbus_message_get_destination(message);
     const char* my_name = dbus_bus_get_unique_name(connection);
     if (dest != NULL && strcmp(dest, my_name) != 0) {
-        bwarn("Received a message for %s I am %s, ignoring\n", dest, my_name);
+        bwarn("[MPRIS] Received a message for %s I am %s, ignoring", dest, my_name);
         return ret;
     }
 
@@ -502,7 +502,7 @@ DBusHandlerResult mpris_source::handle_message(DBusConnection* connection, DBusM
     } else if (strcmp(path, "/org/freedesktop/DBus") == 0 && strcmp(member, "NameOwnerChanged") == 0) {
         ret = handle_dbus(message);
     } else {
-        bwarn("NOT HANDLED: message with path %s and member %s\n", path, member);
+        bwarn("[MPRIS] NOT HANDLED: message with path %s and member %s", path, member);
         ret = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
