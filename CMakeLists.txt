@@ -58,6 +58,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   ./src/gui/widgets/spotify.ui
   ./src/gui/widgets/icecast.ui
   ./src/gui/widgets/vlc.ui
+  ./src/gui/widgets/mpris.ui
   ./src/tuna_plugin.cpp
   ./src/util/constants.hpp
   ./src/util/config.cpp
@@ -116,11 +117,34 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   ./src/gui/widgets/spotify.hpp
   ./src/gui/widgets/vlc.cpp
   ./src/gui/widgets/vlc.hpp
+  ./src/gui/widgets/mpris.cpp
+  ./src/gui/widgets/mpris.hpp
 )
 
 # Import libobs as main plugin dependency
 include(cmake/ObsPluginHelpers.cmake)
 
+if (UNIX AND NOT APPLE)
+    option(WITH_DBUS  "Whether to add mpris support via dbus (Default: ON)" ON)
+
+    if (WITH_DBUS)
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULEPATH} ${CMAKE_SOURCE_DIR}/cmake)
+        find_package(DBus REQUIRED)
+        target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${DBUS_LIBRARIES})
+        target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${DBUS_INCLUDE_DIR})
+        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=1)
+        target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+          ./src/query/mpris_source.cpp
+          ./src/query/mpris_source.hpp
+        )
+    else()
+        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
+    endif()
+elseif(APPLE)
+        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
+elseif(WIN32)
+        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
+endif()
 # Uncomment these lines if you want to use the OBS Frontend API in your plugin
 
 if (LOCAL_INSTALLATION)

@@ -28,6 +28,7 @@
 #define S_SOURCE_VLC            "vlc"
 #define S_SOURCE_WINDOW_TITLE   "window"
 #define S_SOURCE_GPMDP          "gpmdp"
+#define S_SOURCE_MPRIS          "mpris"
 #define S_SOURCE_LAST_FM        "lastfm"
 #define S_SOURCE_WEB            "web"
 #define S_SOURCE_DEEZER         "deezer"
@@ -62,6 +63,7 @@
 #define T_SOURCE_WINDOW_TITLE   T_("tuna.gui.tab.window_title")
 #define T_SOURCE_WEB            T_("tuna.gui.tab.web")
 #define T_SOURCE_DEEZER         T_("tuna.gui.tab.deezer")
+#define T_SOURCE_MPRIS          T_("tuna.gui.tab.mpris")
 
 #define T_PLACEHOLDER           T_("tuna.config.song.placeholder")
 #define T_FORMAT                T_("tuna.config.song.format")
