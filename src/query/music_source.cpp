@@ -26,7 +26,9 @@
 #include "icecast_source.hpp"
 #include "lastfm_source.hpp"
 #include "mpd_source.hpp"
-#include "mpris_source.hpp"
+#if WITH_DBUS
+#    include "mpris_source.hpp"
+#endif
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "web_source.hpp"
