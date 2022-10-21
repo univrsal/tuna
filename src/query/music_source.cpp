@@ -158,6 +158,8 @@ bool music_source::download_missing_cover()
         url = url.replace("{}", search_term);
         auto doc = util::curl_get_json(qt_to_utf8(url));
         if (doc["results"].isArray()) {
+            if (doc["results"].toArray().isEmpty())
+                return false;
             auto first = doc["results"].toArray()[0].toObject();
 
             // We don't want to use the wrong cover so we check if the first (probably also best) search result
