@@ -388,11 +388,14 @@
    </item>
    <item>
     <widget class="QCheckBox" name="cb_use_log">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="text">
       <string>tuna.gui.tab.spotify.enablelog</string>
      </property>
      <property name="checked">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
