@@ -29,6 +29,15 @@
 
 static auto MPRIS_NAME_START = QString("org.mpris.MediaPlayer2");
 
+static inline QString format_name(const char* name)
+{
+
+    QString friendly_name = utf8_to_qt(name);
+    friendly_name = friendly_name.replace(MPRIS_NAME_START + ".", "");
+    friendly_name[0] = friendly_name[0].toUpper();
+    return friendly_name;
+}
+
 bool mpris_source::init_dbus_session()
 {
     DBusConnection* cbus {};
@@ -110,11 +119,7 @@ bool mpris_source::dbus_register_names()
                     dbus_message_iter_get_basic(&iter2, &name);
                     if (utf8_to_qt(name).startsWith(MPRIS_NAME_START)) {
                         char* unique_name = dbus_get_name_owner(name);
-
-                        QString friendly_name = utf8_to_qt(name);
-                        friendly_name = friendly_name.replace(MPRIS_NAME_START + ".", "");
-                        friendly_name[0] = friendly_name[0].toUpper();
-                        m_players[utf8_to_qt(unique_name)] = friendly_name;
+                        m_players[utf8_to_qt(unique_name)] = format_name(name);
                         bfree(unique_name);
                     }
                 }
@@ -221,22 +226,37 @@ void mpris_source::parse_metadata(DBusMessageIter* iter, QString const& player, 
         } break;
         case DBUS_TYPE_VARIANT: {
             if (property_name == NULL) {
-                berr("Error: Encountered property before its name, ignoring\n");
+                berr("[MPRIS] Encountered property before its name, ignoring");
                 continue;
             }
-            if (strcmp(property_name, "xesam:title") == 0) {
+            QString prop = utf8_to_qt(property_name);
+            if (prop == "xesam:title") {
                 char* title;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &title);
                 m_info[player].metadata.set(meta::TITLE, utf8_to_qt(title));
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "mpris:length") == 0) {
+            } else if (prop == "vlc:length") {
+                int length;
+                dbus_message_iter_recurse(iter, &sub);
+                dbus_message_iter_get_basic(&sub, &length);
+                m_info[player].metadata.set(meta::DURATION, length);
+                m_info[player].update_time = util::epoch();
+            } else if (prop == "mpris:length") {
                 int length;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &length);
                 m_info[player].metadata.set(meta::DURATION, length / 1000);
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "mpris:artUrl") == 0) {
+            } else if (prop == "vlc:publisher") {
+                // borked
+                //                char* publisher;
+                //                dbus_message_iter_recurse(iter, &sub);
+                //                dbus_message_iter_recurse(&sub, &subsub);
+                //                dbus_message_iter_get_basic(&subsub, &publisher);
+                //                m_info[player].metadata.set(meta::PUBLISHER, utf8_to_qt(publisher));
+                //                m_info[player].update_time = util::epoch();
+            } else if (prop == "mpris:artUrl") {
                 char* url;
                 QString correct_url;
                 dbus_message_iter_recurse(iter, &sub);
@@ -244,53 +264,68 @@ void mpris_source::parse_metadata(DBusMessageIter* iter, QString const& player, 
                 correct_url = correct_art_url(url);
                 m_info[player].metadata.set(meta::COVER, correct_url);
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "xesam:artist") == 0) {
+            } else if (prop == "vlc:copyright") {
+                char* copyright;
+                dbus_message_iter_recurse(iter, &sub);
+                dbus_message_iter_get_basic(&sub, &copyright);
+                // close enough
+                m_info[player].metadata.set(meta::COPYRIGHT, utf8_to_qt(copyright));
+                m_info[player].update_time = util::epoch();
+            } else if (prop == "xesam:comment") {
+                char* comment;
+                dbus_message_iter_recurse(iter, &sub);
+                dbus_message_iter_recurse(&sub, &subsub);
+                dbus_message_iter_get_basic(&subsub, &comment);
+                // close enough
+                m_info[player].metadata.set(meta::DESCRIPTION, utf8_to_qt(comment));
+                m_info[player].update_time = util::epoch();
+            } else if (prop == "xesam:artist") {
                 char* artist;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_recurse(&sub, &subsub);
                 dbus_message_iter_get_basic(&subsub, &artist);
                 m_info[player].metadata.set(meta::ARTIST, QStringList(utf8_to_qt(artist)));
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "xesam:genre") == 0) {
+            } else if (prop == "xesam:genre") {
                 //                char* val;
                 //                dbus_message_iter_recurse(iter, &sub);
                 //                dbus_message_iter_get_basic(&sub, &val);
                 //                m_internal_song.set(meta ::GENRE, QString ::fromUtf8(val));
-            } else if (strcmp(property_name, "xesam:album") == 0) {
+            } else if (prop == "xesam:album") {
                 char* val;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &val);
                 m_info[player].metadata.set(meta::ALBUM, QString ::fromUtf8(val));
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "xesam:url") == 0) {
+            } else if (prop == "xesam:url") {
                 char* val;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &val);
                 m_info[player].metadata.set(meta::URL, QString ::fromUtf8(val));
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "xesam:discNumber") == 0) {
+            } else if (prop == "xesam:discNumber") {
                 int val;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &val);
                 m_info[player].metadata.set(meta::DISC_NUMBER, val);
                 m_info[player].update_time = util::epoch();
-            } else if (strcmp(property_name, "xesam:contentCreated") == 0) {
+            } else if (prop == "xesam:contentCreated") {
                 char* val;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &val);
                 //                m_internal_song.set(meta ::TRACK_NUMBER, val);
-            } else if (strcmp(property_name, "xesam:trackNumber") == 0) {
+            } else if (prop.toLower() == "xesam:tracknumber") {
                 int val;
                 dbus_message_iter_recurse(iter, &sub);
                 dbus_message_iter_get_basic(&sub, &val);
                 m_info[player].metadata.set(meta::TRACK_NUMBER, val);
                 m_info[player].update_time = util::epoch();
             } else {
-                bdebug("ignored: %s\n", property_name);
+                bdebug("[MPRIS] Ignored: %s", property_name);
             }
         } break;
         default:
-            berr("parse error\n");
+            berr("[MPRIS] parse error");
         }
         dbus_message_iter_next(iter);
     }
@@ -395,16 +430,25 @@ DBusHandlerResult mpris_source::handle_mpris(DBusMessage* message)
             }
             break;
         default:
-            berr("Failed to parse message");
+            berr("[MPRIS] Failed to parse message");
         }
         dbus_message_iter_next(&iter);
     }
 
     std::lock_guard<std::mutex> lock(m_internal_mutex);
-    if (m_info[player].metadata != m_prev) {
-        m_info[player].metadata.set(meta::STATUS, play_state::state_playing); // if a track changes, it is playing (vlc)
-    }
+    if (m_players[player].toLower().contains("vlc")) {
 
+        auto a = m_info[player].metadata;
+        auto b = m_prev;
+        // Make sure these are equivalent, otherwise if the playing state is the only
+        // thing that changed (from playing to paused or stopped) we would then override it again and set it to playing
+        b.set(meta::STATUS, play_state::state_unknown);
+        a.set(meta::STATUS, play_state::state_unknown);
+        if (a != b) {
+            m_info[player].metadata.set(meta::STATUS, play_state::state_playing); // if a track changes, it is playing (vlc)
+        }
+        m_info[player].metadata.set(meta::TRACK_NUMBER, 0); // borked on vlc
+    }
     return DBUS_HANDLER_RESULT_HANDLED;
 }
 
