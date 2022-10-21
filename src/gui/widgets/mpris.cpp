@@ -37,12 +37,14 @@ mpris::~mpris()
 
 void mpris::load_settings()
 {
-    ui->cb_player->setCurrentText(utf8_to_qt(CGET_STR(CFG_MPRIS_PLAYER)));
+    auto idx = ui->cb_player->findData(utf8_to_qt(CGET_STR(CFG_MPRIS_PLAYER)));
+    if (idx >= 0)
+        ui->cb_player->setCurrentIndex(idx);
 }
 
 void mpris::save_settings()
 {
-    CSET_STR(CFG_MPRIS_PLAYER, qt_to_utf8(ui->cb_player->currentText()));
+    CSET_STR(CFG_MPRIS_PLAYER, qt_to_utf8(ui->cb_player->currentData().toString()));
 }
 
 void mpris::tick()
