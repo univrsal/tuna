@@ -58,7 +58,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   ./src/gui/widgets/spotify.ui
   ./src/gui/widgets/icecast.ui
   ./src/gui/widgets/vlc.ui
-  ./src/gui/widgets/mpris.ui
   ./src/tuna_plugin.cpp
   ./src/util/constants.hpp
   ./src/util/config.cpp
@@ -117,8 +116,6 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   ./src/gui/widgets/spotify.hpp
   ./src/gui/widgets/vlc.cpp
   ./src/gui/widgets/vlc.hpp
-  ./src/gui/widgets/mpris.cpp
-  ./src/gui/widgets/mpris.hpp
 )
 
 # Import libobs as main plugin dependency
@@ -136,6 +133,9 @@ if (UNIX AND NOT APPLE)
         target_sources(${CMAKE_PROJECT_NAME} PRIVATE
           ./src/query/mpris_source.cpp
           ./src/query/mpris_source.hpp
+          ./src/gui/widgets/mpris.cpp
+          ./src/gui/widgets/mpris.hpp
+          ./src/gui/widgets/mpris.ui
         )
     else()
         target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
