@@ -19,6 +19,7 @@
 #include "icecast_source.hpp"
 #include "../gui/widgets/icecast.hpp"
 #include "../util/config.hpp"
+#include "../util/utility.hpp"
 #include <QDateTime>
 #include <QJsonDocument>
 #include <QJsonObject>

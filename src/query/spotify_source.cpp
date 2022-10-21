@@ -18,12 +18,13 @@
 
 #define NOMINMAX
 #include "spotify_source.hpp"
-#include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../gui/widgets/spotify.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
-#include "../util/creds.hpp"
+#if !defined(SPOTIFY_CREDENTIALS)
+#    include "../util/creds.hpp"
+#endif
 #include "../util/utility.hpp"
 #include <QJsonArray>
 #include <QJsonDocument>

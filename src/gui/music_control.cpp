@@ -21,7 +21,7 @@
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
-#include "tuna_gui.hpp"
+#include "../util/utility.hpp"
 #include "ui_music_control.h"
 #include <QMenu>
 #include <QScreen>

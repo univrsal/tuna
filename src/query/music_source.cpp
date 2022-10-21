@@ -20,7 +20,6 @@
 #include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../util/config.hpp"
-#include "../util/format.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
 #include "gpmdp_source.hpp"
