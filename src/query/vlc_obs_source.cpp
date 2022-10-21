@@ -65,7 +65,7 @@ bool vlc_obs_source::reload()
             }
             obs_source_release(src);
         } else {
-            static_cast<vlc*>(m_settings_tab)->rebuild_mapping();
+            get_ui<vlc>()->rebuild_mapping();
             result = false;
             obs_weak_source_release(m_weak_src);
             m_weak_src = nullptr;
@@ -150,7 +150,7 @@ void vlc_obs_source::prev_vlc_source()
 void vlc_obs_source::set_gui_values()
 {
     music_source::set_gui_values();
-    static_cast<vlc*>(m_settings_tab)->build_list();
+    get_ui<vlc>()->build_list();
 }
 
 void vlc_obs_source::load()

@@ -134,7 +134,7 @@ void spotify_source::refresh()
         binfo("Refreshing Spotify token");
         QString log;
         const auto result = do_refresh_token(log);
-        emit((spotify*)m_settings_tab)->login_state_changed(result, log);
+        emit(get_ui<spotify>())->login_state_changed(result, log);
         save();
     }
 

@@ -61,6 +61,12 @@ protected:
             m_supported_metadata[d] = true;
     }
 
+    template<class T>
+    T* get_ui()
+    {
+        return static_cast<T*>(m_settings_tab);
+    }
+
 public:
     music_source(const char* id, const char* name, source_widget* w = nullptr);
 
