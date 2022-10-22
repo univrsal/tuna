@@ -128,7 +128,7 @@ if (UNIX AND NOT APPLE)
         set(CMAKE_MODULE_PATH ${CMAKE_MODULEPATH} ${CMAKE_SOURCE_DIR}/cmake)
         find_package(DBus REQUIRED)
         target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${DBUS_LIBRARIES})
-        target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${DBUS_INCLUDE_DIR})
+        target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${DBUS_INCLUDE_DIR} ${DBUS_ARCH_INCLUDE_DIR})
         target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=1)
         target_sources(${CMAKE_PROJECT_NAME} PRIVATE
           ./src/query/mpris_source.cpp
