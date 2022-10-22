@@ -29,6 +29,9 @@
 #if WITH_DBUS
 #    include "mpris_source.hpp"
 #endif
+#if _WIN32
+#    include "wmc_source.hpp"
+#endif
 #include "spotify_source.hpp"
 #include "vlc_obs_source.hpp"
 #include "web_source.hpp"
@@ -57,6 +60,10 @@ void init()
 
 #if WITH_DBUS
     instances.append(std::make_shared<mpris_source>());
+#endif
+
+#if _WIN32
+    instances.append(std::make_shared<wmc_source>());
 #endif
     obs_frontend_pop_ui_translation();
 

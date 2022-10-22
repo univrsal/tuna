@@ -81,6 +81,8 @@
 #define CFG_LASTFM_USERNAME             "lastfm.username"
 #define CFG_LASTFM_API_KEY              "lastfm.apikey"
 
+#define CFG_WMC_PLAYER                  "wmc.player"
+
 #define CFG_MPRIS_PLAYER                "mpris.player"
 
 #define CFG_ICECAST_URL                 "icecast.url"

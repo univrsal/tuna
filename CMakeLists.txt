@@ -144,6 +144,13 @@ elseif(APPLE)
         target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
 elseif(WIN32)
         target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
+        target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+          ./src/query/wmc_source.cpp
+          ./src/query/wmc_source.hpp
+          ./src/gui/widgets/wmc.cpp
+          ./src/gui/widgets/wmc.hpp
+          ./src/gui/widgets/wmc.ui
+        )
 endif()
 # Uncomment these lines if you want to use the OBS Frontend API in your plugin
 

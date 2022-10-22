@@ -25,6 +25,7 @@
 #define S_PLUGIN_ID             "tuna"
 #define S_SOURCE_SPOTIFY        "spotify"
 #define S_SOURCE_MPD            "mpd"
+#define S_SOURCE_WMC            "wmc"
 #define S_SOURCE_VLC            "vlc"
 #define S_SOURCE_WINDOW_TITLE   "window"
 #define S_SOURCE_GPMDP          "gpmdp"
@@ -55,6 +56,7 @@
 #define T_STATUS_STOPPED        T_("tuna.gui.tab.basics.status.stopped")
 #define T_PREVIEW               T_("tuna.gui.tab.basics.preview")
 #define T_SOURCE_MPD            T_("tuna.gui.tab.mpd")
+#define T_SOURCE_WMC            T_("tuna.gui.tab.wmc")
 #define T_SOURCE_LASTFM         T_("tuna.gui.tab.lastfm")
 #define T_SOURCE_SPOTIFY        T_("tuna.gui.tab.spotify")
 #define T_SOURCE_VLC            T_("tuna.gui.tab.vlc")
