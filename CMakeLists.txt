@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16...3.21)
 
 # Change obs-plugintemplate to your plugin's name in a machine-readable format (e.g.:
 # obs-myawesomeplugin) and set
-project(tuna VERSION 1.8.5)
+project(tuna VERSION 1.9.0)
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 add_subdirectory(deps)
 

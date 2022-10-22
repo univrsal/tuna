@@ -63,7 +63,7 @@ public:
 
     void load() override;
 
-    //bool enabled() const override;
-    //void handle_cover() override;
-    //void reset_info() override;
+    // bool enabled() const override;
+    // void handle_cover() override;
+    // void reset_info() override;
 };

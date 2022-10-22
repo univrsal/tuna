@@ -87,7 +87,7 @@ void wmc_source::update_players()
 bool wmc_source::execute_capability(capability c)
 {
     /* We don't wait for the result of the async calls because
-     * that's apparently not possible in the main thread, so we just assume they work 
+     * that's apparently not possible in the main thread, so we just assume they work
      */
     switch (c) {
     case CAP_NEXT_SONG:
