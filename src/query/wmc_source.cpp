@@ -162,7 +162,7 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
     auto thumbnail = media_properties.Thumbnail();
     com_array<uint8_t> pixel_data_detached;
     uint8_t* data = NULL;
-    if (thumbnail != nullptr) {
+    if (thumbnail != nullptr && id == m_selected_player) { // only fetch cover for selected source
         auto stream = thumbnail.OpenReadAsync().get();
 
         auto decoder = BitmapDecoder::CreateAsync(stream).get();
