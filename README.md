@@ -13,7 +13,7 @@ Currently supports
 - Any Window title
 - [last.fm](https://last.fm) scrobbling
 - OBS VLC source
-- [Google Play Music™ Desktop Player](https://github.com/MarshallOfSound/Google-Play-Music-Desktop-Player-UNOFFICIAL-)
+- [YouTube Music](https://github.com/th-ch/youtube-music)
 - Most music players through [MPRIS](https://specifications.freedesktop.org/mpris-spec/latest/) and [Windows Media Control](https://learn.microsoft.com/en-us/uwp/api/windows.media.control?view=winrt-19041)
 - Through [tampermonkey script](https://github.com/univrsal/tuna/raw/master/deps/tuna_browser.user.js):
     - Soundcloud 
