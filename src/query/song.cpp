@@ -156,7 +156,10 @@ void song::from_json(const QJsonObject& obj)
     // TODO: Use only one of the three cover_path/cover_url/cover
     // currently sources use cover_path, the web browser widget uses cover_url
     // and the user script uses cover
-    set(meta::COVER, obj["cover"].toString());
+    if (obj["cover"].isString())
+        set(meta::COVER, obj["cover"].toString());
+    else
+        set(meta::COVER, obj["cover_url"].toString());
 
     auto status = play_state::state_unknown;
     if (obj["status"].toString() == "playing")
