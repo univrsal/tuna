@@ -212,6 +212,7 @@ void mpris_source::parse_metadata(DBusMessageIter* iter, QString const& player, 
     int current_type {};
     DBusMessageIter sub {}, subsub {};
     const char* property_name {};
+    auto has_next = [](auto iter) { return dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INVALID; };
 
     while ((current_type = dbus_message_iter_get_arg_type(iter)) != DBUS_TYPE_INVALID) {
 
@@ -282,10 +283,16 @@ void mpris_source::parse_metadata(DBusMessageIter* iter, QString const& player, 
             } else if (prop == "xesam:artist") {
                 char* artist;
                 dbus_message_iter_recurse(iter, &sub);
-                dbus_message_iter_recurse(&sub, &subsub);
-                dbus_message_iter_get_basic(&subsub, &artist);
-                m_info[player].metadata.set(meta::ARTIST, QStringList(utf8_to_qt(artist)));
-                m_info[player].update_time = util::epoch();
+                if (has_next(&sub)) {
+                    dbus_message_iter_recurse(&sub, &subsub);
+                    dbus_message_iter_get_basic(&subsub, &artist);
+                    m_info[player].metadata.set(meta::ARTIST, QStringList(utf8_to_qt(artist)));
+                    m_info[player].update_time = util::epoch();
+                } else {
+                    dbus_message_iter_get_basic(&sub, &artist);
+                    m_info[player].metadata.set(meta::ARTIST, QStringList(utf8_to_qt(artist)));
+                    m_info[player].update_time = util::epoch();
+                }
             } else if (prop == "xesam:genre") {
                 //                char* val;
                 //                dbus_message_iter_recurse(iter, &sub);
