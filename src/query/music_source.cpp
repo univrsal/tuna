@@ -54,7 +54,7 @@ void init()
     instances.append(std::make_shared<vlc_obs_source>());
     instances.append(std::make_shared<window_source>());
     instances.append(std::make_shared<lastfm_source>());
-    instances.append(std::make_shared<gpmdp_source>());
+    //    instances.append(std::make_shared<gpmdp_source>()); // Deprecated, Youtube music can send information to tuna
     instances.append(std::make_shared<web_source>());
     instances.append(std::make_shared<icecast_source>());
 
@@ -76,14 +76,24 @@ void init()
 
     const auto s = config_get_string(obs_frontend_get_global_config(), CFG_REGION, CFG_SELECTED_SOURCE);
     auto i = 0;
+    auto selected_source = -1;
     for (const auto& src : qAsConst(music_sources::instances)) {
-        if (strcmp(src->id(), s) == 0)
+        if (strcmp(src->id(), s) == 0) {
+            selected_source = i;
             break;
+        }
         i++;
     }
-    tuna_dialog->select_source(i);
+
+    Q_ASSERT(music_sources::instances.length() > 0);
+    if (selected_source < 0) {
+        selected_source = 0;
+        CSET_STR(CFG_SELECTED_SOURCE, music_sources::instances[0]->id());
+    }
+
+    tuna_dialog->select_source(selected_source);
     if (music_dock)
-        music_dock->select_source(i);
+        music_dock->select_source(selected_source);
 }
 
 void load()

@@ -134,7 +134,11 @@ void tuna_gui::toggleShowHide()
         ui->txt_song_placeholder->setText(config::placeholder);
         ui->cb_dl_cover->setChecked(config::download_cover);
         ui->cb_download_missing->setChecked(config::download_missing_cover);
-        ui->cb_source->setCurrentIndex(ui->cb_source->findData(config::selected_source));
+        auto idx = ui->cb_source->findData(config::selected_source);
+        if (idx >= 0)
+            ui->cb_source->setCurrentIndex(idx);
+        else
+            ui->cb_source->setCurrentIndex(0);
         ui->cb_host_server->setChecked(config::webserver_enabled);
         ui->sb_web_port->setValue(config::webserver_port);
         ui->cb_remove_file_extensions->setChecked(config::remove_file_extensions);
