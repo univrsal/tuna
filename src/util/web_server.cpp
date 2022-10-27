@@ -127,6 +127,7 @@ bool start()
         res.set_header("Access-Control-Max-Age", "84600");
         res.set_header("Access-Control-Allow-Origin", "*");
         res.set_header("Date", date);
+        res.set_header("Server", "tuna/" PLUGIN_VERSION);
         res.set_content(date, "text/plain");
     });
     server->Get("/cover.png", [](const httplib::Request&, httplib::Response& res) {
@@ -136,9 +137,11 @@ bool start()
             res.set_content(data, data.length(), "image/png");
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_header("Cache-Control", "no-cache");
+            res.set_header("Server", "tuna/" PLUGIN_VERSION);
             res.status = 200;
         } else {
             res.set_content("500 Internal Server Error: Couldn't open cover file", "text/plain");
+            res.set_header("Server", "tuna/" PLUGIN_VERSION);
             res.status = 500;
         }
     });
