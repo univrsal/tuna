@@ -101,6 +101,13 @@ void init()
         return "";
     }));
 
+    specifiers.emplace_back(new static_specifier("time", [](song const& s) {
+        return s.get(meta::PLAYBACK_TIME);
+    }));
+    specifiers.emplace_back(new static_specifier("date", [](song const& s) {
+        return s.get(meta::PLAYBACK_DATE);
+    }));
+
     specifiers.emplace_back(new specifier("first_artist", meta::ARTIST, [](song const& s) -> QString {
         auto l = s.get<QStringList>(meta::ARTIST);
         if (!l.isEmpty())

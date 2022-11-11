@@ -250,3 +250,16 @@ void music_source::handle_cover()
             util::reset_cover();
     }
 }
+
+void music_source::post_refresh()
+{
+    if (m_prev == m_current) {
+        /* Just copy previous data */
+        m_current.set(meta::PLAYBACK_DATE, m_prev.get(meta::PLAYBACK_DATE));
+        m_current.set(meta::PLAYBACK_TIME, m_prev.get(meta::PLAYBACK_TIME));
+    } else {
+        /* We only set this when the song changes */
+        m_current.set(meta::PLAYBACK_DATE, QDate::currentDate().toString("yyyy.MM.dd"));
+        m_current.set(meta::PLAYBACK_TIME, QTime::currentTime().toString("HH:mm:ss"));
+    }
+}

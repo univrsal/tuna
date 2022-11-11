@@ -82,6 +82,10 @@ static const char* ids[] = {
     "album_artist",
     "disc_total",
 
+    /* Misc */
+    "playback_date",
+    "playback_time",
+
     "count"
 };
 
@@ -127,6 +131,10 @@ enum type : uint8_t {
     ACTORS,
     ALBUM_ARTIST,
     DISC_TOTAL,
+
+    /* misc */
+    PLAYBACK_DATE,
+    PLAYBACK_TIME,
 
     COUNT
 };

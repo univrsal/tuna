@@ -108,6 +108,8 @@ public:
         }
         return true;
     }
+
+    virtual void post_refresh();
 };
 
 namespace music_sources {

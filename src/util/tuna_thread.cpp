@@ -69,6 +69,7 @@ void thread_method()
             if (ref) {
 
                 ref->refresh();
+                ref->post_refresh();
                 auto s = ref->song_info();
 
                 /* Make a copy for the progress bar source, because it can't
