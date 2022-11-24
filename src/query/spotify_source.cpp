@@ -49,7 +49,7 @@ spotify_source::spotify_source()
 {
     build_credentials();
     m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG;
-    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::STATUS, meta::URL });
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::PROGRESS, meta::STATUS, meta::URL });
 }
 
 bool spotify_source::enabled() const
