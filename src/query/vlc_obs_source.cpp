@@ -19,7 +19,6 @@
 #include "vlc_obs_source.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../gui/widgets/vlc.hpp"
-#include "../util/config.hpp"
 #include "../util/constants.hpp"
 #include "../util/tuna_thread.hpp"
 #include "../util/utility.hpp"
@@ -44,30 +43,30 @@ vlc_obs_source::vlc_obs_source()
 
 vlc_obs_source::~vlc_obs_source()
 {
-    obs_weak_source_release(m_weak_src);
     m_weak_src = nullptr;
 }
 
 bool vlc_obs_source::reload()
 {
     auto result = !!m_weak_src;
-    auto target_source = get_target_source();
-    const auto name_changed_or_no_weak_src = !m_weak_src || m_target_source_name != target_source;
-    if (name_changed_or_no_weak_src && !target_source.empty())
+    auto target_source_name = get_target_source_name();
+    const auto name_changed_or_no_weak_src = !m_weak_src || m_target_source_name != target_source_name;
+
+    // Try to find the vlc source with the new name
+    if (name_changed_or_no_weak_src && !target_source_name.empty())
         load_vlc_source();
+
     if (m_weak_src) {
-        auto src = obs_weak_source_get_source(m_weak_src);
+        OBSSourceAutoRelease src = obs_weak_source_get_source(m_weak_src);
         if (src) {
             result = obs_source_showing(src);
             if (!result) {
                 m_current.clear();
                 m_current.set(meta::STATUS, state_stopped);
             }
-            obs_source_release(src);
         } else {
             get_ui<vlc>()->rebuild_mapping();
             result = false;
-            obs_weak_source_release(m_weak_src);
             m_weak_src = nullptr;
         }
     }
@@ -77,11 +76,9 @@ bool vlc_obs_source::reload()
 
 void vlc_obs_source::load_vlc_source()
 {
-    m_target_source_name = get_target_source();
+    m_target_source_name = get_target_source_name();
 
-    auto* src = obs_get_source_by_name(m_target_source_name.c_str());
-
-    obs_weak_source_release(m_weak_src);
+    OBSSourceAutoRelease src = obs_get_source_by_name(m_target_source_name.c_str());
     m_weak_src = nullptr;
 
     if (src) {
@@ -91,11 +88,10 @@ void vlc_obs_source::load_vlc_source()
         } else {
             binfo("%s (%s) is not a valid vlc source", m_target_source_name.c_str(), id);
         }
-        obs_source_release(src);
     }
 }
 
-std::string vlc_obs_source::get_target_source()
+std::string vlc_obs_source::get_target_source_name()
 {
     auto current_scene_name = get_current_scene_name();
 
@@ -113,10 +109,9 @@ std::string vlc_obs_source::get_target_source()
 
 std::string vlc_obs_source::get_current_scene_name()
 {
-    auto active_scene = obs_frontend_get_current_scene();
+    OBSSourceAutoRelease active_scene = obs_frontend_get_current_scene();
     if (active_scene) {
         auto name = obs_source_get_name(active_scene);
-        obs_source_release(active_scene);
         return name;
     }
     return "";
@@ -188,7 +183,7 @@ void vlc_obs_source::refresh()
 
     /* we keep a reference here to make sure that this source won't be freed
      * while we still need it */
-    obs_source_t* src = get_source();
+    OBSSourceAutoRelease src = get_source();
     if (!src)
         return;
 
@@ -198,17 +193,13 @@ void vlc_obs_source::refresh()
 
     /* Prevent polling when vlc is stopped, which otherwise could cause a crash
        when closing obs */
-    if (m_current.get<int>(meta::STATUS) == state_stopped) {
-        obs_source_release(src);
+    if (m_current.get<int>(meta::STATUS) == state_stopped)
         return;
-    }
 
     proc_handler_t* ph = obs_source_get_proc_handler(src);
 
-    if (!ph) {
-        obs_source_release(src);
+    if (!ph)
         return;
-    }
 
     auto* cd = calldata_create();
 
@@ -292,12 +283,11 @@ void vlc_obs_source::refresh()
     }
 
     calldata_destroy(cd);
-    obs_source_release(src);
 }
 
 bool vlc_obs_source::execute_capability(capability c)
 {
-    obs_source_t* src = get_source();
+    OBSSourceAutoRelease src = get_source();
     if (!src)
         return false;
 
@@ -327,7 +317,5 @@ bool vlc_obs_source::execute_capability(capability c)
         break;
     default:;
     }
-
-    obs_source_release(src);
     return true;
 }

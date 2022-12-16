@@ -17,30 +17,29 @@
  *************************************************************************/
 
 #pragma once
-#include "../util/constants.hpp"
 #include "music_source.hpp"
 #include <QString>
 #include <obs-module.h>
+#include <obs.hpp>
 
 class vlc_obs_source : public music_source {
     std::string m_target_source_name {};
     std::string m_target_scene {};
-    obs_weak_source_t* m_weak_src = nullptr;
+    OBSWeakSourceAutoRelease m_weak_src {};
     bool reload();
 
     void load_vlc_source();
 
-    std::string get_target_source();
+    std::string get_target_source_name();
     std::string get_current_scene_name();
     int m_index = 0;
 
+    // Gets the currently tracked obs vlc source with increased ref count
     obs_source_t* get_source()
     {
         auto* src = obs_weak_source_get_source(m_weak_src);
-        if (!src) {
-            obs_weak_source_release(m_weak_src);
-            m_weak_src = nullptr;
-        }
+        if (!src)
+            m_weak_src = {};
         return src;
     }
 
