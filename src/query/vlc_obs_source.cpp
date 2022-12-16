@@ -216,19 +216,24 @@ void vlc_obs_source::refresh()
     m_current.set(meta::DURATION, (int)obs_source_media_get_duration(src));
 
     if (m_current.get<int>(meta::STATUS) <= state_paused) {
-#define check(t, d)        \
-    auto t = get_meta(#t); \
-    if (t != "")           \
-    m_current.set(d, t)
+#define check(t, d)              \
+    do {                         \
+        auto t = get_meta(#t);   \
+        if (t != "")             \
+            m_current.set(d, t); \
+    } while (0)
 
-#define check_num(t, d)          \
-    auto t = get_meta(#t);       \
-    if (t != "") {               \
-        bool ok = false;         \
-        auto i = t.toInt(&ok);   \
-        if (ok)                  \
-            m_current.set(d, i); \
-    }
+#define check_num(t, d)              \
+    do {                             \
+        auto t = get_meta(#t);       \
+        if (t != "") {               \
+            bool ok = false;         \
+            auto i = t.toInt(&ok);   \
+            if (ok)                  \
+                m_current.set(d, i); \
+        }                            \
+    } while (0)
+
         // Some of these could technically be numbers
         // like season or episode, but I think that VLC
         // allows users to enter anything in there so we'll
@@ -237,7 +242,6 @@ void vlc_obs_source::refresh()
         check(title, meta::TITLE);
         check(album, meta::ALBUM);
         check(publisher, meta::LABEL);
-        check(url, meta::FILE_NAME);
         check(genre, meta::GENRE);
         check(copyright, meta::COPYRIGHT);
         check(description, meta::DESCRIPTION);
@@ -257,6 +261,7 @@ void vlc_obs_source::refresh()
         check_num(disc_number, meta::DISC_NUMBER);
         check_num(track_total, meta::TRACK_TOTAL);
         check_num(disc_total, meta::DISC_TOTAL);
+        check(url, meta::URL);
 
         auto artist = get_meta("artist");
         if (artist != "")
@@ -279,10 +284,11 @@ void vlc_obs_source::refresh()
             default:;
             }
         }
-#undef check
     }
 
     calldata_destroy(cd);
+#undef check
+#undef check_num
 }
 
 bool vlc_obs_source::execute_capability(capability c)
