@@ -468,14 +468,12 @@ bool spotify_source::new_token(QString& log)
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
     QJsonDocument& response_json, const char* custom_request_type)
 {
-    static int last_call = 0;
+    static int timeout_start = 0;
     static int timeout = 0;
     static int timeout_multiplier = 1;
-    last_call = util::epoch();
 
     if (timeout > 0) {
-        timeout -= UTIL_MAX(util::epoch() - last_call, 0);
-        if (timeout <= 0)
+        if (util::epoch() - timeout_start >= timeout)
             binfo("cURL request timeout over.");
         else
             return 0; // Waiting for timeout to be over
@@ -515,14 +513,17 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
         QJsonParseError err;
 
         response_json = QJsonDocument::fromJson(response.c_str(), &err);
-        if (response_json.isNull() && !response.empty())
+        if (response_json.isNull() && !response.empty()) {
             berr("Failed to parse json response: %s, Error: %s", response.c_str(), qt_to_utf8(err.errorString()));
-        else
+        } else {
             timeout_multiplier = 1; // Reset on successful requests
+            timeout_start = 0;
+        }
     } else {
+        timeout_start = util::epoch();
         timeout = 5 * timeout_multiplier++;
         berr(
-            "CURL failed while sending spotify command (HTTP error %i, cURL error %i: '%s'). Waiting %i seconds before trying again",
+            "cURL failed while sending spotify command (HTTP error %i, cURL error %i: '%s'). Waiting %i seconds before trying again",
             int(http_code), res, curl_easy_strerror(res), timeout);
     }
 
