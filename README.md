@@ -1,4 +1,4 @@
-![header](https://obsproject.com/forum/attachments/screenshot_20201013_230446-jpg.62004/ "tuna running on obs linux")
+![header](./preview.png "tuna running on obs linux")
 
 [![Plugin Build](https://github.com/univrsal/tuna/actions/workflows/main.yml/badge.svg)](https://github.com/univrsal/tuna/actions/workflows/main.yml)
 
