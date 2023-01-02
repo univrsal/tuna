@@ -181,7 +181,7 @@ void spotify::on_btn_request_token_clicked()
         m_token_request_promise = new std::promise<result>;
         m_token_request_future = m_token_request_promise->get_future();
         // Do the request in a separate thread so the ui doesn't freeze
-        std::thread([&] {
+        std::thread([this] {
             auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
             if (spotify) {
                 QString log;
@@ -232,10 +232,13 @@ void spotify::on_btn_performrefresh_clicked()
         m_token_refresh_future = m_token_refresh_promise->get_future();
 
         // Do the refresh in a  separate thread so the ui doesn't freeze
-        std::thread([&] {
-            QString log;
-            bool result = spotify->do_refresh_token(log);
-            m_token_refresh_promise->set_value_at_thread_exit({ result, log });
+        std::thread([this] {
+            auto spotify = music_sources::get<spotify_source>(S_SOURCE_SPOTIFY);
+            if (spotify) {
+                QString log;
+                bool result = spotify->do_refresh_token(log);
+                m_token_refresh_promise->set_value_at_thread_exit({ result, log });
+            }
         }).detach();
     } else {
         berr("Couldn't get spotify source instance");
