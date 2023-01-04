@@ -178,6 +178,8 @@ static play_state from_obs_state(obs_media_state s)
 
 void vlc_obs_source::refresh()
 {
+    begin_refresh();
+    m_current.clear();
     if (!reload())
         return;
 
@@ -187,8 +189,6 @@ void vlc_obs_source::refresh()
     if (!src)
         return;
 
-    begin_refresh();
-    m_current.clear();
     m_current.set(meta::STATUS, from_obs_state(obs_source_media_get_state(src)));
 
     /* Prevent polling when vlc is stopped, which otherwise could cause a crash
