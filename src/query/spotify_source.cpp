@@ -473,10 +473,12 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     static int timeout_multiplier = 1;
 
     if (timeout > 0) {
-        if (util::epoch() - timeout_start >= timeout)
+        if (util::epoch() - timeout_start >= timeout) {
             binfo("cURL request timeout over.");
-        else
+            timeout = 0;
+        } else {
             return 0; // Waiting for timeout to be over
+        }
     }
 
     long http_code = -1;
@@ -518,6 +520,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
         } else {
             timeout_multiplier = 1; // Reset on successful requests
             timeout_start = 0;
+            timeout = 0;
         }
     } else {
         timeout_start = util::epoch();
