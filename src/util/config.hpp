@@ -54,6 +54,7 @@
 #define CFG_REFRESH_RATE                "refresh_rate"
 #define CFG_SONG_FORMAT                 "song_format"
 #define CFG_SONG_PLACEHOLDER            "song_placeholder"
+#define CFG_DOWNLOAD_LYRICS             "download_lyrics"
 #define CFG_DOWNLOAD_COVER              "download_cover"
 #define CFG_DOWNLOAD_MISSING_COVER      "download_missing_cover"
 #define CFG_COVER_SIZE                  "cover_size"
@@ -128,6 +129,7 @@ extern QString cover_placeholder;
 extern QList<output> outputs;
 extern bool webserver_enabled;
 extern bool download_cover;
+extern bool download_lyrics;
 extern bool download_missing_cover;
 extern bool remove_file_extensions;
 extern bool placeholder_when_paused;

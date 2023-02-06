@@ -97,6 +97,9 @@ public:
     virtual bool execute_capability(capability c) = 0;
     virtual void set_gui_values();
     virtual void handle_cover();
+    virtual void handle_lyrics()
+    { /* NO-OP */
+    }
 
     source_widget* get_settings_tab() { return m_settings_tab; }
 

@@ -41,6 +41,7 @@ public:
     bool execute_capability(capability c) override;
     bool enabled() const override;
     void handle_cover() override;
+    void handle_lyrics() override;
     void reset_info() override;
 
 private:

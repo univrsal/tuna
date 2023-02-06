@@ -17,11 +17,11 @@
  *************************************************************************/
 
 #include "mpd_source.hpp"
-#include "../gui/music_control.hpp"
 #include "../gui/tuna_gui.hpp"
 #include "../gui/widgets/mpd.hpp"
 #include "../util/config.hpp"
 #include "../util/cover_tag_handler.hpp"
+#include "../util/lyrics_handler.hpp"
 #include "../util/utility.hpp"
 #include <QStringList>
 #include <obs-module.h>
@@ -238,8 +238,33 @@ void mpd_source::handle_cover()
         if (!result && !download_missing_cover())
             util::reset_cover();
     } else if (m_current.get<int>(meta::STATUS) != state_paused || config::placeholder_when_paused) {
-        if (!download_missing_cover())
+        /* We either
+            - are in a stopped/unknown state                -> reset cover
+            - are paused & want a placeholder when paused   -> reset cover
+            - do not have a cover                           -> try downloading cover
+        */
+        if (!m_current.has(meta::COVER))
+            download_missing_cover();
+        else
             util::reset_cover();
+    }
+}
+
+void mpd_source::handle_lyrics()
+{
+    if (m_current == m_prev)
+        return;
+
+    if (m_current.get<int>(meta::STATUS) == state_playing) {
+        bool result = false;
+        QString file_path = m_song_file_path;
+        if (lyrics::find_embedded_lyrics(file_path)) {
+            result = true;
+        }
+        if (!result && !lyrics::download_missing_lyrics(m_current))
+            util::reset_lyrics();
+    } else {
+        util::reset_lyrics();
     }
 }
 

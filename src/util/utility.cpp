@@ -384,4 +384,41 @@ void create_config_folder()
         berr("Failed to create config directory %s", path.Get());
 }
 
+void reset_lyrics()
+{
+    QFile out(config::lyrics_path);
+    if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&out);
+#if QT_VERSION_MAJOR < 6
+        stream.setCodec("UTF-8");
+#else
+        stream.setEncoding(QStringConverter::Utf8);
+#endif
+        stream << "\n";
+        stream.flush();
+        out.close();
+    } else {
+        berr("Failed to reset lyrics file at %s", qt_to_utf8(config::lyrics_path));
+    }
+}
+
+bool write_lyrics(const QString& lyrics)
+{
+    QFile out(config::lyrics_path);
+    if (out.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&out);
+#if QT_VERSION_MAJOR < 6
+        stream.setCodec("UTF-8");
+#else
+        stream.setEncoding(QStringConverter::Utf8);
+#endif
+        stream << lyrics;
+        stream.flush();
+        out.close();
+        return true;
+    }
+    berr("Failed to write lyrics file at %s", qt_to_utf8(config::lyrics_path));
+    return false;
+}
+
 } // namespace util

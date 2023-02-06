@@ -65,8 +65,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     ui->tbl_outputs->setColumnWidth(0, 100);
     ui->tbl_outputs->setColumnWidth(1, 180);
-    /* TODO Lyrics */
-    ui->frame_lyrics->setVisible(false);
 
     auto about_text = ui->label->text();
 #define MAKE_VERSION_STRING(prefix, postfix)                                                       \
@@ -100,6 +98,10 @@ tuna_gui::tuna_gui(QWidget* parent)
 
     if (config::cover_size == 8129)
         ui->cb_cover_size->setCurrentIndex(i);
+
+    connect(ui->cb_dl_lyrics, &QCheckBox::stateChanged, [this](int s) {
+        ui->frame_lyrics->setEnabled(s == Qt::CheckState::Checked);
+    });
 }
 
 void tuna_gui::choose_file(QString& path, const char* title, const char* file_types)
@@ -132,6 +134,7 @@ void tuna_gui::toggleShowHide()
         ui->txt_song_lyrics->setText(config::lyrics_path);
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(config::placeholder);
+        ui->cb_dl_lyrics->setChecked(config::download_lyrics);
         ui->cb_dl_cover->setChecked(config::download_cover);
         ui->cb_download_missing->setChecked(config::download_missing_cover);
         auto idx = ui->cb_source->findData(config::selected_source);
@@ -188,6 +191,7 @@ void tuna_gui::tuna_gui_accepted()
     config::lyrics_path = qt_to_utf8(ui->txt_song_lyrics->text());
     config::refresh_rate = ui->sb_refresh_rate->value();
     config::placeholder = qt_to_utf8(ui->txt_song_placeholder->text());
+    config::download_lyrics = ui->cb_dl_lyrics->isChecked();
     config::download_cover = ui->cb_dl_cover->isChecked();
     config::download_missing_cover = ui->cb_download_missing->isChecked();
     config::webserver_enabled = ui->cb_host_server->isChecked();

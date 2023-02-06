@@ -84,6 +84,8 @@ void thread_method()
                 util::handle_outputs(s);
                 if (config::download_cover)
                     ref->handle_cover();
+                if (config::download_lyrics)
+                    ref->handle_lyrics();
             }
         }
 

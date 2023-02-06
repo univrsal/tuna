@@ -57,6 +57,10 @@ extern bool download_cover(const QString& url);
 
 extern void reset_cover();
 
+extern void reset_lyrics();
+
+extern bool write_lyrics(QString const& lyrics);
+
 extern void download_lyrics(const song& song);
 
 extern void handle_outputs(const song& song);

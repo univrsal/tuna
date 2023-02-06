@@ -93,6 +93,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
   ./src/util/format.hpp
   ./src/source/progress.cpp
   ./src/source/progress.hpp
+  ./src/util/lyrics_handler.cpp
+  ./src/util/lyrics_handler.hpp
   ./src/util/cover_tag_handler.cpp
   ./src/util/cover_tag_handler.hpp
   ./src/query/vlc_obs_source.cpp

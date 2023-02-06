@@ -48,6 +48,7 @@ QString cover_placeholder = {};
 QString selected_source = {};
 bool webserver_enabled = false;
 bool download_cover = true;
+bool download_lyrics = false;
 bool download_missing_cover = true;
 bool placeholder_when_paused = true;
 bool remove_file_extensions = true;
@@ -72,6 +73,7 @@ void init()
     CDEF_BOOL(CFG_REMOVE_EXTENSIONS, config::remove_file_extensions);
     CDEF_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, config::placeholder_when_paused);
     CDEF_BOOL(CFG_RUNNING, false);
+    CDEF_BOOL(CFG_DOWNLOAD_LYRICS, config::download_lyrics);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, config::download_cover);
     CDEF_BOOL(CFG_DOWNLOAD_MISSING_COVER, config::download_missing_cover);
     CDEF_UINT(CFG_COVER_SIZE, config::cover_size);
@@ -100,6 +102,7 @@ void load()
     lyrics_path = CGET_STR(CFG_LYRICS_PATH);
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
+    download_lyrics = CGET_BOOL(CFG_DOWNLOAD_LYRICS);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
     download_missing_cover = CGET_BOOL(CFG_DOWNLOAD_MISSING_COVER);
     placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
@@ -132,6 +135,7 @@ void save()
     CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(lyrics_path));
     CSET_UINT(CFG_REFRESH_RATE, refresh_rate);
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(placeholder));
+    CSET_BOOL(CFG_DOWNLOAD_LYRICS, download_lyrics);
     CSET_BOOL(CFG_DOWNLOAD_COVER, download_cover);
     CSET_BOOL(CFG_DOWNLOAD_MISSING_COVER, download_missing_cover);
     CSET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, placeholder_when_paused);
