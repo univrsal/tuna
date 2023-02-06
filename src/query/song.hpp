@@ -86,6 +86,12 @@ static const char* ids[] = {
     "playback_date",
     "playback_time",
 
+    /* Spotify specific */
+    "context",
+    "context_url",
+    "context_external_url",
+    "playlist_name",
+
     "count"
 };
 
@@ -135,6 +141,12 @@ enum type : uint8_t {
     /* misc */
     PLAYBACK_DATE,
     PLAYBACK_TIME,
+
+    /* Spotify specific */
+    CONTEXT,
+    CONTEXT_URL,
+    CONTEXT_EXTERNAL_URL,
+    PLAYLIST_NAME,
 
     COUNT
 };

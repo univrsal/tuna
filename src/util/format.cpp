@@ -133,6 +133,10 @@ void init()
         return QString(doc.toJson(QJsonDocument::Indented));
     }));
 
+    // Spotify
+    specifiers.emplace_back(new specifier("playlist_url", meta::CONTEXT_URL));
+    specifiers.emplace_back(new specifier("playlist_name", meta::PLAYLIST_NAME));
+
     // VLC Stuff
     specifiers.emplace_back(new specifier("genre", meta::GENRE));
     specifiers.emplace_back(new specifier("copyright", meta::COPYRIGHT));

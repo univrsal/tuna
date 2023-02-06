@@ -49,7 +49,7 @@ spotify_source::spotify_source()
 {
     build_credentials();
     m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE | CAP_VOLUME_MUTE | CAP_PREV_SONG;
-    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::PROGRESS, meta::STATUS, meta::URL });
+    supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE, meta::COVER, meta::DURATION, meta::PROGRESS, meta::STATUS, meta::URL, meta::CONTEXT_URL, meta::PLAYLIST_NAME });
 }
 
 bool spotify_source::enabled() const
@@ -174,7 +174,7 @@ void spotify_source::refresh()
             if (device.toObject()["is_private"].toBool()) {
                 berr("Spotify session is private! Can't read track");
             } else {
-                parse_track_json(obj["item"]);
+                parse_track_json(obj);
                 m_current.set(meta::STATUS, playing.toBool() ? state_playing : state_stopped);
             }
             m_current.set(meta::PROGRESS, progress.toInt());
@@ -202,14 +202,40 @@ void spotify_source::refresh()
     }
 }
 
-void spotify_source::parse_track_json(const QJsonValue& track)
+void spotify_source::parse_track_json(const QJsonValue& response)
 {
-    const auto& trackObj = track.toObject();
+    const auto& trackObj = response["item"].toObject();
     const auto& album = trackObj["album"].toObject();
     const auto& artists = trackObj["artists"].toArray();
     const auto& urls = trackObj["external_urls"].toObject();
 
     m_current.clear();
+
+    if (response["context"].isObject()) {
+        const auto& context = response["context"].toObject();
+
+        QJsonDocument doc;
+        doc.setObject(context);
+        m_current.set(meta::CONTEXT, context["type"].toString());
+        m_current.set(meta::CONTEXT_URL, context["uri"].toString());
+        if (context["external_urls"].isObject())
+            m_current.set(meta::CONTEXT_EXTERNAL_URL, context["external_urls"].toObject()["spotify"].toString());
+
+        if (context["href"].isString()) {
+            QJsonDocument response;
+            QJsonObject obj;
+            std::string header = "";
+            const auto& url = context["href"].toString();
+            const auto http_code = execute_command(qt_to_utf8(m_token), qt_to_utf8(url), header, response);
+
+            if (response.isObject())
+                obj = response.object();
+
+            if (http_code == HTTP_OK) {
+                m_current.set(meta::PLAYLIST_NAME, response["name"].toString());
+            }
+        }
+    }
 
     QStringList tmp;
     /* Get All artists */
