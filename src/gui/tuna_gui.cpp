@@ -46,7 +46,6 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->setupUi(this);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply_pressed()));
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(tuna_gui_accepted()));
-    connect(ui->cb_dl_cover, SIGNAL(stateChanged(int)), this, SLOT(cb_try_download_cover_clicked));
     connect(ui->cb_download_missing, SIGNAL(stateChanged(int)), this, SLOT(cb_download_missing_covers_clicked));
 
     /* Other signals */
@@ -99,8 +98,18 @@ tuna_gui::tuna_gui(QWidget* parent)
     if (config::cover_size == 8129)
         ui->cb_cover_size->setCurrentIndex(i);
 
-    connect(ui->cb_dl_lyrics, &QCheckBox::stateChanged, [this](int s) {
+    connect(ui->cb_dl_lyrics, &QCheckBox::stateChanged, this, [this](int s) {
         ui->frame_lyrics->setEnabled(s == Qt::CheckState::Checked);
+    });
+
+    connect(ui->cb_dl_cover, &QCheckBox::stateChanged, this, [this](int s) {
+        ui->cb_download_missing->setEnabled(s == Qt::CheckState::Checked);
+        ui->cb_cover_size->setEnabled(s == Qt::CheckState::Checked && ui->cb_download_missing->isChecked());
+        ui->frame_cover->setEnabled(s == Qt::CheckState::Checked);
+    });
+
+    connect(ui->cb_download_missing, &QCheckBox::stateChanged, this, [this](int s) {
+        ui->cb_cover_size->setEnabled(s == Qt::CheckState::Checked);
     });
 }
 
@@ -138,6 +147,12 @@ void tuna_gui::toggleShowHide()
         ui->cb_dl_cover->setChecked(config::download_cover);
         ui->cb_download_missing->setChecked(config::download_missing_cover);
         auto idx = ui->cb_source->findData(config::selected_source);
+
+        ui->frame_lyrics->setEnabled(ui->cb_dl_lyrics->isChecked());
+        ui->frame_cover->setEnabled(ui->cb_dl_cover->isChecked());
+        ui->cb_download_missing->setEnabled(ui->cb_dl_cover->isChecked());
+        ui->cb_cover_size->setEnabled(ui->cb_dl_cover->isChecked() && ui->cb_download_missing->isChecked());
+
         if (idx >= 0)
             ui->cb_source->setCurrentIndex(idx);
         else
@@ -318,11 +333,6 @@ void tuna_gui::btn_edit_output_clicked()
         obs_frontend_pop_ui_translation();
         dialog->exec();
     }
-}
-
-void tuna_gui::cb_try_download_cover_clicked(int state)
-{
-    ui->cb_download_missing->setEnabled(state == Qt::CheckState::Checked);
 }
 
 void tuna_gui::cb_download_missing_covers_clicked(int state)

@@ -159,6 +159,30 @@
         </widget>
        </item>
        <item>
+        <layout class="QHBoxLayout" name="frame_itunes">
+         <item>
+          <widget class="QCheckBox" name="cb_download_missing">
+           <property name="text">
+            <string>tuna.gui.tab.basics.song.cover.download.missing</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cb_cover_size">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="currentIndex">
+            <number>-1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QCheckBox" name="cb_dl_lyrics">
          <property name="text">
           <string>tuna.gui.tab.basics.song.lyrics.enable</string>
@@ -233,30 +257,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <item>
-          <widget class="QCheckBox" name="cb_download_missing">
-           <property name="text">
-            <string>tuna.gui.tab.basics.song.cover.download.missing</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="cb_cover_size">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="currentIndex">
-            <number>-1</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <widget class="QCheckBox" name="cb_remove_file_extensions">
