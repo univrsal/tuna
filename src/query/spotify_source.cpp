@@ -222,17 +222,17 @@ void spotify_source::parse_track_json(const QJsonValue& response)
             m_current.set(meta::CONTEXT_EXTERNAL_URL, context["external_urls"].toObject()["spotify"].toString());
 
         if (context["href"].isString()) {
-            QJsonDocument response;
+            QJsonDocument playlist_response;
             QJsonObject obj;
             std::string header = "";
             const auto& url = context["href"].toString();
-            const auto http_code = execute_command(qt_to_utf8(m_token), qt_to_utf8(url), header, response);
+            const auto http_code = execute_command(qt_to_utf8(m_token), qt_to_utf8(url), header, playlist_response);
 
-            if (response.isObject())
-                obj = response.object();
+            if (playlist_response.isObject())
+                obj = playlist_response.object();
 
             if (http_code == HTTP_OK) {
-                m_current.set(meta::PLAYLIST_NAME, response["name"].toString());
+                m_current.set(meta::PLAYLIST_NAME, playlist_response["name"].toString());
             }
         }
     }
