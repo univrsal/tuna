@@ -84,7 +84,7 @@ tuna_gui::tuna_gui(QWidget* parent)
 
     m_refresh = new QTimer(this);
     connect(m_refresh, &QTimer::timeout, this, &tuna_gui::refresh);
-    m_refresh->start(250);
+    m_refresh->stop();
 
     int i = 0;
     for (const auto& Size : { 64, 128, 256, 512, 1024 }) {
@@ -135,6 +135,7 @@ void tuna_gui::toggleShowHide()
 {
     setVisible(!isVisible());
     if (isVisible()) {
+        m_refresh->start(250);
         /* Load config values for sources on dialog show */
         music_sources::set_gui_values();
 
@@ -174,6 +175,8 @@ void tuna_gui::toggleShowHide()
             ui->tbl_outputs->setItem(row, 2, new QTableWidgetItem(entry.path));
             row++;
         }
+    } else {
+        m_refresh->stop();
     }
 }
 
