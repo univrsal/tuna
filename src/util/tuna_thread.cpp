@@ -65,7 +65,7 @@ void thread_method()
     util::set_thread_name("tuna-query");
 
     while (thread_flag) {
-        const uint64_t time = os_gettime_ns() / 1000000;
+        const uint64_t start = os_gettime_ns() / 1000000;
         {
             // We don't want to hold the lock while waiting
             std::lock_guard<std::mutex> lock(thread_mutex);
@@ -97,19 +97,17 @@ void thread_method()
          * but we wait at least 10 ms otherwise we will immediately lock the mutex
          * again which can stall other threads that are waiting to lock it
          */
-        uint64_t delta = std::max<uint64_t>(std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate), 10);
-        bdebug("Query thread sleeping for %ims", int(delta)); // macOS doesn't liek %lu so we'll just cast to int, who cares
+        const uint64_t end = os_gettime_ns() / 1000000;
+        uint64_t delta = std::clamp<uint64_t>(end - start, 10ul, config::refresh_rate - 10);
+        int64_t wait = config::refresh_rate - delta;
+        const int64_t step = 50;
 
-        // Prevent integer wrapping
-        if (delta <= config::refresh_rate) {
-            int64_t wait = config::refresh_rate - delta;
-            const int32_t step = 50;
+        bdebug("Query thread sleeping for %ims", int(wait)); // macOS doesn't like %lu so we'll just cast to int, who cares
 
-            // We only wait 50 ms so we can catch the thread stopping faster
-            while (wait > 0 && thread_flag) {
-                os_sleep_ms(step);
-                wait -= step;
-            }
+        // We only wait int 50 ms steps so we can catch the thread stopping faster
+        while (wait > 0 && thread_flag) {
+            os_sleep_ms(step);
+            wait -= step;
         }
     }
     binfo("Query thread stopped.");
