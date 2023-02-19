@@ -98,8 +98,9 @@ void thread_method()
          * again which can stall other threads that are waiting to lock it
          */
         uint64_t delta = std::max<uint64_t>(std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate), 10);
+        bdebug("Query thread sleeping for %ims", int(delta)); // macOS doesn't liek %lu so we'll just cast to int, who cares
+
         // Prevent integer wrapping
-        bdebug("Query thread sleeping for %lums", delta);
         if (delta <= config::refresh_rate) {
             int64_t wait = config::refresh_rate - delta;
             const int32_t step = 50;
