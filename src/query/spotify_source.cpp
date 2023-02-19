@@ -105,7 +105,7 @@ void spotify_source::load()
 
 /* implementation further down */
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json, const char* custom_request_type = nullptr);
+    QJsonDocument& response_json, const char* custom_request_type = nullptr, const char* request_data = nullptr);
 
 void extract_timeout(const std::string& header, uint64_t& timeout)
 {
@@ -301,7 +301,7 @@ bool spotify_source::execute_capability(capability c)
             case CAP_STOP_SONG:
                 http_code = execute_command(qt_to_utf8(token), PLAYER_PAUSE_URL, header, response, "PUT");
             } else {
-                http_code = execute_command(qt_to_utf8(token), PLAYER_PLAY_URL, header, response, "PUT");
+                http_code = execute_command(qt_to_utf8(token), PLAYER_PLAY_URL, header, response, "PUT", "{\"position_ms\": 0}");
             }
             break;
         case CAP_PREV_SONG:
@@ -504,7 +504,7 @@ bool spotify_source::new_token(QString& log)
 /* Sends commands to spotify api via url */
 
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json, const char* custom_request_type)
+    QJsonDocument& response_json, const char* custom_request_type, const char* request_data)
 {
     static int timeout_start = 0;
     static int timeout = 0;
@@ -538,7 +538,10 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
 
     if (custom_request_type != nullptr) {
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, custom_request_type);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
+        if (request_data)
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request_data);
+        else
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "{}");
     }
 
     if (!response_header.empty())
