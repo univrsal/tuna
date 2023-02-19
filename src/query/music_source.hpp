@@ -103,7 +103,7 @@ public:
 
     source_widget* get_settings_tab() { return m_settings_tab; }
 
-    bool provides_metadata(std::vector<meta::type> const& m)
+    bool provides_metadata(std::vector<meta::type> const& m) const
     {
         for (auto const& d : m) {
             if (!m_supported_metadata[d] && d != meta::NONE)
