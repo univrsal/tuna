@@ -285,43 +285,52 @@ void spotify_source::parse_track_json(const QJsonValue& response)
 
 bool spotify_source::execute_capability(capability c)
 {
-    std::string header;
-    long http_code = -1;
-    QJsonDocument response;
+    QString const token = qt_to_utf8(m_token);
+    auto const playing = m_current.get<int>(meta::STATUS);
 
-    switch (c) {
-    case CAP_PLAY_PAUSE:
-        if (m_current.get<int>(meta::STATUS) == state_playing) {
-        case CAP_STOP_SONG:
-            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PAUSE_URL, header, response, "PUT");
-        } else {
-            http_code = execute_command(qt_to_utf8(m_token), PLAYER_PLAY_URL, header, response, "PUT");
+    // offload this into a separate thread because the request
+    // can take up to one second
+    std::thread([token, playing, c] {
+        std::string header;
+        long http_code = -1;
+        QJsonDocument response;
+
+        switch (c) {
+        case CAP_PLAY_PAUSE:
+            if (playing) {
+            case CAP_STOP_SONG:
+                http_code = execute_command(qt_to_utf8(token), PLAYER_PAUSE_URL, header, response, "PUT");
+            } else {
+                http_code = execute_command(qt_to_utf8(token), PLAYER_PLAY_URL, header, response, "PUT");
+            }
+            break;
+        case CAP_PREV_SONG:
+            http_code = execute_command(qt_to_utf8(token), PLAYER_PREVIOUS_URL, header, response, "POST");
+            break;
+        case CAP_NEXT_SONG:
+            http_code = execute_command(qt_to_utf8(token), PLAYER_NEXT_URL, header, response, "POST");
+            break;
+        case CAP_VOLUME_UP:
+            /* TODO? */
+            break;
+        case CAP_VOLUME_DOWN:
+            /* TODO? */
+            break;
+        default:;
         }
-        break;
-    case CAP_PREV_SONG:
-        http_code = execute_command(qt_to_utf8(m_token), PLAYER_PREVIOUS_URL, header, response, "POST");
-        break;
-    case CAP_NEXT_SONG:
-        http_code = execute_command(qt_to_utf8(m_token), PLAYER_NEXT_URL, header, response, "POST");
-        break;
-    case CAP_VOLUME_UP:
-        /* TODO? */
-        break;
-    case CAP_VOLUME_DOWN:
-        /* TODO? */
-        break;
-    default:;
-    }
 
-    /* Parse response */
-    if (http_code != HTTP_NO_CONTENT) {
-        QString r(response.toJson());
-        binfo("Couldn't run spotify command! HTTP code: %i", int(http_code));
-        binfo("Spotify controls only work for premium users!");
-        binfo("Response: %s", qt_to_utf8(r));
-    }
+        /* Parse response */
+        if (http_code != HTTP_NO_CONTENT) {
+            QString r(response.toJson());
+            binfo("Couldn't run spotify command! HTTP code: %i", int(http_code));
+            binfo("Spotify controls only work for premium users!");
+            binfo("Response: %s", qt_to_utf8(r));
+        }
+    }).detach();
 
-    return http_code == HTTP_NO_CONTENT;
+    // Ideally we would check if the http request succeeded, but we can't wait here
+    // otherwise the UI stalls
+    return true;
 }
 
 /* === CURL/Spotify API handling === */
