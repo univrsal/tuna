@@ -163,7 +163,7 @@ void init()
 
 bool execute(QString& q)
 {
-    auto src_ref = music_sources::selected_source_unsafe();
+    auto src_ref = music_sources::selected_source();
     auto copy = q;
     auto result = true;
     q = "";

@@ -43,7 +43,7 @@
 #include <obs-frontend-api.h>
 
 namespace music_sources {
-static int selected_index = -1;
+static std::atomic<int> selected_index = -1;
 QList<std::shared_ptr<music_source>> instances;
 
 void init()
@@ -117,7 +117,6 @@ void select(const char* id)
     if (selected && strcmp(selected->id(), id) == 0)
         return;
 
-    tuna_thread::thread_mutex.lock();
     if (selected)
         selected->reset_info();
     int i = 0;
@@ -131,7 +130,6 @@ void select(const char* id)
 
     /* Ensure that cover is set to place holder on switch */
     util::reset_cover();
-    tuna_thread::thread_mutex.unlock();
 }
 
 void set_gui_values()
@@ -140,19 +138,9 @@ void set_gui_values()
         src->set_gui_values();
 }
 
-std::shared_ptr<music_source> selected_source_unsafe()
-{
-    if (selected_index >= 0) {
-        auto ref = std::shared_ptr<music_source>(instances[selected_index]);
-        return ref;
-    }
-    return nullptr;
-}
-
 std::shared_ptr<music_source> selected_source()
 {
     if (selected_index >= 0) {
-        std::lock_guard<std::mutex> lock(tuna_thread::thread_mutex);
         return std::shared_ptr<music_source>(instances[selected_index]);
     }
     return nullptr;

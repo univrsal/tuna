@@ -49,15 +49,12 @@ void stop()
     thread_handle.join();
     bdebug("Query thread stopped.");
 
-    {
-        bdebug("Resetting song information...");
-        std::lock_guard<std::mutex> lock(thread_mutex);
-        /* Set status to nothing before stopping */
-        auto src = music_sources::selected_source_unsafe();
-        src->reset_info();
-        util::handle_outputs(src->song_info());
-        bdebug("Song information reset.");
-    }
+    bdebug("Resetting song information...");
+    /* Set status to nothing before stopping */
+    auto src = music_sources::selected_source();
+    src->reset_info();
+    util::handle_outputs(src->song_info());
+    bdebug("Song information reset.");
 }
 
 void thread_method()
@@ -67,13 +64,14 @@ void thread_method()
     while (thread_flag) {
         const uint64_t start = os_gettime_ns() / 1000000;
         {
-            // We don't want to hold the lock while waiting
-            std::lock_guard<std::mutex> lock(thread_mutex);
-            auto ref = music_sources::selected_source_unsafe();
+            auto ref = music_sources::selected_source();
             if (ref) {
-
-                ref->refresh();
-                ref->post_refresh();
+                {
+                    // We don't want to hold the lock while waiting
+                    std::lock_guard<std::mutex> lock(thread_mutex);
+                    ref->refresh();
+                    ref->post_refresh();
+                }
                 auto s = ref->song_info();
 
                 /* Make a copy for the progress bar source, because it can't
