@@ -158,9 +158,9 @@ void stop()
         bdebug("Stopping webserver...");
         if (server->is_running() && server->is_valid())
             server->stop();
+        thread_handle.join();
         delete server;
         server = nullptr;
-        thread_handle.join();
         binfo("Stopped webserver");
     }
 }
