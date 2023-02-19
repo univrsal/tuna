@@ -155,6 +155,7 @@ bool start()
 void stop()
 {
     if (server) {
+        bdebug("Stopping webserver...");
         if (server->is_running() && server->is_valid())
             server->stop();
         delete server;

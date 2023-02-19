@@ -167,8 +167,11 @@ void music_control::refresh_play_state()
 void music_control::refresh_source()
 {
     uint32_t flags = 0;
-    if (music_sources::selected_source_unsafe())
-        flags = music_sources::selected_source_unsafe()->get_capabilities();
+    {
+        auto src = music_sources::selected_source();
+        if (src)
+            flags = src->get_capabilities();
+    }
 
     bool next = flags & CAP_NEXT_SONG, prev = flags & CAP_NEXT_SONG, play = flags & CAP_PLAY_PAUSE,
          stop = flags & CAP_STOP_SONG;

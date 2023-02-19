@@ -44,16 +44,20 @@ void stop()
 {
     if (!thread_flag)
         return;
+    bdebug("Stopping query thread...");
+    thread_flag = false;
+    thread_handle.join();
+    bdebug("Query thread stopped.");
+
     {
+        bdebug("Resetting song information...");
         std::lock_guard<std::mutex> lock(thread_mutex);
         /* Set status to nothing before stopping */
         auto src = music_sources::selected_source_unsafe();
         src->reset_info();
         util::handle_outputs(src->song_info());
-        thread_flag = false;
+        bdebug("Song information reset.");
     }
-    thread_handle.join();
-    util::reset_cover();
 }
 
 void thread_method()
@@ -95,6 +99,7 @@ void thread_method()
          */
         uint64_t delta = std::max<uint64_t>(std::min<uint64_t>((os_gettime_ns() / 1000000) - time, config::refresh_rate), 10);
         // Prevent integer wrapping
+        bdebug("Query thread sleeping for %lums", delta);
         if (delta <= config::refresh_rate) {
             int64_t wait = config::refresh_rate - delta;
             const int32_t step = 50;

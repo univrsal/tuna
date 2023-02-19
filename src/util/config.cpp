@@ -130,6 +130,7 @@ void load()
 
 void save()
 {
+    bdebug("Saving config...");
     tuna_thread::thread_mutex.lock();
     CSET_STR(CFG_COVER_PATH, qt_to_utf8(cover_path));
     CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(lyrics_path));
@@ -146,6 +147,7 @@ void save()
     CSET_UINT(CFG_COVER_SIZE, cover_size);
     save_outputs();
     tuna_thread::thread_mutex.unlock();
+    bdebug("Saved config.");
 }
 
 void load_outputs()

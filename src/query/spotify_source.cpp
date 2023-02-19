@@ -129,12 +129,13 @@ void spotify_source::refresh()
         return;
 
     begin_refresh();
+    bdebug("[Spotify] begin refresh");
 
     if (util::epoch() > m_token_termination) {
         binfo("Refreshing Spotify token");
         QString log;
-        const auto result = do_refresh_token(log);
-        emit(get_ui<spotify>())->login_state_changed(result, log);
+        do_refresh_token(log);
+        //        emit(get_ui<spotify>())->login_state_changed(result, log);
         save();
     }
 
@@ -154,7 +155,7 @@ void spotify_source::refresh()
     QJsonObject obj;
 
     const auto http_code = execute_command(qt_to_utf8(m_token), PLAYER_URL, header, response);
-
+    bdebug("Executed %s command", PLAYER_URL);
     if (response.isObject())
         obj = response.object();
 
@@ -200,6 +201,7 @@ void spotify_source::refresh()
             }
         }
     }
+    bdebug("[Spotify] Finished refresh");
 }
 
 void spotify_source::parse_track_json(const QJsonValue& response)
@@ -347,6 +349,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(request.c_str()));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 1000);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, response_header);
@@ -520,6 +523,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 1000);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
 

@@ -150,5 +150,6 @@ void obs_module_post_load()
 
 void obs_module_unload()
 {
+    bdebug("Shutting down...");
     config::close();
 }
