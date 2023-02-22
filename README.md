@@ -28,6 +28,7 @@ Currently supports
 - [COOLIGUAY](https://github.com/COOLIGUAY) (Spanish) 
 - [dEN5-tech](https://github.com/dEN5-tech) (Russian)
 - [Cyame](https://github.com/Cyame) (Simplified Chinese) 
+- [KaiLee2588](https://github.com/KaiLee2588) (Simplified and Traditional Chinese) 
 - [gabrielpastori1](https://github.com/gabrielpastori1) (Brazilian Portuguese) 
 - [orion78fr](https://github.com/orion78fr) (French) 
 

@@ -17,6 +17,7 @@
  *************************************************************************/
 
 #include "tuna_gui.hpp"
+#include "../plugin-macros.generated.h"
 #include "../query/vlc_obs_source.hpp"
 #include "../util/config.hpp"
 #include "../util/constants.hpp"
@@ -36,6 +37,14 @@
 #include <string>
 #include <taglib/taglib.h>
 #include <util/platform.h>
+
+#ifndef GIT_COMMIT_HASH
+#    define GIT_COMMIT_HASH "n/a"
+#endif
+
+#ifndef GIT_BRANCH
+#    define GIT_BRANCH "n/a"
+#endif
 
 tuna_gui* tuna_dialog = nullptr;
 
@@ -79,6 +88,12 @@ tuna_gui::tuna_gui(QWidget* parent)
     about_text = about_text.replace("%taglibversion%", MAKE_VERSION_STRING(TAGLIB, VERSION));
     about_text = about_text.replace("%mpdversion%", MAKE_VERSION_STRING(LIBMPDCLIENT, VERSION));
     about_text = about_text.replace("%cpphttplib%", CPPHTTPLIB_VERSION);
+    about_text = about_text.replace("%version%", PLUGIN_VERSION);
+    about_text = about_text.replace("%branch%", GIT_BRANCH);
+    about_text = about_text.replace("%commit%", GIT_COMMIT_HASH);
+    about_text = about_text.replace("%buildtime%", BUILD_TIME);
+
+    // Version %version%-%branch% (%commit%) compiled on %buildtime%
 
     ui->label->setText(about_text);
 
