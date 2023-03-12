@@ -31,6 +31,7 @@ Currently supports
 - [KaiLee2588](https://github.com/KaiLee2588) (Simplified and Traditional Chinese) 
 - [gabrielpastori1](https://github.com/gabrielpastori1) (Brazilian Portuguese) 
 - [orion78fr](https://github.com/orion78fr) (French) 
+- [jegadk](https://obsproject.com/forum/members/jegadk.185246/) (Danish) 
 
 ### Additional credits
 
