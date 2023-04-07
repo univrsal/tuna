@@ -67,6 +67,7 @@
 #define CFG_SPOTIFY_TOKEN_TERMINATION   "spotify.token_termination"
 #define CFG_SPOTIFY_CLIENT_ID           "spotify.client_id"
 #define CFG_SPOTIFY_CLIENT_SECRET       "spotify.client_secret"
+#define CFG_SPOTIFY_REQUEST_TIMEOUT     "spotify.request_timeout"
 
 #define CFG_DEEZER_CLIENT_ID            "deezer.client.id"
 #define CFG_DEEZER_CLIENT_SECRET        "deezer.client.secret"

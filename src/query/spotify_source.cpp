@@ -80,12 +80,15 @@ void spotify_source::load()
     CDEF_INT(CFG_SPOTIFY_TOKEN_TERMINATION, 0);
     CDEF_STR(CFG_SPOTIFY_CLIENT_ID, "");
     CDEF_STR(CFG_SPOTIFY_CLIENT_SECRET, "");
+    CDEF_INT(CFG_SPOTIFY_REQUEST_TIMEOUT, 1000);
 
     m_logged_in = CGET_BOOL(CFG_SPOTIFY_LOGGEDIN);
     m_token = utf8_to_qt(CGET_STR(CFG_SPOTIFY_TOKEN));
     m_refresh_token = utf8_to_qt(CGET_STR(CFG_SPOTIFY_REFRESH_TOKEN));
     m_auth_code = utf8_to_qt(CGET_STR(CFG_SPOTIFY_AUTH_CODE));
     m_token_termination = CGET_INT(CFG_SPOTIFY_TOKEN_TERMINATION);
+    m_curl_timeout_ms = CGET_INT(CFG_SPOTIFY_REQUEST_TIMEOUT);
+
     build_credentials();
     music_source::load();
 
@@ -105,7 +108,7 @@ void spotify_source::load()
 
 /* implementation further down */
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json, const char* custom_request_type = nullptr, const char* request_data = nullptr);
+    QJsonDocument& response_json, int64_t curl_timeout, const char* custom_request_type = nullptr, const char* request_data = nullptr);
 
 void extract_timeout(const std::string& header, uint64_t& timeout)
 {
@@ -154,7 +157,7 @@ void spotify_source::refresh()
     QJsonDocument response;
     QJsonObject obj;
 
-    const auto http_code = execute_command(qt_to_utf8(m_token), PLAYER_URL, header, response);
+    const auto http_code = execute_command(qt_to_utf8(m_token), PLAYER_URL, header, response, m_curl_timeout_ms);
     bdebug("Executed %s command", PLAYER_URL);
     if (response.isObject())
         obj = response.object();
@@ -228,7 +231,7 @@ void spotify_source::parse_track_json(const QJsonValue& response)
             QJsonObject obj;
             std::string header = "";
             const auto& url = context["href"].toString();
-            const auto http_code = execute_command(qt_to_utf8(m_token), qt_to_utf8(url), header, playlist_response);
+            const auto http_code = execute_command(qt_to_utf8(m_token), qt_to_utf8(url), header, playlist_response, m_curl_timeout_ms);
 
             if (playlist_response.isObject())
                 obj = playlist_response.object();
@@ -287,10 +290,10 @@ bool spotify_source::execute_capability(capability c)
 {
     QString const token = qt_to_utf8(m_token);
     auto const playing = m_current.get<int>(meta::STATUS);
-
+    auto timeout = m_curl_timeout_ms;
     // offload this into a separate thread because the request
     // can take up to one second
-    std::thread([token, playing, c] {
+    std::thread([timeout, token, playing, c] {
         std::string header;
         long http_code = -1;
         QJsonDocument response;
@@ -299,16 +302,16 @@ bool spotify_source::execute_capability(capability c)
         case CAP_PLAY_PAUSE:
             if (playing) {
             case CAP_STOP_SONG:
-                http_code = execute_command(qt_to_utf8(token), PLAYER_PAUSE_URL, header, response, "PUT");
+                http_code = execute_command(qt_to_utf8(token), PLAYER_PAUSE_URL, header, response, timeout, "PUT");
             } else {
-                http_code = execute_command(qt_to_utf8(token), PLAYER_PLAY_URL, header, response, "PUT", "{\"position_ms\": 0}");
+                http_code = execute_command(qt_to_utf8(token), PLAYER_PLAY_URL, header, response, timeout, "PUT", "{\"position_ms\": 0}");
             }
             break;
         case CAP_PREV_SONG:
-            http_code = execute_command(qt_to_utf8(token), PLAYER_PREVIOUS_URL, header, response, "POST");
+            http_code = execute_command(qt_to_utf8(token), PLAYER_PREVIOUS_URL, header, response, timeout, "POST");
             break;
         case CAP_NEXT_SONG:
-            http_code = execute_command(qt_to_utf8(token), PLAYER_NEXT_URL, header, response, "POST");
+            http_code = execute_command(qt_to_utf8(token), PLAYER_NEXT_URL, header, response, timeout, "POST");
             break;
         case CAP_VOLUME_UP:
             /* TODO? */
@@ -348,7 +351,7 @@ size_t header_callback(char* ptr, size_t size, size_t nmemb, std::string* str)
 }
 
 CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string* response_header,
-    const std::string& request)
+    const std::string& request, int64_t timeout)
 {
     CURL* curl = curl_easy_init();
 
@@ -358,7 +361,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(request.c_str()));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 1000);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, response_header);
@@ -370,7 +373,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
 
 /* Requests an access token via request body
  * over a POST request to spotify */
-void request_token(const std::string& request, const std::string& credentials, QJsonDocument& response_json)
+void request_token(const std::string& request, const std::string& credentials, QJsonDocument& response_json, int64_t timeout)
 {
     if (request.empty() || credentials.empty()) {
         berr("Cannot request token without valid credentials"
@@ -383,7 +386,7 @@ void request_token(const std::string& request, const std::string& credentials, Q
     header.append(credentials);
 
     auto* list = curl_slist_append(nullptr, header.c_str());
-    CURL* curl = prepare_curl(list, &response, &response_header, request);
+    CURL* curl = prepare_curl(list, &response, &response_header, request, timeout);
     CURLcode res = curl_easy_perform(curl);
 
     if (res == CURLE_OK) {
@@ -424,7 +427,7 @@ bool spotify_source::do_refresh_token(QString& log)
 
     request = "grant_type=refresh_token&refresh_token=";
     request.append(m_refresh_token.toStdString());
-    request_token(request, m_creds.toStdString(), response);
+    request_token(request, m_creds.toStdString(), response, m_curl_timeout_ms);
 
     if (response.isNull()) {
         berr("Couldn't refresh Spotify token, response was null");
@@ -474,7 +477,7 @@ bool spotify_source::new_token(QString& log)
     request = "grant_type=authorization_code&code=";
     request.append(m_auth_code.toStdString());
     request.append("&redirect_uri=").append(REDIRECT_URI);
-    request_token(request, m_creds.toStdString(), response);
+    request_token(request, m_creds.toStdString(), response, m_curl_timeout_ms);
 
     if (response.isObject()) {
         const auto& response_obj = response.object();
@@ -504,7 +507,7 @@ bool spotify_source::new_token(QString& log)
 /* Sends commands to spotify api via url */
 
 long execute_command(const char* auth_token, const char* url, std::string& response_header,
-    QJsonDocument& response_json, const char* custom_request_type, const char* request_data)
+    QJsonDocument& response_json, int64_t curl_timeout, const char* custom_request_type, const char* request_data)
 {
     static int timeout_start = 0;
     static int timeout = 0;
@@ -532,7 +535,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 1000);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, curl_timeout);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_callback);
     curl_easy_setopt(curl, CURLOPT_HEADERDATA, &response_header);
 

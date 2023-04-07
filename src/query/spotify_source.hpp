@@ -33,6 +33,8 @@ class spotify_source : public music_source {
     /* epoch time in seconds */
     int64_t m_token_termination = 0;
 
+    int64_t m_curl_timeout_ms = 1000;
+
     uint64_t m_timeout_length = 0, /* Rate limit timeout length */
         m_timout_start = 0;        /* Timeout start */
     void parse_track_json(const QJsonValue& track);
