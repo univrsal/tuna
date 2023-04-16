@@ -31,6 +31,7 @@
 #include <ctime>
 #include <curl/curl.h>
 #include <obs-module.h>
+#include <sstream>
 #include <stdio.h>
 #include <util/platform.h>
 #if _WIN32
@@ -126,7 +127,7 @@ void download_lyrics(const song& song)
     }
 }
 
-std::string decodePercentEncoding(const std::string& encodedString)
+std::string decode_percent_encoding(const std::string& encodedString)
 {
     std::stringstream decodedStringStream;
     decodedStringStream << std::hex << encodedString;
@@ -155,7 +156,7 @@ bool download_cover(const QString& url)
 
     if (url.startsWith("file://")) {
         // Don't use curl for local files
-        QString new_cover_path = decodePercentEncoding(qt_to_utf8(url.mid(7))).c_str();
+        QString new_cover_path = decode_percent_encoding(qt_to_utf8(url.mid(7))).c_str();
         QFile cover(new_cover_path);
         if (cover.exists()) {
             QFile current(output_path);
