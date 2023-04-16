@@ -154,9 +154,15 @@ bool download_cover(const QString& url)
     auto output_path = config::cover_path;
     auto tmp = output_path + ".tmp";
 
+    static const int prefix_length =
+#if _WIN32
+        8;
+#else
+        7;
+#endif
     if (url.startsWith("file://")) {
         // Don't use curl for local files
-        QString new_cover_path = decode_percent_encoding(qt_to_utf8(url.mid(7))).c_str();
+        QString new_cover_path = decode_percent_encoding(qt_to_utf8(url.mid(prefix_length))).c_str();
         QFile cover(new_cover_path);
         if (cover.exists()) {
             QFile current(output_path);
