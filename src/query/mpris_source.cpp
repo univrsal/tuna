@@ -480,7 +480,7 @@ mpris_source::~mpris_source()
 {
     m_thread_flag = false;
     m_internal_thread.join();
-    dbus_connection_close(m_dbus_connection);
+    //    dbus_connection_close(m_dbus_connection); // apparently you shouldn't close them???
     m_dbus_connection = nullptr;
 }
 
