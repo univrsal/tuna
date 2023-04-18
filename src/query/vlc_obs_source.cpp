@@ -95,25 +95,41 @@ std::string vlc_obs_source::get_target_source_name()
 {
     auto current_scene_name = get_current_scene_name();
 
-    if (!current_scene_name.empty()) {
-        m_target_scene = current_scene_name;
-        auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(current_scene_name.c_str());
+    if (current_scene_name.empty())
+        return "";
+    m_target_scene = current_scene_name;
+    auto mappings = static_cast<vlc*>(get_settings_tab())->get_mappings_for_scene(current_scene_name.c_str());
 
-        if (!mappings.empty()) {
-            m_index = qMin(mappings.size(), m_index);
-            return qt_to_utf8(mappings[m_index].toString());
-        }
+    if (mappings.empty()) {
+        OBSSourceAutoRelease scene = obs_frontend_get_current_scene();
+        // We don't have any mappings -> try to find the first active VLC source
+        struct data_s {
+            const char* name = nullptr;
+            bool found_source = false;
+        } data;
+        obs_source_enum_active_sources(
+            scene, [](obs_source_t*, obs_source_t* child, void* data) {
+                data_s* datas = static_cast<data_s*>(data);
+                if (!datas->found_source && strcmp(obs_source_get_id(child), "vlc_source") == 0) {
+                    datas->name = obs_source_get_name(child);
+                    datas->found_source = true;
+                }
+            },
+            &data);
+        if (data.found_source)
+            return data.name;
+        return "";
     }
-    return "";
+
+    m_index = qMin(mappings.size(), m_index);
+    return qt_to_utf8(mappings[m_index].toString());
 }
 
 std::string vlc_obs_source::get_current_scene_name()
 {
     OBSSourceAutoRelease active_scene = obs_frontend_get_current_scene();
-    if (active_scene) {
-        auto name = obs_source_get_name(active_scene);
-        return name;
-    }
+    if (active_scene)
+        return obs_source_get_name(active_scene);
     return "";
 }
 
