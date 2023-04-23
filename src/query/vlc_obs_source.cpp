@@ -103,21 +103,21 @@ std::string vlc_obs_source::get_target_source_name()
     if (mappings.empty()) {
         OBSSourceAutoRelease scene = obs_frontend_get_current_scene();
         // We don't have any mappings -> try to find the first active VLC source
-        struct data_s {
-            const char* name = nullptr;
-            bool found_source = false;
-        } data;
-        obs_source_enum_active_sources(
-            scene, [](obs_source_t*, obs_source_t* child, void* data) {
-                data_s* datas = static_cast<data_s*>(data);
-                if (!datas->found_source && strcmp(obs_source_get_id(child), "vlc_source") == 0) {
-                    datas->name = obs_source_get_name(child);
-                    datas->found_source = true;
-                }
-            },
+        const char* data {};
+        obs_enum_sources([](void* data, obs_source_t* src) {
+            if (strcmp(obs_source_get_id(src), "vlc_source") == 0) {
+                if (!obs_source_active(src))
+                    return true;
+                const char** d = (const char**)data;
+                *d = obs_source_get_name(src);
+                return false;
+            }
+            return true;
+        },
             &data);
-        if (data.found_source)
-            return data.name;
+
+        if (data)
+            return data;
         return "";
     }
 
