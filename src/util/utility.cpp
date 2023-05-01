@@ -127,25 +127,6 @@ void download_lyrics(const song& song)
     }
 }
 
-std::string decode_percent_encoding(const std::string& encodedString)
-{
-    std::stringstream decodedStringStream;
-    decodedStringStream << std::hex << encodedString;
-    std::string decodedString;
-    char c;
-    while (decodedStringStream.get(c)) {
-        if (c == '%') {
-            int hexValue;
-            if (decodedStringStream >> std::hex >> hexValue) {
-                decodedString += static_cast<char>(hexValue);
-            }
-        } else {
-            decodedString += c;
-        }
-    }
-    return decodedString;
-}
-
 bool download_cover(const QString& url)
 {
     if (url == "n/a")
@@ -162,7 +143,7 @@ bool download_cover(const QString& url)
 #endif
     if (url.startsWith("file://")) {
         // Don't use curl for local files
-        QString new_cover_path = decode_percent_encoding(qt_to_utf8(url.mid(prefix_length))).c_str();
+        QString new_cover_path = QUrl::fromPercentEncoding(url.mid(prefix_length).toUtf8());
         QFile cover(new_cover_path);
         if (cover.exists()) {
             QFile current(output_path);
@@ -172,7 +153,7 @@ bool download_cover(const QString& url)
             berr("Couldn't move cover file from '%s' to '%s'", qt_to_utf8(new_cover_path), qt_to_utf8(output_path));
             return false;
         }
-        berr("Cover file '%s' does not exist", qt_to_utf8(output_path));
+        berr("Cover file '%s' does not exist", qt_to_utf8(new_cover_path));
         return false;
     }
 
