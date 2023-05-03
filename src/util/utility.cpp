@@ -148,9 +148,9 @@ bool download_cover(const QString& url)
         if (cover.exists()) {
             QFile current(output_path);
             current.remove();
-            if (QFile::rename(new_cover_path, output_path))
+            if (QFile::copy(new_cover_path, output_path))
                 return true;
-            berr("Couldn't move cover file from '%s' to '%s'", qt_to_utf8(new_cover_path), qt_to_utf8(output_path));
+            berr("Couldn't copy cover file from '%s' to '%s'", qt_to_utf8(new_cover_path), qt_to_utf8(output_path));
             return false;
         }
         berr("Cover file '%s' does not exist", qt_to_utf8(new_cover_path));
