@@ -72,6 +72,7 @@
         width: 100%;
         margin-top: 5px;
         border-radius: 2px;
+        transition: background-color 0.8s ease-in-out;
     }
 
     #progressbar {
@@ -152,6 +153,91 @@
         return mins + ':' + secs;
     }
 
+    function calculate_brightness(packed_rgb) {
+        let rgb = unpack_rgb(packed_rgb);
+        const r = rgb[0] / 255;
+        const g = rgb[1] / 255;
+        const b = rgb[2] / 255;
+
+        const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+        return luminance;
+    }
+
+    function unpack_rgb(packed) {
+        const r = (packed >> 16) & 0xFF;
+        const g = (packed >> 8) & 0xFF;
+        const b = packed & 0xFF;
+        return [r, g, b];
+    }
+
+    function pack_rgb(r, g, b) {
+        return (r << 16) | (g << 8) | b;
+    }
+
+    function increase_brightness(rgb, amount) {
+        const [r, g, b] = rgb;
+
+        // Calculate luminance
+        const luminance = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+        // Increase brightness based on luminance
+        const increasedR = Math.min(r + (amount * (255 - luminance) / 255), 255);
+        const increasedG = Math.min(g + (amount * (255 - luminance) / 255), 255);
+        const increasedB = Math.min(b + (amount * (255 - luminance) / 255), 255);
+
+        return [increasedR, increasedG, increasedB];
+    }
+
+    function extract_color_palette(url, num_colors) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+
+            img.onload = function () {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                const colorCounts = {};
+
+                // Set the canvas dimensions to match the image
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Draw the image onto the canvas
+                ctx.drawImage(img, 0, 0);
+
+                // Get the image data
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+                // Loop through each pixel in the image
+                for (let i = 0; i < imageData.length; i += 4) {
+                    const r = imageData[i];
+                    const g = imageData[i + 1];
+                    const b = imageData[i + 2];
+                    const color = pack_rgb(r, g, b);
+
+                    // Count the occurrences of each color
+                    colorCounts[color] = (colorCounts[color] || 0) + 1;
+                }
+
+                // Sort the colors by count in descending order
+                const sortedColors = Object.keys(colorCounts).sort(
+                    (a, b) => colorCounts[b] - colorCounts[a]
+                );
+
+                // Return the top 'numColors' colors from the palette
+                resolve(sortedColors.slice(0, num_colors));
+            };
+
+            img.onerror = function () {
+                reject(new Error("Failed to load image."));
+            };
+
+            // Start loading the image
+            img.src = url;
+        });
+    }
+
     function fetch_data() {
         fetch('http://localhost:1608/')
             .then(response => response.json())
@@ -184,6 +270,24 @@
                         last_cover = data['cover_url'];
                     }, 700);
 
+                    extract_color_palette(data['cover_url'], 10).then(palette => {
+                        var brightest_value = 0;
+                        var packed_rgb = palette[0];
+                        for (var i = 0; i < palette.length; i++) {
+                            let b = calculate_brightness(palette[i]);
+                            if (b > brightest_value && b < 0.85) { // find the brigest color, but don't use colors that are too bright
+                                console.log(b);
+                                packed_rgb = palette[i];
+                                brightest_value = b;
+                            }
+                        }
+                        let rgb = unpack_rgb(packed_rgb);
+                        if (brightest_value < 0.4) {
+                            // brighten the color, if it's too dark
+                            rgb = increase_brightness(rgb, 0.2);
+                        }
+                        document.getElementById('progress').style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                    });
                 }
 
                 if (artists != last_artist) {
