@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.16
+// @version      1.0.17
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -116,7 +116,7 @@
                 let artists = [data.metadata.artist]
                 let progress = query('.playback-bar__progress-time-elapsed', e => timestamp_to_ms(e.textContent));
                 let duration = query('.npFSJSO1wsu3mEEGb5bh', e => timestamp_to_ms(e.textContent));
-                
+
 
                 if (title !== null) {
                     post({ cover, title, artists, status, progress, duration, album });
@@ -135,6 +135,8 @@
                     post({ cover, title, artists, status, progress, duration, album_url });
                 }
             } else if (hostname === 'www.youtube.com') {
+              if (!navigator.mediaSession.metadata) // if nothing is playing we don't submit anything, otherwise having two youtube tabs open causes issues
+                  return;
               let artists = [];
 
               try {
@@ -173,6 +175,8 @@
                 }
               }
             } else if (hostname === 'music.youtube.com') {
+                if (!navigator.mediaSession.metadata) // if nothing is playing we don't submit anything, otherwise having two youtube tabs open causes issues
+                  return;
                 // Youtube Music support by Rubecks
                 const artistsSelectors = [
                     '.ytmusic-player-bar.byline [href*="channel/"]:not([href*="channel/MPREb_"]):not([href*="browse/MPREb_"])', // Artists with links
@@ -315,15 +319,15 @@
                 if(navigator.mediaSession.metadata){
                     let title = navigator.mediaSession.metadata.title;
                     let artists = [navigator.mediaSession.metadata.artist];
-                    
+
                     let mediaElem = document.getElementsByTagName("audio")[0]; // add || document.getElementsByTagName("video")[0] to support sites like yt music where video includes audio
                     let progress = Math.floor(mediaElem.currentTime) * 1000;
                     let duration = Math.floor(mediaElem.duration) * 1000;
-                    
+
                     let artworks = navigator.mediaSession.metadata.artwork;
                     let album = navigator.mediaSession.metadata.album;
                     let album_url = artworks[artworks.length - 1].src;
-                    let cover = album_url; // For now. 
+                    let cover = album_url; // For now.
 
                     if (title !== null) {
                         post({ cover, title, artists, status, progress, duration, album, album_url });
