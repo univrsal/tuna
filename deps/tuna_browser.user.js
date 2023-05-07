@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.17
+// @version      1.0.18
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -29,8 +29,19 @@
     // so we don't want to spam it
     var failure_count = 0;
     var cooldown = 0;
+    var last_state = {};
 
-    function post(data){
+    function post(data) {
+        if (data.status) {
+            /* if this tab isn't playing and the status hasn't changed we don't send an update
+             * otherwise tabs that are paused would constantly send the paused/stopped state
+             * which interferes another tab that is playing something
+             */
+            if (data.status !== "playing" && last_state.status === data.status) {
+                return; // Prevent the paused state from being continously sent, since this tab is not playing, should prevent tabs from clashing with eachother
+            }
+        }
+        last_state = data;
         var url = 'http://localhost:' + port + '/';
         var xhr = new XMLHttpRequest();
         xhr.open('POST', url);
