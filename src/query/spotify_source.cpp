@@ -250,7 +250,7 @@ void spotify_source::parse_track_json(const QJsonValue& response)
 
     /* Cover link */
     const auto& covers = album["images"];
-    if (covers.isArray()) {
+    if (covers.isArray() && !covers.toArray().isEmpty()) {
         const QJsonValue v = covers.toArray()[0];
         if (v.isObject() && v.toObject().contains("url"))
             m_current.set(meta::COVER, v.toObject()["url"].toString());
