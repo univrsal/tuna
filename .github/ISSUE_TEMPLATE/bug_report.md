@@ -4,6 +4,7 @@ name: "Bug report"
 about: "For reporting bugs or crashes"
 title: ""
 ref: "main"
+blank_issues_enabled: false
 labels:
 
 - bug
