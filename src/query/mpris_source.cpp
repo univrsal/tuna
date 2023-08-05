@@ -454,7 +454,7 @@ DBusHandlerResult mpris_source::handle_mpris(DBusMessage* message)
         if (a != b) {
             m_info[player].metadata.set(meta::STATUS, play_state::state_playing); // if a track changes, it is playing (vlc)
         }
-        m_info[player].metadata.set(meta::TRACK_NUMBER, 0); // borked on vlc
+        m_info[player].metadata.set(meta::TRACK_NUMBER, 0);                       // borked on vlc
     }
     return DBUS_HANDLER_RESULT_HANDLED;
 }
