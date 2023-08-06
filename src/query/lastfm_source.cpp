@@ -122,32 +122,6 @@ void lastfm_source::parse_song(const QJsonObject& s)
 
     if (s["name"].isString())
         m_current.set(meta::TITLE, s["name"].toString());
-
-    if (m_current.has(meta::ARTIST) && m_current.has(meta::TITLE)) {
-        /* Try and get song duration */
-        QString artist = QUrl::toPercentEncoding(m_current.get<QStringList>(meta::ARTIST).at(0));
-        QString track = QUrl::toPercentEncoding(m_current.get(meta::TITLE));
-        QString track_request = "https://ws.audioscrobbler.com/2.0/?method="
-                                "track.getInfo&api_key="
-            + m_api_key + "&artist=" + artist + "&track=" + track + "&format=json";
-
-        QJsonDocument response;
-        auto code = lastfm_request(response, track_request);
-        if (code == HTTP_OK) {
-            auto track_obj = response.object()["track"];
-            if (track_obj.isObject()) {
-                auto duration = track_obj.toObject()["duration"];
-                if (duration.isString()) {
-                    bool ok = false;
-                    auto str = duration.toString();
-                    binfo("Last.fm song length: %s", qt_to_utf8(str));
-                    int i = str.toInt(&ok);
-                    if (ok)
-                        m_current.set(meta::DURATION, i);
-                }
-            }
-        }
-    }
 }
 
 bool lastfm_source::execute_capability(capability)
