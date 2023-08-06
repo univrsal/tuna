@@ -140,6 +140,7 @@ void lastfm_source::parse_song(const QJsonObject& s)
                 if (duration.isString()) {
                     bool ok = false;
                     auto str = duration.toString();
+                    binfo("Last.fm song length: %s", qt_to_utf8(str));
                     int i = str.toInt(&ok);
                     if (ok)
                         m_current.set(meta::DURATION, i);
@@ -176,7 +177,6 @@ long lastfm_request(QJsonDocument& response_json, const QString& url)
     CURLcode res = curl_easy_perform(curl);
 
     if (res == CURLE_OK) {
-        binfo("Curl response: %i", (int)response.length());
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
         QJsonParseError err;
         response_json = QJsonDocument::fromJson(response.c_str(), &err);
