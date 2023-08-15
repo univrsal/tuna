@@ -281,6 +281,7 @@ QJsonDocument curl_get_json(const char* url)
             else
                 return doc;
         }
+        curl_easy_cleanup(curl);
     }
     berr("curl_easy_init() failed when receiving json from %s", url);
     return {};

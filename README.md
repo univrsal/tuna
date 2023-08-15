@@ -27,6 +27,7 @@ Currently supports
 ### Translators
 - [COOLIGUAY](https://github.com/COOLIGUAY) (Spanish) 
 - [dEN5-tech](https://github.com/dEN5-tech) (Russian)
+- [libraV3](https://github.com/libraV3) (Russian)
 - [Cyame](https://github.com/Cyame) (Simplified Chinese) 
 - [KaiLee2588](https://github.com/KaiLee2588) (Simplified and Traditional Chinese) 
 - [gabrielpastori1](https://github.com/gabrielpastori1) (Brazilian Portuguese) 
