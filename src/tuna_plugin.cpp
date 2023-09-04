@@ -98,19 +98,22 @@ bool obs_module_load()
 {
     binfo("Loading v%s-%s-%s (build time %s). Qt version: compile-time: %s, run-time: %s. libobs: compile-time: %s, run-time: %s",
         TUNA_VERSION, GIT_BRANCH, GIT_COMMIT_HASH, BUILD_TIME, QT_VERSION_STR, qVersion(), OBS_VERSION_CANONICAL, obs_get_version_string());
-    config::init();
-    register_gui();
-    format::init();
-    music_sources::init();
-    config::load();
-    obs_sources::register_progress();
-    obs_frontend_add_save_callback(&tuna_save_cb, nullptr);
+    std::thread t([] {
+        config::init();
+        register_gui();
+        format::init();
+        music_sources::init();
+        config::load();
+        obs_sources::register_progress();
+        obs_frontend_add_save_callback(&tuna_save_cb, nullptr);
 
-    obs_frontend_add_event_callback([](enum obs_frontend_event event, void*) {
-        if (event == OBS_FRONTEND_EVENT_EXIT)
-            tuna_thread::stop();
-    },
-        nullptr);
+        obs_frontend_add_event_callback([](enum obs_frontend_event event, void*) {
+            if (event == OBS_FRONTEND_EVENT_EXIT)
+                tuna_thread::stop();
+        },
+            nullptr);
+    });
+    t.detach();
     return true;
 }
 
