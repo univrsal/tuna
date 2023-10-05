@@ -2,7 +2,7 @@
 
 name: "Bug report"
 about: "For reporting bugs or crashes"
-title: ""
+title: "issue title"
 ref: "main"
 labels:
 
