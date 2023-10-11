@@ -77,7 +77,7 @@ void init()
     const auto s = config_get_string(obs_frontend_get_global_config(), CFG_REGION, CFG_SELECTED_SOURCE);
     auto i = 0;
     auto selected_source = -1;
-    for (const auto& src : qAsConst(music_sources::instances)) {
+    for (const auto& src : std::as_const(music_sources::instances)) {
         if (strcmp(src->id(), s) == 0) {
             selected_source = i;
             break;
@@ -120,7 +120,7 @@ void select(const char* id)
     if (selected)
         selected->reset_info();
     int i = 0;
-    for (const auto& src : qAsConst(instances)) {
+    for (const auto& src : std::as_const(instances)) {
         if (strcmp(src->id(), id) == 0) {
             selected_index = i;
             break;
@@ -134,7 +134,7 @@ void select(const char* id)
 
 void set_gui_values()
 {
-    for (const auto& src : qAsConst(instances))
+    for (const auto& src : std::as_const(instances))
         src->set_gui_values();
 }
 

@@ -184,7 +184,7 @@ void tuna_gui::toggleShowHide()
             ui->tbl_outputs->removeRow(row);
         row = 0; /* Load rows */
         ui->tbl_outputs->setRowCount(config::outputs.size());
-        for (const auto& entry : qAsConst(config::outputs)) {
+        for (const auto& entry : std::as_const(config::outputs)) {
             ui->tbl_outputs->setItem(row, 0, new QTableWidgetItem(entry.log_mode ? "Yes" : "No"));
             ui->tbl_outputs->setItem(row, 1, new QTableWidgetItem(entry.format));
             ui->tbl_outputs->setItem(row, 2, new QTableWidgetItem(entry.path));
@@ -206,7 +206,7 @@ void tuna_gui::add_source(const QString& display, const QString& id, source_widg
 
 void tuna_gui::refresh()
 {
-    for (auto widget : qAsConst(m_source_widgets))
+    for (auto widget : std::as_const(m_source_widgets))
         widget->tick();
 }
 
