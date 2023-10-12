@@ -244,7 +244,7 @@ void spotify_source::parse_track_json(const QJsonValue& response)
 
     QStringList tmp;
     /* Get All artists */
-    for (const auto& artist : qAsConst(artists))
+    for (const auto& artist : std::as_const(artists))
         tmp.append(artist.toObject()["name"].toString());
     m_current.set(meta::ARTIST, tmp);
 

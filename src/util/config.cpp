@@ -182,7 +182,7 @@ void load_outputs()
         if (doc.isArray())
             array = doc.array();
 
-        for (const auto& val : qAsConst(array)) {
+        for (const auto& val : std::as_const(array)) {
             QJsonObject obj = val.toObject();
             output tmp;
             tmp.format = legacy_convert(obj[JSON_FORMAT_ID].toString());
@@ -206,7 +206,7 @@ void load_outputs()
 void save_outputs()
 {
     QJsonArray output_array;
-    for (const auto& o : qAsConst(outputs)) {
+    for (const auto& o : std::as_const(outputs)) {
         QJsonObject output;
         output[JSON_FORMAT_ID] = o.format;
         output[JSON_OUTPUT_PATH_ID] = QDir::toNativeSeparators(o.path);

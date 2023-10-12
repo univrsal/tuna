@@ -128,7 +128,7 @@ extern std::shared_ptr<music_source> selected_source();
 template<class T>
 std::shared_ptr<T> get(const char* id)
 {
-    for (const auto& src : qAsConst(instances)) {
+    for (const auto& src : std::as_const(instances)) {
         if (strcmp(src->id(), id) == 0) {
             return std::dynamic_pointer_cast<T>(src);
         }
