@@ -381,7 +381,7 @@ target_compile_options(tag
   PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-everything>
 )
 target_compile_options(mpdclient
-  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-everything>
+  PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-everything>
 )
 elseif(UNIX AND NOT APPLE)
 target_compile_options(mpdclient
