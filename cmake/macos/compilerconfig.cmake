@@ -18,6 +18,8 @@ else()
   mark_as_advanced(ENABLE_COMPILER_TRACE)
 
 
+  add_compile_options("$<$<COMPILE_LANGUAGE:CXX>:-Wno-shorten-64-to-32>")
+
   # Enable stripping of dead symbols when not building for Debug configuration
   set(_release_configs RelWithDebInfo Release MinSizeRel)
   if(CMAKE_BUILD_TYPE IN_LIST _release_configs)
