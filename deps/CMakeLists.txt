@@ -378,7 +378,7 @@ set_target_properties(tag PROPERTIES LINKER_LANGUAGE CXX)
 
 if (APPLE)
 target_compile_options(tag
-  PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-shorten-64-to-32 -Wno-unused-parameter>
+  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-shorten-64-to-32 -Wno-unused-parameter>
 )
 endif()
 

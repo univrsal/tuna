@@ -16,7 +16,7 @@ if(XCODE)
 else()
   option(ENABLE_COMPILER_TRACE "Enable clang time-trace (requires Ninja)" OFF)
   mark_as_advanced(ENABLE_COMPILER_TRACE)
-
+  compile_options(-Wno-shorten-64-to-32 -Wno-unused-parameter)
   # Enable stripping of dead symbols when not building for Debug configuration
   set(_release_configs RelWithDebInfo Release MinSizeRel)
   if(CMAKE_BUILD_TYPE IN_LIST _release_configs)
