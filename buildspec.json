@@ -12,10 +12,10 @@
             "label": "Pre-built obs-deps",
             "hashes": {
                 "macos-x86_64": "b669dd1518b9350c307eff8102977c7eb7a8c8c10d677d4437862e66926b46ae",
-                "macos-arm64": "3a6e0e0f8fcca26821f5d842d6e09a31c2376515004ae19a5310ba576b95c63f",
+                "macos-arm64": "b9bab79611774c4651d084e14259abe889d2b8d1653787a843d08cf3f0db881c",
                 "macos-universal": "90c2fc069847ec2768dcc867c1c63b112c615ed845a907dc44acab7a97181974",
                 "windows-x64": "d0825a6fb65822c993a3059edfba70d72d2e632ef74893588cf12b1f0d329ce6",
-                "windows-x86": "b69c864275189464483c240ef3f25ea16fba3050b136fe6c3db6e9ee63036683"
+                "windows-x86": "21d05bab23dabe8dcf21519e31eead64b24e4b5d087c0e766f75adafa9276a09"
             }
         },
         "qt5": {
