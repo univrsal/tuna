@@ -18,12 +18,6 @@ else()
   mark_as_advanced(ENABLE_COMPILER_TRACE)
 
 
-
-  add_compile_options(
-    "$<$<COMPILE_LANGUAGE:C>:${_obs_clang_c_options}>" "$<$<COMPILE_LANGUAGE:CXX>:${_obs_clang_cxx_options}>"
-    "$<$<COMPILE_LANGUAGE:OBJC>:${_obs_clang_objc_options}>"
-    "$<$<COMPILE_LANGUAGE:OBJCXX>:${_obs_clang_objcxx_options}>")
-
   # Enable stripping of dead symbols when not building for Debug configuration
   set(_release_configs RelWithDebInfo Release MinSizeRel)
   if(CMAKE_BUILD_TYPE IN_LIST _release_configs)

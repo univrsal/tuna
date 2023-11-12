@@ -20,11 +20,9 @@ if(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION VERSION_LESS 10.0.20348)
 endif()
 
 add_compile_options(
-  /utf-8 "$<$<COMPILE_LANG_AND_ID:C,MSVC>:/MP>" "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/MP>"
-  "$<$<COMPILE_LANG_AND_ID:C,Clang>:${_obs_clang_c_options}>"
-  "$<$<COMPILE_LANG_AND_ID:CXX,Clang>:${_obs_clang_cxx_options}>")
+  "$<$<COMPILE_LANG_AND_ID:C,MSVC>:/MP>" "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/MP>")
 
-add_compile_definitions(UNICODE _UNICODE _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS $<$<CONFIG:DEBUG>:DEBUG>
+add_compile_definitions(_CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_WARNINGS $<$<CONFIG:DEBUG>:DEBUG>
                         $<$<CONFIG:DEBUG>:_DEBUG>)
 
 add_link_options("$<$<NOT:$<CONFIG:Debug>>:/OPT:REF>" "$<$<CONFIG:Debug>:/INCREMENTAL:NO>"
