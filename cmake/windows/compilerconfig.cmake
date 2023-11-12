@@ -20,7 +20,7 @@ if(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION VERSION_LESS 10.0.20348)
 endif()
 
 add_compile_options(
-  /W3 /utf-8 "$<$<COMPILE_LANG_AND_ID:C,MSVC>:/MP>" "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/MP>"
+  /utf-8 "$<$<COMPILE_LANG_AND_ID:C,MSVC>:/MP>" "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/MP>"
   "$<$<COMPILE_LANG_AND_ID:C,Clang>:${_obs_clang_c_options}>"
   "$<$<COMPILE_LANG_AND_ID:CXX,Clang>:${_obs_clang_cxx_options}>")
 
