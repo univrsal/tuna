@@ -1,7 +1,6 @@
 ![header](./preview.png "tuna running on obs linux")
 
-[![Plugin Build](https://github.com/univrsal/tuna/actions/workflows/main.yml/badge.svg)](https://github.com/univrsal/tuna/actions/workflows/main.yml)
-
+[![Push to master](https://github.com/univrsal/tuna/actions/workflows/push.yaml/badge.svg)](https://github.com/univrsal/tuna/actions/workflows/push.yaml)
 # tuna
 Get song info from right within obs.
 
