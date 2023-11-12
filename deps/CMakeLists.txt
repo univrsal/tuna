@@ -376,6 +376,12 @@ set_property(TARGET mpdclient PROPERTY POSITION_INDEPENDENT_CODE 1)
 set_target_properties(mpdclient PROPERTIES LINKER_LANGUAGE C)
 set_target_properties(tag PROPERTIES LINKER_LANGUAGE CXX)
 
+if (APPLE)
+target_compile_options(tag
+  PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-shorten-64-to-32>
+)
+endif()
+
 file(GLOB_RECURSE HEADERS "./taglib/taglib/*h" "./taglib/taglib/*.tcc")
 foreach(CurrentHeader ${HEADERS})
     get_filename_component(FILE ${CurrentHeader} NAME)
