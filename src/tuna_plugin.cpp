@@ -96,8 +96,8 @@ void tuna_save_cb(obs_data_t* save_data, bool saving, void*)
 
 bool obs_module_load()
 {
-    binfo("Loading v%s-%s-%s (build time %s). Qt version: compile-time: %s, run-time: %s. libobs: compile-time: %s, run-time: %s",
-        TUNA_VERSION, GIT_BRANCH, GIT_COMMIT_HASH, BUILD_TIME, QT_VERSION_STR, qVersion(), OBS_VERSION_CANONICAL, obs_get_version_string());
+    binfo("Loading v%s-%s-%s (build time %s). Qt version: compile-time: %s, run-time: %s. libobs: compile-time: %i.%i.%i, run-time: %s",
+        TUNA_VERSION, GIT_BRANCH, GIT_COMMIT_HASH, BUILD_TIME, QT_VERSION_STR, qVersion(), LIBOBS_API_MAJOR_VER, LIBOBS_API_MINOR_VER, LIBOBS_API_PATCH_VER, obs_get_version_string());
     std::thread t([] {
         config::init();
         register_gui();
