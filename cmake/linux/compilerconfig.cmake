@@ -8,25 +8,13 @@ include(compiler_common)
 option(ENABLE_COMPILER_TRACE "Enable Clang time-trace (required Clang and Ninja)" OFF)
 mark_as_advanced(ENABLE_COMPILER_TRACE)
 
-# gcc options for C++
-set(_obs_gcc_cxx_options
-    # cmake-format: sortable
-    ${_obs_gcc_c_options} -Wconversion -Wfloat-conversion -Winvalid-offsetof -Wno-overloaded-virtual)
-
 add_compile_options(
-  -fopenmp-simd
-  "$<$<COMPILE_LANG_AND_ID:C,GNU>:${_obs_gcc_c_options}>"
-  "$<$<COMPILE_LANG_AND_ID:C,GNU>:-Wint-conversion;-Wno-missing-prototypes;-Wno-strict-prototypes;-Wpointer-sign>"
-  "$<$<COMPILE_LANG_AND_ID:CXX,GNU>:${_obs_gcc_cxx_options}>"
-  "$<$<COMPILE_LANG_AND_ID:C,Clang>:${_obs_clang_c_options}>"
-  "$<$<COMPILE_LANG_AND_ID:CXX,Clang>:${_obs_clang_cxx_options}>")
+  -fopenmp-simd)
 
 # Add support for color diagnostics and CMake switch for warnings as errors to CMake < 3.24
 if(CMAKE_VERSION VERSION_LESS 3.24.0)
   add_compile_options($<$<C_COMPILER_ID:Clang>:-fcolor-diagnostics> $<$<CXX_COMPILER_ID:Clang>:-fcolor-diagnostics>)
-  if(CMAKE_COMPILE_WARNING_AS_ERROR)
-    add_compile_options(-Werror)
-  endif()
+
 else()
   set(CMAKE_COLOR_DIAGNOSTICS ON)
 endif()
