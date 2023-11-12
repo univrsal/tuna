@@ -6,3 +6,4 @@ build-tuna*/
 .idea
 /cmake-build-debug/
 *.generated.h
+build_*/

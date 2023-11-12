@@ -1,0 +1,80 @@
+ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+  ./gui/tuna.qrc
+  ./gui/tuna_gui.ui
+  ./gui/output_edit_dialog.ui
+  ./gui/music_control.ui
+  ./gui/widgets/lastfm.ui
+  ./gui/widgets/mpd.ui
+  ./gui/widgets/window_title.ui
+  ./gui/widgets/spotify.ui
+  ./gui/widgets/icecast.ui
+  ./gui/widgets/vlc.ui
+  ./tuna_plugin.cpp
+  ./util/constants.hpp
+  ./util/config.cpp
+  ./util/config.hpp
+  ./util/creds.hpp
+  ./gui/tuna_gui.cpp
+  ./gui/tuna_gui.hpp
+  ./gui/output_edit_dialog.cpp
+  ./gui/output_edit_dialog.hpp
+  ./gui/music_control.cpp
+  ./gui/music_control.hpp
+  ./gui/scrolltext.cpp
+  ./gui/scrolltext.hpp
+  ./query/music_source.hpp
+  ./query/music_source.cpp
+  ./query/spotify_source.cpp
+  ./query/spotify_source.hpp
+  ./query/mpd_source.cpp
+  ./query/mpd_source.hpp
+  ./query/window_source.cpp
+  ./query/window_source.hpp
+  ./query/lastfm_source.cpp
+  ./query/lastfm_source.hpp
+  ./query/gpmdp_source.cpp
+  ./query/gpmdp_source.hpp
+  ./query/web_source.cpp
+  ./query/web_source.hpp
+  ./query/icecast_source.cpp
+  ./query/icecast_source.hpp
+  ./query/song.cpp
+  ./query/song.hpp
+  ./util/format.cpp
+  ./util/format.hpp
+  ./source/progress.cpp
+  ./source/progress.hpp
+  ./util/lyrics_handler.cpp
+  ./util/lyrics_handler.hpp
+  ./util/cover_tag_handler.cpp
+  ./util/cover_tag_handler.hpp
+  ./query/vlc_obs_source.cpp
+  ./query/vlc_obs_source.hpp
+  ./util/tuna_thread.cpp
+  ./util/tuna_thread.hpp
+  ./util/utility.cpp
+  ./util/utility.hpp
+  ./util/web_server.cpp
+  ./util/web_server.hpp
+  ./util/window/window_helper.hpp
+  ./gui/widgets/lastfm.cpp
+  ./gui/widgets/lastfm.hpp
+  ./gui/widgets/mpd.cpp
+  ./gui/widgets/mpd.hpp
+  ./gui/widgets/window_title.cpp
+  ./gui/widgets/window_title.hpp
+  ./gui/widgets/icecast.cpp
+  ./gui/widgets/icecast.hpp
+  ./gui/widgets/spotify.cpp
+  ./gui/widgets/spotify.hpp
+  ./gui/widgets/vlc.cpp
+  ./gui/widgets/vlc.hpp
+)
+
+if (WIN32)
+    target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./util/window/window_helper_win.cpp")
+elseif(UNIX AND NOT APPLE)
+    target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./util/window/window_helper_nix.cpp")
+elseif(APPLE)
+    target_sources(${CMAKE_PROJECT_NAME} PUBLIC "./util/window/window_helper_mac.mm")
+endif()

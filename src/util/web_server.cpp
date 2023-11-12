@@ -17,8 +17,8 @@
  *************************************************************************/
 
 #include "web_server.hpp"
+#include "../plugin-macros.generated.h"
 #include "config.hpp"
-#include "plugin-macros.generated.h"
 #include "tuna_thread.hpp"
 #include "utility.hpp"
 #include <QDateTime>

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "query/song.hpp"
+#include "../query/song.hpp"
 #include <QString>
 #include <mutex>
 #include <thread>

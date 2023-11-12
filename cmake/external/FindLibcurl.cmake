@@ -1,3 +1,4 @@
+ 
 # Once done these will be defined:
 #
 #  LIBCURL_FOUND
@@ -18,7 +19,6 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
 	set(_lib_suffix 32)
 endif()
-
 find_path(CURL_INCLUDE_DIR
 	NAMES curl/curl.h
 	HINTS
