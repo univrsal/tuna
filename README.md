@@ -3,9 +3,7 @@
 [![Push to master](https://github.com/univrsal/tuna/actions/workflows/push.yaml/badge.svg)](https://github.com/univrsal/tuna/actions/workflows/push.yaml)
 # tuna
 Get song info from right within obs.
-
-Issues have moved to [git.vrsal.xyz/alex/tuna/issues](https://git.vrsal.xyz/alex/tuna/issues). You can sign up to submit issues.
-    
+ 
 Currently supports
 - Spotify
 - MPD
