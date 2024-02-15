@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.19
+// @version      1.0.20
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -219,11 +219,11 @@
                     post({ cover, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === 'www.deezer.com') {
-                let status = query('.chakra-button.css-8cy61', e => {
+                let status = query('.chakra-button.css-h1gi0s', e => {
                     return e.getAttribute('aria-label').toLowerCase() === "play" ? "paused" : "playing";
                 }, "stopped");
 
-                if ("mediaSession" in navigator) {
+                if ("mediaSession" in navigator && navigator.mediaSession.metadata !== null) {
                     let data = navigator.mediaSession;
                     let album = data.metadata.album;
                     let res = data.metadata.artwork[0].sizes;
@@ -236,6 +236,7 @@
                     if (title !== null) {
                         post({ cover, title, artists, status, progress, duration, album });
                     }
+
                 }
             } else if (hostname === "play.pretzel.rocks") {
                 // Pretzel.rocks support by Tarulia
