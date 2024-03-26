@@ -110,6 +110,9 @@ void song::to_json(QJsonObject& obj) const
     }
     obj["status"] = status;
 
+    if (config::remove_file_extensions)
+        obj["title"] = util::remove_extensions(obj["title"].toString());
+
     if (has(meta::COVER)) {
         // Just points to the /cover.png end point
         obj["cover_url"] = QString("http://localhost:%1/cover.png").arg(QString::number(config::webserver_port));
