@@ -198,7 +198,7 @@ DBusHandlerResult mpris_source::handle_dbus(DBusMessage* message)
 
 static inline QString correct_art_url(const char* url)
 {
-    return QUrl::toPercentEncoding(utf8_to_qt(url)).replace("%2F", "/").replace("file%3A", "file:"); // idk why it encodes slashes
+    return QUrl::toPercentEncoding(utf8_to_qt(url)).replace("%2F", "/").replace("file%3A", "file:").replace("%3A", ":"); // idk why it encodes slashes 
 }
 
 void mpris_source::parse_metadata(DBusMessageIter* iter, QString const& player, int level)
