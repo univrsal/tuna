@@ -204,7 +204,7 @@
                 if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M6 19h4V5H6v14zm8-14v14h4V5h-4z']")) {
                     status = "playing";
                 }
-                if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M8 5v14l11-7z']")) {
+                if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M9,19H7V5H9ZM17,5H15V19h2Z']")) {
                     status = "stopped"
                 }
                 let title = query('.ytmusic-player-bar.title', e => e.title);
