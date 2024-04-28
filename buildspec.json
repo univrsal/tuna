@@ -33,16 +33,16 @@
     },
     "platformConfig": {
         "macos": {
-            "bundleId": "com.example.obs-plugintemplate"
+            "bundleId": "cc.vrsal.tuna"
         }
     },
-    "name": "obs-plugintemplate",
-    "displayName": "OBS Plugin Template",
-    "version": "1.0.0",
-    "author": "Your Name Here",
-    "website": "https://example.com",
-    "email": "me@example.com",
+    "name": "tuna",
+    "displayName": "Tuna",
+    "version": "1.9.8",
+    "author": "univrsal",
+    "website": "https://vrsal.cc",
+    "email": "contact@vrsal.xyz",
     "uuids": {
-        "windowsApp": "00000000-0000-0000-0000-000000000000"
+        "windowsApp": "44b785ed-eef5-4b73-bef0-42ee3493c021"
     }
 }
