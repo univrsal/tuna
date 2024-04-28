@@ -1,46 +1,48 @@
 {
     "dependencies": {
         "obs-studio": {
-            "version": "29.1.2",
+            "version": "30.1.2",
             "baseUrl": "https://github.com/obsproject/obs-studio/archive/refs/tags",
-            "label": "OBS sources", "hashes": {
-                "macos": "215f1fa5772c5dd9f3d6e35b0cb573912b00320149666a77864f9d305525504b",
-                "windows-x64": "46d451f3f42b9d2c59339ec268165849c7b7904cdf1cc2a8d44c015815a9e37d"
+            "label": "OBS sources",
+            "hashes": {
+                "macos": "490bae1c392b3b344b0270afd8cb887da4bc50bd92c0c426e96713c1ccb9701a",
+                "windows-x64": "c2dd03fa7fd01fad5beafce8f7156da11f9ed9a588373fd40b44a06f4c03b867"
             }
         },
         "prebuilt": {
-            "version": "2023-04-12",
+            "version": "2024-03-19",
             "baseUrl": "https://github.com/obsproject/obs-deps/releases/download",
             "label": "Pre-Built obs-deps",
             "hashes": {
-                "macos": "9535c6e1ad96f7d49960251e85a245774088d48da1d602bb82f734b10219125a",
-                "windows-x64": "c13a14a1acc4224b21304d97b63da4121de1ed6981297e50496fbc474abc0503"
+                "macos": "2e9bfb55a5e0e4c1086fa1fda4cf268debfead473089df2aaea80e1c7a3ca7ff",
+                "windows-x64": "6e86068371526a967e805f6f9903f9407adb683c21820db5f07da8f30d11e998"
             }
         },
         "qt6": {
-            "version": "2023-04-12",
+            "version": "2024-03-19",
             "baseUrl": "https://github.com/obsproject/obs-deps/releases/download",
             "label": "Pre-Built Qt6",
             "hashes": {
-                "macos": "eb7614544ab4f3d2c6052c797635602280ca5b028a6b987523d8484222ce45d1",
-                "windows-x64": "4d39364b8a8dee5aa24fcebd8440d5c22bb4551c6b440ffeacce7d61f2ed1add"
+                "macos": "694f1e639c017e3b1f456f735330dc5afae287cbea85757101af1368de3142c8",
+                "windows-x64": "72d1df34a0ef7413a681d5fcc88cae81da60adc03dcd23ef17862ab170bcc0dd"
             },
             "debugSymbols": {
-                "windows-x64": "f34ee5067be19ed370268b15c53684b7b8aaa867dc800b68931df905d679e31f"
+                "windows-x64": "fbddd1f659c360f2291911ac5709b67b6f8182e6bca519d24712e4f6fd3cc865"
             }
         }
     },
     "platformConfig": {
         "macos": {
-            "bundleId": "xyz.vrsal.obs-mpv"
+            "bundleId": "com.example.obs-plugintemplate"
         }
     },
-    "name": "tuna",
-    "version": "1.9.7",
-    "author": "univrsal",
-    "website": "https://vrsal.xyz",
-    "email": "uni@vrsal.xyz",
+    "name": "obs-plugintemplate",
+    "displayName": "OBS Plugin Template",
+    "version": "1.0.0",
+    "author": "Your Name Here",
+    "website": "https://example.com",
+    "email": "me@example.com",
     "uuids": {
-        "windowsApp": "44b785ed-eef5-4b73-bef0-42ee3493c021"
+        "windowsApp": "00000000-0000-0000-0000-000000000000"
     }
 }
