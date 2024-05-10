@@ -45,8 +45,8 @@ endif()
 
 if (NOT LASTFM_CREDS)
     # Try getting the credentials from the environment
-    if (DEFINED ENV{LASTFM_API_KEY} AND DEFINED ENV{LASTFM_API_SECRET})
-        set(LASTFM_CREDS "$ENV{LASTFM_API_KEY}")
+    if (DEFINED ENV{LASTFM_KEY})
+        set(LASTFM_CREDS "$ENV{LASTFM_KEY}")
     else()
         set(LASTFM_CREDS "MISSING")
         message(WARNING "Missing LastFM API info")
