@@ -34,12 +34,23 @@ include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
 if (NOT CREDS)
-    set(CREDS "MISSING")
-    message(WARNING "Missing Spotify API info")
+    # Try getting the credentials from the environment
+    if (DEFINED ENV{SPOTIFY_CLIENT_ID} AND DEFINED ENV{SPOTIFY_CLIENT_SECRET})
+        set(CREDS "$ENV{SPOTIFY_CLIENT_ID}:$ENV{SPOTIFY_CLIENT_SECRET}")
+    else()
+        set(CREDS "MISSING")
+        message(WARNING "Missing Spotify API info")
+    endif()
 endif()
+
 if (NOT LASTFM_CREDS)
-    set(LASTFM_CREDS "MISSING")
-    message(WARNING "Missing Last.fm API info")
+    # Try getting the credentials from the environment
+    if (DEFINED ENV{LASTFM_API_KEY} AND DEFINED ENV{LASTFM_API_SECRET})
+        set(LASTFM_CREDS "$ENV{LASTFM_API_KEY}")
+    else()
+        set(LASTFM_CREDS "MISSING")
+        message(WARNING "Missing LastFM API info")
+    endif()
 endif()
 
 # Get the current working branch

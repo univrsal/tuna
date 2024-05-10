@@ -30,6 +30,9 @@ runs:
       env:
         CODESIGN_IDENT: ${{ inputs.codesignIdent }}
         CODESIGN_TEAM: ${{ inputs.codesignTeam }}
+        LASTFM_KEY: ${{ secrets.LASTFM_KEY }}
+        SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_TOKEN }}
+        SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         : Run macOS Build
 
@@ -55,6 +58,10 @@ runs:
       if: runner.os == 'Linux'
       shell: zsh --no-rcs --errexit --pipefail {0}
       working-directory: ${{ inputs.workingDirectory }}
+      env:
+        LASTFM_KEY: ${{ secrets.LASTFM_KEY }}
+        SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_TOKEN }}
+        SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         : Run Ubuntu Build
 
@@ -69,6 +76,10 @@ runs:
     - name: Run Windows Build
       if: runner.os == 'Windows'
       shell: pwsh
+      env:
+        LASTFM_KEY: ${{ secrets.LASTFM_KEY }}
+        SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_TOKEN }}
+        SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         # Run Windows Build
         if ( $Env:RUNNER_DEBUG -ne $null ) {
