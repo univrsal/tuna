@@ -137,6 +137,8 @@ jobs:
           config: ${{ needs.check-event.outputs.config }}
           codesign: ${{ fromJSON(needs.check-event.outputs.codesign) }}
           codesignIdent: ${{ steps.codesign.outputs.codesignIdent }}
+          LASTFM_KEY: ${{ secrets.LASTFM_KEY }}
+          SPOTIFY_TOKEN: ${{ secrets.SPOTIFY_TOKEN }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin
@@ -206,6 +208,8 @@ jobs:
         with:
           target: x86_64
           config: ${{ needs.check-event.outputs.config }}
+          LASTFM_KEY: ${{ secrets.LASTFM_KEY }}
+          SPOTIFY_TOKEN: ${{ secrets.SPOTIFY_TOKEN }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin
@@ -266,6 +270,8 @@ jobs:
         with:
           target: x64
           config: ${{ needs.check-event.outputs.config }}
+          LASTFM_KEY: ${{ secrets.LASTFM_KEY }}
+          SPOTIFY_TOKEN: ${{ secrets.SPOTIFY_TOKEN }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin
