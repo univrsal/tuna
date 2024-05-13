@@ -37,6 +37,8 @@ if (NOT CREDS)
     # Try getting the credentials from the environment
     if (DEFINED ENV{SPOTIFY_CLIENT_ID} AND DEFINED ENV{SPOTIFY_CLIENT_SECRET})
         set(CREDS "$ENV{SPOTIFY_CLIENT_ID}:$ENV{SPOTIFY_CLIENT_SECRET}")
+        message(STATUS "Spotify client id: $ENV{SPOTIFY_CLIENT_ID}")
+        message(STATUS "Spotify client secret: (redacted but the environment variable is set)")
     else()
         set(CREDS "MISSING")
         message(WARNING "Missing Spotify API info")
