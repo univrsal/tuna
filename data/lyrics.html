@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Tuna - synced lyrics</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #lyrics {
+            padding-top: 50vh;
+            padding-bottom: 50vh;
+            font-size: 1.5em;
+            line-height: 1.5em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: center;
+            list-style: none;
+        }
+    </style>
+
+    <script>
+        const REFRESH_INTERVAL_MS = 200;
+        const FETCH_URL = 'http://localhost:1608/';
+        const LYRCIS_HOST = "http://lyrics.vrsal.cc"
+        const OFFSET = 1.3;
+
+        var current_lyrics = [];
+        var current_line_index = -1;
+        var current_song_pos = 0;
+        var current_title = "";
+        var current_artists = [];
+        var current_album = "";
+
+        function getLyrics(title, artists, album = null) {
+            const url = new URL(window.location.href)
+
+            let params = {
+                "album": album ? album : "",
+                "artist": artists[0],
+                "title": title,
+            }
+
+            const url_ = LYRCIS_HOST + "?" + new URLSearchParams(params).toString()
+
+            fetch(url_)
+                .then(response => response.json())
+                .then(data => {
+                    try {
+                        if (data.message.header.status_code === 200) {
+                            current_lyrics = JSON.parse(data.message.body.macro_calls["track.subtitles.get"].message.body.subtitle_list[0].subtitle.subtitle_body);
+                            lyrics.innerHTML = "";
+                            for (let i = 0; i < current_lyrics.length; i++) {
+
+                                lyrics.innerHTML += `<li id="${i}">${current_lyrics[i].text} &nbsp</li>`;
+                            }
+                        } else {
+                            lyrics.innerHTML = "Lyrics not found"
+                        }
+                    } catch (error) {
+                        lyrics.innerHTML = "Lyrics not found"
+                        current_lyrics = [];
+                        console.error(error);
+                    }
+                })
+        }
+
+        function update_opacity(selectedIndex) {
+            const lis = document.querySelectorAll('li');
+            const maxOpacity = 1;
+            const minOpacity = 0.1; // adjust as needed
+            const range = maxOpacity - minOpacity;
+
+            lis.forEach((li, index) => {
+                const distance = Math.abs(index - selectedIndex);
+                const opacity = maxOpacity - (distance * range / 3);
+                li.style.opacity = Math.max(opacity, minOpacity);
+            });
+        }
+
+        function fetch_data() {
+            fetch(FETCH_URL)
+                .then(response => response.json())
+                .then(data => {
+                    // data now contains the json object with song metadata
+                    current_song_pos = data['progress'] / 1000 + OFFSET;
+
+                    if (data['title'] != current_title) {
+                        current_title = data['title'];
+                        current_artists = data['artists'];
+                        current_album = data['album'];
+                        lyrics.innerHTML = "Fetching...";
+                        current_lyrics = [];
+                        getLyrics(current_title, current_artists, current_album)
+                    }
+                })
+                .catch(function () {
+                    // Do nothing
+                });
+            for (let i = 1; i < current_lyrics.length; i++) {
+                if (current_lyrics[i].time.total >= current_song_pos) {
+                    if (current_line_index !== i - 1) {
+                        let line = document.getElementById(i - 1);
+                        let prev_line = document.getElementById(current_line_index);
+                        if (prev_line) {
+                            prev_line.style.fontWeight = "normal";
+                        }
+                        if (line) {
+                            line.style.fontWeight = "bold";
+                        }
+
+                        // scroll to the current line
+                        if (line) {
+                            line.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                                inline: "center"
+                            });
+                        }
+                    }
+                    current_line_index = i - 1;
+                    update_opacity(current_line_index);
+                    break;
+                }
+            }
+        }
+
+        setInterval(fetch_data, REFRESH_INTERVAL_MS);
+    </script>
+</head>
+
+<body>
+    <ul id="lyrics">
+
+    </ul>
+</body>
+
+</html>
