@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.21
+// @version      1.0.22
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -119,6 +119,8 @@
                     post({ cover, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === 'open.spotify.com') {
+                if (!navigator.mediaSession.metadata) // if nothing is playing we don't submit anything, otherwise having two youtube tabs open causes issues
+                    return;
                 let data = navigator.mediaSession;
                 let album = data.metadata.album;
                 let status = query('.vnCew8qzJq3cVGlYFXRI', e => e === null ? 'stopped' : (e.getAttribute('aria-label') === 'Play' ? 'stopped' : 'playing'));
@@ -126,7 +128,7 @@
                 let title = data.metadata.title
                 let artists = [data.metadata.artist]
                 let progress = query('.playback-bar__progress-time-elapsed', e => timestamp_to_ms(e.textContent));
-                let duration = query('.npFSJSO1wsu3mEEGb5bh', e => timestamp_to_ms(e.textContent));
+                let duration = query('[data-testid="playback-duration"]', e => timestamp_to_ms(e.textContent));
 
 
                 if (title !== null) {
