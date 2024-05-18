@@ -19,6 +19,8 @@ Currently supports
     - Yandex Music
     - Pretzel.rocks
 
+Lyrics for the lyrics html overlay are served via [lrclib](https://github.com/tranxuanthang/lrclib) hosted at lyrics.vrsal.cc.
+
 <img src="src/gui/images/tuna.png" alt="hey tuna" width="180px">
 
 ### Translators
