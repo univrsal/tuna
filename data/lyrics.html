@@ -85,7 +85,14 @@
                 .then(data => {
                     try {
                         if (data.length > 0) {
-                            current_lyrics = parseLyrics(data[0].syncedLyrics);
+                            let index = 0;
+                            for (let i = 0; i < data.length; i++) {
+                                if (data[i].trackName.toLowerCase() === title.toLowerCase()) {
+                                    index = i;
+                                    break;
+                                }
+                            }
+                            current_lyrics = parseLyrics(data[index].syncedLyrics);
                             lyrics.innerHTML = "";
                             for (let i = 0; i < current_lyrics.length; i++) {
 
