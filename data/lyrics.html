@@ -29,9 +29,9 @@
     </style>
 
     <script>
-        const REFRESH_INTERVAL_MS = 200;
+        const REFRESH_INTERVAL_MS = 1000;
         const FETCH_URL = 'http://localhost:1608/';
-        const LYRCIS_HOST = "http://lyrics.vrsal.cc"
+        const LYRCIS_HOST = "https://lyrics.vrsal.cc/api/search"
         const OFFSET = 1.3;
 
         var current_lyrics = [];
@@ -40,14 +40,42 @@
         var current_title = "";
         var current_artists = [];
         var current_album = "";
+        var current_status = "";
+        var currend_duration_seconds = 0;
+
+        function parseLyrics(text) {
+            let splits = text.split("\n");
+            let lyrics = [];
+
+            for (let i = 0; i < splits.length; i++) {
+                let line = splits[i];
+                let time = line.match(/\[(\d+):(\d+).(\d+)\]/);
+                if (time) {
+                    let minutes = parseInt(time[1]);
+                    let seconds = parseInt(time[2]);
+                    let milliseconds = parseInt(time[3]);
+                    let total = minutes * 60 + seconds + milliseconds / 1000;
+                    let text = line.replace(/\[(\d+):(\d+).(\d+)\]/, "").trim();
+                    lyrics.push({
+                        time: {
+                            minutes: minutes,
+                            seconds: seconds,
+                            milliseconds: milliseconds,
+                            total: total
+                        },
+                        text: text
+                    });
+                }
+            }
+
+            return lyrics;
+        }
 
         function getLyrics(title, artists, album = null) {
             const url = new URL(window.location.href)
 
             let params = {
-                "album": album ? album : "",
-                "artist": artists[0],
-                "title": title,
+                "q": `${artists[0]}+${title}`
             }
 
             const url_ = LYRCIS_HOST + "?" + new URLSearchParams(params).toString()
@@ -56,8 +84,8 @@
                 .then(response => response.json())
                 .then(data => {
                     try {
-                        if (data.message.header.status_code === 200) {
-                            current_lyrics = JSON.parse(data.message.body.macro_calls["track.subtitles.get"].message.body.subtitle_list[0].subtitle.subtitle_body);
+                        if (data.length > 0) {
+                            current_lyrics = parseLyrics(data[0].syncedLyrics);
                             lyrics.innerHTML = "";
                             for (let i = 0; i < current_lyrics.length; i++) {
 
@@ -72,6 +100,10 @@
                         console.error(error);
                     }
                 })
+                .catch(function () {
+                    lyrics.innerHTML = "Lyrics not found"
+                    current_lyrics = [];
+                });
         }
 
         function update_opacity(selectedIndex) {
@@ -87,25 +119,8 @@
             });
         }
 
-        function fetch_data() {
-            fetch(FETCH_URL)
-                .then(response => response.json())
-                .then(data => {
-                    // data now contains the json object with song metadata
-                    current_song_pos = data['progress'] / 1000 + OFFSET;
+        function update_lyrics() {
 
-                    if (data['title'] != current_title) {
-                        current_title = data['title'];
-                        current_artists = data['artists'];
-                        current_album = data['album'];
-                        lyrics.innerHTML = "Fetching...";
-                        current_lyrics = [];
-                        getLyrics(current_title, current_artists, current_album)
-                    }
-                })
-                .catch(function () {
-                    // Do nothing
-                });
             for (let i = 1; i < current_lyrics.length; i++) {
                 if (current_lyrics[i].time.total >= current_song_pos) {
                     if (current_line_index !== i - 1) {
@@ -134,7 +149,39 @@
             }
         }
 
+        function fetch_data() {
+            fetch(FETCH_URL)
+                .then(response => response.json())
+                .then(data => {
+                    // data now contains the json object with song metadata
+                    current_song_pos = data['progress'] / 1000 + OFFSET;
+
+                    if (data['title'] != current_title) {
+                        current_title = data['title'];
+                        current_artists = data['artists'];
+                        current_album = data['album'];
+                        currend_duration_seconds = data['duration'] / 1000;
+                        current_status = data['status'];
+
+                        lyrics.innerHTML = "Fetching...";
+                        current_lyrics = [];
+                        getLyrics(current_title, current_artists, current_album)
+                    }
+                })
+                .catch(function () {
+                    // Do nothing
+                });
+
+        }
+
         setInterval(fetch_data, REFRESH_INTERVAL_MS);
+        setInterval(() => {
+            if (current_status !== "playing") {
+                return;
+            }
+            current_song_pos += 0.1;
+            update_lyrics();
+        }, 100);
     </script>
 </head>
 
