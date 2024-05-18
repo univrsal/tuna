@@ -85,12 +85,17 @@
                 .then(data => {
                     try {
                         if (data.length > 0) {
-                            let index = 0;
+                            let index = -1;
                             for (let i = 0; i < data.length; i++) {
                                 if (data[i].trackName.toLowerCase() === title.toLowerCase()) {
                                     index = i;
                                     break;
                                 }
+                            }
+                            if (index === -1) {
+                                lyrics.innerHTML = "Lyrics not found"
+                                current_lyrics = [];
+                                return;
                             }
                             current_lyrics = parseLyrics(data[index].syncedLyrics);
                             lyrics.innerHTML = "";
