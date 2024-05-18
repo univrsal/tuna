@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.22
+// @version      1.0.23
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -206,9 +206,7 @@
                 if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M6 19h4V5H6v14zm8-14v14h4V5h-4z']")) {
                     status = "playing";
                 }
-                if (document.querySelector(".ytmusic-player-bar.play-pause-button path[d^='M9,19H7V5H9ZM17,5H15V19h2Z']")) {
-                    status = "stopped"
-                }
+                status = navigator.mediaSession.playbackState;
                 let title = query('.ytmusic-player-bar.title', e => e.title);
                 let artists = Array.from(document.querySelectorAll(artistsSelectors)).map(x => x.innerText);
                 let album = query(albumSelectors, e => e.textContent);
