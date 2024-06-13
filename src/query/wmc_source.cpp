@@ -220,7 +220,7 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
         /* We receive cover updates regardless of whether tuna is
          * configured to monitor WMC so if the current source isn't WMC, we
          * just save the cover for when the user switches to WMC*/
-        if (curren_source.get() == this) {
+        if (current_source.get() == this) {
             save_cover(image);
         }
     }
