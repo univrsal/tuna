@@ -18,6 +18,7 @@
 
 #pragma once
 #include "music_source.hpp"
+#include <QImage>
 #include <string>
 #include <vector>
 
@@ -44,7 +45,10 @@ class wmc_source : public music_source {
     std::string m_selected_player {};
     std::vector<std::string> m_registered_players {};
     std::mutex m_internal_mutex;
-    std::map<std::string, song> m_info;
+    std::map<std::string, song> m_info {};
+    std::map<std::string, QImage> m_covers {};
+
+    void save_cover(QImage& image);
 
 public:
     wmc_source();

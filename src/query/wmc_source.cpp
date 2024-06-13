@@ -22,7 +22,6 @@
 #include "../util/constants.hpp"
 #include "../util/utility.hpp"
 #include <QFile>
-#include <QImage>
 
 /**
  * Large chunks of this source were taken from
@@ -81,6 +80,23 @@ void wmc_source::update_players()
 
     for (auto player_name : players_not_seen) {
         m_registered_players.erase(std::remove(m_registered_players.begin(), m_registered_players.end(), player_name), m_registered_players.end());
+    }
+}
+
+void wmc_source::save_cover(QImage& image)
+{
+    auto tmp = config::cover_path + ".tmp";
+
+    if (image.save(tmp, "png")) {
+        QFile current(config::cover_path);
+        current.remove();
+        if (!QFile::rename(tmp, config::cover_path)) {
+            util::reset_cover();
+            berr("[WMC] Failed to move cover from temporary file to %s", qt_to_utf8(config::cover_path));
+        }
+
+    } else {
+        berr("[WMC] Failed to save cover to %s", qt_to_utf8(config::cover_path));
     }
 }
 
@@ -198,18 +214,14 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
         data = (uint8_t*)pixel_data_detached.data();
 
         QImage image(data, width, height, QImage::Format_RGBA8888);
-        auto tmp = config::cover_path + ".tmp";
+        auto current_source = music_source::selected_source();
+        m_covers[id] = image;
 
-        if (image.save(tmp, "png")) {
-            QFile current(config::cover_path);
-            current.remove();
-            if (!QFile::rename(tmp, config::cover_path)) {
-                util::reset_cover();
-                berr("[WMC] Failed to move cover from temporary file to %s", qt_to_utf8(config::cover_path));
-            }
-
-        } else {
-            berr("[WMC] Failed to save cover to %s", qt_to_utf8(config::cover_path));
+        /* We receive cover updates regardless of whether tuna is
+         * configured to monitor WMC so if the current source isn't WMC, we
+         * just save the cover for when the user switches to WMC*/
+        if (curren_source.get() == this) {
+            save_cover(image);
         }
     }
 }
@@ -259,4 +271,6 @@ void wmc_source::refresh()
     std::lock_guard<std::mutex> lock(m_internal_mutex);
     if (m_info.find(m_selected_player) != m_info.end())
         m_current = m_info[m_selected_player];
+    if (m_covers.find(m_selected_player) != m_covers.end())
+        save_cover(m_covers[m_selected_player]);
 }
