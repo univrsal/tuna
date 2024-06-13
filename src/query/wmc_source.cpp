@@ -214,7 +214,7 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
         data = (uint8_t*)pixel_data_detached.data();
 
         QImage image(data, width, height, QImage::Format_RGBA8888);
-        auto current_source = music_source::selected_source();
+        auto current_source = music_sources::selected_source();
         m_covers[id] = image;
 
         /* We receive cover updates regardless of whether tuna is
