@@ -127,7 +127,7 @@
                 let cover = data.metadata.artwork[0].src;
                 let title = data.metadata.title
                 let artists = [data.metadata.artist]
-                let progress = query('.playback-bar__progress-time-elapsed', e => timestamp_to_ms(e.textContent));
+                let progress = query('.IPbBrI6yF4zhaizFmrg6', e => timestamp_to_ms(e.textContent));
                 let duration = query('[data-testid="playback-duration"]', e => timestamp_to_ms(e.textContent));
 
 
