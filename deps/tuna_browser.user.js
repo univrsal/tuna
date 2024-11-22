@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.23
+// @version      1.0.24
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -219,9 +219,9 @@
                     post({ cover, title, artists, status, progress, duration, album_url, album });
                 }
             } else if (hostname === 'www.deezer.com') {
-                let status = query('.chakra-button.css-h1gi0s', e => {
-                    return e.getAttribute('aria-label').toLowerCase() === "play" ? "paused" : "playing";
-                }, "stopped");
+                const pauseBtn = document.querySelector('[data-testid="play_button_pause"]');
+                const playBtn = document.querySelector('[data-testid="play_button_play"]');
+                let status = pauseBtn !== null ? "playing" : (playBtn !== null ? "paused" : "stopped");
 
                 if ("mediaSession" in navigator && navigator.mediaSession.metadata !== null) {
                     let data = navigator.mediaSession;
