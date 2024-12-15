@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.24
+// @version      1.0.25
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -241,52 +241,43 @@
             } else if (hostname === "play.pretzel.rocks") {
                 // Pretzel.rocks support by Tarulia
                 // Thanks to Rory from Pretzel for helping out :)
+                var MSmetadata = navigator.mediaSession.metadata;
 
                 let status = "unknown";
 
-                if (document.querySelector("[data-testid=pause-button]")) {
+                // it seems MSmetadata.playbackState isn't being populated by Pretzel, so we leave this old-school for now
+                if (document.querySelector("[data-heapid=music-player] [data-testid=pause-button]")) {
                     status = "playing";
                 }
 
-                if (document.querySelector("[data-testid=play-button]")) {
+                if (document.querySelector("[data-heapid=music-player] [data-testid=play-button]")) {
                     status = "stopped";
                 }
 
-                let cover = query('[data-testid=track-artwork]', e => {
-                    let img = e.getElementsByTagName('img');
-                    if (img.length > 0) {
-                        let src = img[0].src; // https://img.pretzel.rocks/artwork/9Mf8m9/medium.jpg
-                        return src.replace('medium.jpg', 'large.jpg'); // https://img.pretzel.rocks/artwork/9Mf8m9/large.jpg
-                    }
-                    return null;
+                let cover   = MSmetadata.artwork[0].src.replace('medium.jpg', 'large.jpg');
+                let title   = MSmetadata.title;
+                let artists = [MSmetadata.artist];
+                let album   = MSmetadata.album;
+
+                // this is not super safe against breakage, but it's the most reliable selector I can find
+                // it's not a major deal if it breaks anyway though
+                let album_url = query('[data-testid=track-artwork]', e => {
+                    return e.parentElement.href;
                 });
 
-                let title = query('[data-testid=title]', e => {
-                    return e.textContent;
-                });
+                // it seems the <audio> elements spread across the DOM are dummies just used for preloading
+                // the actual playback is apparently done using a JavaScript/React element
 
-                let artists = query('[data-testid=artist]', e => {
-                    let elements = e.getElementsByTagName('a');
-                    if (elements.length > 0) {
-                        let artistArray = [];
-                        for (let i = 0; i < elements.length; i++) {
-                            artistArray.push(elements[i].textContent);
-                        }
-                        return artistArray;
-                    }
-                    return null;
-                });
+                // as such we can access audioEl.duration because the track is preloaded
+                let duration = query('[data-heapid=music-player] audio', e => Math.floor(e.duration) * 1000);
 
-                let album = query('[data-testid=album]', e => {
-                    return e.textContent;
+                // but we can't access audioEl.currentTime because it is not actually playing
+                let progress = query('[data-testid=track-time-elapsed]', e => {
+                    let time = e.innerText;
+                    time = time.split(':');
+                    // JavaScript fuckery when minutes is 0...
+                    return (Number(time[0])*60 + Number(time[1])) * 1000;
                 });
-
-                let album_url = query('[data-testid=album]', e => {
-                    return e.href;
-                });
-
-                let duration = query('[data-testid=track-progress-bar]', e => e.max * 1000);
-                let progress = query('[data-testid=track-progress-bar]', e => e.value * 1000);
 
                 if (title !== null) {
                     post({ cover, title, artists, status, progress, duration, album_url, album });
