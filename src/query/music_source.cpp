@@ -41,6 +41,7 @@
 #include <QJsonObject>
 #include <QRegularExpression>
 #include <obs-frontend-api.h>
+#include <obs/obs-nix-platform.h>
 
 namespace music_sources {
 static std::atomic<int> selected_index = -1;
@@ -52,7 +53,15 @@ void init()
     instances.append(std::make_shared<spotify_source>());
     instances.append(std::make_shared<mpd_source>());
     instances.append(std::make_shared<vlc_obs_source>());
-    instances.append(std::make_shared<window_source>());
+#if __linux__ || __FreeBSD__ || __OpenBSD__
+    if (obs_get_nix_platform() == OBS_NIX_PLATFORM_X11_EGL)
+        instances.append(std::make_shared<window_source>());
+    else
+        binfo("Running on Wayland disabling window source");
+#else
+        instances.append(std::make_shared<window_source>());
+#endif
+
     instances.append(std::make_shared<lastfm_source>());
     //    instances.append(std::make_shared<gpmdp_source>()); // Deprecated, Youtube music can send information to tuna
     instances.append(std::make_shared<web_source>());
