@@ -41,7 +41,9 @@
 #include <QJsonObject>
 #include <QRegularExpression>
 #include <obs-frontend-api.h>
+#if __linux__ || __FreeBSD__ || __OpenBSD__
 #include <obs/obs-nix-platform.h>
+#endif
 
 namespace music_sources {
 static std::atomic<int> selected_index = -1;
