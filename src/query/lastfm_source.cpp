@@ -101,18 +101,18 @@ void lastfm_source::parse_song(const QJsonObject& s)
     if (s["@attr"].isObject()) {
         auto attr_obj = s["@attr"].toObject();
         m_current.set(meta::STATUS, attr_obj["nowplaying"].toString() == "true" ? state_playing : state_stopped);
-
-        if (m_current.get<int>(meta::STATUS) == state_playing) {
-            auto covers = s["image"];
-            if (covers.isArray() && covers.toArray().size() > 0) {
-                auto cover_array = covers.toArray();
-                auto cover = cover_array[cover_array.size() - 1];
-                if (cover.isObject())
-                    m_current.set(meta::COVER, cover.toObject()["#text"].toString());
-            }
-        }
-        util::download_cover(m_current.get(meta::COVER));
     }
+
+    if (s["image"].isArray()) {
+        auto covers = s["image"];
+        if (covers.toArray().size() > 0) {
+            auto cover_array = covers.toArray();
+            auto cover = cover_array[cover_array.size() - 1];
+            if (cover.isObject())
+                m_current.set(meta::COVER, cover.toObject()["#text"].toString());
+        }
+    }
+    util::download_cover(m_current.get(meta::COVER));
 
     if (s["artist"].isObject())
         m_current.set(meta::ARTIST, QStringList(s["artist"].toObject()["#text"].toString()));
