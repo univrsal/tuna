@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.25
+// @version      1.0.26
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -13,6 +13,7 @@
 // @match        *://*.youtube.com/*
 // @match        *://app.plex.tv/*
 // @grant        unsafeWindow
+// @grant        GM_xmlhttpRequest
 // @license      GPLv2
 // ==/UserScript==
 
@@ -43,23 +44,28 @@
         }
         last_state = data;
         var url = 'http://localhost:' + port + '/';
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', url);
+        var xhr = new GM_xmlhttpRequest( {
+          'method' : 'POST',
+          'url' : url,
+          data: JSON.stringify({ data, hostname: window.location.hostname, date: Date.now() }),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*'
+          },
+          onload: function(response) {
+            console.log(response)
 
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('Access-Control-Allow-Headers', '*');
-        xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                if (xhr.status !== 200) {
-                    failure_count++;
-                }
-            }
-        };
-
-        xhr.send(JSON.stringify({ data, hostname: window.location.hostname, date: Date.now() }));
+          }
+        });
+        // xhr.onreadystatechange = function () {
+        //     if (xhr.readyState === 4) {
+        //         if (xhr.status !== 200) {
+        //             failure_count++;
+        //         }
+        //     }
+        // };
     }
 
     // Safely query something, and perform operations on it
@@ -153,15 +159,10 @@
                 let artists = [];
 
                 try {
-                    artists = [document.querySelector('div#upload-info').querySelector('a').innerText.trim().replace("\n", "")];
+                    artists = [document.querySelector("#text > a").innerHTML.trim().replace("\n", "")];
                 } catch (e) { }
 
-                let title = query('.style-scope.ytd-video-primary-info-renderer', e => {
-                    let t = e.getElementsByClassName('title');
-                    if (t && t.length > 0)
-                        return t[0].innerText;
-                    return "";
-                });
+                let title = document.querySelector("#container > h1 > yt-formatted-string").innerHTML;
                 let duration = query('video', e => e.duration * 1000);
                 let progress = query('video', e => e.currentTime * 1000);
                 let cover = "";
