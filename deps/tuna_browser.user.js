@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.26
+// @version      1.0.27
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -14,12 +14,23 @@
 // @match        *://app.plex.tv/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
 // @license      GPLv2
 // ==/UserScript==
 
 (function () {
     'use strict';
     console.log("Loading tuna browser script");
+
+    // Tampermonkey and violent monkey seem to have differing implementations
+    function makeRequest(data) {
+        if(typeof(GM_xmlhttpRequest) === "function") {
+            return GM_xmlhttpRequest(data);
+        } else if (GM_xmlhttpRequest === undefined) {
+            return GM.xmlHttpRequest(data);
+        }
+        return new GM_xmlhttpRequest(data);
+    }
 
     // Configuration
     var port = 1608;
@@ -44,7 +55,7 @@
         }
         last_state = data;
         var url = 'http://localhost:' + port + '/';
-        var xhr = new GM_xmlhttpRequest( {
+        var xhr = makeRequest( {
           'method' : 'POST',
           'url' : url,
           data: JSON.stringify({ data, hostname: window.location.hostname, date: Date.now() }),
