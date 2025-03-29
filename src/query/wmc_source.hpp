@@ -58,6 +58,7 @@ public:
     void refresh() override;
     void handle_media_property_change(GlobalSystemMediaTransportControlsSession session, MediaPropertiesChangedEventArgs const& arg);
     void handle_media_playback_info_change(GlobalSystemMediaTransportControlsSession session, PlaybackInfoChangedEventArgs const& args);
+    void handle_timeline_property_change(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs const& args);
     void update_players();
     bool execute_capability(capability c) override;
     bool enabled() const { return true; }

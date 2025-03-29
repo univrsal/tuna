@@ -45,6 +45,13 @@ static void _handle_media_playback_info_change(GlobalSystemMediaTransportControl
         wmc_src->handle_media_playback_info_change(session, args);
 }
 
+static void _handle_timeline_property_change(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs const& args)
+{
+	auto wmc_src = music_sources::get<wmc_source>(S_SOURCE_WMC);
+	if (wmc_src)
+		wmc_src->handle_timeline_property_change(session, args);
+}
+
 static void _handle_session_change(GlobalSystemMediaTransportControlsSessionManager, SessionsChangedEventArgs const&)
 {
     auto wmc_src = music_sources::get<wmc_source>(S_SOURCE_WMC);
@@ -66,6 +73,7 @@ void wmc_source::update_players()
         if (std::find(m_registered_players.begin(), m_registered_players.end(), s) == m_registered_players.end()) { // not found
             session.MediaPropertiesChanged(_handle_media_property_change);
             session.PlaybackInfoChanged(_handle_media_playback_info_change);
+            session.TimelinePropertiesChanged(_handle_timeline_property_change);
 
             m_registered_players.push_back(s);
 
@@ -142,9 +150,15 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
     GlobalSystemMediaTransportControlsSessionMediaProperties media_properties { nullptr };
 
     winrt::hstring t = session.SourceAppUserModelId();
-    std::string id = winrt::to_string(t);
 
-    media_properties = session.TryGetMediaPropertiesAsync().get();
+    std::string id = winrt::to_string(t);
+    auto temp_media_properties = session.TryGetMediaPropertiesAsync();
+
+    if (temp_media_properties == nullptr) {
+		return;
+    }
+
+    media_properties = temp_media_properties.get();
 
     if (media_properties == nullptr)
         return;
@@ -251,6 +265,25 @@ void wmc_source::handle_media_playback_info_change(GlobalSystemMediaTransportCon
         m_info[id].set(meta::STATUS, play_state::state_stopped);
         break;
     }
+}
+
+void wmc_source::handle_timeline_property_change(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs const& args)
+{
+    auto tl = session.GetTimelineProperties();
+	auto pos = tl.Position();
+	auto foo = tl.LastUpdatedTime();
+	auto bar = tl.MaxSeekTime();
+	auto baz = tl.MinSeekTime();
+	auto bams = tl.StartTime();
+	auto end = tl.EndTime();
+	auto progress_ms = std::chrono::duration_cast<std::chrono::milliseconds>(pos).count();
+	auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end).count();
+
+	winrt::hstring t = session.SourceAppUserModelId();
+	std::string id = winrt::to_string(t);
+
+	m_info[id].set<int>(meta::PROGRESS, progress_ms);
+	m_info[id].set<int>(meta::DURATION, duration_ms);
 }
 
 wmc_source::wmc_source()
