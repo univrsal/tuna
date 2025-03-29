@@ -46,9 +46,10 @@ class wmc_source : public music_source {
     std::vector<std::string> m_registered_players {};
     std::mutex m_internal_mutex;
     std::map<std::string, song> m_info {};
-    std::map<std::string, QImage> m_covers {};
+    // player name -> { cover is updated, cover image, cover raw data }
+    std::map<std::string, std::tuple<bool, QImage, std::shared_ptr<std::vector<uint8_t>>>> m_covers {};
 
-    void save_cover(QImage& image);
+    void save_cover(QImage const& image);
 
 public:
     wmc_source();

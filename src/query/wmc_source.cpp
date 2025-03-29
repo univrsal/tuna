@@ -83,7 +83,7 @@ void wmc_source::update_players()
     }
 }
 
-void wmc_source::save_cover(QImage& image)
+void wmc_source::save_cover(QImage const& image)
 {
     auto tmp = config::cover_path + ".tmp";
 
@@ -177,7 +177,7 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
 
     auto thumbnail = media_properties.Thumbnail();
     com_array<uint8_t> pixel_data_detached;
-    uint8_t* data = NULL;
+    std::shared_ptr<std::vector<uint8_t>> data;
     if (thumbnail != nullptr && id == m_selected_player) { // only fetch cover for selected source
         auto stream = thumbnail.OpenReadAsync().get();
 
@@ -211,11 +211,14 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
                                      ColorManagementMode::ColorManageToSRgb)
                               .get();
         pixel_data_detached = pixel_data.DetachPixelData();
-        data = (uint8_t*)pixel_data_detached.data();
+        data = std::make_shared<std::vector<uint8_t>>(pixel_data_detached.size());
+        std::memcpy(data.get()->data(), pixel_data_detached.data(), pixel_data_detached.size());
 
-        QImage image(data, width, height, QImage::Format_RGBA8888);
+        QImage image(data.get()->data(), width, height, QImage::Format_RGBA8888);
         auto current_source = music_sources::selected_source();
-        m_covers[id] = image;
+        m_internal_mutex.lock();
+        m_covers[id] = { true, image, data };
+        m_internal_mutex.unlock();
 
         /* We receive cover updates regardless of whether tuna is
          * configured to monitor WMC so if the current source isn't WMC, we
@@ -271,6 +274,11 @@ void wmc_source::refresh()
     std::lock_guard<std::mutex> lock(m_internal_mutex);
     if (m_info.find(m_selected_player) != m_info.end())
         m_current = m_info[m_selected_player];
-    if (m_covers.find(m_selected_player) != m_covers.end())
-        save_cover(m_covers[m_selected_player]);
+    if (m_covers.find(m_selected_player) != m_covers.end()) {
+        auto& data = m_covers[m_selected_player];
+        if (std::get<0>(data)) { // if the cover has been updated since the last refresh
+            save_cover(std::get<1>(data));
+            std::get<0>(data) = false;
+        }
+    }
 }
