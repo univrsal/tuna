@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Tuna browser script
 // @namespace    univrsal
-// @version      1.0.27
+// @version      1.0.28
 // @description  Get song information from web players, based on NowSniper by Kıraç Armağan Önal
 // @author       univrsal
 // @match        *://open.spotify.com/*
@@ -64,19 +64,8 @@
             'Content-Type': 'application/json',
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*'
-          },
-          onload: function(response) {
-            console.log(response)
-
           }
         });
-        // xhr.onreadystatechange = function () {
-        //     if (xhr.readyState === 4) {
-        //         if (xhr.status !== 200) {
-        //             failure_count++;
-        //         }
-        //     }
-        // };
     }
 
     // Safely query something, and perform operations on it
