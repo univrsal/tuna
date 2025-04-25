@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Tuna - synced lyrics</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #lyrics {
+            padding-top: 50vh;
+            padding-bottom: 50vh;
+            font-size: 1.5em;
+            line-height: 1.5em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: center;
+            list-style: none;
+        }
+    </style>
+
+    <script src="jarowankler.js"></script>
+    <script>
+        const REFRESH_INTERVAL_MS = 1000;
+        const FETCH_URL = 'http://localhost:1608/';
+        const LYRCIS_HOST = "https://lyrics.vrsal.cc/api/search"
+        const OFFSET = 1.3;
+
+        var current_lyrics = [];
+        var current_line_index = -1;
+        var current_song_pos = 0;
+
+        var current_title = "";
+        var current_artists = [];
+        var current_album = "";
+        var current_status = "";
+        var current_duration = 0;
+        var currend_duration_seconds = 0;
+
+        let title = '';
+        let artists = '';
+        let album = null;
+        let alternativeTitle = null;
+        let songDuration = null;
+        let tags = null;
+
+        function parseLyrics(text) {
+            let splits = text.split("\n");
+            let lyrics = [{
+                time: {
+                    minutes: 0,
+                    seconds: 0,
+                    milliseconds: 0,
+                    total: 0
+                },
+                text: '🎵'
+            }];
+
+            for (let i = 0; i < splits.length; i++) {
+                let line = splits[i];
+                let time = line.match(/\[(\d+):(\d+).(\d+)\]/);
+                if (time) {
+                    let minutes = parseInt(time[1]);
+                    let seconds = parseInt(time[2]);
+                    let milliseconds = parseInt(time[3]);
+                    let total = minutes * 60 + seconds + milliseconds / 1000;
+                    let text = line.replace(/\[(\d+):(\d+).(\d+)\]/, "").trim();
+                    lyrics.push({
+                        time: {
+                            minutes: minutes,
+                            seconds: seconds,
+                            milliseconds: milliseconds,
+                            total: total
+                        },
+                        text: text !== '' ? text : '🎵'
+                    });
+                }
+            }
+
+            return lyrics;
+        }
+
+        async function searchLyrics(query) {
+            const baseUrl = `https://lrclib.net/api/search?${query.toString()}`;
+            // const baseUrl = `${LYRCIS_HOST}/api/search?${query.toString()}`;
+
+            let response = await fetch(baseUrl);
+            data = (await response.json());
+
+            return data;
+        }
+
+        async function getLyrics() {
+            artist = current_artists[0]
+
+            let query = new URLSearchParams({
+                artist_name: artist,
+                track_name: title,
+            });
+            if (album !== undefined) {
+                query.set('album_name', album)
+            }
+            const queries = [query]
+
+            const trackName = alternativeTitle || title;
+            let alternativeArtist = trackName.split(' - ')[0];
+            alternativeArtist =
+                alternativeArtist !== trackName ? alternativeArtist : '';
+
+            query = new URLSearchParams({q: `${trackName}`});
+            queries.push(query)
+
+
+            let filteredResults = [];
+            const artists = artist.split(/[&,]/g).map((i) => i.trim());
+            if (alternativeArtist !== '') {
+                artists.push(alternativeArtist);
+            }
+            var topLyircs = null;
+            for (const query of queries) {
+                const data = await this.searchLyrics(query);
+                if (data.length === 0) continue;
+
+                for (const item of data) {
+                    const {artistName} = item;
+                    const itemArtists = artistName.split(/[&,]/g).map((i) => i.trim());
+
+                    // Try to match using artist name first
+                    const permutations = [];
+                    for (const artistA of artists) {
+                        for (const artistB of itemArtists) {
+                            permutations.push([artistA.toLowerCase(), artistB.toLowerCase()]);
+                        }
+                    }
+
+                    for (const artistA of itemArtists) {
+                        for (const artistB of artists) {
+                            permutations.push([artistA.toLowerCase(), artistB.toLowerCase()]);
+                        }
+                    }
+
+                    let ratio = Math.max(
+                        ...permutations.map(([x, y]) => jaroWinkler(x, y)),
+                    );
+
+                    // If direct artist match is below threshold, and we have tags, try matching with tags
+                    if (ratio <= 0.9 && tags && tags.length > 0) {
+                        // Filter out the artist from tags to avoid duplicate comparisons
+                        const filteredTags = tags.filter(
+                            (tag) => tag.toLowerCase() !== artist.toLowerCase(),
+                        );
+
+                        const tagPermutations = [];
+                        // Compare each tag with each item artist
+                        for (const tag of filteredTags) {
+                            for (const itemArtist of itemArtists) {
+                                tagPermutations.push([
+                                    tag.toLowerCase(),
+                                    itemArtist.toLowerCase(),
+                                ]);
+                            }
+                        }
+
+                        // Compare each item artist with each tag
+                        for (const itemArtist of itemArtists) {
+                            for (const tag of filteredTags) {
+                                tagPermutations.push([
+                                    itemArtist.toLowerCase(),
+                                    tag.toLowerCase(),
+                                ]);
+                            }
+                        }
+
+                        if (tagPermutations.length > 0) {
+                            const tagRatio = Math.max(
+                                ...tagPermutations.map(([x, y]) => jaroWinkler(x, y)),
+                            );
+
+                            // Use the best match ratio between direct artist match and tag match
+                            ratio = Math.max(ratio, tagRatio);
+                        }
+                    }
+
+                    if (ratio <= 0.9) continue;
+                    filteredResults.push(item);
+                }
+
+                filteredResults = filteredResults.filter((lrc) => {
+                    return Math.abs(lrc.duration - songDuration) < 15;
+                });
+
+
+                if (filteredResults.length === 0) continue;
+
+                filteredResults.sort(
+                    (
+                        {duration: durationA, syncedLyrics: lyricsA},
+                        {duration: durationB, syncedLyrics: lyricsB},
+                    ) => {
+                        const hasLyricsA = lyricsA != null && lyricsA !== '';
+                        const hasLyricsB = lyricsB != null && lyricsB !== '';
+                        const left = Math.abs(durationA - songDuration);
+                        const right = Math.abs(durationB - songDuration);
+
+                        if (hasLyricsA !== hasLyricsB) {
+                            return hasLyricsB ? 1 : -1;
+                        }
+
+                        return left - right;
+                    },
+                );
+
+                const closestResult = filteredResults[0];
+
+                if (closestResult.instrumental) {
+                    break;
+                }
+
+                const raw = closestResult.syncedLyrics;
+                const plain = closestResult.plainLyrics;
+                if (!raw && !plain) {
+                    continue;
+                }
+
+                topLyircs = filteredResults[0]
+                if (topLyircs) {
+                    break
+                }
+
+
+            }
+
+
+            try {
+                if (topLyircs) {
+                    current_lyrics = parseLyrics(topLyircs.syncedLyrics);
+                    lyrics.innerHTML = "";
+                    for (let i = 0; i < current_lyrics.length; i++) {
+
+                        lyrics.innerHTML += `<li id="${i}">${current_lyrics[i].text} &nbsp</li>`;
+                    }
+                } else {
+                    lyrics.innerHTML = "Lyrics not found"
+                }
+            } catch (error) {
+                lyrics.innerHTML = "Lyrics not found"
+                current_lyrics = [];
+                console.error(error);
+            }
+
+        }
+
+        function update_opacity(selectedIndex) {
+            const lis = document.querySelectorAll('li');
+            const maxOpacity = 1;
+            const minOpacity = 0.1; // adjust as needed
+            const range = maxOpacity - minOpacity;
+
+            lis.forEach((li, index) => {
+                const distance = Math.abs(index - selectedIndex);
+                const opacity = maxOpacity - (distance * range / 3);
+                li.style.opacity = Math.max(opacity, minOpacity);
+            });
+        }
+
+        function update_lyrics() {
+
+            for (let i = 1; i < current_lyrics.length; i++) {
+                if (current_lyrics[i].time.total >= current_song_pos) {
+                    if (current_line_index !== i - 1) {
+                        let line = document.getElementById(i - 1);
+                        let prev_line = document.getElementById(current_line_index);
+                        if (prev_line) {
+                            prev_line.style.fontWeight = "normal";
+                        }
+                        if (line) {
+                            line.style.fontWeight = "bold";
+                        }
+
+                        // scroll to the current line
+                        if (line) {
+                            line.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                                inline: "center"
+                            });
+                        }
+                    }
+                    current_line_index = i - 1;
+                    update_opacity(current_line_index);
+                    break;
+                }
+            }
+        }
+
+        async function fetch_data() {
+            fetch(FETCH_URL)
+                .then(response => response.json())
+                .then(async data => {
+                    // data now contains the json object with song metadata
+                    current_song_pos = data['progress'] / 1000 + OFFSET;
+
+                    if (data['title'] != current_title) {
+                        current_title = title = data['title'];
+                        alternativeTitle = data['alternativeTitle'];
+                        //Why in array? ytm uses string, but tuna plugin does [songInfo.artist], how works other players?
+                        // src/plugins/tuna-obs/index.ts:89
+                        current_artists = data['artists'];
+                        current_album = album = data['album'];
+                        // why in mili? ""  ""      ""                  ""
+                        currend_duration_seconds = songDuration = data['duration'] / 1000;
+                        current_status = data['status'];
+
+                        lyrics.innerHTML = "Fetching...";
+                        current_lyrics = [];
+                        await getLyrics()
+                    }
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    // Do nothing
+                });
+
+        }
+
+        setInterval(fetch_data, REFRESH_INTERVAL_MS);
+        setInterval(() => {
+            if (current_status !== "playing") {
+                return;
+            }
+            // current_song_pos += 0.1;
+            update_lyrics();
+        }, 100);
+
+
+    </script>
+</head>
+
+<body>
+<ul id="lyrics">
+
+</ul>
+</body>
+
+</html>
