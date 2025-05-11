@@ -42,7 +42,7 @@
 #include <QRegularExpression>
 #include <obs-frontend-api.h>
 #if __linux__ || __FreeBSD__ || __OpenBSD__
-#include <obs/obs-nix-platform.h>
+#    include <obs/obs-nix-platform.h>
 #endif
 
 namespace music_sources {
@@ -61,7 +61,7 @@ void init()
     else
         binfo("Running on Wayland disabling window source");
 #else
-        instances.append(std::make_shared<window_source>());
+    instances.append(std::make_shared<window_source>());
 #endif
 
     instances.append(std::make_shared<lastfm_source>());

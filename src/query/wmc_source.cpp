@@ -47,9 +47,9 @@ static void _handle_media_playback_info_change(GlobalSystemMediaTransportControl
 
 static void _handle_timeline_property_change(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs const& args)
 {
-	auto wmc_src = music_sources::get<wmc_source>(S_SOURCE_WMC);
-	if (wmc_src)
-		wmc_src->handle_timeline_property_change(session, args);
+    auto wmc_src = music_sources::get<wmc_source>(S_SOURCE_WMC);
+    if (wmc_src)
+        wmc_src->handle_timeline_property_change(session, args);
 }
 
 static void _handle_session_change(GlobalSystemMediaTransportControlsSessionManager, SessionsChangedEventArgs const&)
@@ -155,7 +155,7 @@ void wmc_source::handle_media_property_change(GlobalSystemMediaTransportControls
     auto temp_media_properties = session.TryGetMediaPropertiesAsync();
 
     if (temp_media_properties == nullptr) {
-		return;
+        return;
     }
 
     media_properties = temp_media_properties.get();
@@ -270,20 +270,20 @@ void wmc_source::handle_media_playback_info_change(GlobalSystemMediaTransportCon
 void wmc_source::handle_timeline_property_change(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs const& args)
 {
     auto tl = session.GetTimelineProperties();
-	auto pos = tl.Position();
-	auto foo = tl.LastUpdatedTime();
-	auto bar = tl.MaxSeekTime();
-	auto baz = tl.MinSeekTime();
-	auto bams = tl.StartTime();
-	auto end = tl.EndTime();
-	auto progress_ms = std::chrono::duration_cast<std::chrono::milliseconds>(pos).count();
-	auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end).count();
+    auto pos = tl.Position();
+    auto foo = tl.LastUpdatedTime();
+    auto bar = tl.MaxSeekTime();
+    auto baz = tl.MinSeekTime();
+    auto bams = tl.StartTime();
+    auto end = tl.EndTime();
+    auto progress_ms = std::chrono::duration_cast<std::chrono::milliseconds>(pos).count();
+    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end).count();
 
-	winrt::hstring t = session.SourceAppUserModelId();
-	std::string id = winrt::to_string(t);
+    winrt::hstring t = session.SourceAppUserModelId();
+    std::string id = winrt::to_string(t);
 
-	m_info[id].set<int>(meta::PROGRESS, progress_ms);
-	m_info[id].set<int>(meta::DURATION, duration_ms);
+    m_info[id].set<int>(meta::PROGRESS, progress_ms);
+    m_info[id].set<int>(meta::DURATION, duration_ms);
 }
 
 wmc_source::wmc_source()
