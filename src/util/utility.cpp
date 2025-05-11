@@ -155,6 +155,28 @@ bool download_cover(const QString& url)
         }
         berr("Cover file '%s' does not exist", qt_to_utf8(new_cover_path));
         return false;
+    } else if (url.startsWith("data:image/")) {
+        int comma = url.indexOf(',');
+        if (comma == -1)
+            berr("Failed to open file '%s' for writing", qt_to_utf8(output_path));
+        return false;
+
+        QByteArray base64 = url.mid(comma + 1).toUtf8();
+        QByteArray image_data = QByteArray::fromBase64(base64);
+
+        QFile current(output_path);
+        current.remove();
+        if (!current.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            berr("Failed to open file '%s' for writing", qt_to_utf8(output_path));
+            return false;
+        }
+
+        if (current.write(image_data) != image_data.size()) {
+            berr("Failed to write all image data to '%s'", qt_to_utf8(output_path));
+            return false;
+        }
+
+        return true;
     }
 
     result = curl_download(qt_to_utf8(url), qt_to_utf8(tmp));

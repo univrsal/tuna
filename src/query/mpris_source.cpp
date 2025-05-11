@@ -199,8 +199,8 @@ DBusHandlerResult mpris_source::handle_dbus(DBusMessage* message)
 static inline QString correct_art_url(const char* url)
 {
     auto str = utf8_to_qt(url);
-    // Don't encode if it's a file or http(s) url
-    if (str.startsWith("file://") || str.startsWith("http://") || str.startsWith("https://")) {
+    // Don't encode if it's a file, data:image or http(s) url
+    if (str.startsWith("data:image/") || str.startsWith("file://") || str.startsWith("http://") || str.startsWith("https://")) {
         return str;
     }
     return QUrl::toPercentEncoding(utf8_to_qt(url)).replace("%2F", "/").replace("file%3A", "file:").replace("%3A", ":"); // idk why it encodes slashes
