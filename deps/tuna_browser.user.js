@@ -332,13 +332,12 @@
                     title = document.title; // fallback
                 }
                 let artists = [];
-                if (navigator.mediaSession.metadata && navigator.mediaSession.metadata.artist) {
-                    artists = [navigator.mediaSession.metadata.artist];
+                let authorEl = document.querySelector('a.up-name');
+                if (authorEl) {
+                    artists = [authorEl.textContent.trim()];
                 } else {
-                    let authorEl = document.querySelector('.up-info__name a, .up-info__name .username, .up-info__link a');
-                    if (authorEl) {
-                        artists = [authorEl.textContent.trim()];
-                    }
+                    document.querySelectorAll('a.staff-name').forEach(el => artists.push(el.textContent.trim())); // multiple video uploaders
+                    artists = [...new Set(artists.filter(Boolean))];
                 }
                 let progress = mediaElem ? Math.floor(mediaElem.currentTime) * 1000 : 0;
                 let duration = mediaElem ? Math.floor(mediaElem.duration) * 1000 : 0;
@@ -364,6 +363,7 @@
                         bvid = parts.find(p => p.startsWith('BV'));
                         if (bvid) album_url = `https://www.bilibili.com/video/${bvid}/`;
                     }
+                    // fallback
                     else {
                         urlObj.search = '';
                         urlObj.hash = '';
