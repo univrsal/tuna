@@ -12,6 +12,7 @@
 // @match        *://play.pretzel.rocks/*
 // @match        *://*.youtube.com/*
 // @match        *://app.plex.tv/*
+// @match        *://www.bilibili.com/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @grant        GM.xmlHttpRequest
@@ -309,6 +310,71 @@
                     if (title !== null) {
                         post({ cover, title, artists, status, progress, duration, album, album_url });
                     }
+                }
+            } else if (hostname === "www.bilibili.com") {
+                // bilibili web support by hanaka
+                // album info is absent and irrelevant in bilibili, so album is the video id (bvid) specified, and album_url is the video url
+                const mediaSessionStatesToTunaStates = {
+                    "none": "unknown",
+                    "playing": "playing",
+                    "paused": "stopped"
+                };
+                let status = mediaSessionStatesToTunaStates[navigator.mediaSession.playbackState] || "unknown";
+                let mediaElem = document.querySelector('video') || document.querySelector('audio');
+                if (status === "unknown" && mediaElem) {
+                    status = mediaElem.paused ? "stopped" : "playing";
+                }
+                let titleEl = document.querySelector('h1.video-title');
+                let title = '';
+                if (titleEl) {
+                    title = titleEl.getAttribute('data-title') || titleEl.getAttribute('title') || titleEl.textContent.trim();
+                } else {
+                    title = document.title; // fallback
+                }
+                let artists = [];
+                let authorEl = document.querySelector('a.up-name');
+                if (authorEl) {
+                    artists = [authorEl.textContent.trim()];
+                } else {
+                    document.querySelectorAll('a.staff-name').forEach(el => artists.push(el.textContent.trim())); // multiple video uploaders
+                    artists = [...new Set(artists.filter(Boolean))];
+                }
+                let progress = mediaElem ? Math.floor(mediaElem.currentTime) * 1000 : 0;
+                let duration = mediaElem ? Math.floor(mediaElem.duration) * 1000 : 0;
+                let cover = '';
+                if (navigator.mediaSession.metadata && navigator.mediaSession.metadata.artwork && navigator.mediaSession.metadata.artwork.length > 0) {
+                    cover = navigator.mediaSession.metadata.artwork.at(-1).src;
+                } else {
+                    let ogImage = document.querySelector('meta[property="og:image"]');
+                    if (ogImage) cover = ogImage.content;
+                }
+                let bvid = '';
+                let album_url = '';
+                try {
+                    let urlObj = new URL(window.location.href);
+                    // case 1: video in a playlist
+                    if (urlObj.pathname.startsWith('/list/') && urlObj.searchParams.has('bvid')) {
+                        bvid = urlObj.searchParams.get('bvid');
+                        album_url = `https://www.bilibili.com/video/${bvid}/`;
+                    }
+                    // case 2: normal video
+                    else if (urlObj.pathname.startsWith('/video/')) {
+                        let parts = urlObj.pathname.split('/');
+                        bvid = parts.find(p => p.startsWith('BV'));
+                        if (bvid) album_url = `https://www.bilibili.com/video/${bvid}/`;
+                    }
+                    // fallback
+                    else {
+                        urlObj.search = '';
+                        urlObj.hash = '';
+                        album_url = urlObj.toString();
+                    }
+                } catch (e) {
+                    album_url = window.location.href;
+                }
+                let album = bvid;
+                if (title) {
+                    post({ cover, title, artists, status, progress, duration, album, album_url });
                 }
             }
         }, refresh_rate_ms);
