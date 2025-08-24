@@ -60,7 +60,7 @@ void register_gui()
 #ifndef __APPLE__
     obs_frontend_push_ui_translation(obs_module_get_string);
     music_dock = new music_control(main_window);
-    obs_frontend_add_dock(music_dock);
+    obs_frontend_add_dock_by_id("tuna_music_control", T_DOCK_MENU_TITLE, music_dock);
     obs_frontend_pop_ui_translation();
 #endif
 }
