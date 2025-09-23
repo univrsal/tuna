@@ -65,8 +65,9 @@
             'Content-Type': 'application/json',
             'Access-Control-Allow-Headers': '*',
             'Access-Control-Allow-Origin': '*'
-          }
-        });
+          },
+          onerror: e => { failure_count++; if (failure_count < 2) console.log(e);}
+	  });
     }
 
     // Safely query something, and perform operations on it
