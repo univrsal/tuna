@@ -179,6 +179,8 @@
                         current_lyrics = [];
                         getLyrics(current_title, current_artists, current_album)
                     }
+                    if (data['status'] != current_status)
+                        current_status = data['status'];
                 })
                 .catch(function () {
                     // Do nothing
