@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16...3.26)
+cmake_minimum_required(VERSION 3.26)
 
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCOPE)
@@ -18,6 +18,8 @@ include(helpers)
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 add_subdirectory(deps)
 
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE tag mpdclient)
+
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
@@ -28,8 +30,6 @@ find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
-include_directories(${TAGLIB_INCLUDE_DIRS})
-include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
@@ -79,6 +79,7 @@ mark_as_advanced(CREDS)
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 add_definitions(-DLASTFM_CREDENTIALS=\"${LASTFM_CREDS}\")
 add_subdirectory(src)
+
 
 if (UNIX AND NOT APPLE)
     option(WITH_DBUS  "Whether to add mpris support via dbus (Default: ON)" ON)
