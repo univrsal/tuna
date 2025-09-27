@@ -32,12 +32,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
 find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 
-
-include_directories(${ZLIB_INCLUDE_DIR})
-include_directories(${LIBCURL_INCLUDE_DIRS})
-include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
-include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
-include_directories(${TAGLIB_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${ZLIB_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIBCURL_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CPPHTTPLIB_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})
 
 add_definitions(${LIBCURL_DEFINITIONS})
 
