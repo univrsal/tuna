@@ -31,7 +31,7 @@ find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
-include_directories{${CMAKE_BINARY_DIR}/libmdclient/install/include)
+include_directories(${CMAKE_BINARY_DIR}/libmdclient/install/include)
 add_definitions(${LIBCURL_DEFINITIONS})
 
 if (NOT CREDS)
