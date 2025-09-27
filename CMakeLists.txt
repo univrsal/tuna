@@ -21,7 +21,7 @@ add_subdirectory(deps)
 add_dependencies(${CMAKE_PROJECT_NAME} build_libmpdclient)
 
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE tag ${LIBMPDCLIENT_LIBRARIES})
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${TAGLIB_LIBRARIES} ${LIBMPDCLIENT_LIBRARIES})
 
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
@@ -37,6 +37,7 @@ include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+include_directories(${TAGLIB_INCLUDE_DIRS})
 
 add_definitions(${LIBCURL_DEFINITIONS})
 
