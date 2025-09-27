@@ -89,7 +89,6 @@ runs:
         SPOTIFY_CLIENT_SECRET: ${{ inputs.SPOTIFY_TOKEN }}
         SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
-        choco install meson -y
         # Run Windows Build
         if ( $Env:RUNNER_DEBUG -ne $null ) {
           Set-PSDebug -Trace 1
