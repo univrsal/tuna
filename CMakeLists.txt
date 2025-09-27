@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16...3.26)
+cmake_minimum_required(VERSION 3.26)
 
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCOPE)
@@ -18,6 +18,11 @@ include(helpers)
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 add_subdirectory(deps)
 
+add_dependencies(${CMAKE_PROJECT_NAME} build_libmpdclient)
+
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${TAGLIB_LIBRARIES} ${LIBMPDCLIENT_LIBRARIES})
+
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
 add_definitions(-DTUNA_VERSION="${PROJECT_VERSION}")
@@ -26,11 +31,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
 
 find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIR})
-include_directories(${LIBCURL_INCLUDE_DIRS})
-include_directories(${TAGLIB_INCLUDE_DIRS})
-include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
-include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${ZLIB_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIBCURL_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CPPHTTPLIB_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIBMPDCLIENT_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${TAGLIB_INCLUDE_DIRS})
+
 add_definitions(${LIBCURL_DEFINITIONS})
 
 if (NOT CREDS)
@@ -79,6 +86,7 @@ mark_as_advanced(CREDS)
 add_definitions(-DSPOTIFY_CREDENTIALS=\"${CREDS}\")
 add_definitions(-DLASTFM_CREDENTIALS=\"${LASTFM_CREDS}\")
 add_subdirectory(src)
+
 
 if (UNIX AND NOT APPLE)
     option(WITH_DBUS  "Whether to add mpris support via dbus (Default: ON)" ON)
@@ -162,7 +170,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 
 find_package(Qt6 COMPONENTS Widgets Core)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets tag mpdclient ZLIB::ZLIB CURL::libcurl)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets ZLIB::ZLIB CURL::libcurl)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
 
 configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)

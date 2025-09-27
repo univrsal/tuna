@@ -7,3 +7,4 @@ build-tuna*/
 /cmake-build-debug/
 *.generated.h
 build_*/
+cmake/.CMakeBuildNumber
