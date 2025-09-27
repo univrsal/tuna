@@ -18,7 +18,10 @@ include(helpers)
 add_library(${CMAKE_PROJECT_NAME} MODULE)
 add_subdirectory(deps)
 
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE tag mpdclient)
+add_dependencies(${CMAKE_PROJECT_NAME} build_libmpdclient)
+
+
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE tag ${LIBMPDCLIENT_LIBRARIES})
 
 string(TIMESTAMP TODAY "%Y.%m.%d %H:%M")
 add_definitions(-DBUILD_TIME="${TODAY}")
@@ -28,10 +31,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/external")
 
 find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
+
+
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
-include_directories(${CMAKE_BINARY_DIR}/libmdclient/install/include)
+include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+
 add_definitions(${LIBCURL_DEFINITIONS})
 
 if (NOT CREDS)
@@ -164,7 +170,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 
 find_package(Qt6 COMPONENTS Widgets Core)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets tag mpdclient ZLIB::ZLIB CURL::libcurl)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets ZLIB::ZLIB CURL::libcurl)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
 
 configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)
