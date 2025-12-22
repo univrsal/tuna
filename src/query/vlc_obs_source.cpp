@@ -1,7 +1,7 @@
 /*************************************************************************
  * This file is part of tuna
- * git.vrsal.xyz/alex/tuna
- * Copyright 2023 univrsal <uni@vrsal.xyz>.
+ * git.vrsal.cc/alex/tuna
+ * Copyright 2025 univrsal <uni@vrsal.xyz>.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,14 @@ vlc_obs_source::vlc_obs_source()
     m_capabilities = CAP_NEXT_SONG | CAP_PREV_SONG | CAP_PLAY_PAUSE |
         CAP_STOP_SONG | CAP_VOLUME_UP | CAP_VOLUME_DOWN | CAP_VOLUME_MUTE;
     supported_metadata({ meta::TITLE, meta::ARTIST, meta::ALBUM, meta::RELEASE,
-        meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER, meta::TRACK_NUMBER,
-        meta::PROGRESS, meta::STATUS, meta::LABEL, meta::FILE_NAME,
-        meta::GENRE, meta::COPYRIGHT, meta::DESCRIPTION, meta::RATING, meta::DATE,
-        meta::SETTING, meta::URL, meta::LANGUAGE, meta::NOW_PLAYING, meta::PUBLISHER,
-        meta::ENCODED_BY, meta::ARTWORK_URL, meta::TRACK_TOTAL, meta::DIRECTOR, meta::SEASON,
-        meta::EPISODE, meta::SHOW_NAME, meta::ALBUM_ARTIST, meta::DISC_TOTAL });
+            meta::COVER, meta::LYRICS, meta::DURATION, meta::DISC_NUMBER,
+            meta::TRACK_NUMBER, meta::PROGRESS, meta::STATUS, meta::LABEL,
+            meta::GENRE, meta::COPYRIGHT, meta::DESCRIPTION, meta::RATING,
+            meta::DATE, meta::SETTING, meta::URL, meta::LANGUAGE,
+            meta::NOW_PLAYING, meta::PUBLISHER, meta::ENCODED_BY,
+            meta::ARTWORK_URL, meta::TRACK_TOTAL, meta::DIRECTOR, meta::SEASON,
+            meta::EPISODE, meta::SHOW_NAME, meta::ALBUM_ARTIST,
+            meta::DISC_TOTAL });
     /* clang-format on */
 }
 
