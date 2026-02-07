@@ -68,7 +68,7 @@ bool extract_ape(TagLib::APE::Tag* tag)
     const TagLib::APE::ItemListMap& listMap = tag->itemListMap();
     if (listMap.contains("COVER ART (FRONT)")) {
         const TagLib::ByteVector nullStringTerminator(1, 0);
-        TagLib::ByteVector item = listMap["COVER ART (FRONT)"].value();
+        TagLib::ByteVector item = listMap["COVER ART (FRONT)"].binaryData();
         const int pos = item.find(nullStringTerminator); // Skip the filename.
         if (pos != -1) {
             const TagLib::ByteVector& pic = item.mid(pos + 1);
