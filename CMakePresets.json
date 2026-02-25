@@ -59,7 +59,7 @@
       "warnings": {"dev": true, "deprecated": true},
       "cacheVariables": {
         "CMAKE_SYSTEM_VERSION": "10.0.18363.657",
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/windows/obs-vcpkg-toolchain.cmake",
         "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
       }
     },
