@@ -1,6 +1,3 @@
-[submodule "deps/taglib"]
-	path = deps/taglib
-	url = https://github.com/taglib/taglib
 [submodule "deps/libmpdclient"]
 	path = deps/libmpdclient
 	url = https://github.com/MusicPlayerDaemon/libmpdclient
