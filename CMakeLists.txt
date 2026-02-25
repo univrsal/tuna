@@ -33,6 +33,17 @@ include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
 if(WIN32)
+    # Add vcpkg installed directory to the prefix path so find_package can locate taglib.
+    # This works without the vcpkg cmake toolchain (which interferes with finding OBS-bundled
+    # packages such as CURL by adding itself to CMAKE_FIND_ROOT_PATH).
+    if(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
+        set(_vcpkg_triplet "${VCPKG_TARGET_TRIPLET}")
+        if(NOT _vcpkg_triplet)
+            set(_vcpkg_triplet "x64-windows-static-md")
+        endif()
+        list(PREPEND CMAKE_PREFIX_PATH "$ENV{VCPKG_INSTALLATION_ROOT}/installed/${_vcpkg_triplet}")
+        unset(_vcpkg_triplet)
+    endif()
     find_package(taglib CONFIG REQUIRED)
     set(TAGLIB_TARGET TagLib::tag)
 else()

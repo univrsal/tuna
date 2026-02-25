@@ -50,6 +50,13 @@ function Build {
 
     if ( ! $SkipDeps ) {
         Install-BuildDependencies -WingetFile "${ScriptHome}/.Wingetfile"
+
+        if ( $Env:VCPKG_INSTALLATION_ROOT -and ( Test-Path "${Env:VCPKG_INSTALLATION_ROOT}/vcpkg.exe" ) ) {
+            Log-Group "Installing vcpkg dependencies..."
+            $VcpkgTriplet = 'x64-windows-static-md'
+            Invoke-External "${Env:VCPKG_INSTALLATION_ROOT}/vcpkg.exe" install "taglib:${VcpkgTriplet}" --no-print-usage
+            Log-Group
+        }
     }
 
     Push-Location -Stack BuildTemp
