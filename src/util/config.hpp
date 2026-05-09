@@ -59,6 +59,7 @@
 #define CFG_DOWNLOAD_MISSING_COVER      "download_missing_cover"
 #define CFG_COVER_SIZE                  "cover_size"
 #define CFG_REMOVE_EXTENSIONS           "removeextensions"
+#define CFG_PROXY                       "proxy"
 
 #define CFG_SPOTIFY_LOGGEDIN            "spotify.login"
 #define CFG_SPOTIFY_TOKEN               "spotify.token"
@@ -125,6 +126,7 @@ extern QString selected_source;
 extern QString placeholder;
 extern QString cover_path;
 extern QString lyrics_path;
+extern QString proxy;
 extern QString cover_placeholder;
 
 extern QList<output> outputs;

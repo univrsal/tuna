@@ -44,6 +44,7 @@
 class song;
 
 class QJsonDocument;
+typedef void CURL;
 
 namespace util {
 
@@ -52,6 +53,8 @@ extern bool have_vlc_source;
 extern bool curl_download(const char* url, const char* path);
 
 QJsonDocument curl_get_json(const char* url);
+
+void apply_curl_proxy(CURL* curl);
 
 extern bool download_cover(const QString& url);
 

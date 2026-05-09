@@ -143,6 +143,7 @@ long lastfm_request(QJsonDocument& response_json, const QString& url)
     long http_code = -1;
     // curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_URL, qt_to_utf8(url));
+    util::apply_curl_proxy(curl);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 #ifdef DEBUG

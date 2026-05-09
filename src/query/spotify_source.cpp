@@ -360,6 +360,7 @@ CURL* prepare_curl(struct curl_slist* header, std::string* response, std::string
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
     curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(request.c_str()));
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.c_str());
+    util::apply_curl_proxy(curl);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
@@ -532,6 +533,7 @@ long execute_command(const char* auth_token, const char* url, std::string& respo
 
     CURL* curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, url);
+    util::apply_curl_proxy(curl);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);

@@ -75,6 +75,16 @@ size_t write_data(void* ptr, size_t size, size_t nmemb, FILE* stream)
     return written;
 }
 
+void apply_curl_proxy(CURL* curl)
+{
+    if (!curl || config::proxy.isEmpty())
+        return;
+
+    curl_easy_setopt(curl, CURLOPT_PROXY, qt_to_utf8(config::proxy));
+    curl_easy_setopt(curl, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+    curl_easy_setopt(curl, CURLOPT_NOPROXY, "localhost,127.0.0.1,::1");
+}
+
 bool curl_download(const char* url, const char* path)
 {
     CURL* curl = curl_easy_init();
@@ -91,6 +101,7 @@ bool curl_download(const char* url, const char* path)
     bool result = false;
     if (fp && curl) {
         curl_easy_setopt(curl, CURLOPT_URL, url);
+        apply_curl_proxy(curl);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 #ifdef DEBUG
@@ -299,6 +310,7 @@ QJsonDocument curl_get_json(const char* url)
     if (curl) {
         std::string response {};
         curl_easy_setopt(curl, CURLOPT_URL, url);
+        apply_curl_proxy(curl);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 #ifdef DEBUG

@@ -52,6 +52,7 @@ void icecast_source::refresh()
         error_buffer[0] = '\0';
         std::string response;
         curl_easy_setopt(curl, CURLOPT_URL, qt_to_utf8(m_url));
+        util::apply_curl_proxy(curl);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, util::write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
         curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error_buffer);

@@ -44,6 +44,7 @@ uint16_t cover_size = 256;
 QString placeholder = {};
 QString cover_path = {};
 QString lyrics_path = {};
+QString proxy = {};
 QString cover_placeholder = {};
 QString selected_source = {};
 bool webserver_enabled = false;
@@ -80,6 +81,7 @@ void init()
     CDEF_UINT(CFG_REFRESH_RATE, config::refresh_rate);
     CDEF_UINT(CFG_SERVER_PORT, config::webserver_port);
     CDEF_STR(CFG_SONG_PLACEHOLDER, T_PLACEHOLDER);
+    CDEF_STR(CFG_PROXY, "");
 
     CDEF_BOOL(CFG_DOCK_VISIBLE, false);
     CDEF_BOOL(CFG_DOCK_INFO_VISIBLE, true);
@@ -100,6 +102,7 @@ void load()
     load_outputs();
     cover_path = CGET_STR(CFG_COVER_PATH);
     lyrics_path = CGET_STR(CFG_LYRICS_PATH);
+    proxy = CGET_STR(CFG_PROXY);
     refresh_rate = CGET_UINT(CFG_REFRESH_RATE);
     placeholder = CGET_STR(CFG_SONG_PLACEHOLDER);
     download_lyrics = CGET_BOOL(CFG_DOWNLOAD_LYRICS);
@@ -134,6 +137,7 @@ void save()
     tuna_thread::thread_mutex.lock();
     CSET_STR(CFG_COVER_PATH, qt_to_utf8(cover_path));
     CSET_STR(CFG_LYRICS_PATH, qt_to_utf8(lyrics_path));
+    CSET_STR(CFG_PROXY, qt_to_utf8(proxy));
     CSET_UINT(CFG_REFRESH_RATE, refresh_rate);
     CSET_STR(CFG_SONG_PLACEHOLDER, qt_to_utf8(placeholder));
     CSET_BOOL(CFG_DOWNLOAD_LYRICS, download_lyrics);

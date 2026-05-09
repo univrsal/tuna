@@ -157,6 +157,7 @@ void tuna_gui::toggleShowHide()
         /* load basic values */
         ui->txt_song_cover->setText(config::cover_path);
         ui->txt_song_lyrics->setText(config::lyrics_path);
+        ui->txt_proxy->setText(config::proxy);
         ui->sb_refresh_rate->setValue(config::refresh_rate);
         ui->txt_song_placeholder->setText(config::placeholder);
         ui->cb_dl_lyrics->setChecked(config::download_lyrics);
@@ -222,6 +223,7 @@ void tuna_gui::tuna_gui_accepted()
     config::selected_source = qt_to_utf8(ui->cb_source->currentData().toString());
     config::cover_path = qt_to_utf8(ui->txt_song_cover->text());
     config::lyrics_path = qt_to_utf8(ui->txt_song_lyrics->text());
+    config::proxy = qt_to_utf8(ui->txt_proxy->text().trimmed());
     config::refresh_rate = ui->sb_refresh_rate->value();
     config::placeholder = qt_to_utf8(ui->txt_song_placeholder->text());
     config::download_lyrics = ui->cb_dl_lyrics->isChecked();
