@@ -58,7 +58,7 @@ void init()
 {
     util::create_config_folder();
     if (!instance)
-        instance = obs_frontend_get_global_config();
+        instance = obs_frontend_get_app_config();
 
     QDir home = QDir::homePath();
     QString path_song_file = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
