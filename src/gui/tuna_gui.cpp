@@ -55,7 +55,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->setupUi(this);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply_pressed()));
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(tuna_gui_accepted()));
-    connect(ui->cb_download_missing, SIGNAL(stateChanged(int)), this, SLOT(cb_download_missing_covers_clicked));
+    connect(ui->cb_download_missing, SIGNAL(stateChanged(int)), this, SLOT(cb_download_missing_covers_clicked(int)));
 
     /* Other signals */
 #define ADD_SIGNAL(btn) connect(ui->btn, SIGNAL(clicked()), this, SLOT(btn##_clicked()))
