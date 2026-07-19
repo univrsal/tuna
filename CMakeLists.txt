@@ -28,10 +28,28 @@ find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
-include_directories(${TAGLIB_INCLUDE_DIRS})
-include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
+
+# --- Find taglib and libmpdclient ---
+if(UNIX AND NOT APPLE)
+    # Linux: use system libraries via pkg-config
+    find_package(PkgConfig REQUIRED)
+
+    pkg_check_modules(TAGLIB REQUIRED taglib)
+    include_directories(${TAGLIB_INCLUDE_DIRS})
+    link_directories(${TAGLIB_LIBRARY_DIRS})
+    set(TAGLIB_TARGET ${TAGLIB_LIBRARIES})
+
+    pkg_check_modules(LIBMPDCLIENT REQUIRED libmpdclient)
+    include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+    link_directories(${LIBMPDCLIENT_LIBRARY_DIRS})
+    set(LIBMPDCLIENT_TARGET ${LIBMPDCLIENT_LIBRARIES})
+else()
+    # macOS / Windows: use FetchContent-built static libraries from deps/
+    include_directories(${TAGLIB_INCLUDE_DIRS})
+    include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+endif()
 
 if (NOT CREDS)
     # Try getting the credentials from the environment
@@ -162,7 +180,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 
 find_package(Qt6 COMPONENTS Widgets Core)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets tag mpdclient ZLIB::ZLIB CURL::libcurl)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets ${TAGLIB_TARGET} ${LIBMPDCLIENT_TARGET} ZLIB::ZLIB CURL::libcurl)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
 
 configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)

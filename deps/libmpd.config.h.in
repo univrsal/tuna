@@ -1,0 +1,10 @@
+#pragma once
+#define DEFAULT_HOST "@MPD_DEFAULT_HOST@"
+#define DEFAULT_PORT @MPD_DEFAULT_PORT@
+#define ENABLE_TCP
+#define PACKAGE "libmpdclient"
+#define VERSION "@MPD_VERSION@"
+#define DEFAULT_SOCKET "@MPD_DEFAULT_SOCKET@"
+
+#cmakedefine HAVE_GETADDRINFO
+#cmakedefine HAVE_STRNDUP
