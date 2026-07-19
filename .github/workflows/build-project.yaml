@@ -8,7 +8,7 @@ on:
 jobs:
   check-event:
     name: Check GitHub Event Data 🔎
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
@@ -73,7 +73,7 @@ jobs:
 
   ubuntu-build:
     name: Build for Ubuntu 🐧
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: check-event
     defaults:
       run:
