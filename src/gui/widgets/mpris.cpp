@@ -51,7 +51,7 @@ void mpris::tick()
 {
     auto mpris_src = music_sources::get<mpris_source>(S_SOURCE_MPRIS);
     if (mpris_src) {
-        std::lock_guard<std::mutex> lock(mpris_src->m_internal_mutex);
+        std::scoped_lock lock(mpris_src->m_internal_mutex);
 
         if (m_current_players != mpris_src->m_players) {
             m_current_players = mpris_src->m_players;
