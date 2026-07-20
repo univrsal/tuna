@@ -38,13 +38,13 @@ if(UNIX)
 
     pkg_check_modules(TAGLIB REQUIRED taglib)
     include_directories(${TAGLIB_INCLUDE_DIRS})
-    link_directories(${TAGLIB_LIBRARY_DIRS})
-    set(TAGLIB_TARGET ${TAGLIB_LIBRARIES})
+    find_library(_taglib_path tag HINTS ${TAGLIB_LIBRARY_DIRS} REQUIRED)
+    set(TAGLIB_TARGET ${_taglib_path})
 
     pkg_check_modules(LIBMPDCLIENT REQUIRED libmpdclient)
     include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
-    link_directories(${LIBMPDCLIENT_LIBRARY_DIRS})
-    set(LIBMPDCLIENT_TARGET ${LIBMPDCLIENT_LIBRARIES})
+    find_library(_libmpdclient_path mpdclient HINTS ${LIBMPDCLIENT_LIBRARY_DIRS} REQUIRED)
+    set(LIBMPDCLIENT_TARGET ${_libmpdclient_path})
 else()
     # Windows: use vcpkg for taglib, FetchContent for libmpdclient from deps/
     include_directories(${TAGLIB_INCLUDE_DIRS})
