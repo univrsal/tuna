@@ -35,13 +35,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Set Up vcpkg & Install Taglib 📦
-      if: runner.os == 'macOS'
-      shell: zsh --no-rcs --errexit --pipefail {0}
-      run: |
-        : Install taglib via Homebrew
-        brew install taglib libmpdclient
-
     - name: Run macOS Build
       if: runner.os == 'macOS'
       shell: zsh --no-rcs --errexit --pipefail {0}
@@ -104,25 +97,6 @@ runs:
         if (( ${+RUNNER_DEBUG} )) build_args+=(--debug)
 
         .github/scripts/build-ubuntu ${build_args}
-
-    - name: Set Up vcpkg & Install Taglib 📦
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        # Set Up vcpkg & Install Taglib
-        if ( $Env:RUNNER_DEBUG -ne $null ) {
-          Set-PSDebug -Trace 1
-        }
-        $VcpkgRoot = "C:/Users/runneradmin/Documents/git/vcpkg"
-        if (-not (Test-Path $VcpkgRoot)) {
-          git clone https://github.com/microsoft/vcpkg.git $VcpkgRoot
-          Push-Location $VcpkgRoot
-          .\bootstrap-vcpkg.bat
-          Pop-Location
-        }
-        $Env:VCPKG_ROOT = $VcpkgRoot
-        & "$VcpkgRoot/vcpkg.exe" install --triplet x64-windows
-        echo "VCPKG_ROOT=$VcpkgRoot" >> $env:GITHUB_ENV
 
     - name: Run Windows Build
       if: runner.os == 'Windows'

@@ -29,21 +29,21 @@
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
-#include <taglib/apefile.h>
-#include <taglib/apeitem.h>
-#include <taglib/apetag.h>
-#include <taglib/asffile.h>
-#include <taglib/attachedpictureframe.h>
+#include <taglib/ape/apefile.h>
+#include <taglib/ape/apeitem.h>
+#include <taglib/ape/apetag.h>
+#include <taglib/asf/asffile.h>
+#include <taglib/mpeg/id3v2/frames/attachedpictureframe.h>
 #include <taglib/fileref.h>
-#include <taglib/flacfile.h>
-#include <taglib/id3v2frame.h>
-#include <taglib/id3v2tag.h>
-#include <taglib/mp4file.h>
-#include <taglib/mpcfile.h>
-#include <taglib/mpegfile.h>
-#include <taglib/opusfile.h>
-#include <taglib/tlist.h>
-#include <taglib/tmap.h>
+#include <taglib/flac/flacfile.h>
+#include <taglib/mpeg/id3v2/id3v2frame.h>
+#include <taglib/mpeg/id3v2/id3v2tag.h>
+#include <taglib/mp4/mp4file.h>
+#include <taglib/mpc/mpcfile.h>
+#include <taglib/mpeg/mpegfile.h>
+#include <taglib/ogg/opus/opusfile.h>
+#include <taglib/toolkit/tlist.h>
+#include <taglib/toolkit/tmap.h>
 
 namespace cover {
 

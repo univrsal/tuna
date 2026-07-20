@@ -32,8 +32,8 @@ include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
 # --- Find taglib and libmpdclient ---
-if(UNIX)
-    # Linux & macOS: use system libraries via pkg-config
+if(UNIX AND NOT APPLE)
+    # Linux: use system libraries via pkg-config
     find_package(PkgConfig REQUIRED)
 
     pkg_check_modules(TAGLIB REQUIRED taglib)
@@ -46,9 +46,10 @@ if(UNIX)
     find_library(_libmpdclient_path mpdclient HINTS ${LIBMPDCLIENT_LIBRARY_DIRS} REQUIRED)
     set(LIBMPDCLIENT_TARGET ${_libmpdclient_path})
 else()
-    # Windows: use vcpkg for taglib, FetchContent for libmpdclient from deps/
+    # macOS / Windows: FetchContent-built static libs from deps/
     include_directories(${TAGLIB_INCLUDE_DIRS})
     include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+    add_definitions(-DTAGLIB_STATIC)
 endif()
 
 if (NOT CREDS)

@@ -35,7 +35,7 @@
 #include <mpd/client.h>
 #include <obs-frontend-api.h>
 #include <taglib/tag.h>
-#include <taglib/taglib.h>
+#include <taglib/toolkit/taglib.h>
 #include <util/platform.h>
 #ifndef GIT_COMMIT_HASH
 #    define GIT_COMMIT_HASH "n/a"
