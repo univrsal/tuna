@@ -100,17 +100,17 @@ tuna_gui::tuna_gui(QWidget* parent)
     connect(m_refresh, &QTimer::timeout, this, &tuna_gui::refresh);
     m_refresh->stop();
 
-    connect(ui->cb_dl_lyrics, &QCheckBox::stateChanged, this, [this](int s) {
+    connect(ui->cb_dl_lyrics, &QCheckBox::checkStateChanged, this, [this](int s) {
         ui->frame_lyrics->setEnabled(s == Qt::CheckState::Checked);
     });
 
-    connect(ui->cb_dl_cover, &QCheckBox::stateChanged, this, [this](int s) {
+    connect(ui->cb_dl_cover, &QCheckBox::checkStateChanged, this, [this](int s) {
         ui->cb_download_missing->setEnabled(s == Qt::CheckState::Checked);
         ui->cb_cover_size->setEnabled(s == Qt::CheckState::Checked && ui->cb_download_missing->isChecked());
         ui->frame_cover->setEnabled(s == Qt::CheckState::Checked);
     });
 
-    connect(ui->cb_download_missing, &QCheckBox::stateChanged, this, [this](int s) {
+    connect(ui->cb_download_missing, &QCheckBox::checkStateChanged, this, [this](int s) {
         ui->cb_cover_size->setEnabled(s == Qt::CheckState::Checked);
         ui->cb_always_download_missing->setEnabled(s == Qt::CheckState::Checked);
     });
