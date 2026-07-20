@@ -1,33 +1,27 @@
 set(CPPHTTPLIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/cpp-httplib CACHE STRING "" FORCE)
 
-# --- On Linux: use system libraries (found via pkg-config in root CMakeLists) ---
+# --- On Linux / macOS: use system libraries (found via pkg-config in root CMakeLists) ---
 # Nothing else to do here for taglib/libmpdclient.
 
-# --- On macOS / Windows: fetch and build taglib and libmpdclient statically ---
-if(NOT UNIX OR APPLE)
+# --- On Windows: get taglib from vcpkg, build libmpdclient via FetchContent ---
+if(WIN32)
   include(FetchContent)
 
-  # ---- taglib (v2.0.2) ----
-  FetchContent_Declare(
-    taglib
-    GIT_REPOSITORY https://github.com/taglib/taglib.git
-    GIT_TAG v2.0.2
-  )
+  # Use vcpkg to provide taglib (taglibConfig.cmake).
+  find_package(taglib CONFIG REQUIRED)
 
-  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-  set(BUILD_BINDINGS OFF CACHE BOOL "" FORCE)
-  set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-  set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-  set(ENABLE_CCACHE OFF CACHE BOOL "" FORCE)
-
-  FetchContent_MakeAvailable(taglib)
-
-  set(TAGLIB_INCLUDE_DIRS
-    ${taglib_SOURCE_DIR}/taglib
-    ${taglib_BINARY_DIR}/taglib
-    CACHE STRING "" FORCE
-  )
-  set(TAGLIB_TARGET tag CACHE STRING "" FORCE)
+  # vcpkg's taglib target is TagLib::tag (or TagLib::tag_c if using its C API).
+  # Use whichever target was imported — we just need the include dirs.
+  if(TARGET TagLib::tag)
+    set(TAGLIB_TARGET TagLib::tag CACHE STRING "" FORCE)
+    get_target_property(_tag_iface_include TagLib::tag INTERFACE_INCLUDE_DIRECTORIES)
+  elseif(TARGET TagLib::tag_c)
+    set(TAGLIB_TARGET TagLib::tag_c CACHE STRING "" FORCE)
+    get_target_property(_tag_iface_include TagLib::tag_c INTERFACE_INCLUDE_DIRECTORIES)
+  else()
+    message(FATAL_ERROR "vcpkg taglib target not found (expected TagLib::tag or TagLib::tag_c)")
+  endif()
+  set(TAGLIB_INCLUDE_DIRS ${_tag_iface_include} CACHE STRING "" FORCE)
 
   # ---- libmpdclient (v2.22, uses Meson so we compile sources manually) ----
   FetchContent_Declare(
@@ -88,7 +82,11 @@ if(NOT UNIX OR APPLE)
     target_compile_options(mpdclient PUBLIC -w)
   endif()
 
-  set(LIBMPDCLIENT_INCLUDE_DIRS ${libmpdclient_SOURCE_DIR}/include CACHE STRING "" FORCE)
+  set(LIBMPDCLIENT_INCLUDE_DIRS
+    ${libmpdclient_SOURCE_DIR}/include
+    ${libmpdclient_BINARY_DIR}/include
+    CACHE STRING "" FORCE
+  )
   set(LIBMPDCLIENT_TARGET mpdclient CACHE STRING "" FORCE)
 
 endif()

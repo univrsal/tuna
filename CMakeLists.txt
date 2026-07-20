@@ -32,8 +32,8 @@ include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
 # --- Find taglib and libmpdclient ---
-if(UNIX AND NOT APPLE)
-    # Linux: use system libraries via pkg-config
+if(UNIX)
+    # Linux & macOS: use system libraries via pkg-config
     find_package(PkgConfig REQUIRED)
 
     pkg_check_modules(TAGLIB REQUIRED taglib)
@@ -46,7 +46,7 @@ if(UNIX AND NOT APPLE)
     link_directories(${LIBMPDCLIENT_LIBRARY_DIRS})
     set(LIBMPDCLIENT_TARGET ${LIBMPDCLIENT_LIBRARIES})
 else()
-    # macOS / Windows: use FetchContent-built static libraries from deps/
+    # Windows: use vcpkg for taglib, FetchContent for libmpdclient from deps/
     include_directories(${TAGLIB_INCLUDE_DIRS})
     include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 endif()
@@ -120,7 +120,7 @@ if (UNIX AND NOT APPLE)
 elseif(APPLE)
         target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
 elseif(WIN32)
-        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
+        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0 -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
         target_sources(${CMAKE_PROJECT_NAME} PRIVATE
           ./src/query/wmc_source.cpp
           ./src/query/wmc_source.hpp

@@ -1,6 +1,17 @@
 name: Build Project
 on:
   workflow_call:
+    inputs:
+      lastfmKey:
+        description: 'API key for last.fm'
+        required: false
+        type: string
+        default: 'n/a'
+      spotifyToken:
+        description: 'API token for Spotify'
+        required: false
+        type: string
+        default: 'n/a'
     outputs:
       pluginName:
         description: Project name detected by parsing build spec file
@@ -141,6 +152,8 @@ jobs:
           config: ${{ needs.check-event.outputs.config }}
           codesign: ${{ fromJSON(needs.check-event.outputs.codesign) }}
           codesignIdent: ${{ steps.codesign.outputs.codesignIdent }}
+          lastfmKey: ${{ inputs.lastfmKey }}
+          spotifyToken: ${{ inputs.spotifyToken }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin
@@ -216,6 +229,8 @@ jobs:
         with:
           target: x86_64
           config: ${{ needs.check-event.outputs.config }}
+          lastfmKey: ${{ inputs.lastfmKey }}
+          spotifyToken: ${{ inputs.spotifyToken }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin
@@ -282,6 +297,8 @@ jobs:
         with:
           target: x64
           config: ${{ needs.check-event.outputs.config }}
+          lastfmKey: ${{ inputs.lastfmKey }}
+          spotifyToken: ${{ inputs.spotifyToken }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin

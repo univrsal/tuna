@@ -20,6 +20,14 @@ inputs:
     description: Team ID for application codesigning (macOS only)
     required: false
     default: ''
+  lastfmKey:
+    description: API key for last.fm
+    required: false
+    default: ''
+  spotifyToken:
+    description: API token for Spotify
+    required: false
+    default: ''
   workingDirectory:
     description: Working directory for packaging
     required: false
@@ -27,6 +35,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Set Up vcpkg & Install Taglib 📦
+      if: runner.os == 'macOS'
+      shell: zsh --no-rcs --errexit --pipefail {0}
+      run: |
+        : Install taglib via Homebrew
+        brew install taglib libmpdclient
+
     - name: Run macOS Build
       if: runner.os == 'macOS'
       shell: zsh --no-rcs --errexit --pipefail {0}
@@ -35,6 +50,9 @@ runs:
         CCACHE_DIR: ${{ inputs.workingDirectory }}/.ccache
         CODESIGN_IDENT: ${{ inputs.codesignIdent }}
         CODESIGN_TEAM: ${{ inputs.codesignTeam }}
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_CLIENT_SECRET: ${{ inputs.spotifyToken }}
+        SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         : Run macOS Build
 
@@ -55,7 +73,7 @@ runs:
         sudo apt update
       
         : Install system dependencies 🛍️
-        sudo apt install cmake ninja-build pkg-config clang clang-format build-essential curl ccache git zsh
+        sudo apt install cmake ninja-build pkg-config clang clang-format build-essential curl ccache git zsh libtag1-dev libmpdclient-dev
         
         : Install OBS dependencies 🛍️
         sudo apt install libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libx264-dev libcurl4-openssl-dev libmbedtls-dev libgl1-mesa-dev libjansson-dev libluajit-5.1-dev python3-dev libx11-dev libxcb-randr0-dev libxcb-shm0-dev libxcb-xinerama0-dev libxcb-composite0-dev libxcomposite-dev libxinerama-dev libxcb1-dev libx11-xcb-dev libxcb-xfixes0-dev swig libcmocka-dev libxss-dev libglvnd-dev libgles2-mesa-dev libwayland-dev librist-dev libsrt-openssl-dev libpci-dev libpipewire-0.3-dev libqrcodegencpp-dev uthash-dev
@@ -73,6 +91,9 @@ runs:
       working-directory: ${{ inputs.workingDirectory }}
       env:
         CCACHE_DIR: ${{ inputs.workingDirectory }}/.ccache
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_CLIENT_SECRET: ${{ inputs.spotifyToken }}
+        SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         : Run Ubuntu Build
 
@@ -84,9 +105,32 @@ runs:
 
         .github/scripts/build-ubuntu ${build_args}
 
+    - name: Set Up vcpkg & Install Taglib 📦
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        # Set Up vcpkg & Install Taglib
+        if ( $Env:RUNNER_DEBUG -ne $null ) {
+          Set-PSDebug -Trace 1
+        }
+        $VcpkgRoot = "C:/Users/runneradmin/Documents/git/vcpkg"
+        if (-not (Test-Path $VcpkgRoot)) {
+          git clone https://github.com/microsoft/vcpkg.git $VcpkgRoot
+          Push-Location $VcpkgRoot
+          .\bootstrap-vcpkg.bat
+          Pop-Location
+        }
+        $Env:VCPKG_ROOT = $VcpkgRoot
+        & "$VcpkgRoot/vcpkg.exe" install --triplet x64-windows
+        echo "VCPKG_ROOT=$VcpkgRoot" >> $env:GITHUB_ENV
+
     - name: Run Windows Build
       if: runner.os == 'Windows'
       shell: pwsh
+      env:
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_CLIENT_SECRET: ${{ inputs.spotifyToken }}
+        SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         # Run Windows Build
         if ( $Env:RUNNER_DEBUG -ne $null ) {

@@ -7,3 +7,6 @@ build-tuna*/
 /cmake-build-debug/
 *.generated.h
 build_*/
+.deps/
+vcpkg_installed/
+.vs/

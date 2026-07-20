@@ -25,7 +25,7 @@
 #include "../util/utility.hpp"
 #include <QStringList>
 #include <obs-module.h>
-#include <taglib/fileref.h>
+#include <taglib/tag.h>
 
 mpd_source::mpd_source()
     : music_source(S_SOURCE_MPD, T_SOURCE_MPD, new mpd)
