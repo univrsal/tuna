@@ -76,7 +76,6 @@ function Package {
     Copy-Item -Path "${ProjectRoot}/release/${Configuration}/${ProductName}/bin" -Destination "${ProjectRoot}/release/Package/obs-plugins" -Recurse
     Copy-Item -Path "${ProjectRoot}/release/${Configuration}/${ProductName}/data" -Destination "${ProjectRoot}/release/Package/data/obs-plugins/${ProductName}" -Recurse
     Copy-Item "${IsccFile}" -Destination "${ProjectRoot}/release"
-    Copy-Item "${ProjectRoot}/media/icon.ico" -Destination "${ProjectRoot}/release"
 
     Log-Information 'Creating InnoSetup installer...'
     Push-Location -Stack BuildTemp

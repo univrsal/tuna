@@ -25,7 +25,7 @@ AllowNoIcons=yes
 ; Wizard Information
 WizardStyle=modern
 WizardResizable=yes
-SetupIconFile="../media/icon.ico"
+; SetupIconFile="../media/icon.ico"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
