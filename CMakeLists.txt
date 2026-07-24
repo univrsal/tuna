@@ -126,6 +126,11 @@ elseif(WIN32)
           ./src/gui/widgets/wmc.hpp
           ./src/gui/widgets/wmc.ui
         )
+        configure_file(
+            cmake/windows/resources/installer-Windows.iss.in
+            ${CMAKE_BINARY_DIR}/installer-Windows.generated.iss
+            @ONLY
+        )
 endif()
 
 if (LOCAL_INSTALLATION)
