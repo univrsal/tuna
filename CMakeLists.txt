@@ -31,22 +31,10 @@ include_directories(${LIBCURL_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
 
-# --- Find taglib and libmpdclient ---
+# --- Find libmpdclient ---
 if(UNIX AND NOT APPLE)
-    # Linux: use system libraries via pkg-config
+    # Linux: use system libmpdclient via pkg-config
     find_package(PkgConfig REQUIRED)
-
-    pkg_check_modules(TAGLIB REQUIRED taglib)
-    # Strip trailing "/taglib" from pkg-config include dir so that
-    # #include <taglib/toolkit/taglib.h> resolves correctly.
-    foreach(_dir IN LISTS TAGLIB_INCLUDE_DIRS)
-        string(REGEX REPLACE "/taglib$" "" _dir "${_dir}")
-        list(APPEND _taglib_fixed_dirs "${_dir}")
-    endforeach()
-    set(TAGLIB_INCLUDE_DIRS ${_taglib_fixed_dirs})
-    include_directories(${TAGLIB_INCLUDE_DIRS})
-    find_library(_taglib_path tag HINTS ${TAGLIB_LIBRARY_DIRS} REQUIRED)
-    set(TAGLIB_TARGET ${_taglib_path})
 
     pkg_check_modules(LIBMPDCLIENT REQUIRED libmpdclient)
     include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
@@ -54,10 +42,12 @@ if(UNIX AND NOT APPLE)
     set(LIBMPDCLIENT_TARGET ${_libmpdclient_path})
 else()
     # macOS / Windows: FetchContent-built static libs from deps/
-    include_directories(${TAGLIB_INCLUDE_DIRS})
     include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
-    add_definitions(-DTAGLIB_STATIC)
 endif()
+
+# taglib is always built via FetchContent (see deps/CMakeLists.txt)
+include_directories(${TAGLIB_INCLUDE_DIRS})
+add_definitions(-DTAGLIB_STATIC)
 
 if (NOT CREDS)
     # Try getting the credentials from the environment

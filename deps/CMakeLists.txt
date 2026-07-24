@@ -1,62 +1,58 @@
 set(CPPHTTPLIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/cpp-httplib CACHE STRING "" FORCE)
 
-# --- On Linux: use system libraries (found via pkg-config in root CMakeLists) ---
-# Nothing else to do here for taglib/libmpdclient.
+# --- taglib: use FetchContent everywhere for consistent v2.x layout ---
+include(FetchContent)
+FetchContent_Declare(
+  taglib
+  GIT_REPOSITORY https://github.com/taglib/taglib.git
+  GIT_TAG v2.3.1
+)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_BINDINGS OFF CACHE BOOL "" FORCE)
+set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+set(ENABLE_CCACHE OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(taglib)
 
-# --- On Windows / macOS: build taglib from source, libmpdclient via FetchContent ---
+set(TAGLIB_INCLUDE_DIRS
+  ${taglib_SOURCE_DIR}
+  ${taglib_SOURCE_DIR}/taglib
+  ${taglib_SOURCE_DIR}/taglib/toolkit
+  ${taglib_SOURCE_DIR}/taglib/asf
+  ${taglib_SOURCE_DIR}/taglib/mpeg
+  ${taglib_SOURCE_DIR}/taglib/mpeg/id3v1
+  ${taglib_SOURCE_DIR}/taglib/mpeg/id3v2
+  ${taglib_SOURCE_DIR}/taglib/mpeg/id3v2/frames
+  ${taglib_SOURCE_DIR}/taglib/ogg
+  ${taglib_SOURCE_DIR}/taglib/ogg/flac
+  ${taglib_SOURCE_DIR}/taglib/flac
+  ${taglib_SOURCE_DIR}/taglib/mpc
+  ${taglib_SOURCE_DIR}/taglib/mp4
+  ${taglib_SOURCE_DIR}/taglib/ogg/vorbis
+  ${taglib_SOURCE_DIR}/taglib/ogg/speex
+  ${taglib_SOURCE_DIR}/taglib/ogg/opus
+  ${taglib_SOURCE_DIR}/taglib/ape
+  ${taglib_SOURCE_DIR}/taglib/wavpack
+  ${taglib_SOURCE_DIR}/taglib/trueaudio
+  ${taglib_SOURCE_DIR}/taglib/riff
+  ${taglib_SOURCE_DIR}/taglib/riff/aiff
+  ${taglib_SOURCE_DIR}/taglib/riff/wav
+  ${taglib_SOURCE_DIR}/taglib/mod
+  ${taglib_SOURCE_DIR}/taglib/s3m
+  ${taglib_SOURCE_DIR}/taglib/it
+  ${taglib_SOURCE_DIR}/taglib/xm
+  ${taglib_SOURCE_DIR}/taglib/dsf
+  ${taglib_SOURCE_DIR}/taglib/dsdiff
+  ${taglib_SOURCE_DIR}/taglib/shorten
+  ${taglib_SOURCE_DIR}/taglib/matroska
+  ${taglib_SOURCE_DIR}/taglib/matroska/ebml
+  ${taglib_BINARY_DIR}
+  CACHE STRING "" FORCE
+)
+set(TAGLIB_TARGET tag CACHE STRING "" FORCE)
+
+# --- libmpdclient: system on Linux, FetchContent on macOS/Windows ---
 if(WIN32 OR APPLE)
-  include(FetchContent)
-
-  # taglib: build from source for correct include layout (taglib/ape/apefile.h etc.)
-  FetchContent_Declare(
-    taglib
-    GIT_REPOSITORY https://github.com/taglib/taglib.git
-    GIT_TAG v2.3.1
-  )
-  set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-  set(BUILD_BINDINGS OFF CACHE BOOL "" FORCE)
-  set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-  set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-  set(ENABLE_CCACHE OFF CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(taglib)
-
-  set(TAGLIB_INCLUDE_DIRS
-    ${taglib_SOURCE_DIR}
-    ${taglib_SOURCE_DIR}/taglib/toolkit
-    ${taglib_SOURCE_DIR}/taglib/asf
-    ${taglib_SOURCE_DIR}/taglib/mpeg
-    ${taglib_SOURCE_DIR}/taglib/mpeg/id3v1
-    ${taglib_SOURCE_DIR}/taglib/mpeg/id3v2
-    ${taglib_SOURCE_DIR}/taglib/mpeg/id3v2/frames
-    ${taglib_SOURCE_DIR}/taglib/ogg
-    ${taglib_SOURCE_DIR}/taglib/ogg/flac
-    ${taglib_SOURCE_DIR}/taglib/flac
-    ${taglib_SOURCE_DIR}/taglib/mpc
-    ${taglib_SOURCE_DIR}/taglib/mp4
-    ${taglib_SOURCE_DIR}/taglib/ogg/vorbis
-    ${taglib_SOURCE_DIR}/taglib/ogg/speex
-    ${taglib_SOURCE_DIR}/taglib/ogg/opus
-    ${taglib_SOURCE_DIR}/taglib/ape
-    ${taglib_SOURCE_DIR}/taglib/wavpack
-    ${taglib_SOURCE_DIR}/taglib/trueaudio
-    ${taglib_SOURCE_DIR}/taglib/riff
-    ${taglib_SOURCE_DIR}/taglib/riff/aiff
-    ${taglib_SOURCE_DIR}/taglib/riff/wav
-    ${taglib_SOURCE_DIR}/taglib/mod
-    ${taglib_SOURCE_DIR}/taglib/s3m
-    ${taglib_SOURCE_DIR}/taglib/it
-    ${taglib_SOURCE_DIR}/taglib/xm
-    ${taglib_SOURCE_DIR}/taglib/dsf
-    ${taglib_SOURCE_DIR}/taglib/dsdiff
-    ${taglib_SOURCE_DIR}/taglib/shorten
-    ${taglib_SOURCE_DIR}/taglib/matroska
-    ${taglib_SOURCE_DIR}/taglib/matroska/ebml
-    ${taglib_BINARY_DIR}
-    CACHE STRING "" FORCE
-  )
-  set(TAGLIB_TARGET tag CACHE STRING "" FORCE)
-
-  # ---- libmpdclient (v2.22, uses Meson so we compile sources manually) ----
   FetchContent_Declare(
     libmpdclient
     GIT_REPOSITORY https://github.com/MusicPlayerDaemon/libmpdclient.git
