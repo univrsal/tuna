@@ -9,10 +9,21 @@ on:
         type: choice
         options:
           - build
+      LASTFM_KEY:
+        description: 'API key for last.fm'
+        required: false
+        default: 'n/a'
+      SPOTIFY_TOKEN:
+        description: 'API key for Spotify'
+        required: false
+        default: 'n/a'
 permissions:
   contents: write
 jobs:
   check-and-build:
     if: inputs.job == 'build'
     uses: ./.github/workflows/build-project.yaml
+    with:
+      lastfmKey: ${{ inputs.LASTFM_KEY }}
+      spotifyToken: ${{ inputs.SPOTIFY_TOKEN }}
     secrets: inherit

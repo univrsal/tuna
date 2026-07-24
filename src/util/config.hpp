@@ -57,6 +57,7 @@
 #define CFG_DOWNLOAD_LYRICS             "download_lyrics"
 #define CFG_DOWNLOAD_COVER              "download_cover"
 #define CFG_DOWNLOAD_MISSING_COVER      "download_missing_cover"
+#define CFG_ALWAYS_DOWNLOAD_COVERS      "always_download_covers"
 #define CFG_COVER_SIZE                  "cover_size"
 #define CFG_REMOVE_EXTENSIONS           "removeextensions"
 #define CFG_PROXY                       "proxy"
@@ -134,6 +135,7 @@ extern bool webserver_enabled;
 extern bool download_cover;
 extern bool download_lyrics;
 extern bool download_missing_cover;
+extern bool always_download_covers;
 extern bool remove_file_extensions;
 extern bool placeholder_when_paused;
 extern uint16_t cover_size;

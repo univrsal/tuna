@@ -34,10 +34,9 @@
 #include <httplib.h>
 #include <mpd/client.h>
 #include <obs-frontend-api.h>
-#include <string>
-#include <taglib/taglib.h>
+#include <taglib/tag.h>
+#include <taglib/toolkit/taglib.h>
 #include <util/platform.h>
-
 #ifndef GIT_COMMIT_HASH
 #    define GIT_COMMIT_HASH "n/a"
 #endif
@@ -55,7 +54,7 @@ tuna_gui::tuna_gui(QWidget* parent)
     ui->setupUi(this);
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply_pressed()));
     connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(tuna_gui_accepted()));
-    connect(ui->cb_download_missing, SIGNAL(stateChanged(int)), this, SLOT(cb_download_missing_covers_clicked));
+    connect(ui->cb_download_missing, SIGNAL(checkStateChanged(int)), this, SLOT(cb_download_missing_covers_clicked(int)));
 
     /* Other signals */
 #define ADD_SIGNAL(btn) connect(ui->btn, SIGNAL(clicked()), this, SLOT(btn##_clicked()))
@@ -101,30 +100,19 @@ tuna_gui::tuna_gui(QWidget* parent)
     connect(m_refresh, &QTimer::timeout, this, &tuna_gui::refresh);
     m_refresh->stop();
 
-    int i = 0;
-    for (const auto& Size : { 64, 128, 256, 512, 1024 }) {
-        ui->cb_cover_size->addItem(QString::number(Size) + "x" + QString::number(Size), Size);
-        if (config::cover_size == Size)
-            ui->cb_cover_size->setCurrentIndex(i);
-        i++;
-    }
-    ui->cb_cover_size->addItem(T_LARGEST_COVER, 8129);
-
-    if (config::cover_size == 8129)
-        ui->cb_cover_size->setCurrentIndex(i);
-
     connect(ui->cb_dl_lyrics, &QCheckBox::stateChanged, this, [this](int s) {
-        ui->frame_lyrics->setEnabled(s == Qt::CheckState::Checked);
+        ui->frame_lyrics->setEnabled(s == Qt::Checked);
     });
 
     connect(ui->cb_dl_cover, &QCheckBox::stateChanged, this, [this](int s) {
-        ui->cb_download_missing->setEnabled(s == Qt::CheckState::Checked);
-        ui->cb_cover_size->setEnabled(s == Qt::CheckState::Checked && ui->cb_download_missing->isChecked());
-        ui->frame_cover->setEnabled(s == Qt::CheckState::Checked);
+        ui->cb_download_missing->setEnabled(s == Qt::Checked);
+        ui->cb_cover_size->setEnabled(s == Qt::Checked && ui->cb_download_missing->isChecked());
+        ui->frame_cover->setEnabled(s == Qt::Checked);
     });
 
     connect(ui->cb_download_missing, &QCheckBox::stateChanged, this, [this](int s) {
-        ui->cb_cover_size->setEnabled(s == Qt::CheckState::Checked);
+        ui->cb_cover_size->setEnabled(s == Qt::Checked);
+        ui->cb_always_download_missing->setEnabled(s == Qt::Checked);
     });
 }
 
@@ -154,6 +142,18 @@ void tuna_gui::toggleShowHide()
         /* Load config values for sources on dialog show */
         music_sources::set_gui_values();
 
+        int i = 0;
+        for (const auto& Size : { 64, 128, 256, 512, 1024 }) {
+            ui->cb_cover_size->addItem(QString::number(Size) + "x" + QString::number(Size), Size);
+            if (config::cover_size == Size)
+                ui->cb_cover_size->setCurrentIndex(i);
+            i++;
+        }
+        ui->cb_cover_size->addItem(T_LARGEST_COVER, 8129);
+
+        if (config::cover_size == 8129)
+            ui->cb_cover_size->setCurrentIndex(i);
+
         /* load basic values */
         ui->txt_song_cover->setText(config::cover_path);
         ui->txt_song_lyrics->setText(config::lyrics_path);
@@ -163,12 +163,14 @@ void tuna_gui::toggleShowHide()
         ui->cb_dl_lyrics->setChecked(config::download_lyrics);
         ui->cb_dl_cover->setChecked(config::download_cover);
         ui->cb_download_missing->setChecked(config::download_missing_cover);
+        ui->cb_always_download_missing->setChecked(config::always_download_covers);
         auto idx = ui->cb_source->findData(config::selected_source);
 
         ui->frame_lyrics->setEnabled(ui->cb_dl_lyrics->isChecked());
         ui->frame_cover->setEnabled(ui->cb_dl_cover->isChecked());
         ui->cb_download_missing->setEnabled(ui->cb_dl_cover->isChecked());
         ui->cb_cover_size->setEnabled(ui->cb_dl_cover->isChecked() && ui->cb_download_missing->isChecked());
+        ui->cb_always_download_missing->setEnabled(ui->cb_dl_cover->isChecked() && ui->cb_download_missing->isChecked());
 
         if (idx >= 0)
             ui->cb_source->setCurrentIndex(idx);
@@ -228,6 +230,7 @@ void tuna_gui::tuna_gui_accepted()
     config::placeholder = qt_to_utf8(ui->txt_song_placeholder->text());
     config::download_lyrics = ui->cb_dl_lyrics->isChecked();
     config::download_cover = ui->cb_dl_cover->isChecked();
+    config::always_download_covers = ui->cb_always_download_missing->isChecked();
     config::download_missing_cover = ui->cb_download_missing->isChecked();
     config::webserver_enabled = ui->cb_host_server->isChecked();
     config::webserver_port = ui->sb_web_port->value();

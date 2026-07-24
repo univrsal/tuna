@@ -51,6 +51,7 @@ bool webserver_enabled = false;
 bool download_cover = true;
 bool download_lyrics = false;
 bool download_missing_cover = true;
+bool always_download_covers = false;
 bool placeholder_when_paused = true;
 bool remove_file_extensions = true;
 
@@ -58,7 +59,7 @@ void init()
 {
     util::create_config_folder();
     if (!instance)
-        instance = obs_frontend_get_global_config();
+        instance = obs_frontend_get_user_config();
 
     QDir home = QDir::homePath();
     QString path_song_file = QDir::toNativeSeparators(home.absoluteFilePath("song.txt"));
@@ -77,6 +78,7 @@ void init()
     CDEF_BOOL(CFG_DOWNLOAD_LYRICS, config::download_lyrics);
     CDEF_BOOL(CFG_DOWNLOAD_COVER, config::download_cover);
     CDEF_BOOL(CFG_DOWNLOAD_MISSING_COVER, config::download_missing_cover);
+    CDEF_BOOL(CFG_ALWAYS_DOWNLOAD_COVERS, config::always_download_covers);
     CDEF_UINT(CFG_COVER_SIZE, config::cover_size);
     CDEF_UINT(CFG_REFRESH_RATE, config::refresh_rate);
     CDEF_UINT(CFG_SERVER_PORT, config::webserver_port);
@@ -108,6 +110,7 @@ void load()
     download_lyrics = CGET_BOOL(CFG_DOWNLOAD_LYRICS);
     download_cover = CGET_BOOL(CFG_DOWNLOAD_COVER);
     download_missing_cover = CGET_BOOL(CFG_DOWNLOAD_MISSING_COVER);
+    always_download_covers = CGET_BOOL(CFG_ALWAYS_DOWNLOAD_COVERS);
     placeholder_when_paused = CGET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED);
     remove_file_extensions = CGET_BOOL(CFG_REMOVE_EXTENSIONS);
     webserver_enabled = CGET_BOOL(CFG_SERVER_ENABLED);
@@ -143,6 +146,7 @@ void save()
     CSET_BOOL(CFG_DOWNLOAD_LYRICS, download_lyrics);
     CSET_BOOL(CFG_DOWNLOAD_COVER, download_cover);
     CSET_BOOL(CFG_DOWNLOAD_MISSING_COVER, download_missing_cover);
+    CSET_BOOL(CFG_ALWAYS_DOWNLOAD_COVERS, always_download_covers);
     CSET_BOOL(CFG_PLACEHOLDER_WHEN_PAUSED, placeholder_when_paused);
     CSET_BOOL(CFG_REMOVE_EXTENSIONS, remove_file_extensions);
     CSET_BOOL(CFG_SERVER_ENABLED, webserver_enabled);

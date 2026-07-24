@@ -52,9 +52,9 @@ public:
     QString get_scene_collection();
 private slots:
     void on_btn_refresh_vlc_clicked();
-    void on_scene_changed(int index);
-    void on_add_source();
-    void on_remove_source();
+    void scene_selection_changed(int index);
+    void add_vlc_source();
+    void remove_vlc_source();
 
 private:
     void set_map(const QString& scene, const QJsonArray&);

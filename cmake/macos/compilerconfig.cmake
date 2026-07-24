@@ -22,8 +22,8 @@ set_property(CACHE CMAKE_OSX_ARCHITECTURES PROPERTY STRINGS arm64 x86_64)
 
 # Ensure recent enough Xcode and platform SDK
 function(check_sdk_requirements)
-  set(_obs_macos_minimum_sdk 14.2) # Keep in sync with Xcode
-  set(_obs_macos_minimum_xcode 15.1) # Keep in sync with SDK
+  set(obs_macos_minimum_sdk 15.0) # Keep in sync with Xcode
+  set(obs_macos_minimum_xcode 16.0) # Keep in sync with SDK
   execute_process(
     COMMAND xcrun --sdk macosx --show-sdk-platform-version
     OUTPUT_VARIABLE obs_macos_current_sdk

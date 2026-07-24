@@ -1,33 +1,37 @@
-name: 'Set up and build plugin'
-description: 'Builds the plugin for specified architecture and build config'
+name: Set up and build plugin
+description: Builds the plugin for specified architecture and build config
 inputs:
   target:
-    description: 'Target architecture for dependencies'
+    description: Target architecture for dependencies
     required: true
   config:
-    description: 'Build configuration'
+    description: Build configuration
     required: false
-    default: 'RelWithDebInfo'
+    default: RelWithDebInfo
   codesign:
-    description: 'Enable codesigning (macOS only)'
+    description: Enable codesigning (macOS only)
     required: false
     default: 'false'
   codesignIdent:
-    description: 'Developer ID for application codesigning (macOS only)'
+    description: Developer ID for application codesigning (macOS only)
     required: false
     default: '-'
+  codesignTeam:
+    description: Team ID for application codesigning (macOS only)
+    required: false
+    default: ''
+  lastfmKey:
+    description: API key for last.fm
+    required: false
+    default: ''
+  spotifyToken:
+    description: API token for Spotify
+    required: false
+    default: ''
   workingDirectory:
-    description: 'Working directory for packaging'
+    description: Working directory for packaging
     required: false
     default: ${{ github.workspace }}
-  LASTFM_KEY:
-    description: 'API key for last.fm'
-    required: false
-    default: 'n/a'
-  SPOTIFY_TOKEN:
-    description: 'API key for Spotify'
-    required: false
-    default: 'n/a'
 runs:
   using: composite
   steps:
@@ -36,10 +40,11 @@ runs:
       shell: zsh --no-rcs --errexit --pipefail {0}
       working-directory: ${{ inputs.workingDirectory }}
       env:
+        CCACHE_DIR: ${{ inputs.workingDirectory }}/.ccache
         CODESIGN_IDENT: ${{ inputs.codesignIdent }}
         CODESIGN_TEAM: ${{ inputs.codesignTeam }}
-        LASTFM_KEY: ${{ inputs.LASTFM_KEY }}
-        SPOTIFY_CLIENT_SECRET: ${{ inputs.SPOTIFY_TOKEN }}
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_CLIENT_SECRET: ${{ inputs.spotifyToken }}
         SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         : Run macOS Build
@@ -49,6 +54,7 @@ runs:
 
         if [[ '${{ inputs.codesign }}' == 'true' ]] build_args+=(--codesign)
 
+        git fetch origin --no-tags --no-recurse-submodules -q
         .github/scripts/build-macos ${build_args}
 
     - name: Install Dependencies 🛍️
@@ -57,6 +63,16 @@ runs:
       run: |
         : Install Dependencies 🛍️
         echo ::group::Install Dependencies
+        sudo apt update
+      
+        : Install system dependencies 🛍️
+        sudo apt install cmake ninja-build pkg-config clang clang-format build-essential curl ccache git zsh libtag1-dev libmpdclient-dev libdbus-1-dev
+        
+        : Install OBS dependencies 🛍️
+        sudo apt install libavcodec-dev libavdevice-dev libavfilter-dev libavformat-dev libavutil-dev libswresample-dev libswscale-dev libx264-dev libcurl4-openssl-dev libmbedtls-dev libgl1-mesa-dev libjansson-dev libluajit-5.1-dev python3-dev libx11-dev libxcb-randr0-dev libxcb-shm0-dev libxcb-xinerama0-dev libxcb-composite0-dev libxcomposite-dev libxinerama-dev libxcb1-dev libx11-xcb-dev libxcb-xfixes0-dev swig libcmocka-dev libxss-dev libglvnd-dev libgles2-mesa-dev libwayland-dev librist-dev libsrt-openssl-dev libpci-dev libpipewire-0.3-dev libqrcodegencpp-dev uthash-dev
+        
+        : Install OBS Qt6 dependencies 🛍️
+        sudo apt install qt6-base-dev qt6-base-private-dev libqt6svg6-dev qt6-wayland qt6-image-formats-plugins
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
         brew install --quiet zsh
@@ -67,26 +83,27 @@ runs:
       shell: zsh --no-rcs --errexit --pipefail {0}
       working-directory: ${{ inputs.workingDirectory }}
       env:
-        LASTFM_KEY: ${{ inputs.LASTFM_KEY }}
-        SPOTIFY_CLIENT_SECRET: ${{ inputs.SPOTIFY_TOKEN }}
+        CCACHE_DIR: ${{ inputs.workingDirectory }}/.ccache
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_CLIENT_SECRET: ${{ inputs.spotifyToken }}
         SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         : Run Ubuntu Build
 
         local -a build_args=(
-          --target linux-${{ inputs.target }}
+          --target ubuntu-${{ inputs.target }}
           --config ${{ inputs.config }}
         )
         if (( ${+RUNNER_DEBUG} )) build_args+=(--debug)
 
-        .github/scripts/build-linux ${build_args}
+        .github/scripts/build-ubuntu ${build_args}
 
     - name: Run Windows Build
       if: runner.os == 'Windows'
       shell: pwsh
       env:
-        LASTFM_KEY: ${{ inputs.LASTFM_KEY }}
-        SPOTIFY_CLIENT_SECRET: ${{ inputs.SPOTIFY_TOKEN }}
+        LASTFM_KEY: ${{ inputs.lastfmKey }}
+        SPOTIFY_CLIENT_SECRET: ${{ inputs.spotifyToken }}
         SPOTIFY_CLIENT_ID: 847d7cf0c5dc4ff185161d1f000a9d0e
       run: |
         # Run Windows Build
@@ -105,7 +122,7 @@ runs:
       if: contains(fromJSON('["Linux", "macOS"]'),runner.os)
       shell: zsh --no-rcs --errexit --pipefail {0}
       env:
-        CCACHE_CONFIGPATH: ${{ inputs.workingDirectory }}/.ccache.conf
+        CCACHE_DIR: ${{ inputs.workingDirectory }}/.ccache
       run: |
         : Create Summary 📊
 

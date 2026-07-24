@@ -19,7 +19,7 @@
 #include "lyrics_handler.hpp"
 #include "utility.hpp"
 #include <taglib/fileref.h>
-#include <taglib/tpropertymap.h>
+#include <taglib/toolkit/tpropertymap.h>
 namespace lyrics {
 
 bool download_missing_lyrics(const song&)

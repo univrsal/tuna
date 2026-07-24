@@ -85,7 +85,7 @@ void init()
             music_dock->add_source(utf8_to_qt(s->name()), utf8_to_qt(s->id()));
     }
 
-    const auto s = config_get_string(obs_frontend_get_global_config(), CFG_REGION, CFG_SELECTED_SOURCE);
+    const auto s = config_get_string(obs_frontend_get_user_config(), CFG_REGION, CFG_SELECTED_SOURCE);
     auto i = 0;
     auto selected_source = -1;
     for (const auto& src : std::as_const(music_sources::instances)) {
@@ -174,11 +174,16 @@ void deinit()
 bool music_source::download_missing_cover()
 {
     static const QString request = "https://itunes.apple.com/search?term={}&media=music&entity=album"; // should we also look for singles?
-    if (config::download_missing_cover && m_current.has_cover_lookup_information()) {
+    if ((config::download_missing_cover || config::always_download_covers) && m_current.has_cover_lookup_information()) {
         auto artists = m_current.get<QStringList>(meta::ARTIST);
-        auto search_term = QUrl::toPercentEncoding(artists[0] + " " + m_current.get(meta::ALBUM));
+        auto album_or_title = m_current.get(meta::ALBUM);
+        if (album_or_title.isEmpty())
+            album_or_title = m_current.get(meta::TITLE);
+
+        auto search_term = QUrl::toPercentEncoding(artists[0] + " " + album_or_title);
         auto url = request;
         url = url.replace("{}", search_term);
+        binfo("Downloading missing cover for %s - %s from %s", qt_to_utf8(artists[0]), qt_to_utf8(album_or_title), qt_to_utf8(url));
         auto doc = util::curl_get_json(qt_to_utf8(url));
         if (doc["results"].isArray()) {
             if (doc["results"].toArray().isEmpty())
@@ -189,7 +194,9 @@ bool music_source::download_missing_cover()
             // has a matching title. (We search if the title contains the currently playing title or the other
             // way around in case the titles aren't exactly the same (eg. it has something like a "(Single)"
             // prefix or postfix
-            if (!first["collectionName"].toString().toLower().contains(m_current.get(meta::TITLE).toLower()) || m_current.get(meta::TITLE).toLower().contains(first["collectionName"].toString().toLower())) {
+
+            auto coll = first["collectionName"].toString().toLower();
+            if (!coll.contains(album_or_title.toLower()) && !album_or_title.toLower().contains(coll)) {
                 return false;
             }
             if (first["artworkUrl60"].isString()) {
@@ -233,6 +240,13 @@ void music_source::handle_cover()
         return;
 
     if (m_current.get<int>(meta::STATUS) == state_playing) {
+        if (config::always_download_covers) {
+            // basically just the inverse, try itunes first, then fallback to getting it from the file
+            if (!download_missing_cover() && !util::download_cover(m_current.get(meta::COVER))) {
+                util::reset_cover();
+            }
+            return;
+        }
         if (!util::download_cover(m_current.get(meta::COVER))) {
             if (!download_missing_cover())
                 util::reset_cover();

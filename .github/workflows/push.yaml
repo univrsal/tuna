@@ -1,4 +1,4 @@
-name: Push to master
+name: Push
 run-name: ${{ github.ref_name }} push run 🚀
 on:
   push:
@@ -10,10 +10,14 @@ on:
       - '*'
 permissions:
   contents: write
-concurrency:
-  group: '${{ github.workflow }} @ ${{ github.ref }}'
-  cancel-in-progress: ${{ github.ref_type == 'tag' }}
 jobs:
+  check-format:
+    name: Check Formatting 🔍
+    if: github.ref_name == 'master' || github.ref_name == 'main'
+    uses: ./.github/workflows/check-format.yaml
+    permissions:
+      contents: read
+
   build-project:
     name: Build Project 🧱
     uses: ./.github/workflows/build-project.yaml
@@ -24,7 +28,7 @@ jobs:
   create-release:
     name: Create Release 🛫
     if: github.ref_type == 'tag'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: build-project
     defaults:
       run:
@@ -37,9 +41,19 @@ jobs:
           if [[ "${RUNNER_DEBUG}" ]]; then set -x; fi
           shopt -s extglob
 
-          echo 'validTag=true' >> $GITHUB_OUTPUT
-          echo 'prerelease=false' >> $GITHUB_OUTPUT
-          echo "version=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          case "${GITHUB_REF_NAME}" in
+            +([0-9]).+([0-9]).+([0-9]) )
+              echo 'validTag=true' >> $GITHUB_OUTPUT
+              echo 'prerelease=false' >> $GITHUB_OUTPUT
+              echo "version=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+              ;;
+            +([0-9]).+([0-9]).+([0-9])-@(beta|rc)*([0-9]) )
+              echo 'validTag=true' >> $GITHUB_OUTPUT
+              echo 'prerelease=true' >> $GITHUB_OUTPUT
+              echo "version=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+              ;;
+            *) echo 'validTag=false' >> $GITHUB_OUTPUT ;;
+          esac
 
       - name: Download Build Artifacts 📥
         uses: actions/download-artifact@v4
@@ -59,7 +73,8 @@ jobs:
 
           variants=(
             'windows-x64;zip|exe'
-            'ubuntu-22.04-x86_64;tar.xz|deb|ddeb'
+            'macos-universal;tar.xz|pkg'
+            'ubuntu-24.04-x86_64;tar.xz|deb|ddeb'
             'sources;tar.xz'
           )
 

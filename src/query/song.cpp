@@ -41,10 +41,11 @@ void song::clear()
 
 bool song::has_cover_lookup_information() const
 {
-    auto has_meta = has(meta::ARTIST) && has(meta::ALBUM);
+    auto has_meta = has(meta::ARTIST) && (has(meta::ALBUM) || has(meta::TITLE));
     auto artists = get<QStringList>(meta::ARTIST);
     auto album = get(meta::ALBUM);
-    return has_meta && !artists.isEmpty() && !album.isEmpty();
+    auto title = get(meta::TITLE);
+    return has_meta && !artists.isEmpty() && (!album.isEmpty() || !title.isEmpty());
 }
 
 void song::update_release_precision()

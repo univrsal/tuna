@@ -39,9 +39,9 @@ vlc::vlc(QWidget* parent)
     auto* spacer = new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding);
     ui->verticalLayout->addWidget(m_list);
     ui->verticalLayout->addItem(spacer);
-    connect(ui->cb_scene, qOverload<int>(&QComboBox::currentIndexChanged), this, &vlc::on_scene_changed);
-    connect(ui->btn_add_source, &QPushButton::clicked, this, &vlc::on_add_source);
-    connect(ui->btn_remove_source, &QPushButton::clicked, this, &vlc::on_remove_source);
+    connect(ui->cb_scene, qOverload<int>(&QComboBox::currentIndexChanged), this, &vlc::scene_selection_changed);
+    connect(ui->btn_add_source, &QPushButton::clicked, this, &vlc::add_vlc_source);
+    connect(ui->btn_remove_source, &QPushButton::clicked, this, &vlc::remove_vlc_source);
 }
 
 vlc::~vlc()
@@ -156,7 +156,7 @@ void vlc::on_btn_refresh_vlc_clicked()
     load_vlc_sources();
 }
 
-void vlc::on_scene_changed(int)
+void vlc::scene_selection_changed(int)
 {
     refresh_sources();
     m_list->clear();
@@ -173,7 +173,7 @@ void vlc::on_scene_changed(int)
     }
 }
 
-void vlc::on_remove_source()
+void vlc::remove_vlc_source()
 {
     m_list->takeItem(m_list->currentRow());
     rebuild_from_list();
@@ -223,7 +223,7 @@ QString vlc::get_scene_collection()
     return str;
 }
 
-void vlc::on_add_source()
+void vlc::add_vlc_source()
 {
     auto src_id = ui->cb_source->currentText();
     auto scene_id = ui->cb_scene->currentText();

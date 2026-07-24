@@ -28,10 +28,26 @@ find_package(CURL REQUIRED)
 find_package(ZLIB REQUIRED)
 include_directories(${ZLIB_INCLUDE_DIR})
 include_directories(${LIBCURL_INCLUDE_DIRS})
-include_directories(${TAGLIB_INCLUDE_DIRS})
-include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
 include_directories(${CPPHTTPLIB_INCLUDE_DIRS})
 add_definitions(${LIBCURL_DEFINITIONS})
+
+# --- Find libmpdclient ---
+if(UNIX AND NOT APPLE)
+    # Linux: use system libmpdclient via pkg-config
+    find_package(PkgConfig REQUIRED)
+
+    pkg_check_modules(LIBMPDCLIENT REQUIRED libmpdclient)
+    include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+    find_library(_libmpdclient_path mpdclient HINTS ${LIBMPDCLIENT_LIBRARY_DIRS} REQUIRED)
+    set(LIBMPDCLIENT_TARGET ${_libmpdclient_path})
+else()
+    # macOS / Windows: FetchContent-built static libs from deps/
+    include_directories(${LIBMPDCLIENT_INCLUDE_DIRS})
+endif()
+
+# taglib is always built via FetchContent (see deps/CMakeLists.txt)
+include_directories(${TAGLIB_INCLUDE_DIRS})
+add_definitions(-DTAGLIB_STATIC)
 
 if (NOT CREDS)
     # Try getting the credentials from the environment
@@ -102,13 +118,18 @@ if (UNIX AND NOT APPLE)
 elseif(APPLE)
         target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
 elseif(WIN32)
-        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0)
+        target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE -DWITH_DBUS=0 -D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
         target_sources(${CMAKE_PROJECT_NAME} PRIVATE
           ./src/query/wmc_source.cpp
           ./src/query/wmc_source.hpp
           ./src/gui/widgets/wmc.cpp
           ./src/gui/widgets/wmc.hpp
           ./src/gui/widgets/wmc.ui
+        )
+        configure_file(
+            cmake/windows/resources/installer-Windows.iss.in
+            ${CMAKE_BINARY_DIR}/installer-Windows.generated.iss
+            @ONLY
         )
 endif()
 
@@ -162,7 +183,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 
 find_package(Qt6 COMPONENTS Widgets Core)
-target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets tag mpdclient ZLIB::ZLIB CURL::libcurl)
+target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets ${TAGLIB_TARGET} ${LIBMPDCLIENT_TARGET} ZLIB::ZLIB CURL::libcurl)
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON)
 
 configure_file(src/plugin-macros.h.in ${CMAKE_SOURCE_DIR}/src/plugin-macros.generated.h)

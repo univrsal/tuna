@@ -18,31 +18,14 @@
 
 #include "music_source.hpp"
 #include <atomic>
-#include <dbus/dbus.h>
 #include <mutex>
 #include <thread>
+#include "tinympris.h"
 
 class mpris_source : public music_source {
-    friend class mpris;
+    friend class mpris; // so the gui can access the mutex and data
     bool m_stopped = false;
-    DBusConnection* m_dbus_connection {};
-
-    bool init_dbus_session();
-    bool dbus_add_matches();
-    bool dbus_register_names();
-    char* dbus_get_name_owner(const char*);
-
-    DBusHandlerResult handle_dbus(DBusMessage*);
-    DBusHandlerResult handle_mpris(DBusMessage*);
-
-    void parse_array(DBusMessageIter* iter, QString const& player, int level = 0);
-    void parse_metadata(DBusMessageIter* iter, QString const& player, int level = 0);
-
-    inline void ensure_entry(QString const& player)
-    {
-        if (!m_info.contains(player))
-            m_info[player] = {};
-    }
+    bool init_mpris();
 
     std::mutex m_internal_mutex;
     std::thread m_internal_thread;
@@ -56,17 +39,19 @@ class mpris_source : public music_source {
     QMap<QString, QString> m_players {};
     QMap<QString, SongInfo> m_info {};
     QString m_selected_player {};
-    bool init_dbus();
+    void handle_mpris_event(tinympris_event_type event, const tinympris_player* player);
 
+    tinympris_ctx* m_ctx{};
+
+    tinympris_player* get_selected_player();
+    void internal_refresh();
 public:
     mpris_source();
     ~mpris_source();
 
     void load() override;
     void refresh() override;
-    void internal_refresh();
-    bool execute_capability(capability) override { return false; }
+    bool execute_capability(capability) override;
     bool enabled() const override { return true; }
 
-    DBusHandlerResult handle_message(DBusConnection*, DBusMessage*);
 };
