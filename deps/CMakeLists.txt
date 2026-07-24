@@ -7,12 +7,19 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/taglib/taglib.git
   GIT_TAG v2.3.1
 )
+FetchContent_GetProperties(taglib)
+if(NOT taglib_POPULATED)
+  FetchContent_Populate(taglib)
+endif()
+# Must run add_subdirectory on every configure so the 'tag' target exists.
+# EXCLUDE_FROM_ALL keeps taglib's install rules out of the default install.
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(BUILD_BINDINGS OFF CACHE BOOL "" FORCE)
 set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(ENABLE_CCACHE OFF CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(taglib)
+add_subdirectory(${taglib_SOURCE_DIR} ${taglib_BINARY_DIR} EXCLUDE_FROM_ALL)
+set_target_properties(tag PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 set(TAGLIB_INCLUDE_DIRS
   ${taglib_SOURCE_DIR}
