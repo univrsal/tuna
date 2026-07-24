@@ -20,8 +20,8 @@ if(WIN32 OR APPLE)
   set(ENABLE_CCACHE OFF CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(taglib)
 
-  target_include_directories(tag INTERFACE
-    ${taglib_SOURCE_DIR}/taglib
+  set(TAGLIB_INCLUDE_DIRS
+    ${taglib_SOURCE_DIR}
     ${taglib_SOURCE_DIR}/taglib/toolkit
     ${taglib_SOURCE_DIR}/taglib/asf
     ${taglib_SOURCE_DIR}/taglib/mpeg
@@ -48,7 +48,11 @@ if(WIN32 OR APPLE)
     ${taglib_SOURCE_DIR}/taglib/xm
     ${taglib_SOURCE_DIR}/taglib/dsf
     ${taglib_SOURCE_DIR}/taglib/dsdiff
-    ${taglib_BINARY_DIR}/taglib
+    ${taglib_SOURCE_DIR}/taglib/shorten
+    ${taglib_SOURCE_DIR}/taglib/matroska
+    ${taglib_SOURCE_DIR}/taglib/matroska/ebml
+    ${taglib_BINARY_DIR}
+    CACHE STRING "" FORCE
   )
   set(TAGLIB_TARGET tag CACHE STRING "" FORCE)
 

@@ -37,6 +37,13 @@ if(UNIX AND NOT APPLE)
     find_package(PkgConfig REQUIRED)
 
     pkg_check_modules(TAGLIB REQUIRED taglib)
+    # Strip trailing "/taglib" from pkg-config include dir so that
+    # #include <taglib/toolkit/taglib.h> resolves correctly.
+    foreach(_dir IN LISTS TAGLIB_INCLUDE_DIRS)
+        string(REGEX REPLACE "/taglib$" "" _dir "${_dir}")
+        list(APPEND _taglib_fixed_dirs "${_dir}")
+    endforeach()
+    set(TAGLIB_INCLUDE_DIRS ${_taglib_fixed_dirs})
     include_directories(${TAGLIB_INCLUDE_DIRS})
     find_library(_taglib_path tag HINTS ${TAGLIB_LIBRARY_DIRS} REQUIRED)
     set(TAGLIB_TARGET ${_taglib_path})
