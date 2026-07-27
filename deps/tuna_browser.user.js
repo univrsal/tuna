@@ -12,6 +12,7 @@
 // @match        *://play.pretzel.rocks/*
 // @match        *://*.youtube.com/*
 // @match        *://app.plex.tv/*
+// @match        *://chillhop.com/*
 // @match        *://www.bilibili.com/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
@@ -376,6 +377,34 @@
                 let album = bvid;
                 if (title) {
                     post({ cover, title, artists, status, progress, duration, album, album_url });
+                }
+            } else if (hostname === "chillhop.com") {
+                // Simple Chillhop support by Exopl0x
+                // Supports Chillhop Creators Dashboard, so monetize at your hearts content!
+                // Just make sure you credit Chillhop correctly:
+                // https://chillhop.notion.site/Crediting-Chillhop-as-a-Creator-a9663987fbf44a799f692a2197bf19da#5531e20c04874bb0a2b8082c65d2f4b9
+
+                let plButtonElement = document.getElementById('p-btn-play');
+
+                let status = "unknown";
+                if (plButtonElement.classList.contains('playing')) {
+                    status = "playing";
+                } else {
+                    status = "stopped";
+                }
+
+                let title = document.getElementsByClassName("p-track-title")[0].innerText; // Title
+                let artists = [document.getElementsByClassName("p-track-artist")[0].innerText]; // Artist(s)
+                let progress = document.getElementsByClassName("play-progress-at")[0].innerText; // Current Time
+                let duration = document.getElementsByClassName("play-progress-duration")[0]; // Current Time
+
+                // Unfortunately, referencing the cover URL returns a 403, so we can't use it.
+                // However, including it removes the default gray question mark icon, which may look nicer on stream overlays,
+                // revealing whatever's underneath the cover normally.
+                let cover = document.getElementsByClassName("player-image")[0].style.backgroundImage.slice(5, -2); // Cover
+
+                if (title !== null) {
+                    post({ cover, title, artists, status, progress, duration });
                 }
             }
         }, refresh_rate_ms);
