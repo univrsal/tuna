@@ -391,8 +391,8 @@
 
                 let title = document.getElementsByClassName("p-track-title")[0].innerText; // Title
                 let artists = [document.getElementsByClassName("p-track-artist")[0].innerText]; // Artist(s)
-                let progress = document.getElementsByClassName("play-progress-at")[0].innerText; // Current Time
-                let duration = document.getElementsByClassName("play-progress-duration")[0]; // Total Time
+                let progress = timestamp_to_ms(document.getElementsByClassName("play-progress-at")[0].innerText.slice(1)); // Current Time
+                let duration = timestamp_to_ms(document.getElementsByClassName("play-progress-duration")[0].innerText.slice(1)); // Total Time
 
                 // Unfortunately, referencing the cover URL returns a 403, so we can't use it.
                 // However, including it removes the default gray question mark icon, which may look nicer on stream overlays,
