@@ -400,9 +400,8 @@
                 let cover = document.getElementsByClassName("player-image")[0].style.backgroundImage.slice(5, -2); // Cover
 
                 // Chillhop doesn't expose album information, so it's absent.
-                let album = ''
                 if (title !== null) {
-                    post({ cover, title, artists, status, progress, duration, album });
+                    post({ cover, title, artists, status, progress, duration });
                 }
             }
         }, refresh_rate_ms);
