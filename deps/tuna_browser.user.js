@@ -380,14 +380,10 @@
                 }
             } else if (hostname === "chillhop.com") {
                 // Simple Chillhop support by Exopl0x
-                // Supports Chillhop Creators Dashboard, so monetize at your hearts content!
-                // Just make sure you credit Chillhop correctly:
-                // https://chillhop.notion.site/Crediting-Chillhop-as-a-Creator-a9663987fbf44a799f692a2197bf19da#5531e20c04874bb0a2b8082c65d2f4b9
-
-                let plButtonElement = document.getElementById('p-btn-play');
+                // Supports Chillhop Creators Dashboard.
 
                 let status = "unknown";
-                if (plButtonElement.classList.contains('playing')) {
+                if (document.getElementById('p-btn-play').classList.contains('playing')) {
                     status = "playing";
                 } else {
                     status = "stopped";
@@ -403,8 +399,10 @@
                 // revealing whatever's underneath the cover normally.
                 let cover = document.getElementsByClassName("player-image")[0].style.backgroundImage.slice(5, -2); // Cover
 
+                // Chillhop doesn't expose album information, so it's absent.
+                let album = ''
                 if (title !== null) {
-                    post({ cover, title, artists, status, progress, duration });
+                    post({ cover, title, artists, status, progress, duration, album });
                 }
             }
         }, refresh_rate_ms);
