@@ -143,14 +143,15 @@
                     post({ cover, title, artists, status, progress, duration, album });
                 }
             } else if (hostname === 'music.yandex.ru') {
-                // Yandex music support by MjKey
-                let status = query('.player-controls__btn_play', e => e.classList.contains('player-controls__btn_pause') ? "playing" : "stopped", 'unknown');
-                let cover = query('.track-cover .entity-cover__image', e => e.src.replace('50x50', '200x200'));
-                let title = query('.track__title', e => e.title);
-                let artists = [query('.track__artists', e => e.textContent)];
-                let progress = query('.progress__left', e => timestamp_to_ms(e.textContent));
-                let duration = query('.progress__right', e => timestamp_to_ms(e.textContent));
-                let album_url = query('.track-cover a', e => e.title);
+                // Yandex music support by MjKey (edited by Phantom1337)
+                let status = query('[class*="VibePlayerControls_playButton"]', e => Array.from(e.classList).some(c => c.includes('_playing')) ? "playing" : "stopped", 'unknown');
+                let cover = query('[class*="AlbumCover_cover"] img', e => e.src.replace(/(\d+)x(\d+)/, '400x400'));
+                let title = query('[class*="VibePlayerbarMeta_trackNameText"]', e => e.textContent);
+                let artists = [query('[class*="VibePage_text"]', e => e.textContent)];
+                let time = query('[class*="VibePlayerbarMeta_timecodeOverlay"]', e => e.textContent.split(' / '));
+                let progress = timestamp_to_ms(time[0]);
+                let duration = timestamp_to_ms(time[1]);
+                let album_url = query('[class*="AlbumCover_link"]', e => e.href);
 
                 if (title !== null) {
                     post({ cover, title, artists, status, progress, duration, album_url });
