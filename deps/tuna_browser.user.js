@@ -12,6 +12,7 @@
 // @match        *://play.pretzel.rocks/*
 // @match        *://*.youtube.com/*
 // @match        *://app.plex.tv/*
+// @match        *://chillhop.com/*
 // @match        *://www.bilibili.com/*
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
@@ -377,6 +378,31 @@
                 let album = bvid;
                 if (title) {
                     post({ cover, title, artists, status, progress, duration, album, album_url });
+                }
+            } else if (hostname === "chillhop.com") {
+                // Simple Chillhop support by Exopl0x
+                // Supports Chillhop Creators Dashboard.
+
+                let status = "unknown";
+                if (document.getElementById('p-btn-play').classList.contains('playing')) {
+                    status = "playing";
+                } else {
+                    status = "stopped";
+                }
+
+                let title = document.getElementsByClassName("p-track-title")[0].innerText; // Title
+                let artists = [document.getElementsByClassName("p-track-artist")[0].innerText]; // Artist(s)
+                let progress = timestamp_to_ms(document.getElementsByClassName("play-progress-at")[0].innerText.slice(1)); // Current Time
+                let duration = timestamp_to_ms(document.getElementsByClassName("play-progress-duration")[0].innerText.slice(1)); // Total Time
+
+                // Unfortunately, referencing the cover URL returns a 403, so we can't use it.
+                // However, including it removes the default gray question mark icon, which may look nicer on stream overlays,
+                // revealing whatever's underneath the cover normally.
+                let cover = document.getElementsByClassName("player-image")[0].style.backgroundImage.slice(5, -2); // Cover
+
+                // Chillhop doesn't expose album information, so it's absent.
+                if (title !== null) {
+                    post({ cover, title, artists, status, progress, duration });
                 }
             }
         }, refresh_rate_ms);
