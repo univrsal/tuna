@@ -14,8 +14,10 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={code:GetDirName}
+DefaultDirName={commonappdata}\obs-studio\plugins\{#MyAppName}
 AppendDefaultDirName=no
+; Older versions were installed into the OBS install directory, don't reuse that directory on updates
+UsePreviousAppDir=no
 DefaultGroupName={#MyAppName}
 OutputBaseFilename={#MyAppName}-{#MyAppVersion}-windows-installer
 Compression=lzma
@@ -29,6 +31,13 @@ WizardResizable=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
+
+[InstallDelete]
+; Remove files of older versions from the legacy plugin locations, OBS Studio 34 won't load plugins from there
+Type: files; Name: "{code:GetObsDir}\obs-plugins\64bit\{#MyAppName}.dll"
+Type: files; Name: "{code:GetObsDir}\obs-plugins\64bit\{#MyAppName}.pdb"
+Type: filesandordirs; Name: "{code:GetObsDir}\data\obs-plugins\{#MyAppName}"
+Type: filesandordirs; Name: "{app}\bin"
 
 [Files]
 Source: "..\release\Package\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -56,7 +65,7 @@ end;
 
 // credit where it's due :
 // following function come from https://github.com/Xaymar/obs-studio_amf-encoder-plugin/blob/master/%23Resources/Installer.in.iss#L45
-function GetDirName(Value: string): string;
+function GetObsDir(Value: string): string;
 var
   InstallPath: string;
 begin
@@ -71,35 +80,26 @@ begin
 end;
 
 /////////////////////////////////////////////////////////////////////
-function NextButtonClick(PageId: Integer): Boolean;
+function InitializeSetup(): Boolean;
 var
     ObsFileName: string;
     ObsMS, ObsLS: Cardinal;
-    ObsMajorVersion, ObsMinorVersion: Cardinal;
+    ObsMajorVersion: Cardinal;
 begin
     Result := True;
-    if not (PageId = wpSelectDir) then begin
-        exit;
-    end;
-    ObsFileName := ExpandConstant('{app}\bin\64bit\obs64.exe');
+    ObsFileName := GetObsDir('') + '\bin\64bit\obs64.exe';
+    { Portable and custom installations of OBS Studio can't be detected, skip the version check for those }
     if not FileExists(ObsFileName) then begin
-        MsgBox('OBS Studio (bin\64bit\obs64.exe) does not seem to be installed in that folder.  Please select the correct folder.', mbError, MB_OK);
-        Result := False;
         exit;
     end;
-    Result := GetVersionNumbers(ObsFileName, ObsMS, ObsLS);
-    if not Result then begin
-        MsgBox('Failed to read version from OBS Studio (bin\64bit\obs64.exe).', mbError, MB_OK);
-        Result := False;
+    if not GetVersionNumbers(ObsFileName, ObsMS, ObsLS) then begin
         exit;
     end;
     { shift 16 bits to the right to get major version }
-    ObsMajorVersion := ObsMS shr 16; 
-    { select only low 16 bits }
-    ObsMinorVersion := ObsMS and $FFFF;
-    if ObsMajorVersion < 31 then begin
-        MsgBox('Version of OBS Studio (bin\64bit\obs64.exe) is lower than the version 31 required.', mbError, MB_OK);
+    ObsMajorVersion := ObsMS shr 16;
+    { OBS Studio only loads plugins with the new folder structure in ProgramData since version 33 }
+    if ObsMajorVersion < 33 then begin
+        MsgBox('Version of OBS Studio (bin\64bit\obs64.exe) is lower than the version 33 required. Please update OBS Studio first.', mbError, MB_OK);
         Result := False;
-        exit;
     end;
 end;

@@ -73,8 +73,8 @@ function Package {
         throw 'InnoSetup install script not found. Run the build script or the CMake build and install procedures first.'
     }
 
-    Copy-Item -Path "${ProjectRoot}/release/${Configuration}/${ProductName}/bin" -Destination "${ProjectRoot}/release/Package/obs-plugins" -Recurse
-    Copy-Item -Path "${ProjectRoot}/release/${Configuration}/${ProductName}/data" -Destination "${ProjectRoot}/release/Package/data/obs-plugins/${ProductName}" -Recurse
+    Remove-Item -Path "${ProjectRoot}/release/Package" -Recurse -Force -ErrorAction SilentlyContinue
+    Copy-Item -Path "${ProjectRoot}/release/${Configuration}/${ProductName}" -Destination "${ProjectRoot}/release/Package" -Recurse
     Copy-Item "${IsccFile}" -Destination "${ProjectRoot}/release"
 
     Log-Information 'Creating InnoSetup installer...'
@@ -86,14 +86,6 @@ function Package {
     Log-Group "Archiving ${ProductName}..."
     $CompressArgs = @{
         Path = (Get-ChildItem -Path "${ProjectRoot}/release/${Configuration}" -Exclude "${OutputName}*.*")
-        CompressionLevel = 'Optimal'
-        DestinationPath = "${ProjectRoot}/release/${OutputName}-programdata.zip"
-        Verbose = ($Env:CI -ne $null)
-    }
-    Compress-Archive -Force @CompressArgs
-
-    $CompressArgs = @{
-        Path = (Get-ChildItem -Path "${ProjectRoot}/release/Package" -Exclude "${OutputName}*.*")
         CompressionLevel = 'Optimal'
         DestinationPath = "${ProjectRoot}/release/${OutputName}.zip"
         Verbose = ($Env:CI -ne $null)
